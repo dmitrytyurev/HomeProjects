@@ -884,7 +884,7 @@ void CombineImages()
 
 	Image result(xSize, ySize);
 	for (int y = 0; y < ySize; ++y)	{
-		if ((y % 300) == 0)
+		if ((y % 300) == 0 || y == ySize - 1)
 			printf("   combining progress: %d%%\n", y * 100 / (ySize - 1));
 		for (int x = 0; x < xSize; ++x)	{
 			int pixelIndex = y * xSize + x;
