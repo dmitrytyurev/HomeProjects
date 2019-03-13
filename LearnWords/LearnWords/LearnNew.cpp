@@ -443,9 +443,9 @@ void LearnNew::learn_forgotten(time_t freezedTime, AdditionalCheck* pAdditionalC
 				}
 				else
 				{
+					pAdditionalCheck->put_word_to_end_of_random_repeat_queue_common(w);
 					if (wordToLearn._fromWhatSource == FromWhatSource::FROM_MANDATORY && distractWordsSupplier.is_first_cycle())
 					{
-						pAdditionalCheck->put_word_to_end_of_random_repeat_queue_common(w);
 						if (isQuickAnswer)
 							w.isNeedSkipOneRandomLoop = true;
 						_learnWordsApp->fill_dates_and_save(w, freezedTime, true, isQuickAnswer);
