@@ -347,7 +347,7 @@ void LearnNew::learn_forgotten(time_t freezedTime, AdditionalCheck* pAdditionalC
 		printf("*** Повторение забытых слов ***\n\n");
 		printf("\n%s\n\n", w.word.c_str());
 		printf("%s", w.translation.c_str());
-		printf("\n");
+		printf("\n\n");
 		printf("Нажмите пробел\n");
 		char c = 0;
 		do
@@ -400,7 +400,7 @@ void LearnNew::learn_forgotten(time_t freezedTime, AdditionalCheck* pAdditionalC
 		for (const auto& word : learnCycleQueue)
 			sumRightUnswers += word._localRightAnswersNum;
 		int progress = sumRightUnswers * 100 / (wordsToLearnIndices.size() * TIMES_TO_GUESS_TO_LEARNED);
-		printf("\nProgress = %d\n", progress);
+		printf("\nProgress = %d%%\n", progress);
 
 		// Показываем слово
 		WordsData::WordInfo& w = _pWordsData->_words[wordToLearn._index];
