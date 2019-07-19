@@ -48,6 +48,7 @@ public:
 class TextTranslated //: public ISerializable
 {
 public:
+	using Ptr = std::shared_ptr<TextTranslated>;
 
 	std::string id;                   // ID текста
 	uint32_t timestampCreated;        // Время создания
@@ -57,6 +58,7 @@ public:
 	std::string baseText;             // Текст на базовом языке (русском)
 	std::vector<AttributeInText> attributes; // Атрибуты текста с их данными
 };
+
 
 //===============================================================================
 // Каталог с текстами и вложенными каталогами в базе текстов
@@ -71,7 +73,7 @@ public:
 	uint32_t timestampModified;  // Время изменения данных папки или её текстов
 	std::string name;            // Имя папки
 	uint32_t id;                 // ID родительской папки
-	std::vector<TextTranslatedPtr> texts;  // Тексты лежащие непосредственно в папке
+	std::vector<TextTranslated::Ptr> texts;  // Тексты лежащие непосредственно в папке
 };
 
 //===============================================================================
