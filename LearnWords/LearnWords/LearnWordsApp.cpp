@@ -561,7 +561,7 @@ void LearnWordsApp::collect_words_to_mandatory_check(std::vector<WordToCheck>& w
 				{
 					if (w.dateOfRepeat != 0 && w.dateOfRepeat < freezedTime + 3600 * PRELIMINARY_CHECK_HOURS)
 					{
-						logger("Add from future: %s, time to repeat: %d\n", w.word.c_str(), w.dateOfRepeat - freezedTime);
+//						logger("Add from future: %s, time to repeat: %d\n", w.word.c_str(), w.dateOfRepeat - freezedTime);
 						wordsToRepeat.emplace_back(WordToCheck(i));
 						if (wordsToRepeat.size() == MAX_WORDS_TO_CHECK2)
 							break;

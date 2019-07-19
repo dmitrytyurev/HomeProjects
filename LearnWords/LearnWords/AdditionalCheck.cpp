@@ -110,8 +110,14 @@ int AdditionalCheck::get_word_to_repeat_inner(time_t freezedTime)
 
 	fill_indices_of_random_repeat_words(indicesOfWordsCommon, false, freezedTime);  // Заполним indicesOfWordsCommon
 	fill_indices_of_random_repeat_words(indicesOfWordsFast, true, freezedTime);   // Заполним indicesOfWordsTrue
-logger("      indicesOfWordsCommon.size() = %d\n", indicesOfWordsCommon.size());
-logger("      indicesOfWordsFast.size() = %d\n", indicesOfWordsFast.size());
+logger("indicesOfWordsCommon.size() = %d\n", indicesOfWordsCommon.size());
+int toShow = std::min(10u, indicesOfWordsCommon.size());
+for (int i=0; i<toShow; ++i)
+{
+WordsData::WordInfo& w = _pWordsData->_words[indicesOfWordsCommon[i]];
+logger("      %s, needSkip:%d, randTestInc:%d\n", w.word.c_str(), int(w.isNeedSkipOneRandomLoop), w.randomTestIncID);
+}
+logger("indicesOfWordsFast.size() = %d\n", indicesOfWordsFast.size());
 
 	if ((rand_float(0, 1) < 0.5f || indicesOfWordsCommon.empty()) && !indicesOfWordsFast.empty())
 	{
@@ -137,12 +143,19 @@ int AdditionalCheck::get_word_to_repeat(time_t freezedTime)
 	{
 		int index = get_word_to_repeat_inner(freezedTime);
 		if (index == -1)
+		{
+logger("get_word_to_repeat: ret: -1\n");
 			return index;
+		}
 
 		WordsData::WordInfo& w = _pWordsData->_words[index];
 		if (w.isNeedSkipOneRandomLoop == false)
+		{
+logger("get_word_to_repeat: ret: %d %s\n", index, w.word.c_str());
 			return index;
+		}
 
+logger("get_word_to_repeat: put_word_to_end_ %d %s\n", index, w.word.c_str());
 		put_word_to_end_of_random_repeat_queue_common(w);
 	}
 }
@@ -154,7 +167,7 @@ int AdditionalCheck::get_word_to_repeat(time_t freezedTime)
 void AdditionalCheck::put_word_to_end_of_random_repeat_queue_common(WordsData::WordInfo& w)
 {
 	w.randomTestIncID = calc_max_randomTestIncID(false) + 1;
-//	logger("put rand common = %d\n", w.randomTestIncID);
+logger("put_word_to_end_of_random_repeat_queue_common = %s, randomTestIncID = %d\n", w.word.c_str(), w.randomTestIncID);
 	w.isInFastRandomQueue = false;
 	w.isNeedSkipOneRandomLoop = false;
 	w.cantRandomTestedBefore = 0;
