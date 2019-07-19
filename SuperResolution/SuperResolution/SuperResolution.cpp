@@ -804,13 +804,11 @@ Pixel CombinePixelAverage(int pixelIndex)
 	return Pixel(r, g, b);
 }
 
-Pixel CombinePixelMedian(int pixelIndex)
+Pixel CombinePixelMedian(int pixelIndex, int imagesFromSidesToSkip)
 {
 	static std::vector<int> comp;
-	Pixel p1(0, 0, 0);
-	Pixel p2(0, 0, 0);
-	int index1 = ((int)comp.size() - 1) / 2;
-	int index2 = ((int)comp.size()) / 2;
+	int sum[3] = {0,0,0};
+	int imagesToAverage = numberOfImages - imagesFromSidesToSkip * 2;
 
 	for (int i = 0; i < 3; ++i) {
 		comp.clear();
@@ -819,10 +817,12 @@ Pixel CombinePixelMedian(int pixelIndex)
 			comp.push_back(*pc);
 		}
 		std::sort(comp.begin(), comp.end());
-		((unsigned char*)&p1)[i] = comp[index1];
-		((unsigned char*)&p2)[i] = comp[index2];
+
+		for (int i2 = 0; i2 < imagesToAverage; ++i2) {
+			sum[i] += comp[i2 + imagesFromSidesToSkip];
+		}
 	}
-	return Pixel((int(p1.r) + p2.r) / 2, (int(p1.g) + p2.g) / 2, (int(p1.b) + p2.b) / 2);
+	return Pixel(sum[2] / imagesToAverage, sum[1] / imagesToAverage, sum[0] / imagesToAverage);
 }
 
 Pixel CombinePixelMostClose(int pixelIndex)
@@ -881,21 +881,25 @@ void CombineImages()
 	}
 
 	puts("Combining aligned images");
-
-	Image result(xSize, ySize);
-	for (int y = 0; y < ySize; ++y)	{
-		if ((y % 300) == 0 || y == ySize - 1)
-			printf("   combining progress: %d%%\n", y * 100 / (ySize - 1));
-		for (int x = 0; x < xSize; ++x)	{
-			int pixelIndex = y * xSize + x;
-			result.pixels[pixelIndex] = CombinePixelMedian(pixelIndex);
+	std::string resultFname = "0_result.bmp";
+	int resultImagesN = (numberOfImages + 1) / 2;
+	for (int i = 0; i < resultImagesN; ++i) {
+		Image result(xSize, ySize);
+		for (int y = 0; y < ySize; ++y) {
+			if ((y % 500) == 0 || y == ySize - 1)
+				printf("   Image: %d (max %d), combining progress: %d%%\n", i, resultImagesN-1, y * 100 / (ySize - 1));
+			for (int x = 0; x < xSize; ++x) {
+				int pixelIndex = y * xSize + x;
+				result.pixels[pixelIndex] = CombinePixelMedian(pixelIndex, i);
+			}
 		}
-	}
-	printf("   Done!\n");
+		printf("   Done!\n");
 
-	puts("Saving result");
-	save_bmp24("result.bmp", xSize, ySize, (const char*)(result.pixels));
-	printf("   Done!\n");
+		puts("Saving result");
+		resultFname[0] = i + '0';
+		save_bmp24(resultFname.c_str(), xSize, ySize, (const char*)(result.pixels));
+		printf("   Done!\n");
+	}
 }
 
 void LoadImageFiles()
