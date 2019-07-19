@@ -421,7 +421,7 @@ void LearnNew::learn_forgotten(time_t freezedTime, AdditionalCheck* pAdditionalC
 		double extraDurationForAnswer = 0;
 		bool isQuickAnswer = _learnWordsApp->is_quick_answer(durationForAnswer, w.translation.c_str(), &ifTooLongAnswer, &extraDurationForAnswer);
 
-		_learnWordsApp->print_buttons_hints(w.translation, false);
+		_learnWordsApp->print_buttons_hints(w.translation, true);
 
 		// ќбрабатываем ответ - знает ли пользователь слово
 		while (true)
