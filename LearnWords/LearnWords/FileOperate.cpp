@@ -188,6 +188,11 @@ void FileOperate::load_from_file(const char* fullFileName, WordsData* pWordsData
 				++parseIndex;
 		}
 
+//		int n = 3600 * 24 * 3;
+//		wi.dateOfRepeat += n;
+//		wi.cantRandomTestedAfter += n;
+//		wi.cantRandomTestedBefore += n;
+
 		// Занести WordInfo в вектор
 		pWordsData->_words.push_back(wi);
 

@@ -3,6 +3,48 @@
 #include <vector>
 
 //===============================================================================
+// 
+//===============================================================================
+
+class SerializationBuffer
+{
+public:
+	void Push(uint8_t v);
+	void Push(uint32_t v);
+	void Push(const std::string& v);
+	void PushStringWithoutZero(const std::string& v);
+
+	void PushBytes(const void* bytes, int size);
+	uint32_t GetCurrentOffset();
+	void PushBytesFromOff(uint32_t offset, const void* bytes, int size);
+
+	std::vector<uint8_t> buffer;
+};
+
+//===============================================================================
+// Запись и чтение базы текстов на диск (как целиком, так и история)
+//===============================================================================
+
+class TextsDatabase;
+
+class DbSerializer
+{
+public:
+	DbSerializer(TextsDatabase* pDataBase);
+	void Update(float dt); // Как минимум для закрытия файла через 1 сек после записи
+
+	void SaveDatabase();  // Имя файла базы конструирует из имени базы
+	void LoadDatabaseAndHistory(); // Имена файлов базы и истории конструирует из имени базы, выбирает самые свежие файлы
+
+//	void SaveCreateFolder(const Folder& folder);
+//	void SaveRenameFolder(const Folder& folder);
+
+	TextsDatabase* _pDataBase;
+	SerializationBuffer _serializationBuffer;
+};
+
+
+//===============================================================================
 // Свойства атрибута (колонка в базе текстов)
 //===============================================================================
 
@@ -72,7 +114,7 @@ public:
 	uint32_t timestampCreated;   // Время создания
 	uint32_t timestampModified;  // Время изменения данных папки или её текстов
 	std::string name;            // Имя папки
-	uint32_t id;                 // ID родительской папки
+	uint32_t parentId;                 // ID родительской папки
 	std::vector<TextTranslated::Ptr> texts;  // Тексты лежащие непосредственно в папке
 };
 
@@ -84,11 +126,12 @@ class TextsDatabase
 {
 public:
 
-	TextsDatabase(const std::string DbName); // Загружает в объект базу из свежих файлов
+	TextsDatabase(const std::string dbName); // Загружает в объект базу из свежих файлов
 	void Update(float dt);
 
-	DbSerializer dbSerializer;
-	std::string dbName;           // Имя базы данных текстов
-	std::vector<AttributeProperty> attributeProps; // Свойства атрибутов (колонок) таблицы
-	std::vector<Folder> folders;  // Папки. Рекурсивная структура через ссылку на ID родителя
+	std::string _dbName;           // Имя базы данных текстов
+	std::vector<AttributeProperty> _attributeProps; // Свойства атрибутов (колонок) таблицы
+	std::vector<Folder> _folders;  // Папки. Рекурсивная структура через ссылку на ID родителя
+
+	DbSerializer _dbSerializer; // Чтение/запись базы текстов на диск
 };

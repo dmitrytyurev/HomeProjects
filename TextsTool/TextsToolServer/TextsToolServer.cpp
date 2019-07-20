@@ -1,9 +1,17 @@
 ﻿
 #include "pch.h"
 #include <iostream>
+#include "Common.h"
+
+void test()
+{
+	TextsDatabase db("TestDB");
+
+}
+
 
 int main()
 {
-    std::cout << "Hello World!\n"; 
+	test();
 }
 
