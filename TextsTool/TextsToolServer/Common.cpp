@@ -4,6 +4,7 @@
 #include <ctime>
 #include <iostream>
 #include <fstream>
+#include <experimental/filesystem>
 
 #include "Common.h"
 
@@ -124,13 +125,14 @@ void DbSerializer::Update(float dt) // Как минимум для закрытия файла через 1 се
 {
 }
 
+
 //===============================================================================
-// Читает базу из полного файла и файла истории
-// Имена файлов базы и истории конструирует из имени базы, выбирает самые свежие файлы
+// 
 //===============================================================================
 
-void DbSerializer::LoadDatabaseAndHistory() 
+void DbSerializer::SetPath(const std::string& path)
 {
+	_path = path;
 }
 
 //===============================================================================
@@ -142,9 +144,10 @@ void DbSerializer::SaveDatabase()
 {
 	std::string timestamp = std::to_string(std::time(0));
 	std::string fileName = "TextsBase_" + _pDataBase->_dbName + "_" + timestamp + ".bin";
+	std::string fullFileName = _path + fileName;
 
 	std::ofstream myfile;
-	myfile.open(fileName, std::ios::out | std::ios::app | std::ios::binary);
+	myfile.open(fullFileName, std::ios::out | std::ios::app | std::ios::binary);
 	if (myfile.rdstate()) {
 		ExitMsg("Error creating file " + fileName);
 	}
@@ -164,6 +167,48 @@ void DbSerializer::SaveDatabase()
 
 	myfile.write(reinterpret_cast<const char*>(serializationBuffer.buffer.data()), serializationBuffer.buffer.size());
 	myfile.close();
+}
+
+//===============================================================================
+// 
+//===============================================================================
+
+std::string DbSerializer::GetFreshBaseFileName()
+{
+	namespace fs = std::experimental::filesystem;
+
+	uint32_t maxTimestamp = 0;
+	for (auto& p : fs::directory_iterator(_path)) {
+		std::string fullFileName = p.path().string();
+		std::string fileName = fullFileName.c_str() + _path.length();
+
+		if (fileName.compare(0, 9, "TextsBase") == 0) {
+			std::string timestampStr = fileName.substr(17, 10);
+			uint32_t timestamp = stoi(timestampStr);
+			maxTimestamp = std::max(maxTimestamp, timestamp);
+		}
+	}
+
+	if (maxTimestamp == 0) {
+		ExitMsg("TextsBase_TestDB_??????????.bin not found");
+	}
+
+	std::string fileName = "TextsBase_" + _pDataBase->_dbName + "_" + std::to_string(maxTimestamp) + ".bin";
+	return fileName;
+}
+
+//===============================================================================
+// Читает базу из полного файла и файла истории
+// Имена файлов базы и истории конструирует из имени базы, выбирает самые свежие файлы
+//===============================================================================
+
+void DbSerializer::LoadDatabaseAndHistory()
+{
+	std::string fileName = GetFreshBaseFileName();
+
+
+	std::cout << fileName << '\n';
+
 }
 
 //===============================================================================

@@ -29,6 +29,7 @@ class DbSerializer
 {
 public:
 	DbSerializer(TextsDatabase* pDataBase);
+	void SetPath(const std::string& path);
 	void Update(float dt); // Как минимум для закрытия файла через 1 сек после записи
 
 	void SaveDatabase();  // Имя файла базы конструирует из имени базы
@@ -37,6 +38,10 @@ public:
 //	void SaveCreateFolder(const Folder& folder);
 //	void SaveRenameFolder(const Folder& folder);
 
+private:
+	std::string GetFreshBaseFileName();
+
+	std::string _path;
 	TextsDatabase* _pDataBase;
 };
 
