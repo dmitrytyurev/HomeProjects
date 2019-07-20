@@ -149,19 +149,20 @@ void DbSerializer::SaveDatabase()
 		ExitMsg("Error creating file " + fileName);
 	}
 
-	_serializationBuffer.PushStringWithoutZero("TDBF0001");
+	SerializationBuffer serializationBuffer;
+	serializationBuffer.PushStringWithoutZero("TDBF0001");
 
-	_serializationBuffer.Push(_pDataBase->_attributeProps.size());
+	serializationBuffer.Push(_pDataBase->_attributeProps.size());
 	for (const auto& atribProp : _pDataBase->_attributeProps) {
-		atribProp.serialize(_serializationBuffer);
+		atribProp.serialize(serializationBuffer);
 	}
 
-	_serializationBuffer.Push(_pDataBase->_folders.size());
+	serializationBuffer.Push(_pDataBase->_folders.size());
 	for (const auto& folder : _pDataBase->_folders) {
-		folder.serialize(_serializationBuffer);
+		folder.serialize(serializationBuffer);
 	}
 
-	myfile.write(reinterpret_cast<const char*>(_serializationBuffer.buffer.data()), _serializationBuffer.buffer.size());
+	myfile.write(reinterpret_cast<const char*>(serializationBuffer.buffer.data()), serializationBuffer.buffer.size());
 	myfile.close();
 }
 

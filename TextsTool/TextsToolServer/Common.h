@@ -38,7 +38,6 @@ public:
 //	void SaveRenameFolder(const Folder& folder);
 
 	TextsDatabase* _pDataBase;
-	SerializationBuffer _serializationBuffer;
 };
 
 //===============================================================================
