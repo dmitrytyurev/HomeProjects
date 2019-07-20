@@ -146,10 +146,9 @@ void DbSerializer::SaveDatabase()
 	std::string fileName = "TextsBase_" + _pDataBase->_dbName + "_" + timestamp + ".bin";
 	std::string fullFileName = _path + fileName;
 
-	std::ofstream myfile;
-	myfile.open(fullFileName, std::ios::out | std::ios::app | std::ios::binary);
-	if (myfile.rdstate()) {
-		ExitMsg("Error creating file " + fileName);
+	std::ofstream file(fullFileName, std::ios::out | std::ios::app | std::ios::binary);
+	if (file.rdstate()) {
+		ExitMsg("Error creating file " + fullFileName);
 	}
 
 	SerializationBuffer serializationBuffer;
@@ -165,8 +164,8 @@ void DbSerializer::SaveDatabase()
 		folder.serialize(serializationBuffer);
 	}
 
-	myfile.write(reinterpret_cast<const char*>(serializationBuffer.buffer.data()), serializationBuffer.buffer.size());
-	myfile.close();
+	file.write(reinterpret_cast<const char*>(serializationBuffer.buffer.data()), serializationBuffer.buffer.size());
+	file.close();
 }
 
 //===============================================================================
@@ -205,10 +204,29 @@ std::string DbSerializer::GetFreshBaseFileName()
 void DbSerializer::LoadDatabaseAndHistory()
 {
 	std::string fileName = GetFreshBaseFileName();
+	std::string fullFileName = _path + fileName;
 
+	uint32_t fileSize = 0;
+	{
+		std::ifstream file(fullFileName, std::ios::binary | std::ios::ate);
+		if (file.rdstate()) {
+			ExitMsg("Error opening file " + fullFileName);
+		}
+		fileSize = static_cast<uint32_t>(file.tellg());
+	}
 
-	std::cout << fileName << '\n';
+	DeserializationBuffer deserializationBuffer;
+	deserializationBuffer.buffer.resize(fileSize);
 
+	std::ifstream file(fullFileName, std::ios::in | std::ios::binary);
+	if (file.rdstate()) {
+		ExitMsg("Error opening file " + fullFileName);
+	}
+	file.read(reinterpret_cast<char*>(deserializationBuffer.buffer.data()), fileSize);
+	file.close();
+
+	std::cout << deserializationBuffer.buffer[0] << '\n';
+	std::cout << deserializationBuffer.buffer[1] << '\n';
 }
 
 //===============================================================================
