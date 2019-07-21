@@ -194,20 +194,20 @@ void DbSerializer::SaveDatabase()
 		ExitMsg("Error creating file " + fullFileName);
 	}
 
-	SerializationBuffer serializationBuffer;
-	serializationBuffer.PushStringWithoutZero("TDBF0001");
+	SerializationBuffer buffer;
+	buffer.PushStringWithoutZero("TDBF0001");
 
-	serializationBuffer.Push(_pDataBase->_attributeProps.size());
+	buffer.Push(_pDataBase->_attributeProps.size());
 	for (const auto& atribProp : _pDataBase->_attributeProps) {
-		atribProp.serialize(serializationBuffer);
+		atribProp.serialize(buffer);
 	}
 
-	serializationBuffer.Push(_pDataBase->_folders.size());
+	buffer.Push(_pDataBase->_folders.size());
 	for (const auto& folder : _pDataBase->_folders) {
-		folder.serialize(serializationBuffer);
+		folder.serialize(buffer);
 	}
 
-	file.write(reinterpret_cast<const char*>(serializationBuffer.buffer.data()), serializationBuffer.buffer.size());
+	file.write(reinterpret_cast<const char*>(buffer.buffer.data()), buffer.buffer.size());
 	file.close();
 }
 
@@ -298,9 +298,9 @@ void DbSerializer::LoadDatabaseAndHistory()
 
 void DbSerializer::SaveCommonHeader(uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType)
 {
-	_historyFile.serializationBuffer.Push(timestamp);
-	_historyFile.serializationBuffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
-	_historyFile.serializationBuffer.Push(actionType);
+	_historyFile.buffer.Push(timestamp);
+	_historyFile.buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
+	_historyFile.buffer.Push(actionType);
 }
 
 //===============================================================================
@@ -310,9 +310,9 @@ void DbSerializer::SaveCommonHeader(uint32_t timestamp, const std::string& login
 void DbSerializer::SaveCreateFolder(const Folder& folder, const std::string& loginOfLastModifier)
 {
 	SaveCommonHeader(folder.timestampCreated, loginOfLastModifier, ActionCreateFolder);
-	_historyFile.serializationBuffer.Push(folder.id);
-	_historyFile.serializationBuffer.Push(folder.parentId);
-	_historyFile.serializationBuffer.PushStringWithoutZero<uint8_t>(folder.name);
+	_historyFile.buffer.Push(folder.id);
+	_historyFile.buffer.Push(folder.parentId);
+	_historyFile.buffer.PushStringWithoutZero<uint8_t>(folder.name);
 }
 
 //===============================================================================

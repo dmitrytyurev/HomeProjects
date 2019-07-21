@@ -61,7 +61,7 @@ public:
 		std::string name;                // Имя файла истории текущей базы (пустая строка, если файл истории ещё не создавался - с момента чтения/записи основного файла не было событий)
 		std::ofstream stream;            // Открытый или закрытый поток файла истории. Файл закрывается через несколько секунд после последней записи.
 		uint32_t lastWriteTimestamp = 0; // Время последней записи в файл истории
-		SerializationBuffer serializationBuffer;
+		SerializationBuffer buffer;
 	};
 
 	DbSerializer(TextsDatabase* pDataBase);
