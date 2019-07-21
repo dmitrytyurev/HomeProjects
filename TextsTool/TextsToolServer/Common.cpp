@@ -15,6 +15,34 @@ void ExitMsg(const std::string& message)
 	exit(1);
 }
 
+//===============================================================================
+//
+//===============================================================================
+
+template <typename T>
+T DeserializationBuffer::GetUint()
+{
+	T val = *(reinterpret_cast<T*>(buffer.data() + offset));
+	offset += sizeof(T);
+	return val;
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+template <typename T>
+void DeserializationBuffer::GetString(std::string& result)
+{
+	T textLength = *(reinterpret_cast<T*>(buffer.data() + offset));
+	offset += sizeof(T);
+	uint8_t keep = buffer[offset + textLength];
+	buffer[offset + textLength] = 0;
+	
+	result = reinterpret_cast<const char*>(buffer.data() + offset);
+	buffer[offset + textLength] = keep;
+	offset += textLength;
+}
 
 //===============================================================================
 //
@@ -216,7 +244,8 @@ void DbSerializer::LoadDatabaseAndHistory()
 	}
 
 	DeserializationBuffer deserializationBuffer;
-	deserializationBuffer.buffer.resize(fileSize);
+	deserializationBuffer.buffer.resize(fileSize + 1);  // +1 потому, что строки грузим путЄм временного добавлени€ 0 в конце
+	deserializationBuffer.buffer[fileSize] = 0;
 
 	std::ifstream file(fullFileName, std::ios::in | std::ios::binary);
 	if (file.rdstate()) {
@@ -225,8 +254,39 @@ void DbSerializer::LoadDatabaseAndHistory()
 	file.read(reinterpret_cast<char*>(deserializationBuffer.buffer.data()), fileSize);
 	file.close();
 
-	std::cout << deserializationBuffer.buffer[0] << '\n';
-	std::cout << deserializationBuffer.buffer[1] << '\n';
+	deserializationBuffer.offset = 8; // ѕропускаем сигнатуру и номер версии
+	std::vector<uint8_t> attributesIdToType; // ƒл€ быстрой перекодировки id атрибута в его type
+
+	uint32_t attributesNum = deserializationBuffer.GetUint<uint32_t>();
+	for (uint32_t i = 0; i < attributesNum; ++i) {
+		_pDataBase->_attributeProps.emplace_back(deserializationBuffer);
+		uint8_t id = _pDataBase->_attributeProps.back().id;
+		if (id >= attributesIdToType.size()) {
+			attributesIdToType.resize(id + 1);
+		}
+		attributesIdToType[id] = _pDataBase->_attributeProps.back().type;
+	}
+
+	uint32_t foldersNum = deserializationBuffer.GetUint<uint32_t>();
+	for (uint32_t i = 0; i < foldersNum; ++i) {
+		_pDataBase->_folders.emplace_back(deserializationBuffer, attributesIdToType);
+	}
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+AttributeProperty::AttributeProperty(DeserializationBuffer& buffer)
+{
+	id = buffer.GetUint<uint8_t>();
+	visiblePosition = buffer.GetUint<uint8_t>();
+	isVisible = static_cast<bool>(buffer.GetUint<uint8_t>());
+	timestampCreated = buffer.GetUint<uint32_t>();
+	buffer.GetString<uint8_t>(name);
+	type = buffer.GetUint<uint8_t>();
+	param1 = buffer.GetUint<uint32_t>();
+	param2 = buffer.GetUint<uint32_t>();
 }
 
 //===============================================================================
@@ -252,6 +312,23 @@ void AttributeProperty::serialize(SerializationBuffer& buffer) const
 //
 //===============================================================================
 
+Folder::Folder(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
+{
+	id = buffer.GetUint<uint32_t>();
+	timestampCreated = buffer.GetUint<uint32_t>();
+	timestampModified = buffer.GetUint<uint32_t>();
+	buffer.GetString<uint16_t>(name);
+	parentId = buffer.GetUint<uint32_t>();
+	uint32_t textsNum = buffer.GetUint<uint32_t>();
+	for (uint32_t i = 0; i < textsNum; ++i) {
+		texts.emplace_back(std::make_shared<TextTranslated>(buffer, attributesIdToType));
+	}
+}
+
+//===============================================================================
+//
+//===============================================================================
+
 void Folder::serialize(SerializationBuffer& buffer) const
 {
 	buffer.Push(id);
@@ -264,6 +341,24 @@ void Folder::serialize(SerializationBuffer& buffer) const
 	buffer.Push(texts.size());
 	for (const auto& text : texts) {
 		text->serialize(buffer);
+	}
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+TextTranslated::TextTranslated(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
+{
+	buffer.GetString<uint8_t>(id);
+	timestampCreated = buffer.GetUint<uint32_t>();
+	timestampModified = buffer.GetUint<uint32_t>();
+	buffer.GetString<uint8_t>(loginOfLastModifier);
+	offsLastModified = buffer.GetUint<uint32_t>();
+	buffer.GetString<uint16_t>(baseText);
+	uint8_t attributesNum = buffer.GetUint<uint8_t>();
+	for (uint8_t i = 0; i < attributesNum; ++i) {
+		attributes.emplace_back(buffer, attributesIdToType);
 	}
 }
 
@@ -292,6 +387,32 @@ void TextTranslated::serialize(SerializationBuffer& buffer) const
 	}
 }
 
+//===============================================================================
+//
+//===============================================================================
+
+AttributeInText::AttributeInText(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
+{
+	id = buffer.GetUint<uint8_t>();
+	if (id >= attributesIdToType.size()) {
+		ExitMsg("id >= attributesIdToType.size()");
+	}
+	type = attributesIdToType[id];
+	switch (type) {
+		case AttributeProperty::Translation_t:
+		case AttributeProperty::CommonText_t:
+			{
+				buffer.GetString<uint16_t>(text);
+			}
+			break;
+		case AttributeProperty::Checkbox_t:
+			flagState = buffer.GetUint<uint8_t>();
+			break;
+	
+		default:
+			ExitMsg("Wrong attribute type!");
+	}
+}
 
 //===============================================================================
 //

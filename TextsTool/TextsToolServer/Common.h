@@ -26,7 +26,12 @@ public:
 class DeserializationBuffer
 {
 public:
+	template <typename T>
+	T GetUint();
+	template <typename T>
+	void GetString(std::string& result);
 
+	uint32_t offset = 0;
 	std::vector<uint8_t> buffer;
 };
 
@@ -53,26 +58,14 @@ private:
 	std::string GetFreshBaseFileName();
 
 	std::string _path;
-	TextsDatabase* _pDataBase;
-};
-
-//===============================================================================
-// 
-//===============================================================================
-
-
-class ISerializable
-{
-public:
-	virtual void serialize(SerializationBuffer& buffer) const = 0;
-//	virtual void deserialize(DeserializationBuffer& buffer) = 0;
+	TextsDatabase* _pDataBase = nullptr;
 };
 
 //===============================================================================
 // Свойства атрибута (колонка в базе текстов)
 //===============================================================================
 
-class AttributeProperty: public ISerializable
+class AttributeProperty
 {
 public:
 	enum DataType
@@ -82,31 +75,35 @@ public:
 		Checkbox_t = 2,     // Чекбокс
 	};
 
-	virtual void serialize(SerializationBuffer& buffer) const;
+	AttributeProperty() {}
+	AttributeProperty(DeserializationBuffer& buffer);
+	void serialize(SerializationBuffer& buffer) const;
 
-	uint8_t id;           // ID атрибута
-	std::string name;     // Имя атрибута
-	uint8_t type;         // Значение одного из типов DataType
-	uint32_t param1;      // Параметр, зависящий от типа (для Translation_t - тут id языка)
-	uint32_t param2;      // Параметр, зависящий от типа (запас)
-	uint8_t visiblePosition;  // Визуальная позиция атрибута в таблице (даже если скрыт)
-	bool isVisible;       // Видимость атрибута
-	uint32_t timestampCreated;  // Время создания
+	uint8_t id = 0;           // ID атрибута
+	std::string name;         // Имя атрибута
+	uint8_t type = 0;         // Значение одного из типов DataType
+	uint32_t param1 = 0;      // Параметр, зависящий от типа (для Translation_t - тут id языка)
+	uint32_t param2 = 0;      // Параметр, зависящий от типа (запас)
+	uint8_t visiblePosition = 0;    // Визуальная позиция атрибута в таблице (даже если скрыт)
+	bool isVisible = false;         // Видимость атрибута
+	uint32_t timestampCreated = 0;  // Время создания
 };
 
 //===============================================================================
 // Данные атрибута в тексте
 //===============================================================================
 
-class AttributeInText: public ISerializable
+class AttributeInText
 {
 public:
-	virtual void serialize(SerializationBuffer& buffer) const;
+	AttributeInText() {}
+	AttributeInText(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);
+	void serialize(SerializationBuffer& buffer) const;
 
-	std::string text;   // Текстовые данные атрибута, если это текст
-	uint8_t flagState;  // Состояние флажка, если это флажок;
-	uint8_t id;         // ID атрибута, по которому можно узнать его тип
-	uint8_t type;       // Значение одного из типов AttributeProperty::DataType. !!!Здесь копия для быстрого доступа! В файле не нужно, поскольку тип можно определить по ID атрибута
+	std::string text;       // Текстовые данные атрибута, если это текст
+	uint8_t flagState = 0;  // Состояние флажка, если это флажок;
+	uint8_t id = 0;         // ID атрибута, по которому можно узнать его тип
+	uint8_t type = 0;       // Значение одного из типов AttributeProperty::DataType. !!!Здесь копия для быстрого доступа! В файле не нужно, поскольку тип можно определить по ID атрибута
 };
 
 
@@ -114,18 +111,20 @@ public:
 // Текст со всеми переводами и прочими свойствами (строчка в таблице)
 //===============================================================================
 
-class TextTranslated: public ISerializable
+class TextTranslated
 {
 public:
 	using Ptr = std::shared_ptr<TextTranslated>;
 
-	virtual void serialize(SerializationBuffer& buffer) const;
+	TextTranslated() {}
+	TextTranslated(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);
+	void serialize(SerializationBuffer& buffer) const;
 
 	std::string id;                   // ID текста
-	uint32_t timestampCreated;        // Время создания
-	uint32_t timestampModified;   // Время последнего изменения
+	uint32_t timestampCreated = 0;    // Время создания
+	uint32_t timestampModified = 0;   // Время последнего изменения
 	std::string loginOfLastModifier;  // Логин того, кто менял последний раз
-	uint32_t offsLastModified;        // смещение в файле истории до записи о последнем изменении
+	uint32_t offsLastModified = 0;    // смещение в файле истории до записи о последнем изменении
 	std::string baseText;             // Текст на базовом языке (русском)
 	std::vector<AttributeInText> attributes; // Атрибуты текста с их данными
 };
@@ -135,16 +134,18 @@ public:
 // Каталог с текстами и вложенными каталогами в базе текстов
 //===============================================================================
 
-class Folder: public ISerializable
+class Folder
 {
 public:
-	virtual void serialize(SerializationBuffer& buffer) const;
+	Folder() {}
+	Folder(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);
+	void serialize(SerializationBuffer& buffer) const;
 
-	uint32_t id;                 // ID папки
-	uint32_t timestampCreated;   // Время создания
-	uint32_t timestampModified;  // Время изменения данных папки или её текстов
-	std::string name;            // Имя папки
-	uint32_t parentId;           // ID родительской папки
+	uint32_t id = 0;                 // ID папки
+	uint32_t timestampCreated = 0;   // Время создания
+	uint32_t timestampModified = 0;  // Время изменения данных папки или её текстов
+	std::string name;                // Имя папки
+	uint32_t parentId = 0;           // ID родительской папки
 	std::vector<TextTranslated::Ptr> texts;  // Тексты лежащие непосредственно в папке
 };
 
