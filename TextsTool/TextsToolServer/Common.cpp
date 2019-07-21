@@ -3,7 +3,6 @@
 #include <iostream>
 #include <ctime>
 #include <iostream>
-#include <fstream>
 #include <experimental/filesystem>
 
 #include "Common.h"
@@ -62,6 +61,22 @@ void SerializationBuffer::Push(const std::string& v)
 
 void SerializationBuffer::PushStringWithoutZero(const std::string& v)
 {
+	const uint8_t* beg = reinterpret_cast<const uint8_t*>(v.c_str());
+	const uint8_t* end = beg + v.length();
+
+	buffer.insert(buffer.end(), beg, end);
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+template <typename T>
+void SerializationBuffer::PushStringWithoutZero(const std::string& v)
+{
+	T nameLength = static_cast<T>(v.length());
+	Push(nameLength);
+
 	const uint8_t* beg = reinterpret_cast<const uint8_t*>(v.c_str());
 	const uint8_t* end = beg + v.length();
 
@@ -271,6 +286,33 @@ void DbSerializer::LoadDatabaseAndHistory()
 	for (uint32_t i = 0; i < foldersNum; ++i) {
 		_pDataBase->_folders.emplace_back(deserializationBuffer, attributesIdToType);
 	}
+
+	//!!! Прочитать файл истории
+	// Занести его имя в _historyFileName
+
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void DbSerializer::SaveCommonHeader(uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType)
+{
+	_historyFile.serializationBuffer.Push(timestamp);
+	_historyFile.serializationBuffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
+	_historyFile.serializationBuffer.Push(actionType);
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void DbSerializer::SaveCreateFolder(const Folder& folder, const std::string& loginOfLastModifier)
+{
+	SaveCommonHeader(folder.timestampCreated, loginOfLastModifier, ActionCreateFolder);
+	_historyFile.serializationBuffer.Push(folder.id);
+	_historyFile.serializationBuffer.Push(folder.parentId);
+	_historyFile.serializationBuffer.PushStringWithoutZero<uint8_t>(folder.name);
 }
 
 //===============================================================================
@@ -300,9 +342,7 @@ void AttributeProperty::serialize(SerializationBuffer& buffer) const
 	uint8_t flag = isVisible;
 	buffer.Push(flag);
 	buffer.Push(timestampCreated);
-	uint8_t nameLength = static_cast<uint8_t>(name.length());
-	buffer.Push(nameLength);
-	buffer.PushStringWithoutZero(name);
+	buffer.PushStringWithoutZero<uint8_t>(name);
 	buffer.Push(type);
 	buffer.Push(param1);
 	buffer.Push(param2);
@@ -334,9 +374,7 @@ void Folder::serialize(SerializationBuffer& buffer) const
 	buffer.Push(id);
 	buffer.Push(timestampCreated);
 	buffer.Push(timestampModified);
-	uint16_t nameLength = static_cast<uint16_t>(name.length());
-	buffer.Push(nameLength);
-	buffer.PushStringWithoutZero(name);
+	buffer.PushStringWithoutZero<uint16_t>(name);
 	buffer.Push(parentId);
 	buffer.Push(texts.size());
 	for (const auto& text : texts) {
@@ -368,18 +406,12 @@ TextTranslated::TextTranslated(DeserializationBuffer& buffer, const std::vector<
 
 void TextTranslated::serialize(SerializationBuffer& buffer) const
 {
-	uint8_t nameLength8 = static_cast<uint8_t>(id.length());
-	buffer.Push(nameLength8);
-	buffer.PushStringWithoutZero(id);
+	buffer.PushStringWithoutZero<uint8_t>(id);
 	buffer.Push(timestampCreated);
 	buffer.Push(timestampModified);
-	nameLength8 = static_cast<uint8_t>(loginOfLastModifier.length());
-	buffer.Push(nameLength8);
-	buffer.PushStringWithoutZero(loginOfLastModifier);
+	buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
 	buffer.Push(offsLastModified);
-	uint16_t nameLength16 = static_cast<uint16_t>(baseText.length());
-	buffer.Push(nameLength16);
-	buffer.PushStringWithoutZero(baseText);
+	buffer.PushStringWithoutZero<uint16_t>(baseText);
 	uint8_t attributesNum = static_cast<uint8_t>(attributes.size());
 	buffer.Push(attributesNum);
 	for (const auto& attrib : attributes) {
@@ -425,9 +457,7 @@ void AttributeInText::serialize(SerializationBuffer& buffer) const
 		case AttributeProperty::Translation_t:
 		case AttributeProperty::CommonText_t:
 			{
-				uint16_t nameLength = static_cast<uint16_t>(text.length());
-				buffer.Push(nameLength);
-				buffer.PushStringWithoutZero(text);
+				buffer.PushStringWithoutZero<uint16_t>(text);
 			}
 			break;
 		case AttributeProperty::Checkbox_t:

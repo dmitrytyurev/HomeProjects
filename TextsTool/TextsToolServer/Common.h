@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <fstream>
 
 //===============================================================================
 // 
@@ -14,6 +15,11 @@ public:
 	void Push(uint32_t v);
 	void Push(const std::string& v);
 	void PushStringWithoutZero(const std::string& v);
+
+	template <typename T>
+	void PushStringWithoutZero(const std::string& v);
+
+
 	void PushBytes(const void* bytes, int size);
 
 	std::vector<uint8_t> buffer;
@@ -40,10 +46,24 @@ public:
 //===============================================================================
 
 class TextsDatabase;
+class Folder;
 
 class DbSerializer
 {
 public:
+	enum ActionType
+	{
+		ActionCreateFolder = 0,  // Создан каталог для текстов
+	};
+
+	struct HistoryFile
+	{
+		std::string name;                // Имя файла истории текущей базы (пустая строка, если файл истории ещё не создавался - с момента чтения/записи основного файла не было событий)
+		std::ofstream stream;            // Открытый или закрытый поток файла истории. Файл закрывается через несколько секунд после последней записи.
+		uint32_t lastWriteTimestamp = 0; // Время последней записи в файл истории
+		SerializationBuffer serializationBuffer;
+	};
+
 	DbSerializer(TextsDatabase* pDataBase);
 	void SetPath(const std::string& path);
 	void Update(float dt); // Как минимум для закрытия файла через 1 сек после записи
@@ -51,13 +71,14 @@ public:
 	void SaveDatabase();  // Имя файла базы конструирует из имени базы
 	void LoadDatabaseAndHistory(); // Имена файлов базы и истории конструирует из имени базы, выбирает самые свежие файлы
 
-//	void SaveCreateFolder(const Folder& folder);
-//	void SaveRenameFolder(const Folder& folder);
+	void SaveCreateFolder(const Folder& folder, const std::string& loginOfLastModifier);
 
 private:
 	std::string GetFreshBaseFileName();
+	void SaveCommonHeader(uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType);
 
-	std::string _path;
+	std::string _path;            // Путь, где хранятся файлы базы и файлы истории
+	HistoryFile _historyFile;     // Информация о файле истории
 	TextsDatabase* _pDataBase = nullptr;
 };
 
