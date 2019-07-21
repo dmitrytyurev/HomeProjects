@@ -144,13 +144,10 @@ TextsDatabase::TextsDatabase(const std::string dbName): _dbSerializer(this), _db
 //
 //===============================================================================
 
-void TextsDatabase::Update(float dt)
+void TextsDatabase::Update(double dt)
 {
-
+	_dbSerializer.Update(dt);
 }
-
-
-
 
 //===============================================================================
 //
@@ -164,8 +161,26 @@ DbSerializer::DbSerializer(TextsDatabase* pDataBase): _pDataBase(pDataBase)
 //
 //===============================================================================
 
-void DbSerializer::Update(float dt) // Как минимум для закрытия файла через 1 сек после записи
+void DbSerializer::HistoryFlush()
 {
+	const double HISTORY_FLUSH_INTERVAL = 1.f;
+
+	_historyFile.timeToFlush = HISTORY_FLUSH_INTERVAL;
+
+	//	std::ofstream stream;
+
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void DbSerializer::Update(double dt)
+{
+	_historyFile.timeToFlush -= dt;
+	if (_historyFile.timeToFlush <= 0) {
+		HistoryFlush();
+	}
 }
 
 
@@ -185,6 +200,9 @@ void DbSerializer::SetPath(const std::string& path)
 
 void DbSerializer::SaveDatabase()
 {
+	HistoryFlush();            // Флаш истории
+	_historyFile.name.clear(); // Сбросить имя (признак, что файл истории для последнего файла базы ещё не создавался и его нужно будет создать)
+
 	std::string timestamp = std::to_string(std::time(0));
 	std::string fileName = "TextsBase_" + _pDataBase->_dbName + "_" + timestamp + ".bin";
 	std::string fullFileName = _path + fileName;
@@ -468,3 +486,16 @@ void AttributeInText::serialize(SerializationBuffer& buffer) const
 			ExitMsg("Wrong attribute type!");
 	}
 }
+
+//===============================================================================
+//
+//===============================================================================
+
+void STextsToolApp::Update(double dt)
+{
+	for (const auto& db : _dbs) {
+		db->Update(dt);
+	}
+}
+
+

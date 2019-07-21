@@ -2,6 +2,13 @@
 #include "pch.h"
 #include <iostream>
 #include "Common.h"
+#include <chrono>
+#include <thread>
+
+
+//===============================================================================
+//
+//===============================================================================
 
 void test()
 {
@@ -69,9 +76,37 @@ void test()
 	db._dbSerializer.SaveDatabase();
 }
 
+//===============================================================================
+//
+//===============================================================================
+
+void test2()
+{
+	using namespace std::chrono_literals;
+
+	STextsToolApp app;
+
+	app._dbs.emplace_back(std::make_shared<TextsDatabase>("TestDB"));
+	app._dbs.back()->_dbSerializer.SetPath("D:/Dimka/HomeProjects/");
+
+	auto prevTime = std::chrono::high_resolution_clock::now();
+	while (true)
+	{
+		auto curTime = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double, std::milli> elapsed = curTime - prevTime;
+		prevTime = curTime;
+		app.Update(elapsed.count() / 1000.f);
+		std::this_thread::sleep_for(50ms);
+	}
+}
+
+//===============================================================================
+//
+//===============================================================================
 
 int main()
 {
-	test();
+//	test();
+	test2();
 }
 

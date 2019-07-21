@@ -59,18 +59,18 @@ public:
 	struct HistoryFile
 	{
 		std::string name;                // Имя файла истории текущей базы (пустая строка, если файл истории ещё не создавался - с момента чтения/записи основного файла не было событий)
-		std::ofstream stream;            // Открытый или закрытый поток файла истории. Файл закрывается через несколько секунд после последней записи.
-		uint32_t lastWriteTimestamp = 0; // Время последней записи в файл истории
+		double timeToFlush = 0;          // Время в секундах до флаша буфера истории на диск
 		SerializationBuffer buffer;
 	};
 
 	DbSerializer(TextsDatabase* pDataBase);
 	void SetPath(const std::string& path);
-	void Update(float dt); // Как минимум для закрытия файла через 1 сек после записи
+	void Update(double dt);
 
 	void SaveDatabase();  // Имя файла базы конструирует из имени базы
 	void LoadDatabaseAndHistory(); // Имена файлов базы и истории конструирует из имени базы, выбирает самые свежие файлы
 
+	void HistoryFlush();
 	void PushCreateFolder(const Folder& folder, const std::string& loginOfLastModifier);
 
 private:
@@ -177,13 +177,30 @@ public:
 class TextsDatabase
 {
 public:
+	using Ptr = std::shared_ptr<TextsDatabase>;
 
 	TextsDatabase(const std::string dbName); // Загружает в объект базу из свежих файлов
-	void Update(float dt);
+	void Update(double dt);
 
 	std::string _dbName;           // Имя базы данных текстов
 	std::vector<AttributeProperty> _attributeProps; // Свойства атрибутов (колонок) таблицы
 	std::vector<Folder> _folders;  // Папки. Рекурсивная структура через ссылку на ID родителя
 
 	DbSerializer _dbSerializer; // Чтение/запись базы текстов на диск
+};
+
+//===============================================================================
+//
+//===============================================================================
+
+class STextsToolApp
+{
+public:
+	void Update(double dt);
+
+	std::vector<TextsDatabase::Ptr> _dbs;
+//	std::vector<ConnectedClien::Ptr> clients;
+//	SHttpManager httpManager;
+//	SMessagesRepaker messagesRepaker;
+//	SClientMessagesMgr clientMessagesMgr;
 };
