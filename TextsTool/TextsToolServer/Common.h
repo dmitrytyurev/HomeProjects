@@ -71,11 +71,11 @@ public:
 	void SaveDatabase();  // Имя файла базы конструирует из имени базы
 	void LoadDatabaseAndHistory(); // Имена файлов базы и истории конструирует из имени базы, выбирает самые свежие файлы
 
-	void SaveCreateFolder(const Folder& folder, const std::string& loginOfLastModifier);
+	void PushCreateFolder(const Folder& folder, const std::string& loginOfLastModifier);
 
 private:
 	std::string GetFreshBaseFileName();
-	void SaveCommonHeader(uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType);
+	void PushCommonHeader(uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType);
 
 	std::string _path;            // Путь, где хранятся файлы базы и файлы истории
 	HistoryFile _historyFile;     // Информация о файле истории

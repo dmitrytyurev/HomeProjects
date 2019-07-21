@@ -296,7 +296,7 @@ void DbSerializer::LoadDatabaseAndHistory()
 //
 //===============================================================================
 
-void DbSerializer::SaveCommonHeader(uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType)
+void DbSerializer::PushCommonHeader(uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType)
 {
 	_historyFile.buffer.Push(timestamp);
 	_historyFile.buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
@@ -307,9 +307,9 @@ void DbSerializer::SaveCommonHeader(uint32_t timestamp, const std::string& login
 //
 //===============================================================================
 
-void DbSerializer::SaveCreateFolder(const Folder& folder, const std::string& loginOfLastModifier)
+void DbSerializer::PushCreateFolder(const Folder& folder, const std::string& loginOfLastModifier)
 {
-	SaveCommonHeader(folder.timestampCreated, loginOfLastModifier, ActionCreateFolder);
+	PushCommonHeader(folder.timestampCreated, loginOfLastModifier, ActionCreateFolder);
 	_historyFile.buffer.Push(folder.id);
 	_historyFile.buffer.Push(folder.parentId);
 	_historyFile.buffer.PushStringWithoutZero<uint8_t>(folder.name);
