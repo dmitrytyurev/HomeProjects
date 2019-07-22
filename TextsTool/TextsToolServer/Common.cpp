@@ -136,8 +136,10 @@ void SerializationBuffer::PushBytes(const void* bytes, int size)
 // Загружает в объект базу из свежих файлов
 //===============================================================================
 
-TextsDatabase::TextsDatabase(const std::string dbName): _dbSerializer(this), _dbName(dbName)
+TextsDatabase::TextsDatabase(const std::string path, const std::string dbName): _dbSerializer(this), _dbName(dbName)
 {
+	_dbSerializer.SetPath(path);
+	_dbSerializer.LoadDatabaseAndHistory();
 }
 
 //===============================================================================
@@ -164,11 +166,33 @@ DbSerializer::DbSerializer(TextsDatabase* pDataBase): _pDataBase(pDataBase)
 void DbSerializer::HistoryFlush()
 {
 	const double HISTORY_FLUSH_INTERVAL = 1.f;
-
+	
 	_historyFile.timeToFlush = HISTORY_FLUSH_INTERVAL;
+	bool isJustCreated = false;
+	std::ofstream file;
 
-	//	std::ofstream stream;
-
+	if (_historyFile.name.empty()) {
+		std::string timestamp = std::to_string(std::time(0));
+		_historyFile.name = "TextsHistory_" + _pDataBase->_dbName + "_" + timestamp + ".bin";
+		std::string fullFileName = _path + _historyFile.name;
+		file.open(fullFileName, std::ios::out | std::ios::app | std::ios::binary);
+		if (file.rdstate()) {
+			ExitMsg("Error creating file " + fullFileName);
+		}
+		file.write("TDHF0001", 8);
+		isJustCreated = true;
+	}
+	if (!isJustCreated) {
+		std::string fullFileName = _path + _historyFile.name;
+		file.open(fullFileName, std::ios::out | std::ios::app | std::ios::binary);
+		if (file.rdstate()) {
+			ExitMsg("Error opening file " + fullFileName);
+		}
+	}
+	
+	file.write(reinterpret_cast<const char*>(_historyFile.buffer.buffer.data()), _historyFile.buffer.buffer.size());
+	file.close();
+	_historyFile.buffer.buffer.clear();
 }
 
 //===============================================================================
@@ -316,8 +340,8 @@ void DbSerializer::LoadDatabaseAndHistory()
 
 void DbSerializer::PushCommonHeader(uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType)
 {
-	_historyFile.buffer.Push(timestamp);
 	_historyFile.buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
+	_historyFile.buffer.Push(timestamp);
 	_historyFile.buffer.Push(actionType);
 }
 

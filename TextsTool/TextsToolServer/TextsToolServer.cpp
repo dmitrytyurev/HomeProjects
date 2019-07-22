@@ -13,8 +13,7 @@
 void test()
 {
 	{
-		TextsDatabase db("TestDB");
-		db._dbSerializer.SetPath("D:/Dimka/HomeProjects/");
+		TextsDatabase db("D:/Dimka/HomeProjects/", "TestDB");
 
 		AttributeProperty ap;
 		ap.id = 99;
@@ -69,9 +68,7 @@ void test()
 		db._dbSerializer.SaveDatabase();
 	}
 
-	TextsDatabase db("TestDB");
-	db._dbSerializer.SetPath("D:/Dimka/HomeProjects/");
-	db._dbSerializer.LoadDatabaseAndHistory();
+	TextsDatabase db("D:/Dimka/HomeProjects/", "TestDB");
 	db._dbSerializer.SetPath("D:/Dimka/");
 	db._dbSerializer.SaveDatabase();
 }
@@ -86,8 +83,12 @@ void test2()
 
 	STextsToolApp app;
 
-	app._dbs.emplace_back(std::make_shared<TextsDatabase>("TestDB"));
-	app._dbs.back()->_dbSerializer.SetPath("D:/Dimka/HomeProjects/");
+	app._dbs.emplace_back(std::make_shared<TextsDatabase>("D:/Dimka/HomeProjects/", "TestDB"));
+
+	std::cout << "TS:" << app._dbs.back()->_folders[0].timestampCreated;
+
+	app._dbs.back()->_dbSerializer.PushCreateFolder(app._dbs.back()->_folders[0], "tiurev-d");
+	app._dbs.back()->_dbSerializer.PushCreateFolder(app._dbs.back()->_folders[0], "tiurev-d");
 
 	auto prevTime = std::chrono::high_resolution_clock::now();
 	while (true)

@@ -179,7 +179,7 @@ class TextsDatabase
 public:
 	using Ptr = std::shared_ptr<TextsDatabase>;
 
-	TextsDatabase(const std::string dbName); // Загружает в объект базу из свежих файлов
+	TextsDatabase(const std::string path, const std::string dbName); // Загружает в объект базу из свежих файлов
 	void Update(double dt);
 
 	std::string _dbName;           // Имя базы данных текстов
