@@ -36,6 +36,7 @@ public:
 	T GetUint();
 	template <typename T>
 	void GetString(std::string& result);
+	bool IsEmpty() { return buffer.size()-1 == offset; }
 
 	uint32_t offset = 0;
 	std::vector<uint8_t> buffer;
@@ -74,7 +75,10 @@ public:
 	void PushCreateFolder(const Folder& folder, const std::string& loginOfLastModifier);
 
 private:
-	std::string GetFreshBaseFileName();
+	std::string FindFreshBaseFileName(uint32_t& resultTimestamp);
+	std::string FindHistoryFileName(uint32_t tsBaseFile);
+	void LoadDatabaseInner(const std::string& fullFileName);
+	void LoadHistoryInner(const std::string& fullFileName);
 	void PushCommonHeader(uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType);
 
 	std::string _path;            // Путь, где хранятся файлы базы и файлы истории

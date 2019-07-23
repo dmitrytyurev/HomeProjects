@@ -7,6 +7,7 @@
 
 #include "Common.h"
 
+#define CHECK_BUFFER 1
 
 void ExitMsg(const std::string& message)
 {
@@ -21,6 +22,11 @@ void ExitMsg(const std::string& message)
 template <typename T>
 T DeserializationBuffer::GetUint()
 {
+#if CHECK_BUFFER
+	if (offset + sizeof(T) > buffer.size()) {
+		ExitMsg("GetUint buffer overrun");
+	}
+#endif
 	T val = *(reinterpret_cast<T*>(buffer.data() + offset));
 	offset += sizeof(T);
 	return val;
@@ -33,11 +39,21 @@ T DeserializationBuffer::GetUint()
 template <typename T>
 void DeserializationBuffer::GetString(std::string& result)
 {
+#if CHECK_BUFFER
+	if (offset + sizeof(T) > buffer.size()) {
+		ExitMsg("GetString buffer overrun");
+	}
+#endif
 	T textLength = *(reinterpret_cast<T*>(buffer.data() + offset));
 	offset += sizeof(T);
 	uint8_t keep = buffer[offset + textLength];
 	buffer[offset + textLength] = 0;
 	
+#if CHECK_BUFFER
+	if (offset + 1 > buffer.size()) {
+		ExitMsg("GetString buffer overrun");
+	}
+#endif
 	result = reinterpret_cast<const char*>(buffer.data() + offset);
 	buffer[offset + textLength] = keep;
 	offset += textLength;
@@ -257,40 +273,76 @@ void DbSerializer::SaveDatabase()
 // 
 //===============================================================================
 
-std::string DbSerializer::GetFreshBaseFileName()
+std::string DbSerializer::FindFreshBaseFileName(uint32_t& resultTimestamp)
 {
 	namespace fs = std::experimental::filesystem;
 
 	uint32_t maxTimestamp = 0;
+	std::string resultFileName;
+
+	std::string prefix = "TextsBase_";
+	std::string combinedPrefix = prefix + _pDataBase->_dbName;
+
+	for (auto& p : fs::directory_iterator(_path)) {
+		std::string fullFileName = p.path().string();
+		std::string fileName = fullFileName.c_str() + _path.length();
+		if (fileName.compare(0, combinedPrefix.length(), combinedPrefix)) {
+			continue;
+		}
+		int offs = fileName.length() - 14;
+		std::string timestampStr = fileName.substr(offs, 10);
+		uint32_t timestamp = stoi(timestampStr);
+		if (timestamp > maxTimestamp) {
+			maxTimestamp = timestamp;
+			resultFileName = fileName;
+		}
+	}
+	resultTimestamp = maxTimestamp;
+	return resultFileName;
+}
+
+//===============================================================================
+// 
+//===============================================================================
+
+std::string DbSerializer::FindHistoryFileName(uint32_t tsBaseFile)
+{
+	namespace fs = std::experimental::filesystem;
+
+	uint32_t tsFound = 0;
+	std::string resultFileName;
+
+	std::string prefix = "TextsHistory_";
+	std::string combinedPrefix = prefix + _pDataBase->_dbName;
+
 	for (auto& p : fs::directory_iterator(_path)) {
 		std::string fullFileName = p.path().string();
 		std::string fileName = fullFileName.c_str() + _path.length();
 
-		if (fileName.compare(0, 9, "TextsBase") == 0) {
-			std::string timestampStr = fileName.substr(17, 10);
-			uint32_t timestamp = stoi(timestampStr);
-			maxTimestamp = std::max(maxTimestamp, timestamp);
+		if (fileName.compare(0, combinedPrefix.length(), combinedPrefix)) {
+			continue;
 		}
+		int offs = fileName.length() - 14;
+		std::string timestampStr = fileName.substr(offs, 10);
+		uint32_t ts = stoi(timestampStr);
+		if (ts < tsBaseFile) {
+			continue;
+		}
+		if (tsFound) {
+			ExitMsg("More than one HistoryFile per BaseFile");
+		}
+		tsFound = ts;
+		resultFileName = fileName;
 	}
-
-	if (maxTimestamp == 0) {
-		ExitMsg("TextsBase_TestDB_??????????.bin not found");
-	}
-
-	std::string fileName = "TextsBase_" + _pDataBase->_dbName + "_" + std::to_string(maxTimestamp) + ".bin";
-	return fileName;
+	return resultFileName;
 }
 
 //===============================================================================
-// Читает базу из полного файла и файла истории
-// Имена файлов базы и истории конструирует из имени базы, выбирает самые свежие файлы
+// 
 //===============================================================================
 
-void DbSerializer::LoadDatabaseAndHistory()
+void DbSerializer::LoadDatabaseInner(const std::string& fullFileName)
 {
-	std::string fileName = GetFreshBaseFileName();
-	std::string fullFileName = _path + fileName;
-
 	uint32_t fileSize = 0;
 	{
 		std::ifstream file(fullFileName, std::ios::binary | std::ios::ate);
@@ -328,10 +380,86 @@ void DbSerializer::LoadDatabaseAndHistory()
 	for (uint32_t i = 0; i < foldersNum; ++i) {
 		_pDataBase->_folders.emplace_back(deserializationBuffer, attributesIdToType);
 	}
+}
 
-	//!!! Прочитать файл истории
-	// Занести его имя в _historyFileName
+//===============================================================================
+// 
+//===============================================================================
 
+void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
+{
+	uint32_t fileSize = 0;
+	{
+		std::ifstream file(fullFileName, std::ios::binary | std::ios::ate);
+		if (file.rdstate()) {
+			ExitMsg("Error opening file " + fullFileName);
+		}
+		fileSize = static_cast<uint32_t>(file.tellg());
+	}
+
+	DeserializationBuffer deserializationBuffer;
+	deserializationBuffer.buffer.resize(fileSize + 1);  // +1 потому, что строки грузим путём временного добавления 0 в конце
+	deserializationBuffer.buffer[fileSize] = 0;
+
+	std::ifstream file(fullFileName, std::ios::in | std::ios::binary);
+	if (file.rdstate()) {
+		ExitMsg("Error opening file " + fullFileName);
+	}
+	file.read(reinterpret_cast<char*>(deserializationBuffer.buffer.data()), fileSize);
+	file.close();
+
+	deserializationBuffer.offset = 8; // Пропускаем сигнатуру и номер версии
+
+	while (true)
+	{
+		std::string modifierLogin;
+		deserializationBuffer.GetString<uint8_t>(modifierLogin);
+		uint32_t timestamp = deserializationBuffer.GetUint<uint32_t>();
+		uint8_t actionType = deserializationBuffer.GetUint<uint8_t>();
+		switch (actionType)
+		{
+		case ActionCreateFolder:
+		{
+			uint32_t id = deserializationBuffer.GetUint<uint32_t>();
+			uint32_t idParent = deserializationBuffer.GetUint<uint32_t>();
+			std::string name;
+			deserializationBuffer.GetString<uint8_t>(name);
+			// !!! Тут модифицировать базу
+		}
+		break;
+		default:
+			ExitMsg("Unknown action type");
+			break;
+		}
+		if (deserializationBuffer.IsEmpty()) {
+			break;
+		}
+	}
+}
+
+//===============================================================================
+// Читает базу из полного файла и файла истории
+// Имена файлов базы и истории конструирует из имени базы, выбирает самые свежие файлы
+//===============================================================================
+
+void DbSerializer::LoadDatabaseAndHistory()
+{
+	// === Прочитать файл основной базы ==============================
+
+	uint32_t baseTimestamp = 0;
+	std::string fileName = FindFreshBaseFileName(baseTimestamp);
+	if (fileName.empty()) {
+		return;
+	}
+	LoadDatabaseInner(_path + fileName);
+
+	// === Прочитать файл истории ============================
+
+	_historyFile.name = FindHistoryFileName(baseTimestamp);
+	if (_historyFile.name.empty()) {
+		return;
+	}
+	LoadHistoryInner(_path + _historyFile.name);
 }
 
 //===============================================================================
