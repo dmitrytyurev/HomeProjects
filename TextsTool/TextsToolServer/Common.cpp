@@ -352,23 +352,23 @@ void DbSerializer::LoadDatabaseInner(const std::string& fullFileName)
 		fileSize = static_cast<uint32_t>(file.tellg());
 	}
 
-	DeserializationBuffer deserializationBuffer;
-	deserializationBuffer.buffer.resize(fileSize + 1);  // +1 потому, что строки грузим путЄм временного добавлени€ 0 в конце
-	deserializationBuffer.buffer[fileSize] = 0;
+	DeserializationBuffer deserialBuf;
+	deserialBuf.buffer.resize(fileSize + 1);  // +1 потому, что строки грузим путЄм временного добавлени€ 0 в конце
+	deserialBuf.buffer[fileSize] = 0;
 
 	std::ifstream file(fullFileName, std::ios::in | std::ios::binary);
 	if (file.rdstate()) {
 		ExitMsg("Error opening file " + fullFileName);
 	}
-	file.read(reinterpret_cast<char*>(deserializationBuffer.buffer.data()), fileSize);
+	file.read(reinterpret_cast<char*>(deserialBuf.buffer.data()), fileSize);
 	file.close();
 
-	deserializationBuffer.offset = 8; // ѕропускаем сигнатуру и номер версии
+	deserialBuf.offset = 8; // ѕропускаем сигнатуру и номер версии
 	std::vector<uint8_t> attributesIdToType; // ƒл€ быстрой перекодировки id атрибута в его type
 
-	uint32_t attributesNum = deserializationBuffer.GetUint<uint32_t>();
+	uint32_t attributesNum = deserialBuf.GetUint<uint32_t>();
 	for (uint32_t i = 0; i < attributesNum; ++i) {
-		_pDataBase->_attributeProps.emplace_back(deserializationBuffer);
+		_pDataBase->_attributeProps.emplace_back(deserialBuf);
 		uint8_t id = _pDataBase->_attributeProps.back().id;
 		if (id >= attributesIdToType.size()) {
 			attributesIdToType.resize(id + 1);
@@ -376,9 +376,9 @@ void DbSerializer::LoadDatabaseInner(const std::string& fullFileName)
 		attributesIdToType[id] = _pDataBase->_attributeProps.back().type;
 	}
 
-	uint32_t foldersNum = deserializationBuffer.GetUint<uint32_t>();
+	uint32_t foldersNum = deserialBuf.GetUint<uint32_t>();
 	for (uint32_t i = 0; i < foldersNum; ++i) {
-		_pDataBase->_folders.emplace_back(deserializationBuffer, attributesIdToType);
+		_pDataBase->_folders.emplace_back(deserialBuf, attributesIdToType);
 	}
 }
 
@@ -397,41 +397,43 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 		fileSize = static_cast<uint32_t>(file.tellg());
 	}
 
-	DeserializationBuffer deserializationBuffer;
-	deserializationBuffer.buffer.resize(fileSize + 1);  // +1 потому, что строки грузим путЄм временного добавлени€ 0 в конце
-	deserializationBuffer.buffer[fileSize] = 0;
+	DeserializationBuffer deserialBuf;
+	deserialBuf.buffer.resize(fileSize + 1);  // +1 потому, что строки грузим путЄм временного добавлени€ 0 в конце
+	deserialBuf.buffer[fileSize] = 0;
 
 	std::ifstream file(fullFileName, std::ios::in | std::ios::binary);
 	if (file.rdstate()) {
 		ExitMsg("Error opening file " + fullFileName);
 	}
-	file.read(reinterpret_cast<char*>(deserializationBuffer.buffer.data()), fileSize);
+	file.read(reinterpret_cast<char*>(deserialBuf.buffer.data()), fileSize);
 	file.close();
 
-	deserializationBuffer.offset = 8; // ѕропускаем сигнатуру и номер версии
+	deserialBuf.offset = 8; // ѕропускаем сигнатуру и номер версии
 
 	while (true)
 	{
 		std::string modifierLogin;
-		deserializationBuffer.GetString<uint8_t>(modifierLogin);
-		uint32_t timestamp = deserializationBuffer.GetUint<uint32_t>();
-		uint8_t actionType = deserializationBuffer.GetUint<uint8_t>();
+		deserialBuf.GetString<uint8_t>(modifierLogin);
+		uint32_t timestamp = deserialBuf.GetUint<uint32_t>();
+		uint8_t actionType = deserialBuf.GetUint<uint8_t>();
 		switch (actionType)
 		{
 		case ActionCreateFolder:
 		{
-			uint32_t id = deserializationBuffer.GetUint<uint32_t>();
-			uint32_t idParent = deserializationBuffer.GetUint<uint32_t>();
-			std::string name;
-			deserializationBuffer.GetString<uint8_t>(name);
-			// !!! “ут модифицировать базу
+			_pDataBase->_folders.emplace_back();
+			Folder& f = _pDataBase->_folders.back();
+			f.timestampCreated = timestamp;
+			f.timestampModified = timestamp;
+			f.id = deserialBuf.GetUint<uint32_t>();
+			f.parentId = deserialBuf.GetUint<uint32_t>();
+			deserialBuf.GetString<uint8_t>(f.name);
 		}
 		break;
 		default:
 			ExitMsg("Unknown action type");
 			break;
 		}
-		if (deserializationBuffer.IsEmpty()) {
+		if (deserialBuf.IsEmpty()) {
 			break;
 		}
 	}
