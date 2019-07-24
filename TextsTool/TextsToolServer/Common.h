@@ -163,8 +163,9 @@ class Folder
 {
 public:
 	Folder() {}
-	Folder(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);
-	void serialize(SerializationBuffer& buffer) const;
+	Folder(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);  // Создание объекта из полного файла базы
+	Folder(DeserializationBuffer& buffer);                              // Создание объекта из файла истории
+	void serialize(SerializationBuffer& buffer) const;                                      // Запись объекта в полный файл базы
 
 	uint32_t id = 0;                 // ID папки
 	uint32_t timestampCreated = 0;   // Время создания

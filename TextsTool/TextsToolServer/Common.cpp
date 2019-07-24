@@ -414,21 +414,12 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 	{
 		std::string modifierLogin;
 		deserialBuf.GetString<uint8_t>(modifierLogin);
-		uint32_t timestamp = deserialBuf.GetUint<uint32_t>();
 		uint8_t actionType = deserialBuf.GetUint<uint8_t>();
 		switch (actionType)
 		{
 		case ActionCreateFolder:
-		{
-			_pDataBase->_folders.emplace_back();
-			Folder& f = _pDataBase->_folders.back();
-			f.timestampCreated = timestamp;
-			f.timestampModified = timestamp;
-			f.id = deserialBuf.GetUint<uint32_t>();
-			f.parentId = deserialBuf.GetUint<uint32_t>();
-			deserialBuf.GetString<uint8_t>(f.name);
-		}
-		break;
+			_pDataBase->_folders.emplace_back(deserialBuf);
+			break;
 		default:
 			ExitMsg("Unknown action type");
 			break;
@@ -471,8 +462,8 @@ void DbSerializer::LoadDatabaseAndHistory()
 void DbSerializer::PushCommonHeader(uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType)
 {
 	_historyFile.buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
-	_historyFile.buffer.Push(timestamp);
 	_historyFile.buffer.Push(actionType);
+	_historyFile.buffer.Push(timestamp);
 }
 
 //===============================================================================
@@ -535,6 +526,20 @@ Folder::Folder(DeserializationBuffer& buffer, const std::vector<uint8_t>& attrib
 	for (uint32_t i = 0; i < textsNum; ++i) {
 		texts.emplace_back(std::make_shared<TextTranslated>(buffer, attributesIdToType));
 	}
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+Folder::Folder(DeserializationBuffer& buffer)
+{
+	uint32_t timestamp = buffer.GetUint<uint32_t>();
+	timestampCreated = timestamp;
+	timestampModified = timestamp;
+	id = buffer.GetUint<uint32_t>();
+	parentId = buffer.GetUint<uint32_t>();
+	buffer.GetString<uint8_t>(name);
 }
 
 //===============================================================================
