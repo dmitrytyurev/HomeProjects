@@ -195,6 +195,15 @@ void TextsDatabase::Update(double dt)
 //
 //===============================================================================
 
+SerializationBuffer& TextsDatabase::GetSerialBuffer()
+{
+	return _dbSerializer.GetSerialBuffer();
+}
+
+//===============================================================================
+//
+//===============================================================================
+
 DbSerializer::DbSerializer(TextsDatabase* pDataBase): _pDataBase(pDataBase)
 {
 }
@@ -233,6 +242,15 @@ void DbSerializer::HistoryFlush()
 	file.write(reinterpret_cast<const char*>(_historyFile.buffer.buffer.data()), _historyFile.buffer.buffer.size());
 	file.close();
 	_historyFile.buffer.buffer.clear();
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+SerializationBuffer& DbSerializer::GetSerialBuffer()
+{
+	return _historyFile.buffer;
 }
 
 //===============================================================================
@@ -490,23 +508,11 @@ void DbSerializer::LoadDatabaseAndHistory()
 //
 //===============================================================================
 
-void DbSerializer::PushCommonHeader(uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType)
+void DbSerializer::PushCommonHeader(SerializationBuffer& buffer, uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType)
 {
-	_historyFile.buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
-	_historyFile.buffer.Push(actionType);
-	_historyFile.buffer.Push(timestamp);
-}
-
-//===============================================================================
-//
-//===============================================================================
-
-void DbSerializer::PushCreateFolder(const Folder& folder, const std::string& loginOfLastModifier)
-{
-	PushCommonHeader(folder.timestampCreated, loginOfLastModifier, ActionCreateFolder);
-	_historyFile.buffer.Push(folder.id);
-	_historyFile.buffer.Push(folder.parentId);
-	_historyFile.buffer.PushStringWithoutZero<uint8_t>(folder.name);
+	buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
+	buffer.Push(actionType);
+	buffer.Push(timestamp);
 }
 
 //===============================================================================
@@ -600,6 +606,18 @@ void Folder::SaveToBase(SerializationBuffer& buffer) const
 	for (const auto& text : texts) {
 		text->SaveToBase(buffer);
 	}
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void Folder::SaveToHistory(SerializationBuffer& buffer, const std::string& loginOfLastModifier)
+{
+	DbSerializer::PushCommonHeader(buffer, timestampCreated, loginOfLastModifier, DbSerializer::ActionCreateFolder);
+	buffer.Push(id);
+	buffer.Push(parentId);
+	buffer.PushStringWithoutZero<uint8_t>(name);
 }
 
 //===============================================================================
@@ -738,9 +756,10 @@ void SClientMessagesMgr::Update(double dt)
 			case DbSerializer::ActionCreateFolder:
 			{
 				db->_folders.emplace_back();
-				db->_folders.back().CreateFromPacket(el->_msgData);
-				db->_folders.back().id = db->_newFolderId++;
-
+				Folder& folder = db->_folders.back();
+				folder.CreateFromPacket(el->_msgData);
+				folder.id = db->_newFolderId++;
+				folder.SaveToHistory(db->GetSerialBuffer(), client->login);
 
 			}
 			break;

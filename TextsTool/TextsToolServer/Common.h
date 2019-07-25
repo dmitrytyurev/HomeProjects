@@ -73,14 +73,14 @@ public:
 	void LoadDatabaseAndHistory(); // Имена файлов базы и истории конструирует из имени базы, выбирает самые свежие файлы
 
 	void HistoryFlush();
-	void PushCreateFolder(const Folder& folder, const std::string& loginOfLastModifier);
+	SerializationBuffer& GetSerialBuffer();
+	static void PushCommonHeader(SerializationBuffer& buffer, uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType);
 
 private:
 	std::string FindFreshBaseFileName(uint32_t& resultTimestamp);
 	std::string FindHistoryFileName(uint32_t tsBaseFile);
 	void LoadDatabaseInner(const std::string& fullFileName);
 	void LoadHistoryInner(const std::string& fullFileName);
-	void PushCommonHeader(uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType);
 
 	std::string _path;            // Путь, где хранятся файлы базы и файлы истории
 	HistoryFile _historyFile;     // Информация о файле истории
@@ -168,6 +168,7 @@ public:
 	void CreateFromHistory(DeserializationBuffer& buffer);  // Создание объекта из файла истории
 	void CreateFromPacket(DeserializationBuffer& buffer);   // Создание объекта из сообщения от клиента 
 	void SaveToBase(SerializationBuffer& buffer) const;      // Запись объекта в полный файл базы
+	void SaveToHistory(SerializationBuffer& buffer, const std::string& loginOfLastModifier);
 
 	uint32_t id = 0;                 // ID папки
 	uint32_t timestampCreated = 0;   // Время создания
@@ -188,6 +189,7 @@ public:
 
 	TextsDatabase(const std::string path, const std::string dbName); // Загружает в объект базу из свежих файлов
 	void Update(double dt);
+	SerializationBuffer& GetSerialBuffer();
 
 	std::string _dbName;           // Имя базы данных текстов
 	uint8_t _newAttributeId = 0;   // Когда пользователь создаёт новый атрибут, берём этот номер. Поле инкрементим.
@@ -308,6 +310,7 @@ class SConnectedClient
 public:
 	using Ptr = std::shared_ptr<SConnectedClient>;
 
+	std::string login;
 	std::string _dbName;  // Имя база, с которой сейчас работает клиент
 	std::vector<MsgInQueue::Ptr> _msgsQueueOut; // Очередь сообщений, которые нужно отослать клиенту
 	std::vector<MsgInQueue::Ptr> _msgsQueueIn;  // Очередь пришедших от клиента сообщений
