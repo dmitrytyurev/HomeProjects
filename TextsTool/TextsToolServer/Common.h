@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <mutex>
 
 //===============================================================================
 // 
@@ -54,7 +55,7 @@ class DbSerializer
 public:
 	enum ActionType
 	{
-		ActionCreateFolder = 0,  // Создан каталог для текстов
+		ActionCreateFolder = 0,         // Создание каталога для текстов
 	};
 
 	struct HistoryFile
@@ -102,7 +103,7 @@ public:
 
 	AttributeProperty() {}
 	AttributeProperty(DeserializationBuffer& buffer);
-	void serialize(SerializationBuffer& buffer) const;
+	void SaveToBase(SerializationBuffer& buffer) const;
 
 	uint8_t id = 0;           // ID атрибута
 	std::string name;         // Имя атрибута
@@ -123,7 +124,7 @@ class AttributeInText
 public:
 	AttributeInText() {}
 	AttributeInText(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);
-	void serialize(SerializationBuffer& buffer) const;
+	void SaveToBase(SerializationBuffer& buffer) const;
 
 	std::string text;       // Текстовые данные атрибута, если это текст
 	uint8_t flagState = 0;  // Состояние флажка, если это флажок;
@@ -143,7 +144,7 @@ public:
 
 	TextTranslated() {}
 	TextTranslated(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);
-	void serialize(SerializationBuffer& buffer) const;
+	void SaveToBase(SerializationBuffer& buffer) const;
 
 	std::string id;                   // ID текста
 	uint32_t timestampCreated = 0;    // Время создания
@@ -163,9 +164,10 @@ class Folder
 {
 public:
 	Folder() {}
-	Folder(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);  // Создание объекта из полного файла базы
-	Folder(DeserializationBuffer& buffer);                              // Создание объекта из файла истории
-	void serialize(SerializationBuffer& buffer) const;                                      // Запись объекта в полный файл базы
+	void CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);  // Создание объекта из полного файла базы
+	void CreateFromHistory(DeserializationBuffer& buffer);  // Создание объекта из файла истории
+	void CreateFromPacket(DeserializationBuffer& buffer);   // Создание объекта из сообщения от клиента 
+	void SaveToBase(SerializationBuffer& buffer) const;      // Запись объекта в полный файл базы
 
 	uint32_t id = 0;                 // ID папки
 	uint32_t timestampCreated = 0;   // Время создания
@@ -188,7 +190,9 @@ public:
 	void Update(double dt);
 
 	std::string _dbName;           // Имя базы данных текстов
+	uint8_t _newAttributeId = 0;   // Когда пользователь создаёт новый атрибут, берём этот номер. Поле инкрементим.
 	std::vector<AttributeProperty> _attributeProps; // Свойства атрибутов (колонок) таблицы
+	uint32_t _newFolderId = 0;     // Когда пользователь создаёт новую папку, берём этот номер. Поле инкрементим.
 	std::vector<Folder> _folders;  // Папки. Рекурсивная структура через ссылку на ID родителя
 
 	DbSerializer _dbSerializer; // Чтение/запись базы текстов на диск
@@ -198,14 +202,136 @@ public:
 //
 //===============================================================================
 
+class PeriodUpdater
+{
+public:
+	void SetPeriod(double period);
+	bool IsTimeToProceed(double dt);
+
+private:
+	double _timeToProcess = 0;
+	double _period = 1;
+};
+
+//===============================================================================
+// Обрабатывает входящую очередь сообщений от клиентов, модифицирует базу под действием этих сообщений, 
+// записывает на диск историю, добавляет сообщения в очередь на отсылку (для синхронизации всем клиентам -
+// в том числе и тем, от кого пришли сообщения)
+// Также обрабатывает очередь подключений и отключений. На основании этого создаёт/удаляет объекты 
+// SConnectedClient. Для новых объектов накидывает в очередь сообщения о стартовой синхронизации.
+//===============================================================================
+
+class STextsToolApp;
+
+class SClientMessagesMgr
+{
+public:
+	SClientMessagesMgr(STextsToolApp* app);
+	void Update(double dt);
+
+	STextsToolApp* _app;
+
+private:
+	TextsDatabase::Ptr GetDbPtrByDbName(const std::string& dbName);
+};
+
+//===============================================================================
+//
+//===============================================================================
+
+class MsgInQueue
+{
+public:
+	using Ptr = std::unique_ptr<MsgInQueue>;
+
+	uint8_t actionType; // Одно из значений DbSerializer::ActionType
+	DeserializationBuffer _msgData; // Сериализованные данные события полученные от клиента и готовые к отсылке на клиент
+};
+
+//===============================================================================
+//
+//===============================================================================
+
+class MutexLock
+{
+public:
+	MutexLock(std::mutex& mutex) { pMutex = &mutex; mutex.lock(); }
+	~MutexLock() { pMutex->unlock();  }
+private:
+	std::mutex* pMutex;
+};
+
+//===============================================================================
+//
+//===============================================================================
+
+class HttpPacket
+{
+public:
+	using Ptr = std::unique_ptr<HttpPacket>;
+
+	uint32_t packetIndex; // Порядковый номер пакета
+	std::vector<uint8_t> packetData;
+};
+
+//===============================================================================
+//
+//===============================================================================
+
+class MTQueue
+{
+public:
+	std::vector<HttpPacket::Ptr> queue;
+	std::mutex mutex;
+};
+
+//===============================================================================
+//
+//===============================================================================
+
+class SConnectedClientLow
+{
+	std::string login;
+	std::string password;
+	uint32_t timestampLastRequest;  // Когда от этого клиента приходил последний запрос
+	MTQueue packetsQueueOut;
+	MTQueue packetsQueueIn;
+	uint32_t lastRecievedPacketN;
+};
+
+//===============================================================================
+//
+//===============================================================================
+
+class SConnectedClient
+{
+public:
+	using Ptr = std::shared_ptr<SConnectedClient>;
+
+	std::string _dbName;  // Имя база, с которой сейчас работает клиент
+	std::vector<MsgInQueue::Ptr> _msgsQueueOut; // Очередь сообщений, которые нужно отослать клиенту
+	std::vector<MsgInQueue::Ptr> _msgsQueueIn;  // Очередь пришедших от клиента сообщений
+};
+
+//===============================================================================
+//
+//===============================================================================
+
 class STextsToolApp
 {
 public:
+	STextsToolApp();
 	void Update(double dt);
 
 	std::vector<TextsDatabase::Ptr> _dbs;
-//	std::vector<ConnectedClien::Ptr> clients;
-//	SHttpManager httpManager;
-//	SMessagesRepaker messagesRepaker;
-//	SClientMessagesMgr clientMessagesMgr;
+	std::vector<SConnectedClient::Ptr> _clients;
+
+	SClientMessagesMgr _messagesMgr;
+
+	//	SHttpManager httpManager;
+	//	SMessagesRepaker messagesRepaker;
 };
+
+
+
+

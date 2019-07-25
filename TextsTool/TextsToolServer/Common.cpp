@@ -19,6 +19,30 @@ void ExitMsg(const std::string& message)
 //
 //===============================================================================
 
+void PeriodUpdater::SetPeriod(double period)
+{
+	_period = period;
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+bool PeriodUpdater::IsTimeToProceed(double dt)
+{
+	_timeToProcess -= dt;
+	bool isTimeToProceed = (_timeToProcess <= 0);
+
+	if (isTimeToProceed) {
+		_timeToProcess += _period;
+	}
+	return isTimeToProceed;
+}
+
+//===============================================================================
+//
+//===============================================================================
+
 template <typename T>
 T DeserializationBuffer::GetUint()
 {
@@ -255,14 +279,16 @@ void DbSerializer::SaveDatabase()
 	SerializationBuffer buffer;
 	buffer.PushStringWithoutZero("TDBF0001");
 
+	buffer.Push(_pDataBase->_newAttributeId);
 	buffer.Push(_pDataBase->_attributeProps.size());
 	for (const auto& atribProp : _pDataBase->_attributeProps) {
-		atribProp.serialize(buffer);
+		atribProp.SaveToBase(buffer);
 	}
 
+	buffer.Push(_pDataBase->_newFolderId);
 	buffer.Push(_pDataBase->_folders.size());
 	for (const auto& folder : _pDataBase->_folders) {
-		folder.serialize(buffer);
+		folder.SaveToBase(buffer);
 	}
 
 	file.write(reinterpret_cast<const char*>(buffer.buffer.data()), buffer.buffer.size());
@@ -366,6 +392,7 @@ void DbSerializer::LoadDatabaseInner(const std::string& fullFileName)
 	deserialBuf.offset = 8; // Пропускаем сигнатуру и номер версии
 	std::vector<uint8_t> attributesIdToType; // Для быстрой перекодировки id атрибута в его type
 
+	_pDataBase->_newAttributeId = deserialBuf.GetUint<uint8_t>();
 	uint32_t attributesNum = deserialBuf.GetUint<uint32_t>();
 	for (uint32_t i = 0; i < attributesNum; ++i) {
 		_pDataBase->_attributeProps.emplace_back(deserialBuf);
@@ -376,9 +403,11 @@ void DbSerializer::LoadDatabaseInner(const std::string& fullFileName)
 		attributesIdToType[id] = _pDataBase->_attributeProps.back().type;
 	}
 
+	_pDataBase->_newFolderId = deserialBuf.GetUint<uint32_t>();
 	uint32_t foldersNum = deserialBuf.GetUint<uint32_t>();
 	for (uint32_t i = 0; i < foldersNum; ++i) {
-		_pDataBase->_folders.emplace_back(deserialBuf, attributesIdToType);
+		_pDataBase->_folders.emplace_back();
+		_pDataBase->_folders.back().CreateFromBase(deserialBuf, attributesIdToType);
 	}
 }
 
@@ -418,7 +447,9 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 		switch (actionType)
 		{
 		case ActionCreateFolder:
-			_pDataBase->_folders.emplace_back(deserialBuf);
+			_pDataBase->_folders.emplace_back();
+			_pDataBase->_folders.back().CreateFromHistory(deserialBuf);
+			_pDataBase->_newFolderId = _pDataBase->_folders.back().id + 1;
 			break;
 		default:
 			ExitMsg("Unknown action type");
@@ -498,7 +529,7 @@ AttributeProperty::AttributeProperty(DeserializationBuffer& buffer)
 //
 //===============================================================================
 
-void AttributeProperty::serialize(SerializationBuffer& buffer) const
+void AttributeProperty::SaveToBase(SerializationBuffer& buffer) const
 {
 	buffer.Push(id);
 	buffer.Push(visiblePosition);
@@ -515,7 +546,7 @@ void AttributeProperty::serialize(SerializationBuffer& buffer) const
 //
 //===============================================================================
 
-Folder::Folder(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
+void Folder::CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
 {
 	id = buffer.GetUint<uint32_t>();
 	timestampCreated = buffer.GetUint<uint32_t>();
@@ -532,7 +563,7 @@ Folder::Folder(DeserializationBuffer& buffer, const std::vector<uint8_t>& attrib
 //
 //===============================================================================
 
-Folder::Folder(DeserializationBuffer& buffer)
+void Folder::CreateFromHistory(DeserializationBuffer& buffer)
 {
 	uint32_t timestamp = buffer.GetUint<uint32_t>();
 	timestampCreated = timestamp;
@@ -546,7 +577,19 @@ Folder::Folder(DeserializationBuffer& buffer)
 //
 //===============================================================================
 
-void Folder::serialize(SerializationBuffer& buffer) const
+void Folder::CreateFromPacket(DeserializationBuffer& buffer)
+{
+	timestampCreated = static_cast<uint32_t>(std::time(0));
+	timestampModified = timestampCreated;
+	parentId = buffer.GetUint<uint32_t>();
+	buffer.GetString<uint8_t>(name);
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void Folder::SaveToBase(SerializationBuffer& buffer) const
 {
 	buffer.Push(id);
 	buffer.Push(timestampCreated);
@@ -555,7 +598,7 @@ void Folder::serialize(SerializationBuffer& buffer) const
 	buffer.Push(parentId);
 	buffer.Push(texts.size());
 	for (const auto& text : texts) {
-		text->serialize(buffer);
+		text->SaveToBase(buffer);
 	}
 }
 
@@ -581,7 +624,7 @@ TextTranslated::TextTranslated(DeserializationBuffer& buffer, const std::vector<
 //
 //===============================================================================
 
-void TextTranslated::serialize(SerializationBuffer& buffer) const
+void TextTranslated::SaveToBase(SerializationBuffer& buffer) const
 {
 	buffer.PushStringWithoutZero<uint8_t>(id);
 	buffer.Push(timestampCreated);
@@ -592,7 +635,7 @@ void TextTranslated::serialize(SerializationBuffer& buffer) const
 	uint8_t attributesNum = static_cast<uint8_t>(attributes.size());
 	buffer.Push(attributesNum);
 	for (const auto& attrib : attributes) {
-		attrib.serialize(buffer);
+		attrib.SaveToBase(buffer);
 	}
 }
 
@@ -627,7 +670,7 @@ AttributeInText::AttributeInText(DeserializationBuffer& buffer, const std::vecto
 //
 //===============================================================================
 
-void AttributeInText::serialize(SerializationBuffer& buffer) const
+void AttributeInText::SaveToBase(SerializationBuffer& buffer) const
 {
 	buffer.Push(id);
 	switch (type) {
@@ -652,9 +695,67 @@ void AttributeInText::serialize(SerializationBuffer& buffer) const
 
 void STextsToolApp::Update(double dt)
 {
+	_messagesMgr.Update(dt);
 	for (const auto& db : _dbs) {
 		db->Update(dt);
 	}
 }
 
+//===============================================================================
+//
+//===============================================================================
 
+STextsToolApp::STextsToolApp(): _messagesMgr(this)
+{
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+TextsDatabase::Ptr SClientMessagesMgr::GetDbPtrByDbName(const std::string& dbName)
+{
+	for (const auto& db : _app->_dbs) {
+		if (dbName == db->_dbName) {
+			return db;
+		}
+	}
+	ExitMsg("Database not found: " + dbName);  
+	return nullptr;
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void SClientMessagesMgr::Update(double dt)
+{
+	for (auto& client: _app->_clients) {
+		// !!! Вероятно, тут надо проверить наличие базы и если нету, то запустить фоновую загрузку, а выполнение запроса отложить
+		TextsDatabase::Ptr db = GetDbPtrByDbName(client->_dbName);
+		for (const auto& el : client->_msgsQueueIn) {
+			switch (el->actionType) {
+			case DbSerializer::ActionCreateFolder:
+			{
+				db->_folders.emplace_back();
+				db->_folders.back().CreateFromPacket(el->_msgData);
+				db->_folders.back().id = db->_newFolderId++;
+
+
+			}
+			break;
+			default:
+				ExitMsg("Wrong actionType");
+			}
+		}
+		client->_msgsQueueIn.resize(0); // Не используем clear, чтобы гарантировать отсутствие релокации
+	}
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+SClientMessagesMgr::SClientMessagesMgr(STextsToolApp* app): _app(app)
+{
+}
