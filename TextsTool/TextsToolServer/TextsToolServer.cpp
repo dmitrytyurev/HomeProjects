@@ -13,7 +13,8 @@
 void test()
 {
 	{
-		TextsDatabase db("D:/Dimka/HomeProjects/", "TestDB");
+		TextsDatabase db;
+		db.CreateFromBase("D:/Dimka/HomeProjects/", "TestDB");
 
 		AttributeProperty ap;
 		ap.id = 99;
@@ -65,12 +66,13 @@ void test()
 
 		db._folders.emplace_back(folder);
 
-		db._dbSerializer.SaveDatabase();
+		db._dbSerializer->SaveDatabase();
 	}
 
-	TextsDatabase db("D:/Dimka/HomeProjects/", "TestDB");
-	db._dbSerializer.SetPath("D:/Dimka/");
-	db._dbSerializer.SaveDatabase();
+	TextsDatabase db;
+	db.CreateFromBase("D:/Dimka/HomeProjects/", "TestDB");
+	db._dbSerializer->SetPath("D:/Dimka/");
+	db._dbSerializer->SaveDatabase();
 }
 
 //===============================================================================
@@ -79,26 +81,26 @@ void test()
 
 void test2()
 {
-	using namespace std::chrono_literals;
+	//using namespace std::chrono_literals;
 
-	STextsToolApp app;
+	//STextsToolApp app;
 
-	app._dbs.emplace_back(std::make_shared<TextsDatabase>("D:/Dimka/HomeProjects/", "TestDB"));
+	//app._dbs.emplace_back(std::make_shared<TextsDatabase>("D:/Dimka/HomeProjects/", "TestDB"));
 
-	std::cout << "TS:" << app._dbs.back()->_folders[0].timestampCreated;
+	//std::cout << "TS:" << app._dbs.back()->_folders[0].timestampCreated;
 
-	app._dbs.back()->_dbSerializer.PushCreateFolder(app._dbs.back()->_folders[0], "tiurev-d");
-	app._dbs.back()->_dbSerializer.PushCreateFolder(app._dbs.back()->_folders[0], "tiurev-d");
+	//app._dbs.back()->_dbSerializer->PushCreateFolder(app._dbs.back()->_folders[0], "tiurev-d");
+	//app._dbs.back()->_dbSerializer->PushCreateFolder(app._dbs.back()->_folders[0], "tiurev-d");
 
-	auto prevTime = std::chrono::high_resolution_clock::now();
-	while (true)
-	{
-		auto curTime = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<double, std::milli> elapsed = curTime - prevTime;
-		prevTime = curTime;
-		app.Update(elapsed.count() / 1000.f);
-		std::this_thread::sleep_for(50ms);
-	}
+	//auto prevTime = std::chrono::high_resolution_clock::now();
+	//while (true)
+	//{
+	//	auto curTime = std::chrono::high_resolution_clock::now();
+	//	std::chrono::duration<double, std::milli> elapsed = curTime - prevTime;
+	//	prevTime = curTime;
+	//	app.Update(elapsed.count() / 1000.f);
+	//	std::this_thread::sleep_for(50ms);
+	//}
 }
 
 //===============================================================================

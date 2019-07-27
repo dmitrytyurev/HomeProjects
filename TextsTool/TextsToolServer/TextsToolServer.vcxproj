@@ -154,6 +154,7 @@
   <ItemGroup>
     <ClInclude Include="Common.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="TextsBaseClasses.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common.cpp" />

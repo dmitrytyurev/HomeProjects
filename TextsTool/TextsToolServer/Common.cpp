@@ -176,10 +176,12 @@ void SerializationBuffer::PushBytes(const void* bytes, int size)
 // Загружает в объект базу из свежих файлов
 //===============================================================================
 
-TextsDatabase::TextsDatabase(const std::string path, const std::string dbName): _dbSerializer(this), _dbName(dbName)
+void TextsDatabase::CreateFromBase(const std::string path, const std::string dbName)
 {
-	_dbSerializer.SetPath(path);
-	_dbSerializer.LoadDatabaseAndHistory();
+	_dbName = dbName;
+	_dbSerializer = std::make_unique<DbSerializer>(this);
+	_dbSerializer->SetPath(path);
+	_dbSerializer->LoadDatabaseAndHistory();
 }
 
 //===============================================================================
@@ -188,7 +190,7 @@ TextsDatabase::TextsDatabase(const std::string path, const std::string dbName): 
 
 void TextsDatabase::Update(double dt)
 {
-	_dbSerializer.Update(dt);
+	_dbSerializer->Update(dt);
 }
 
 //===============================================================================
@@ -197,7 +199,7 @@ void TextsDatabase::Update(double dt)
 
 SerializationBuffer& TextsDatabase::GetSerialBuffer()
 {
-	return _dbSerializer.GetSerialBuffer();
+	return _dbSerializer->GetSerialBuffer();
 }
 
 //===============================================================================
@@ -413,7 +415,8 @@ void DbSerializer::LoadDatabaseInner(const std::string& fullFileName)
 	_pDataBase->_newAttributeId = deserialBuf.GetUint<uint8_t>();
 	uint32_t attributesNum = deserialBuf.GetUint<uint32_t>();
 	for (uint32_t i = 0; i < attributesNum; ++i) {
-		_pDataBase->_attributeProps.emplace_back(deserialBuf);
+		_pDataBase->_attributeProps.emplace_back();
+		_pDataBase->_attributeProps.back().CreateFromBase(deserialBuf);
 		uint8_t id = _pDataBase->_attributeProps.back().id;
 		if (id >= attributesIdToType.size()) {
 			attributesIdToType.resize(id + 1);
@@ -519,7 +522,7 @@ void DbSerializer::PushCommonHeader(SerializationBuffer& buffer, uint32_t timest
 //
 //===============================================================================
 
-AttributeProperty::AttributeProperty(DeserializationBuffer& buffer)
+void AttributeProperty::CreateFromBase(DeserializationBuffer& buffer)
 {
 	id = buffer.GetUint<uint8_t>();
 	visiblePosition = buffer.GetUint<uint8_t>();
@@ -561,7 +564,8 @@ void Folder::CreateFromBase(DeserializationBuffer& buffer, const std::vector<uin
 	parentId = buffer.GetUint<uint32_t>();
 	uint32_t textsNum = buffer.GetUint<uint32_t>();
 	for (uint32_t i = 0; i < textsNum; ++i) {
-		texts.emplace_back(std::make_shared<TextTranslated>(buffer, attributesIdToType));
+		texts.emplace_back(std::make_shared<TextTranslated>());
+		texts.back()->CreateFromBase(buffer, attributesIdToType);
 	}
 }
 
@@ -624,7 +628,7 @@ void Folder::SaveToHistory(SerializationBuffer& buffer, const std::string& login
 //
 //===============================================================================
 
-TextTranslated::TextTranslated(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
+void TextTranslated::CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
 {
 	buffer.GetString<uint8_t>(id);
 	timestampCreated = buffer.GetUint<uint32_t>();
@@ -634,7 +638,8 @@ TextTranslated::TextTranslated(DeserializationBuffer& buffer, const std::vector<
 	buffer.GetString<uint16_t>(baseText);
 	uint8_t attributesNum = buffer.GetUint<uint8_t>();
 	for (uint8_t i = 0; i < attributesNum; ++i) {
-		attributes.emplace_back(buffer, attributesIdToType);
+		attributes.emplace_back();
+		attributes.back().CreateFromBase(buffer, attributesIdToType);
 	}
 }
 
@@ -661,7 +666,7 @@ void TextTranslated::SaveToBase(SerializationBuffer& buffer) const
 //
 //===============================================================================
 
-AttributeInText::AttributeInText(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
+void AttributeInText::CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
 {
 	id = buffer.GetUint<uint8_t>();
 	if (id >= attributesIdToType.size()) {
