@@ -6,8 +6,7 @@
 #include <experimental/filesystem>
 
 #include "Common.h"
-
-#define CHECK_BUFFER 1
+#include "DbSerializer.h"
 
 void ExitMsg(const std::string& message);
 
