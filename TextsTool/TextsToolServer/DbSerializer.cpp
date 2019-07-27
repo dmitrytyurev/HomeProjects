@@ -205,14 +205,14 @@ void DbSerializer::LoadDatabaseInner(const std::string& fullFileName)
 	}
 
 	DeserializationBuffer deserialBuf;
-	deserialBuf.buffer.resize(fileSize + 1);  // +1 потому, что строки грузим путём временного добавления 0 в конце
-	deserialBuf.buffer[fileSize] = 0;
+	deserialBuf._buffer.resize(fileSize + 1);  // +1 потому, что строки грузим путём временного добавления 0 в конце
+	deserialBuf._buffer[fileSize] = 0;
 
 	std::ifstream file(fullFileName, std::ios::in | std::ios::binary);
 	if (file.rdstate()) {
 		ExitMsg("Error opening file " + fullFileName);
 	}
-	file.read(reinterpret_cast<char*>(deserialBuf.buffer.data()), fileSize);
+	file.read(reinterpret_cast<char*>(deserialBuf._buffer.data()), fileSize);
 	file.close();
 
 	deserialBuf.offset = 8; // Пропускаем сигнатуру и номер версии
@@ -254,14 +254,14 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 	}
 
 	DeserializationBuffer deserialBuf;
-	deserialBuf.buffer.resize(fileSize + 1);  // +1 потому, что строки грузим путём временного добавления 0 в конце
-	deserialBuf.buffer[fileSize] = 0;
+	deserialBuf._buffer.resize(fileSize + 1);  // +1 потому, что строки грузим путём временного добавления 0 в конце
+	deserialBuf._buffer[fileSize] = 0;
 
 	std::ifstream file(fullFileName, std::ios::in | std::ios::binary);
 	if (file.rdstate()) {
 		ExitMsg("Error opening file " + fullFileName);
 	}
-	file.read(reinterpret_cast<char*>(deserialBuf.buffer.data()), fileSize);
+	file.read(reinterpret_cast<char*>(deserialBuf._buffer.data()), fileSize);
 	file.close();
 
 	deserialBuf.offset = 8; // Пропускаем сигнатуру и номер версии

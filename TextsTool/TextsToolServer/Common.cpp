@@ -48,6 +48,8 @@ bool PeriodUpdater::IsTimeToProceed(double dt)
 void STextsToolApp::Update(double dt)
 {
 	_messagesMgr.Update(dt);
+	_messagesRepaker.Update(dt);
+
 	for (const auto& db : _dbs) {
 		db->Update(dt);
 	}
@@ -57,7 +59,7 @@ void STextsToolApp::Update(double dt)
 //
 //===============================================================================
 
-STextsToolApp::STextsToolApp(): _messagesMgr(this)
+STextsToolApp::STextsToolApp(): _messagesMgr(this), _messagesRepaker(this)
 {
 }
 
@@ -86,15 +88,17 @@ void SClientMessagesMgr::Update(double dt)
 		// !!! Вероятно, тут надо проверить наличие базы и если нету, то запустить фоновую загрузку, а выполнение запроса отложить
 		TextsDatabase::Ptr db = GetDbPtrByDbName(client->_dbName);
 		for (const auto& el : client->_msgsQueueIn) {
-			switch (el->actionType) {
+			uint8_t actionType = el->GetUint<uint8_t>();
+			switch (actionType) {
 			case DbSerializer::ActionCreateFolder:
 			{
 				db->_folders.emplace_back();
 				Folder& folder = db->_folders.back();
-				folder.CreateFromPacket(el->_msgData);
+				folder.CreateFromPacket(*el);
 				folder.id = db->_newFolderId++;
-				folder.SaveToHistory(db->GetSerialBuffer(), client->login);
-
+				folder.SaveToHistory(db->GetSerialBuffer(), client->_login);
+				SerializationBufferPtr buPtr = folder.SaveToPacket();
+				AddPacketToClients(buPtr, client->_dbName);
 			}
 			break;
 			default:
@@ -112,3 +116,78 @@ void SClientMessagesMgr::Update(double dt)
 SClientMessagesMgr::SClientMessagesMgr(STextsToolApp* app): _app(app)
 {
 }
+
+//===============================================================================
+//
+//===============================================================================
+
+void SClientMessagesMgr::AddPacketToClients(SerializationBufferPtr& bufPtr, std::string& srcDbName)
+{
+	for (auto client: _app->_clients) {
+		if (client->_dbName == srcDbName) {
+			client->_msgsQueueOut.emplace_back(bufPtr);
+		}
+	}
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+SMessagesRepaker::SMessagesRepaker(STextsToolApp* app): _app(app)
+{
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void SMessagesRepaker::Update(double dt)
+{
+	MutexLock lock(_app->_httpManager._mtClients.mutex);
+	for (auto& client : _app->_clients) {
+		SConnectedClientLow* clLow = nullptr;
+		for (auto& clientLow : _app->_httpManager._mtClients.clients) {
+			if (client->_login == clientLow->login) {
+				clLow = clientLow.get();
+				break;
+			}
+		}
+		if (!clLow) {
+			continue;
+		}
+		{
+			MutexLock lock(clLow->packetsQueueOut.mutex);
+			for (auto& buf : client->_msgsQueueOut) {
+				clLow->packetsQueueOut.PushPacket(buf->buffer);
+			}
+			client->_msgsQueueOut.resize(0);
+		}
+		{
+			MutexLock lock(clLow->packetsQueueIn.mutex);
+			for (auto& packetPtr : clLow->packetsQueueIn.queue) {
+				client->_msgsQueueIn.push_back(std::make_unique<DeserializationBuffer>(packetPtr->_packetData));
+			}
+			clLow->packetsQueueIn.queue.resize(0);
+		}
+	}
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+HttpPacket::HttpPacket(uint32_t packetIndex, std::vector<uint8_t>& packetData): _packetIndex(packetIndex), _packetData(packetData)
+{
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void MTQueueOut::PushPacket(std::vector<uint8_t>& data)
+{
+	queue.push(std::make_unique<HttpPacket>(lastSentPacketN++, data));
+}
+
+

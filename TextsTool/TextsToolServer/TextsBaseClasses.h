@@ -9,6 +9,7 @@ class SerializationBuffer;
 class DbSerializer;
 
 using DbSerializerPtr = std::unique_ptr<DbSerializer>;
+using SerializationBufferPtr = std::shared_ptr<SerializationBuffer>;
 
 //===============================================================================
 // Свойства атрибута (колонка в базе текстов)
@@ -91,7 +92,8 @@ public:
 	void CreateFromHistory(DeserializationBuffer& buffer);  // Создание объекта из файла истории
 	void CreateFromPacket(DeserializationBuffer& buffer);   // Создание объекта из сообщения от клиента 
 	void SaveToBase(SerializationBuffer& buffer) const;      // Запись объекта в полный файл базы
-	void SaveToHistory(SerializationBuffer& buffer, const std::string& loginOfLastModifier);
+	void SaveToHistory(SerializationBuffer& buffer, const std::string& loginOfLastModifier) const;
+	SerializationBufferPtr SaveToPacket() const;      // Запись объекта в пакет для рассылки всем клиентам, работающим с этой базой
 
 	uint32_t id = 0;                 // ID папки
 	uint32_t timestampCreated = 0;   // Время создания

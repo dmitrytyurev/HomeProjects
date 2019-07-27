@@ -139,12 +139,28 @@ void Folder::SaveToBase(SerializationBuffer& buffer) const
 //
 //===============================================================================
 
-void Folder::SaveToHistory(SerializationBuffer& buffer, const std::string& loginOfLastModifier)
+void Folder::SaveToHistory(SerializationBuffer& buffer, const std::string& loginOfLastModifier) const
 {
 	DbSerializer::PushCommonHeader(buffer, timestampCreated, loginOfLastModifier, DbSerializer::ActionCreateFolder);
 	buffer.Push(id);
 	buffer.Push(parentId);
 	buffer.PushStringWithoutZero<uint8_t>(name);
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+SerializationBufferPtr Folder::SaveToPacket() const
+{
+	auto bufPtr = std::make_shared<SerializationBuffer>();
+
+	bufPtr->Push(static_cast<uint8_t>(DbSerializer::ActionCreateFolder));
+	bufPtr->Push(timestampCreated);
+	bufPtr->Push(id);
+	bufPtr->Push(parentId);
+	bufPtr->PushStringWithoutZero<uint8_t>(name);
+	return bufPtr;
 }
 
 //===============================================================================
