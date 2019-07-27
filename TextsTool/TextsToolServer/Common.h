@@ -1,44 +1,7 @@
 #pragma once
 #include "TextsBaseClasses.h"
-
-//===============================================================================
-// 
-//===============================================================================
-
-class SerializationBuffer
-{
-public:
-	void Push(uint8_t v);
-	void Push(uint16_t v);
-	void Push(uint32_t v);
-	void Push(const std::string& v);
-	void PushStringWithoutZero(const std::string& v);
-
-	template <typename T>
-	void PushStringWithoutZero(const std::string& v);
-
-
-	void PushBytes(const void* bytes, int size);
-
-	std::vector<uint8_t> buffer;
-};
-
-//===============================================================================
-// 
-//===============================================================================
-
-class DeserializationBuffer
-{
-public:
-	template <typename T>
-	T GetUint();
-	template <typename T>
-	void GetString(std::string& result);
-	bool IsEmpty() { return buffer.size()-1 == offset; }
-
-	uint32_t offset = 0;
-	std::vector<uint8_t> buffer;
-};
+#include "SerializationBuffer.h"
+#include "DeserializationBuffer.h"
 
 //===============================================================================
 // Запись и чтение базы текстов на диск (как целиком, так и история)

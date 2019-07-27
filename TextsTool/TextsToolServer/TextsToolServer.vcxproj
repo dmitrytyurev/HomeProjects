@@ -153,7 +153,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Common.h" />
+    <ClInclude Include="DeserializationBuffer.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="SerializationBuffer.h" />
     <ClInclude Include="TextsBaseClasses.h" />
   </ItemGroup>
   <ItemGroup>
@@ -164,6 +166,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TextsBaseClasses.cpp" />
     <ClCompile Include="TextsToolServer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
