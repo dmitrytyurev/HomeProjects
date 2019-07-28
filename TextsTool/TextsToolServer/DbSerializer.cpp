@@ -56,7 +56,7 @@ void DbSerializer::HistoryFlush()
 //
 //===============================================================================
 
-SerializationBuffer& DbSerializer::GetSerialBuffer()
+SerializationBuffer& DbSerializer::GetHistoryBuffer()
 {
 	return _historyFile.buffer;
 }
@@ -278,6 +278,31 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 			_pDataBase->_folders.back().CreateFromHistory(deserialBuf);
 			_pDataBase->_newFolderId = _pDataBase->_folders.back().id + 1;
 			break;
+		case ActionDeleteFolder:
+		{
+			uint32_t folderId = deserialBuf.GetUint<uint32_t>();
+			auto& f = _pDataBase->_folders;
+			auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+			if (result != std::end(f)) {
+				f.erase(result);
+			} else {
+				ExitMsg("LoadFromHistory: ActionDeleteFolder: Folder id not found");
+			}
+		}
+		break;
+		case ActionChangeFolderParent:
+		{
+			uint32_t folderId = deserialBuf.GetUint<uint32_t>();
+			uint32_t newParentFolderId = deserialBuf.GetUint<uint32_t>();
+			auto& f = _pDataBase->_folders;
+			auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+			if (result != std::end(f)) {
+				result->parentId = newParentFolderId;
+			} else {
+				ExitMsg("LoadFromHistory: ActionChangeFolderParent: Folder id not found");
+			}
+		}
+		break;
 		default:
 			ExitMsg("Unknown action type");
 			break;

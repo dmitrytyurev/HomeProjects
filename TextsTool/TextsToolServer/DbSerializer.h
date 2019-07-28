@@ -1,8 +1,8 @@
 #pragma once
 
-#include "TextsBaseClasses.h"  // !!!!
-#include "SerializationBuffer.h" // !!!!
-#include "DeserializationBuffer.h" // !!!!
+#include "TextsBaseClasses.h"
+#include "SerializationBuffer.h"
+#include "DeserializationBuffer.h"
 
 
 //===============================================================================
@@ -18,6 +18,8 @@ public:
 	enum ActionType
 	{
 		ActionCreateFolder = 0,         // Создание каталога для текстов
+		ActionDeleteFolder = 1,         // Удаление каталога (должен не иметь текстов и вложенных каталогов)
+		ActionChangeFolderParent = 2,   // Изменение родительского каталога
 	};
 
 	struct HistoryFile
@@ -35,7 +37,7 @@ public:
 	void LoadDatabaseAndHistory(); // Имена файлов базы и истории конструирует из имени базы, выбирает самые свежие файлы
 
 	void HistoryFlush();
-	SerializationBuffer& GetSerialBuffer();
+	SerializationBuffer& GetHistoryBuffer();
 	static void PushCommonHeader(SerializationBuffer& buffer, uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType);
 
 private:

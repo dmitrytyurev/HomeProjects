@@ -116,7 +116,7 @@ public:
 
 	void CreateFromBase(const std::string path, const std::string dbName); // Загружает в объект базу из свежих файлов
 	void Update(double dt);
-	SerializationBuffer& GetSerialBuffer();
+	SerializationBuffer& GetHistoryBuffer();
 
 	std::string _dbName;           // Имя базы данных текстов
 	uint8_t _newAttributeId = 0;   // Когда пользователь создаёт новый атрибут, берём этот номер. Поле инкрементим.

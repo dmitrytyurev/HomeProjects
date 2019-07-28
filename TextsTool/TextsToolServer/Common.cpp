@@ -92,13 +92,33 @@ void SClientMessagesMgr::Update(double dt)
 			switch (actionType) {
 			case DbSerializer::ActionCreateFolder:
 			{
-				db->_folders.emplace_back();
+				db->_folders.emplace_back();                                 // Изменения в базе
 				Folder& folder = db->_folders.back();
 				folder.CreateFromPacket(*el);
 				folder.id = db->_newFolderId++;
-				folder.SaveToHistory(db->GetSerialBuffer(), client->_login);
-				SerializationBufferPtr buPtr = folder.SaveToPacket();
-				AddPacketToClients(buPtr, client->_dbName);
+				folder.SaveToHistory(db->GetHistoryBuffer(), client->_login); // Запись в файл истории
+				SerializationBufferPtr bufPtr = folder.SaveToPacket();        // Разослать пакеты другим клиентам 
+				AddPacketToClients(bufPtr, client->_dbName);
+			}
+			break;
+			case DbSerializer::ActionDeleteFolder:
+			{
+				uint32_t folderId = el->GetUint<uint32_t>();
+				auto& f = db->_folders;                                      // Изменения в базе
+				auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+				if (result != std::end(f)) {
+					f.erase(result);
+				}
+				DbSerializer::PushCommonHeader(db->GetHistoryBuffer(), std::time(0), client->_login, DbSerializer::ActionDeleteFolder); // Запись в файл истории
+				db->GetHistoryBuffer().Push(folderId);
+				auto bufPtr = std::make_shared<SerializationBuffer>();       // Разослать пакеты другим клиентам
+				bufPtr->Push(static_cast<uint8_t>(DbSerializer::ActionCreateFolder));  
+				bufPtr->Push(folderId);
+				AddPacketToClients(bufPtr, client->_dbName);
+			}
+			break;
+			case DbSerializer::ActionChangeFolderParent:
+			{
 			}
 			break;
 			default:

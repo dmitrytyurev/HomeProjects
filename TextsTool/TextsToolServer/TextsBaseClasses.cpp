@@ -36,9 +36,9 @@ void TextsDatabase::Update(double dt)
 //
 //===============================================================================
 
-SerializationBuffer& TextsDatabase::GetSerialBuffer()
+SerializationBuffer& TextsDatabase::GetHistoryBuffer()
 {
-	return _dbSerializer->GetSerialBuffer();
+	return _dbSerializer->GetHistoryBuffer();
 }
 
 //===============================================================================
