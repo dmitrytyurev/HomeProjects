@@ -8,10 +8,35 @@
 #include "Common.h"
 #include "DbSerializer.h"
 
+//===============================================================================
+//
+//===============================================================================
+
 void ExitMsg(const std::string& message)
 {
+	// !!! Сделать запись в лог
 	std::cout << "Fatal: " << message << std::endl;
 	exit(1);
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void LogMsg(const std::string& message)
+{
+	// !!! Сделать запись в лог
+	std::cout << message << std::endl;
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+uint32_t GetTime()
+{
+	return static_cast<uint32_t>(std::time(0));
+
 }
 
 //===============================================================================
@@ -87,14 +112,14 @@ void SClientMessagesMgr::Update(double dt)
 	for (auto& client: _app->_clients) {
 		// !!! Вероятно, тут надо проверить наличие базы и если нету, то запустить фоновую загрузку, а выполнение запроса отложить
 		TextsDatabase::Ptr db = GetDbPtrByDbName(client->_dbName);
-		for (const auto& el : client->_msgsQueueIn) {
-			uint8_t actionType = el->GetUint<uint8_t>();
+		for (const auto& buf : client->_msgsQueueIn) {
+			uint8_t actionType = buf->GetUint<uint8_t>();
 			switch (actionType) {
 			case DbSerializer::ActionCreateFolder:
 			{
 				db->_folders.emplace_back();                                 // Изменения в базе
 				Folder& folder = db->_folders.back();
-				folder.CreateFromPacket(*el);
+				folder.CreateFromPacket(*buf);
 				folder.id = db->_newFolderId++;
 				folder.SaveToHistory(db->GetHistoryBuffer(), client->_login); // Запись в файл истории
 				SerializationBufferPtr bufPtr = folder.SaveToPacket();        // Разослать пакеты другим клиентам 
@@ -103,22 +128,40 @@ void SClientMessagesMgr::Update(double dt)
 			break;
 			case DbSerializer::ActionDeleteFolder:
 			{
-				uint32_t folderId = el->GetUint<uint32_t>();
+				uint32_t folderId = buf->GetUint<uint32_t>();
 				auto& f = db->_folders;                                      // Изменения в базе
 				auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
 				if (result != std::end(f)) {
 					f.erase(result);
+				} else {
+					LogMsg("SClientMessagesMgr::Update:DbSerializer::ActionDeleteFolder: folder not found");
 				}
-				DbSerializer::PushCommonHeader(db->GetHistoryBuffer(), std::time(0), client->_login, DbSerializer::ActionDeleteFolder); // Запись в файл истории
+				DbSerializer::PushHeader(db->GetHistoryBuffer(), GetTime(), client->_login, DbSerializer::ActionDeleteFolder); // Запись в файл истории
 				db->GetHistoryBuffer().Push(folderId);
 				auto bufPtr = std::make_shared<SerializationBuffer>();       // Разослать пакеты другим клиентам
-				bufPtr->Push(static_cast<uint8_t>(DbSerializer::ActionCreateFolder));  
+				bufPtr->Push(static_cast<uint8_t>(actionType));
 				bufPtr->Push(folderId);
 				AddPacketToClients(bufPtr, client->_dbName);
 			}
 			break;
 			case DbSerializer::ActionChangeFolderParent:
 			{
+				uint32_t folderId = buf->GetUint<uint32_t>();
+				uint32_t newParentFolderId = buf->GetUint<uint32_t>();
+				auto& f = db->_folders;                                      // Изменения в базе
+				auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+				if (result != std::end(f)) {
+					result->parentId = newParentFolderId;
+				} else {
+					LogMsg("SClientMessagesMgr::Update:DbSerializer::ActionChangeFolderParent: folder not found");
+				}
+				DbSerializer::PushHeader(db->GetHistoryBuffer(), GetTime(), client->_login, DbSerializer::ActionDeleteFolder); // Запись в файл истории
+				db->GetHistoryBuffer().Push(folderId);
+				auto bufPtr = std::make_shared<SerializationBuffer>();       // Разослать пакеты другим клиентам
+				bufPtr->Push(static_cast<uint8_t>(actionType));
+				bufPtr->Push(folderId);
+				bufPtr->Push(newParentFolderId);
+				AddPacketToClients(bufPtr, client->_dbName);
 			}
 			break;
 			default:

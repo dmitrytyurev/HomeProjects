@@ -38,7 +38,7 @@ public:
 
 	void HistoryFlush();
 	SerializationBuffer& GetHistoryBuffer();
-	static void PushCommonHeader(SerializationBuffer& buffer, uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType);
+	static void PushHeader(SerializationBuffer& buffer, uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType);
 
 private:
 	std::string FindFreshBaseFileName(uint32_t& resultTimestamp);

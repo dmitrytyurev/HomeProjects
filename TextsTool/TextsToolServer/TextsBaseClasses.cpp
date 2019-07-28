@@ -141,7 +141,7 @@ void Folder::SaveToBase(SerializationBuffer& buffer) const
 
 void Folder::SaveToHistory(SerializationBuffer& buffer, const std::string& loginOfLastModifier) const
 {
-	DbSerializer::PushCommonHeader(buffer, timestampCreated, loginOfLastModifier, DbSerializer::ActionCreateFolder);
+	DbSerializer::PushHeader(buffer, timestampCreated, loginOfLastModifier, DbSerializer::ActionCreateFolder);
 	buffer.Push(id);
 	buffer.Push(parentId);
 	buffer.PushStringWithoutZero<uint8_t>(name);

@@ -204,25 +204,25 @@ void DbSerializer::LoadDatabaseInner(const std::string& fullFileName)
 		fileSize = static_cast<uint32_t>(file.tellg());
 	}
 
-	DeserializationBuffer deserialBuf;
-	deserialBuf._buffer.resize(fileSize + 1);  // +1 потому, что строки грузим путЄм временного добавлени€ 0 в конце
-	deserialBuf._buffer[fileSize] = 0;
+	DeserializationBuffer buf;
+	buf._buffer.resize(fileSize + 1);  // +1 потому, что строки грузим путЄм временного добавлени€ 0 в конце
+	buf._buffer[fileSize] = 0;
 
 	std::ifstream file(fullFileName, std::ios::in | std::ios::binary);
 	if (file.rdstate()) {
 		ExitMsg("Error opening file " + fullFileName);
 	}
-	file.read(reinterpret_cast<char*>(deserialBuf._buffer.data()), fileSize);
+	file.read(reinterpret_cast<char*>(buf._buffer.data()), fileSize);
 	file.close();
 
-	deserialBuf.offset = 8; // ѕропускаем сигнатуру и номер версии
+	buf.offset = 8; // ѕропускаем сигнатуру и номер версии
 	std::vector<uint8_t> attributesIdToType; // ƒл€ быстрой перекодировки id атрибута в его type
 
-	_pDataBase->_newAttributeId = deserialBuf.GetUint<uint8_t>();
-	uint32_t attributesNum = deserialBuf.GetUint<uint32_t>();
+	_pDataBase->_newAttributeId = buf.GetUint<uint8_t>();
+	uint32_t attributesNum = buf.GetUint<uint32_t>();
 	for (uint32_t i = 0; i < attributesNum; ++i) {
 		_pDataBase->_attributeProps.emplace_back();
-		_pDataBase->_attributeProps.back().CreateFromBase(deserialBuf);
+		_pDataBase->_attributeProps.back().CreateFromBase(buf);
 		uint8_t id = _pDataBase->_attributeProps.back().id;
 		if (id >= attributesIdToType.size()) {
 			attributesIdToType.resize(id + 1);
@@ -230,11 +230,11 @@ void DbSerializer::LoadDatabaseInner(const std::string& fullFileName)
 		attributesIdToType[id] = _pDataBase->_attributeProps.back().type;
 	}
 
-	_pDataBase->_newFolderId = deserialBuf.GetUint<uint32_t>();
-	uint32_t foldersNum = deserialBuf.GetUint<uint32_t>();
+	_pDataBase->_newFolderId = buf.GetUint<uint32_t>();
+	uint32_t foldersNum = buf.GetUint<uint32_t>();
 	for (uint32_t i = 0; i < foldersNum; ++i) {
 		_pDataBase->_folders.emplace_back();
-		_pDataBase->_folders.back().CreateFromBase(deserialBuf, attributesIdToType);
+		_pDataBase->_folders.back().CreateFromBase(buf, attributesIdToType);
 	}
 }
 
@@ -253,34 +253,34 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 		fileSize = static_cast<uint32_t>(file.tellg());
 	}
 
-	DeserializationBuffer deserialBuf;
-	deserialBuf._buffer.resize(fileSize + 1);  // +1 потому, что строки грузим путЄм временного добавлени€ 0 в конце
-	deserialBuf._buffer[fileSize] = 0;
+	DeserializationBuffer buf;
+	buf._buffer.resize(fileSize + 1);  // +1 потому, что строки грузим путЄм временного добавлени€ 0 в конце
+	buf._buffer[fileSize] = 0;
 
 	std::ifstream file(fullFileName, std::ios::in | std::ios::binary);
 	if (file.rdstate()) {
 		ExitMsg("Error opening file " + fullFileName);
 	}
-	file.read(reinterpret_cast<char*>(deserialBuf._buffer.data()), fileSize);
+	file.read(reinterpret_cast<char*>(buf._buffer.data()), fileSize);
 	file.close();
 
-	deserialBuf.offset = 8; // ѕропускаем сигнатуру и номер версии
+	buf.offset = 8; // ѕропускаем сигнатуру и номер версии
 
 	while (true)
 	{
 		std::string modifierLogin;
-		deserialBuf.GetString<uint8_t>(modifierLogin);
-		uint8_t actionType = deserialBuf.GetUint<uint8_t>();
+		buf.GetString<uint8_t>(modifierLogin);
+		uint8_t actionType = buf.GetUint<uint8_t>();
 		switch (actionType)
 		{
 		case ActionCreateFolder:
 			_pDataBase->_folders.emplace_back();
-			_pDataBase->_folders.back().CreateFromHistory(deserialBuf);
+			_pDataBase->_folders.back().CreateFromHistory(buf);
 			_pDataBase->_newFolderId = _pDataBase->_folders.back().id + 1;
 			break;
 		case ActionDeleteFolder:
 		{
-			uint32_t folderId = deserialBuf.GetUint<uint32_t>();
+			uint32_t folderId = buf.GetUint<uint32_t>();
 			auto& f = _pDataBase->_folders;
 			auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
 			if (result != std::end(f)) {
@@ -292,8 +292,8 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 		break;
 		case ActionChangeFolderParent:
 		{
-			uint32_t folderId = deserialBuf.GetUint<uint32_t>();
-			uint32_t newParentFolderId = deserialBuf.GetUint<uint32_t>();
+			uint32_t folderId = buf.GetUint<uint32_t>();
+			uint32_t newParentFolderId = buf.GetUint<uint32_t>();
 			auto& f = _pDataBase->_folders;
 			auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
 			if (result != std::end(f)) {
@@ -307,7 +307,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 			ExitMsg("Unknown action type");
 			break;
 		}
-		if (deserialBuf.IsEmpty()) {
+		if (buf.IsEmpty()) {
 			break;
 		}
 	}
@@ -342,7 +342,7 @@ void DbSerializer::LoadDatabaseAndHistory()
 //
 //===============================================================================
 
-void DbSerializer::PushCommonHeader(SerializationBuffer& buffer, uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType)
+void DbSerializer::PushHeader(SerializationBuffer& buffer, uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType)
 {
 	buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
 	buffer.Push(actionType);
