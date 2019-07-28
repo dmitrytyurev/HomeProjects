@@ -20,6 +20,7 @@ public:
 		ActionCreateFolder = 0,         // Создание каталога для текстов
 		ActionDeleteFolder = 1,         // Удаление каталога (должен не иметь текстов и вложенных каталогов)
 		ActionChangeFolderParent = 2,   // Изменение родительского каталога
+		ActionRenameFolder = 3,         // Переименование каталога
 	};
 
 	struct HistoryFile

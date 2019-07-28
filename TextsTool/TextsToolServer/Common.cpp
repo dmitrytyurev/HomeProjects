@@ -136,7 +136,7 @@ void SClientMessagesMgr::Update(double dt)
 				} else {
 					LogMsg("SClientMessagesMgr::Update:DbSerializer::ActionDeleteFolder: folder not found");
 				}
-				DbSerializer::PushHeader(db->GetHistoryBuffer(), GetTime(), client->_login, DbSerializer::ActionDeleteFolder); // Запись в файл истории
+				DbSerializer::PushHeader(db->GetHistoryBuffer(), GetTime(), client->_login, actionType); // Запись в файл истории
 				db->GetHistoryBuffer().Push(folderId);
 				auto bufPtr = std::make_shared<SerializationBuffer>();       // Разослать пакеты другим клиентам
 				bufPtr->Push(static_cast<uint8_t>(actionType));
@@ -155,8 +155,9 @@ void SClientMessagesMgr::Update(double dt)
 				} else {
 					LogMsg("SClientMessagesMgr::Update:DbSerializer::ActionChangeFolderParent: folder not found");
 				}
-				DbSerializer::PushHeader(db->GetHistoryBuffer(), GetTime(), client->_login, DbSerializer::ActionDeleteFolder); // Запись в файл истории
+				DbSerializer::PushHeader(db->GetHistoryBuffer(), GetTime(), client->_login, actionType); // Запись в файл истории
 				db->GetHistoryBuffer().Push(folderId);
+				db->GetHistoryBuffer().Push(newParentFolderId);
 				auto bufPtr = std::make_shared<SerializationBuffer>();       // Разослать пакеты другим клиентам
 				bufPtr->Push(static_cast<uint8_t>(actionType));
 				bufPtr->Push(folderId);
@@ -164,6 +165,29 @@ void SClientMessagesMgr::Update(double dt)
 				AddPacketToClients(bufPtr, client->_dbName);
 			}
 			break;
+			case DbSerializer::ActionRenameFolder:
+			{
+				uint32_t folderId = buf->GetUint<uint32_t>();
+				std::string newFolderName;
+				buf->GetString<uint8_t>(newFolderName);
+				auto& f = db->_folders;                                      // Изменения в базе
+				auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+				if (result != std::end(f)) {
+					result->name = newFolderName;
+				}
+				else {
+					LogMsg("SClientMessagesMgr::Update:DbSerializer::ActionRenameFolder: folder not found");
+				}
+				DbSerializer::PushHeader(db->GetHistoryBuffer(), GetTime(), client->_login, actionType); // Запись в файл истории
+				db->GetHistoryBuffer().Push(folderId);
+				db->GetHistoryBuffer().PushStringWithoutZero<uint8_t>(newFolderName);
+				auto bufPtr = std::make_shared<SerializationBuffer>();       // Разослать пакеты другим клиентам
+				bufPtr->Push(static_cast<uint8_t>(actionType));
+				bufPtr->Push(folderId);
+				bufPtr->PushStringWithoutZero<uint8_t>(newFolderName);
+				AddPacketToClients(bufPtr, client->_dbName);
+			}
+			break;			
 			default:
 				ExitMsg("Wrong actionType");
 			}

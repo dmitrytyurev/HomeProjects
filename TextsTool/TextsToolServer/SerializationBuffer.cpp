@@ -5,13 +5,13 @@
 //
 //===============================================================================
 
-void SerializationBuffer::Push(const std::string& v)
-{
-	const uint8_t* beg = reinterpret_cast<const uint8_t*>(v.c_str());
-	const uint8_t* end = beg + v.length() + 1;
-
-	buffer.insert(buffer.end(), beg, end);
-}
+//void SerializationBuffer::Push(const std::string& v)
+//{
+//	const uint8_t* beg = reinterpret_cast<const uint8_t*>(v.c_str());
+//	const uint8_t* end = beg + v.length() + 1;
+//
+//	buffer.insert(buffer.end(), beg, end);
+//}
 
 //===============================================================================
 //

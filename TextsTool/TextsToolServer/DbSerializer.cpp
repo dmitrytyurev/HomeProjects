@@ -303,6 +303,21 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 			}
 		}
 		break;
+		case ActionRenameFolder:
+		{
+			uint32_t folderId = buf.GetUint<uint32_t>();
+			std::string newFolderName;
+			buf.GetString<uint8_t>(newFolderName);
+			auto& f = _pDataBase->_folders;
+			auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+			if (result != std::end(f)) {
+				result->name = newFolderName;
+			}
+			else {
+				ExitMsg("LoadFromHistory: ActionRenameFolder: Folder id not found");
+			}
+		}
+		break;
 		default:
 			ExitMsg("Unknown action type");
 			break;
