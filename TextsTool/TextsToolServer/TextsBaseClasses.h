@@ -89,10 +89,12 @@ class Folder
 public:
 	Folder() {}
 	void CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);  // Создание объекта из полного файла базы
-	void CreateFromHistory(DeserializationBuffer& buffer);  // Создание объекта из файла истории
-	void CreateFromPacket(DeserializationBuffer& buffer);   // Создание объекта из сообщения от клиента 
 	void SaveToBase(SerializationBuffer& buffer) const;      // Запись объекта в полный файл базы
+
+	void CreateFromHistory(DeserializationBuffer& buffer);  // Создание объекта из файла истории
 	void SaveToHistory(SerializationBuffer& buffer, const std::string& loginOfLastModifier) const;
+
+	void CreateFromPacket(DeserializationBuffer& buffer);   // Создание объекта из сообщения от клиента 
 	SerializationBufferPtr SaveToPacket() const;      // Запись объекта в пакет для рассылки всем клиентам, работающим с этой базой
 
 	uint32_t id = 0;                 // ID папки
