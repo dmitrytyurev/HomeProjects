@@ -65,6 +65,18 @@ void SerializationBuffer::Push(uint32_t v)
 //
 //===============================================================================
 
+void SerializationBuffer::Push(const DeserializationBuffer& buf)
+{
+	const uint8_t* beg = buf._buffer.data();
+	const uint8_t* end = beg + buf._buffer.size();
+
+	buffer.insert(buffer.end(), beg, end);
+}
+
+//===============================================================================
+//
+//===============================================================================
+
 void SerializationBuffer::PushBytes(const void* bytes, int size)
 {
 	const uint8_t* beg = reinterpret_cast<const uint8_t*>(bytes);

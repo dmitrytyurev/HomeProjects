@@ -270,12 +270,13 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 	{
 		std::string modifierLogin;
 		buf.GetString<uint8_t>(modifierLogin);
+		uint32_t ts = buf.GetUint<uint32_t>();
 		uint8_t actionType = buf.GetUint<uint8_t>();
 		switch (actionType)
 		{
 		case ActionCreateFolder:
 			_pDataBase->_folders.emplace_back();
-			_pDataBase->_folders.back().CreateFromHistory(buf);
+			_pDataBase->_folders.back().CreateFromHistory(buf, ts);
 			_pDataBase->_newFolderId = _pDataBase->_folders.back().id + 1;
 			break;
 		case ActionDeleteFolder:
@@ -298,6 +299,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 			auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
 			if (result != std::end(f)) {
 				result->parentId = newParentFolderId;
+				result->timestampModified = ts;
 			} else {
 				ExitMsg("LoadFromHistory: ActionChangeFolderParent: Folder id not found");
 			}
@@ -312,6 +314,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 			auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
 			if (result != std::end(f)) {
 				result->name = newFolderName;
+				result->timestampModified = ts;
 			}
 			else {
 				ExitMsg("LoadFromHistory: ActionRenameFolder: Folder id not found");
@@ -351,16 +354,5 @@ void DbSerializer::LoadDatabaseAndHistory()
 		return;
 	}
 	LoadHistoryInner(_path + _historyFile.name);
-}
-
-//===============================================================================
-//
-//===============================================================================
-
-void DbSerializer::PushHeader(SerializationBuffer& buffer, uint32_t timestamp, const std::string& loginOfLastModifier, uint8_t actionType)
-{
-	buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
-	buffer.Push(actionType);
-	buffer.Push(timestamp);
 }
 

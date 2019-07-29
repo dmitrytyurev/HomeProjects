@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include "DeserializationBuffer.h"
+
 //===============================================================================
 // 
 //===============================================================================
@@ -13,7 +15,8 @@ public:
 	void Push(uint8_t v);
 	void Push(uint16_t v);
 	void Push(uint32_t v);
-//	void Push(const std::string& v);
+	void Push(const DeserializationBuffer& buf);
+	//	void Push(const std::string& v);
 	void PushStringWithoutZero(const std::string& v);
 
 	template <typename T>

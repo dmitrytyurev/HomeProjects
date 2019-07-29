@@ -96,11 +96,10 @@ void Folder::CreateFromBase(DeserializationBuffer& buffer, const std::vector<uin
 //
 //===============================================================================
 
-void Folder::CreateFromHistory(DeserializationBuffer& buffer)
+void Folder::CreateFromHistory(DeserializationBuffer& buffer, uint32_t ts)
 {
-	uint32_t timestamp = buffer.GetUint<uint32_t>();
-	timestampCreated = timestamp;
-	timestampModified = timestamp;
+	timestampCreated = ts;
+	timestampModified = ts;
 	id = buffer.GetUint<uint32_t>();
 	parentId = buffer.GetUint<uint32_t>();
 	buffer.GetString<uint8_t>(name);
@@ -110,10 +109,10 @@ void Folder::CreateFromHistory(DeserializationBuffer& buffer)
 //
 //===============================================================================
 
-void Folder::CreateFromPacket(DeserializationBuffer& buffer)
+void Folder::CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts)
 {
-	timestampCreated = static_cast<uint32_t>(std::time(0));
-	timestampModified = timestampCreated;
+	timestampCreated = ts;
+	timestampModified = ts;
 	parentId = buffer.GetUint<uint32_t>();
 	buffer.GetString<uint8_t>(name);
 }
@@ -139,9 +138,12 @@ void Folder::SaveToBase(SerializationBuffer& buffer) const
 //
 //===============================================================================
 
-void Folder::SaveToHistory(SerializationBuffer& buffer, const std::string& loginOfLastModifier) const
+void Folder::SaveToHistory(TextsDatabasePtr db, const std::string& loginOfLastModifier) const
 {
-	DbSerializer::PushHeader(buffer, timestampCreated, loginOfLastModifier, DbSerializer::ActionCreateFolder);
+	auto& buffer = db->GetHistoryBuffer();
+	buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
+	buffer.Push(timestampCreated);
+	buffer.Push(static_cast<uint8_t>(DbSerializer::ActionCreateFolder));
 	buffer.Push(id);
 	buffer.Push(parentId);
 	buffer.PushStringWithoutZero<uint8_t>(name);
@@ -155,8 +157,8 @@ SerializationBufferPtr Folder::SaveToPacket() const
 {
 	auto bufPtr = std::make_shared<SerializationBuffer>();
 
-	bufPtr->Push(static_cast<uint8_t>(DbSerializer::ActionCreateFolder));
 	bufPtr->Push(timestampCreated);
+	bufPtr->Push(static_cast<uint8_t>(DbSerializer::ActionCreateFolder));
 	bufPtr->Push(id);
 	bufPtr->Push(parentId);
 	bufPtr->PushStringWithoutZero<uint8_t>(name);

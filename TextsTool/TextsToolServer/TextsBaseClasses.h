@@ -83,6 +83,8 @@ public:
 //===============================================================================
 // Каталог с текстами и вложенными каталогами в базе текстов
 //===============================================================================
+class TextsDatabase;
+using TextsDatabasePtr = std::shared_ptr<TextsDatabase>;
 
 class Folder
 {
@@ -91,10 +93,10 @@ public:
 	void CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);  // Создание объекта из полного файла базы
 	void SaveToBase(SerializationBuffer& buffer) const;      // Запись объекта в полный файл базы
 
-	void CreateFromHistory(DeserializationBuffer& buffer);  // Создание объекта из файла истории
-	void SaveToHistory(SerializationBuffer& buffer, const std::string& loginOfLastModifier) const;
+	void CreateFromHistory(DeserializationBuffer& buffer, uint32_t ts);  // Создание объекта из файла истории
+	void SaveToHistory(TextsDatabasePtr db, const std::string& loginOfLastModifier) const;
 
-	void CreateFromPacket(DeserializationBuffer& buffer);   // Создание объекта из сообщения от клиента 
+	void CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts);   // Создание объекта из сообщения от клиента 
 	SerializationBufferPtr SaveToPacket() const;      // Запись объекта в пакет для рассылки всем клиентам, работающим с этой базой
 
 	uint32_t id = 0;                 // ID папки
@@ -112,8 +114,6 @@ public:
 class TextsDatabase
 {
 public:
-	using Ptr = std::shared_ptr<TextsDatabase>;
-
 	void CreateFromBase(const std::string path, const std::string dbName); // Загружает в объект базу из свежих файлов
 	void Update(double dt);
 	SerializationBuffer& GetHistoryBuffer();

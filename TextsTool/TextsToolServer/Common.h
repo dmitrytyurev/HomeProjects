@@ -38,12 +38,14 @@ class SClientMessagesMgr
 public:
 	SClientMessagesMgr(STextsToolApp* app);
 	void Update(double dt);
-	void AddPacketToClients(SerializationBufferPtr& bufPtr, std::string& srcDbName);
+	void AddPacketToClients(SerializationBufferPtr& bufPtr, const std::string& srcDbName);
 
 	STextsToolApp* _app = nullptr;
 
 private:
-	TextsDatabase::Ptr GetDbPtrByDbName(const std::string& dbName);
+	void SaveToHistory(TextsDatabasePtr db, const std::string& login, uint8_t ts, const DeserializationBuffer& buf);
+	void SendToClients(const std::string& dbName, uint8_t ts, const DeserializationBuffer& buf);
+	TextsDatabasePtr GetDbPtrByDbName(const std::string& dbName);
 };
 
 //===============================================================================
@@ -211,7 +213,7 @@ public:
 	STextsToolApp();
 	void Update(double dt);
 
-	std::vector<TextsDatabase::Ptr> _dbs;
+	std::vector<TextsDatabasePtr> _dbs;
 	std::vector<SConnectedClient::Ptr> _clients;
 
 	SClientMessagesMgr _messagesMgr;
