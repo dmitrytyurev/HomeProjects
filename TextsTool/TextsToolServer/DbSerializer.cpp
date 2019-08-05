@@ -321,6 +321,70 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 			}
 		}
 		break;
+		case ActionCreateAttribute:
+		{
+			_pDataBase->_attributeProps.emplace_back();
+			_pDataBase->_attributeProps.back().CreateFromHistory(buf, ts);
+			_pDataBase->_newAttributeId = _pDataBase->_attributeProps.back().id + 1;
+		}
+		break;
+		case ActionDeleteAttribute:
+		{
+			uint8_t attributeId = buf.GetUint<uint8_t>();
+			uint8_t visPosOfDeletedAttr = 0;
+			auto& ap = _pDataBase->_attributeProps;
+			auto result = std::find_if(std::begin(ap), std::end(ap), [attributeId](const AttributeProperty& el) { return el.id == attributeId; });
+			if (result != std::end(ap)) {
+				visPosOfDeletedAttr = result->visiblePosition;
+				ap.erase(result);
+			} 
+			else {
+				ExitMsg("LoadFromHistory: ActionDeleteAttribute: attribute id not found");
+			}
+			for (auto it = ap.begin(); it != ap.end(); ) {  // —двинуть позицию всех атрибутов справа от удал€емого
+				if (it->visiblePosition > visPosOfDeletedAttr) {
+					--(it->visiblePosition);
+				}
+			}
+			for (auto& folder : _pDataBase->_folders) {  // ”далить атрибуты с таким id из всех текстов
+				for (auto& text : folder.texts) {
+					auto& attribs = text->attributes;
+					attribs.erase(std::remove_if(attribs.begin(), attribs.end(), [attributeId](const auto& el) { return el.id == attributeId; }), attribs.end());
+				}
+			}
+		}
+		break;
+		case ActionRenameAttribute:
+		{
+			uint8_t attributeId = buf.GetUint<uint8_t>();
+			std::string newAttributeName;
+			buf.GetString<uint8_t>(newAttributeName);
+			auto& ap = _pDataBase->_attributeProps;
+			auto result = std::find_if(std::begin(ap), std::end(ap), [attributeId](const AttributeProperty& el) { return el.id == attributeId; });
+			if (result != std::end(ap)) {
+				result->name = newAttributeName;
+			}
+			else {
+				ExitMsg("LoadFromHistory: ActionRenameAttribute: attribute id not found");
+			}
+		}
+		break;
+		case ActionChangeAttributeVis:
+		{
+			uint8_t attributeId = buf.GetUint<uint8_t>();
+			uint8_t newVisiblePosition = buf.GetUint<uint8_t>();
+			uint8_t newVisibilityFlag = buf.GetUint<uint8_t>();
+			auto& ap = _pDataBase->_attributeProps;
+			auto result = std::find_if(std::begin(ap), std::end(ap), [attributeId](const AttributeProperty& el) { return el.id == attributeId; });
+			if (result != std::end(ap)) {
+				result->visiblePosition = newVisiblePosition;
+				result->isVisible = static_cast<bool>(newVisibilityFlag);
+			}
+			else {
+				ExitMsg("LoadFromHistory: ActionChangeAttributeVis: attribute id not found");
+			}
+		}
+		break;
 		default:
 			ExitMsg("Unknown action type");
 			break;

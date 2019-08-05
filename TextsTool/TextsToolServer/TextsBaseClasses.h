@@ -7,9 +7,12 @@
 class DeserializationBuffer;
 class SerializationBuffer;
 class DbSerializer;
+class TextsDatabase;
 
 using DbSerializerPtr = std::unique_ptr<DbSerializer>;
 using SerializationBufferPtr = std::shared_ptr<SerializationBuffer>;
+using TextsDatabasePtr = std::shared_ptr<TextsDatabase>;
+
 
 //===============================================================================
 // Свойства атрибута (колонка в базе текстов)
@@ -28,6 +31,12 @@ public:
 	AttributeProperty() {}
 	void CreateFromBase(DeserializationBuffer& buffer);
 	void SaveToBase(SerializationBuffer& buffer) const;
+
+	void CreateFromHistory(DeserializationBuffer& buffer, uint32_t ts);  // Создание объекта из файла истории
+	void SaveToHistory(TextsDatabasePtr db, const std::string& loginOfLastModifier) const;
+
+	void CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32_t newId);   // Создание объекта из сообщения от клиента 
+	SerializationBufferPtr SaveToPacket() const;      // Запись объекта в пакет для рассылки всем клиентам, работающим с этой базой
 
 	uint8_t id = 0;           // ID атрибута
 	std::string name;         // Имя атрибута
@@ -83,8 +92,6 @@ public:
 //===============================================================================
 // Каталог с текстами и вложенными каталогами в базе текстов
 //===============================================================================
-class TextsDatabase;
-using TextsDatabasePtr = std::shared_ptr<TextsDatabase>;
 
 class Folder
 {
@@ -96,7 +103,7 @@ public:
 	void CreateFromHistory(DeserializationBuffer& buffer, uint32_t ts);  // Создание объекта из файла истории
 	void SaveToHistory(TextsDatabasePtr db, const std::string& loginOfLastModifier) const;
 
-	void CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts);   // Создание объекта из сообщения от клиента 
+	void CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32_t newId);   // Создание объекта из сообщения от клиента 
 	SerializationBufferPtr SaveToPacket() const;      // Запись объекта в пакет для рассылки всем клиентам, работающим с этой базой
 
 	uint32_t id = 0;                 // ID папки

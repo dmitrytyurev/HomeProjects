@@ -21,6 +21,10 @@ public:
 		ActionDeleteFolder = 1,         // Удаление каталога (должен не иметь текстов и вложенных каталогов)
 		ActionChangeFolderParent = 2,   // Изменение родительского каталога
 		ActionRenameFolder = 3,         // Переименование каталога
+		ActionCreateAttribute = 4,      // Создание атрибута таблицы
+		ActionDeleteAttribute = 5,      // Удаление атрибута таблицы
+		ActionRenameAttribute = 6,      // Переименование атрибута таблицы
+		ActionChangeAttributeVis = 7,   // Изменение отображаемого порядкового номера атрибута в таблице текстов или видимость атрибута
 	};
 
 	struct HistoryFile

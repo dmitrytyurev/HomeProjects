@@ -142,20 +142,19 @@ void SClientMessagesMgr::Update(double dt)
 			switch (actionType) {
 			case DbSerializer::ActionCreateFolder:
 			{
-				db->_folders.emplace_back();                                 // Изменения в базе
+				db->_folders.emplace_back();                            // Изменения в базе
 				Folder& folder = db->_folders.back();
 				uint32_t ts = GetTime();
-				folder.CreateFromPacket(*buf, ts);
-				folder.id = db->_newFolderId++;
-				folder.SaveToHistory(db, client->_login); // Запись в файл истории
-				SerializationBufferPtr bufPtr = folder.SaveToPacket();        // Разослать пакеты другим клиентам 
+				folder.CreateFromPacket(*buf, ts, db->_newFolderId++);
+				folder.SaveToHistory(db, client->_login);               // Запись в файл истории
+				SerializationBufferPtr bufPtr = folder.SaveToPacket();  // Разослать пакеты другим клиентам 
 				AddPacketToClients(bufPtr, client->_dbName);
 			}
 			break;
 			case DbSerializer::ActionDeleteFolder:
 			{
 				uint32_t folderId = buf->GetUint<uint32_t>();
-				auto& f = db->_folders;                                      // Изменения в базе
+				auto& f = db->_folders;                                 // Изменения в базе
 				auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
 				if (result != std::end(f)) {
 					f.erase(result);
@@ -172,7 +171,7 @@ void SClientMessagesMgr::Update(double dt)
 				uint32_t ts = GetTime();
 				uint32_t folderId = buf->GetUint<uint32_t>();
 				uint32_t newParentFolderId = buf->GetUint<uint32_t>();
-				auto& f = db->_folders;                                      // Изменения в базе
+				auto& f = db->_folders;                                  // Изменения в базе
 				auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
 				if (result != std::end(f)) {
 					result->parentId = newParentFolderId;
@@ -203,6 +202,29 @@ void SClientMessagesMgr::Update(double dt)
 				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам
 			}
 			break;			
+			case DbSerializer::ActionCreateAttribute:
+			{
+				db->_attributeProps.emplace_back();                 // Изменения в базе
+				AttributeProperty& ap = db->_attributeProps.back();
+				uint32_t ts = GetTime();
+				ap.CreateFromPacket(*buf, ts, db->_newAttributeId++);
+				ap.SaveToHistory(db, client->_login);               // Запись в файл истории
+				SerializationBufferPtr bufPtr = ap.SaveToPacket();  // Разослать пакеты другим клиентам 
+				AddPacketToClients(bufPtr, client->_dbName);
+				db->_newAttributeId = db->_attributeProps.back().id + 1;
+			}
+			break;
+			case DbSerializer::ActionDeleteAttribute:
+			{
+			}
+			break;
+			case DbSerializer::ActionRenameAttribute:
+			{
+			}
+			break;
+			case DbSerializer::ActionChangeAttributeVis:
+			{
+			}
 			default:
 				ExitMsg("Wrong actionType");
 			}
@@ -260,14 +282,11 @@ void SMessagesRepaker::Update(double dt)
 			continue;
 		}
 		{
-			MutexLock lock(clLow->packetsQueueOut.mutex);
+			MutexLock lock(_app->_httpManager._mtClients.mutex);
 			for (auto& buf : client->_msgsQueueOut) {
 				clLow->packetsQueueOut.PushPacket(buf->buffer);
 			}
 			client->_msgsQueueOut.resize(0);
-		}
-		{
-			MutexLock lock(clLow->packetsQueueIn.mutex);
 			for (auto& packetPtr : clLow->packetsQueueIn.queue) {
 				client->_msgsQueueIn.push_back(std::make_unique<DeserializationBuffer>(packetPtr->_packetData));
 			}

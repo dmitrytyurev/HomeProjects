@@ -68,12 +68,20 @@ private:
 class HttpPacket
 {
 public:
-	using Ptr = std::unique_ptr<HttpPacket>;
+	using Ptr = std::shared_ptr<HttpPacket>;
+
+	enum class Status
+	{
+		WAITING_FOR_PACKING,
+		PAKING,
+		PACKED
+	};
 
 	HttpPacket(uint32_t packetIndex, std::vector<uint8_t>& packetData);
 
 	uint32_t _packetIndex = 0; // ѕор€дковый номер пакета
 	std::vector<uint8_t> _packetData;
+	Status status;
 };
 
 //===============================================================================
@@ -104,8 +112,6 @@ public:
 	uint32_t lastSentPacketN = 0;     // Ќомер последнего добавленного в эту очередь пакета
 
 	void PushPacket(std::vector<uint8_t>& data);
-
-	std::mutex mutex;
 };
 
 //===============================================================================
@@ -116,7 +122,6 @@ class MTQueueIn
 {
 public:
 	std::vector<HttpPacket::Ptr> queue;
-	std::mutex mutex;
 };
 
 //===============================================================================
@@ -160,6 +165,7 @@ public:
 
 	std::string _login;
 	std::string _dbName;  // »м€ база, с которой сейчас работает клиент
+	bool _startSyncFinished = false; // —тавитс€ в true, когда в _msgsQueueOut записаны все сообщени€ стартовой синхронизации и значит можно добавл€ть сообщени€ синхронизации с других клиентов
 	std::vector<SerializationBufferPtr>   _msgsQueueOut; // ќчередь сообщений, которые нужно отослать клиенту
 	std::vector<DeserializationBuffer::Ptr> _msgsQueueIn;  // ќчередь пришедших от клиента сообщений
 };

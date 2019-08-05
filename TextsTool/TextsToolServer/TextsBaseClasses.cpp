@@ -75,6 +75,77 @@ void AttributeProperty::SaveToBase(SerializationBuffer& buffer) const
 }
 
 //===============================================================================
+// Создание объекта из файла истории
+//===============================================================================
+
+void AttributeProperty::CreateFromHistory(DeserializationBuffer& buffer, uint32_t ts)
+{
+	id = buffer.GetUint<uint8_t>();
+	visiblePosition = buffer.GetUint<uint8_t>();
+	isVisible = static_cast<bool>(buffer.GetUint<uint8_t>());
+	timestampCreated = ts;
+	buffer.GetString<uint8_t>(name);
+	type = buffer.GetUint<uint8_t>();
+	param1 = buffer.GetUint<uint32_t>();
+	param2 = buffer.GetUint<uint32_t>();
+}
+
+//===============================================================================
+// Создание объекта из сообщения от клиента 
+//===============================================================================
+void AttributeProperty::CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32_t newId)
+{
+	id = newId;
+	visiblePosition = buffer.GetUint<uint8_t>();
+	isVisible = static_cast<bool>(buffer.GetUint<uint8_t>());
+	timestampCreated = ts;
+	buffer.GetString<uint8_t>(name);
+	type = buffer.GetUint<uint8_t>();
+	param1 = buffer.GetUint<uint32_t>();
+	param2 = buffer.GetUint<uint32_t>();
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void AttributeProperty::SaveToHistory(TextsDatabasePtr db, const std::string& loginOfLastModifier) const
+{
+	auto& buffer = db->GetHistoryBuffer();
+	buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
+	buffer.Push(timestampCreated);
+	buffer.Push(static_cast<uint8_t>(DbSerializer::ActionCreateAttribute));
+	buffer.Push(id);
+	buffer.Push(visiblePosition);
+	buffer.Push(static_cast<uint8_t>(isVisible));
+	buffer.PushStringWithoutZero<uint8_t>(name);
+	buffer.Push(type);
+	buffer.Push(param1);
+	buffer.Push(param2);
+}
+
+
+//===============================================================================
+//
+//===============================================================================
+
+SerializationBufferPtr AttributeProperty::SaveToPacket() const
+{
+	auto bufPtr = std::make_shared<SerializationBuffer>();
+
+	bufPtr->Push(timestampCreated);
+	bufPtr->Push(static_cast<uint8_t>(DbSerializer::ActionCreateAttribute));
+	bufPtr->Push(id);
+	bufPtr->Push(visiblePosition);
+	bufPtr->Push(static_cast<uint8_t>(isVisible));
+	bufPtr->PushStringWithoutZero<uint8_t>(name);
+	bufPtr->Push(type);
+	bufPtr->Push(param1);
+	bufPtr->Push(param2);
+	return bufPtr;
+}
+
+//===============================================================================
 //
 //===============================================================================
 
@@ -109,8 +180,9 @@ void Folder::CreateFromHistory(DeserializationBuffer& buffer, uint32_t ts)
 //
 //===============================================================================
 
-void Folder::CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts)
+void Folder::CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32_t newId)
 {
+	id = newId;
 	timestampCreated = ts;
 	timestampModified = ts;
 	parentId = buffer.GetUint<uint32_t>();
