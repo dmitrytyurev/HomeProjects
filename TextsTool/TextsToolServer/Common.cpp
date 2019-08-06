@@ -159,7 +159,7 @@ void SClientMessagesMgr::Update(double dt)
 				if (result != std::end(f)) {
 					f.erase(result);
 				} else {
-					LogMsg("SClientMessagesMgr::Update:DbSerializer::ActionDeleteFolder: folder not found");
+					LogMsg("SClientMessagesMgr::Update::ActionDeleteFolder: folder not found");
 				}
 				uint32_t ts = GetTime();
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
@@ -177,7 +177,7 @@ void SClientMessagesMgr::Update(double dt)
 					result->parentId = newParentFolderId;
 					result->timestampModified = ts;
 				} else {
-					LogMsg("SClientMessagesMgr::Update:DbSerializer::ActionChangeFolderParent: folder not found");
+					LogMsg("SClientMessagesMgr::Update::ActionChangeFolderParent: folder not found");
 				}
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
 				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам
@@ -196,7 +196,7 @@ void SClientMessagesMgr::Update(double dt)
 					result->timestampModified = ts;
 				}
 				else {
-					LogMsg("SClientMessagesMgr::Update:DbSerializer::ActionRenameFolder: folder not found");
+					LogMsg("SClientMessagesMgr::Update::ActionRenameFolder: folder not found");
 				}
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
 				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам
@@ -216,6 +216,31 @@ void SClientMessagesMgr::Update(double dt)
 			break;
 			case DbSerializer::ActionDeleteAttribute:
 			{
+				uint8_t attributeId = buf->GetUint<uint8_t>();
+				uint8_t visPosOfDeletedAttr = 0;                   // Изменения в базе
+				auto& ap = db->_attributeProps;
+				auto result = std::find_if(std::begin(ap), std::end(ap), [attributeId](const AttributeProperty& el) { return el.id == attributeId; });
+				if (result != std::end(ap)) {
+					visPosOfDeletedAttr = result->visiblePosition;
+					ap.erase(result);
+				}
+				else {
+					LogMsg("SClientMessagesMgr::Update::ActionDeleteAttribute: attribute id not found");
+				}
+				for (auto it = ap.begin(); it != ap.end(); ) {  // Сдвинуть позицию всех атрибутов справа от удаляемого
+					if (it->visiblePosition > visPosOfDeletedAttr) {
+						--(it->visiblePosition);
+					}
+				}
+				for (auto& folder : db->_folders) {  // Удалить атрибуты с таким id из всех текстов
+					for (auto& text : folder.texts) {
+						auto& attribs = text->attributes;
+						attribs.erase(std::remove_if(attribs.begin(), attribs.end(), [attributeId](const auto& el) { return el.id == attributeId; }), attribs.end());
+					}
+				}				
+				uint32_t ts = GetTime();
+				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
+				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам			
 			}
 			break;
 			case DbSerializer::ActionRenameAttribute:
