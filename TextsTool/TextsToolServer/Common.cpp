@@ -153,14 +153,7 @@ void SClientMessagesMgr::Update(double dt)
 			break;
 			case DbSerializer::ActionDeleteFolder:
 			{
-				uint32_t folderId = buf->GetUint<uint32_t>();
-				auto& f = db->_folders;                                 // Изменения в базе
-				auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
-				if (result != std::end(f)) {
-					f.erase(result);
-				} else {
-					LogMsg("SClientMessagesMgr::Update::ActionDeleteFolder: folder not found");
-				}
+				ModifyDbDeleteFolder(*buf, *db);
 				uint32_t ts = GetTime();
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
 				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам
@@ -169,16 +162,7 @@ void SClientMessagesMgr::Update(double dt)
 			case DbSerializer::ActionChangeFolderParent:
 			{
 				uint32_t ts = GetTime();
-				uint32_t folderId = buf->GetUint<uint32_t>();
-				uint32_t newParentFolderId = buf->GetUint<uint32_t>();
-				auto& f = db->_folders;                                  // Изменения в базе
-				auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
-				if (result != std::end(f)) {
-					result->parentId = newParentFolderId;
-					result->timestampModified = ts;
-				} else {
-					LogMsg("SClientMessagesMgr::Update::ActionChangeFolderParent: folder not found");
-				}
+				ModifyDbChangeFolderParent(*buf, *db, ts);
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
 				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам
 			}
@@ -186,18 +170,7 @@ void SClientMessagesMgr::Update(double dt)
 			case DbSerializer::ActionRenameFolder:
 			{
 				uint32_t ts = GetTime();
-				uint32_t folderId = buf->GetUint<uint32_t>();
-				std::string newFolderName;
-				buf->GetString<uint8_t>(newFolderName);
-				auto& f = db->_folders;                                      // Изменения в базе
-				auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
-				if (result != std::end(f)) {
-					result->name = newFolderName;
-					result->timestampModified = ts;
-				}
-				else {
-					LogMsg("SClientMessagesMgr::Update::ActionRenameFolder: folder not found");
-				}
+				ModifyDbRenameFolder(*buf, *db, ts);              // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
 				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам
 			}
@@ -216,28 +189,7 @@ void SClientMessagesMgr::Update(double dt)
 			break;
 			case DbSerializer::ActionDeleteAttribute:
 			{
-				uint8_t attributeId = buf->GetUint<uint8_t>();
-				uint8_t visPosOfDeletedAttr = 0;                   // Изменения в базе
-				auto& ap = db->_attributeProps;
-				auto result = std::find_if(std::begin(ap), std::end(ap), [attributeId](const AttributeProperty& el) { return el.id == attributeId; });
-				if (result != std::end(ap)) {
-					visPosOfDeletedAttr = result->visiblePosition;
-					ap.erase(result);
-				}
-				else {
-					LogMsg("SClientMessagesMgr::Update::ActionDeleteAttribute: attribute id not found");
-				}
-				for (auto it = ap.begin(); it != ap.end(); ) {  // Сдвинуть позицию всех атрибутов справа от удаляемого
-					if (it->visiblePosition > visPosOfDeletedAttr) {
-						--(it->visiblePosition);
-					}
-				}
-				for (auto& folder : db->_folders) {  // Удалить атрибуты с таким id из всех текстов
-					for (auto& text : folder.texts) {
-						auto& attribs = text->attributes;
-						attribs.erase(std::remove_if(attribs.begin(), attribs.end(), [attributeId](const auto& el) { return el.id == attributeId; }), attribs.end());
-					}
-				}				
+				ModifyDbDeleteAttribute(*buf, *db);               // Изменения в базе
 				uint32_t ts = GetTime();
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
 				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам			
@@ -258,6 +210,92 @@ void SClientMessagesMgr::Update(double dt)
 	}
 }
 
+//===============================================================================
+//
+//===============================================================================
+
+void SClientMessagesMgr::ModifyDbDeleteFolder(DeserializationBuffer& buf, TextsDatabase& db)
+{
+	uint32_t folderId = buf.GetUint<uint32_t>();
+	auto& f = db._folders;                                 // Изменения в базе
+	auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+	if (result != std::end(f)) {
+		f.erase(result);
+	}
+	else {
+		LogMsg("SClientMessagesMgr::Update::ActionDeleteFolder: folder not found");
+	}
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void SClientMessagesMgr::ModifyDbChangeFolderParent(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts)
+{
+	uint32_t folderId = buf.GetUint<uint32_t>();
+	uint32_t newParentFolderId = buf.GetUint<uint32_t>();
+	auto& f = db._folders;                                  // Изменения в базе
+	auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+	if (result != std::end(f)) {
+		result->parentId = newParentFolderId;
+		result->timestampModified = ts;
+	}
+	else {
+		LogMsg("SClientMessagesMgr::Update::ActionChangeFolderParent: folder not found");
+	}
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+
+void SClientMessagesMgr::ModifyDbRenameFolder(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts)
+{
+	uint32_t folderId = buf.GetUint<uint32_t>();
+	std::string newFolderName;
+	buf.GetString<uint8_t>(newFolderName);
+	auto& f = db._folders;                                      
+	auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+	if (result != std::end(f)) {
+		result->name = newFolderName;
+		result->timestampModified = ts;
+	}
+	else {
+		LogMsg("SClientMessagesMgr::Update::ActionRenameFolder: folder not found");
+	}
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void SClientMessagesMgr::ModifyDbDeleteAttribute(DeserializationBuffer& buf, TextsDatabase& db)
+{
+	uint8_t attributeId = buf.GetUint<uint8_t>();
+	uint8_t visPosOfDeletedAttr = 0;                   // Изменения в базе
+	auto& ap = db._attributeProps;
+	auto result = std::find_if(std::begin(ap), std::end(ap), [attributeId](const AttributeProperty& el) { return el.id == attributeId; });
+	if (result != std::end(ap)) {
+		visPosOfDeletedAttr = result->visiblePosition;
+		ap.erase(result);
+	}
+	else {
+		LogMsg("SClientMessagesMgr::Update::ActionDeleteAttribute: attribute id not found");
+	}
+	for (auto it = ap.begin(); it != ap.end(); ) {  // Сдвинуть позицию всех атрибутов справа от удаляемого
+		if (it->visiblePosition > visPosOfDeletedAttr) {
+			--(it->visiblePosition);
+		}
+	}
+	for (auto& folder : db._folders) {  // Удалить атрибуты с таким id из всех текстов
+		for (auto& text : folder.texts) {
+			auto& attribs = text->attributes;
+			attribs.erase(std::remove_if(attribs.begin(), attribs.end(), [attributeId](const auto& el) { return el.id == attributeId; }), attribs.end());
+		}
+	}
+}
 
 //===============================================================================
 //

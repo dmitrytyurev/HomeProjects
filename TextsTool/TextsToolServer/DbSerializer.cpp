@@ -3,6 +3,7 @@
 #include <experimental/filesystem>
 
 #include "DbSerializer.h"
+#include "Common.h"
 
 
 void ExitMsg(const std::string& message);
@@ -280,46 +281,13 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 			_pDataBase->_newFolderId = _pDataBase->_folders.back().id + 1;
 			break;
 		case ActionDeleteFolder:
-		{
-			uint32_t folderId = buf.GetUint<uint32_t>();
-			auto& f = _pDataBase->_folders;
-			auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
-			if (result != std::end(f)) {
-				f.erase(result);
-			} else {
-				ExitMsg("LoadFromHistory: ActionDeleteFolder: Folder id not found");
-			}
-		}
+			SClientMessagesMgr::ModifyDbDeleteFolder(buf, *_pDataBase);
 		break;
 		case ActionChangeFolderParent:
-		{
-			uint32_t folderId = buf.GetUint<uint32_t>();
-			uint32_t newParentFolderId = buf.GetUint<uint32_t>();
-			auto& f = _pDataBase->_folders;
-			auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
-			if (result != std::end(f)) {
-				result->parentId = newParentFolderId;
-				result->timestampModified = ts;
-			} else {
-				ExitMsg("LoadFromHistory: ActionChangeFolderParent: Folder id not found");
-			}
-		}
+			SClientMessagesMgr::ModifyDbChangeFolderParent(buf, *_pDataBase, ts);
 		break;
 		case ActionRenameFolder:
-		{
-			uint32_t folderId = buf.GetUint<uint32_t>();
-			std::string newFolderName;
-			buf.GetString<uint8_t>(newFolderName);
-			auto& f = _pDataBase->_folders;
-			auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
-			if (result != std::end(f)) {
-				result->name = newFolderName;
-				result->timestampModified = ts;
-			}
-			else {
-				ExitMsg("LoadFromHistory: ActionRenameFolder: Folder id not found");
-			}
-		}
+			SClientMessagesMgr::ModifyDbRenameFolder(buf, *_pDataBase, ts);
 		break;
 		case ActionCreateAttribute:
 		{
@@ -329,30 +297,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 		}
 		break;
 		case ActionDeleteAttribute:
-		{
-			uint8_t attributeId = buf.GetUint<uint8_t>();
-			uint8_t visPosOfDeletedAttr = 0;
-			auto& ap = _pDataBase->_attributeProps;
-			auto result = std::find_if(std::begin(ap), std::end(ap), [attributeId](const AttributeProperty& el) { return el.id == attributeId; });
-			if (result != std::end(ap)) {
-				visPosOfDeletedAttr = result->visiblePosition;
-				ap.erase(result);
-			} 
-			else {
-				ExitMsg("LoadFromHistory: ActionDeleteAttribute: attribute id not found");
-			}
-			for (auto it = ap.begin(); it != ap.end(); ) {  // —двинуть позицию всех атрибутов справа от удал€емого
-				if (it->visiblePosition > visPosOfDeletedAttr) {
-					--(it->visiblePosition);
-				}
-			}
-			for (auto& folder : _pDataBase->_folders) {  // ”далить атрибуты с таким id из всех текстов
-				for (auto& text : folder.texts) {
-					auto& attribs = text->attributes;
-					attribs.erase(std::remove_if(attribs.begin(), attribs.end(), [attributeId](const auto& el) { return el.id == attributeId; }), attribs.end());
-				}
-			}
-		}
+			SClientMessagesMgr::ModifyDbDeleteAttribute(buf, *_pDataBase);
 		break;
 		case ActionRenameAttribute:
 		{

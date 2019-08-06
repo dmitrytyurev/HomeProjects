@@ -40,6 +40,11 @@ public:
 	void Update(double dt);
 	void AddPacketToClients(SerializationBufferPtr& bufPtr, const std::string& srcDbName);
 
+	static void ModifyDbRenameFolder(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts);
+	static void ModifyDbDeleteFolder(DeserializationBuffer& buf, TextsDatabase& db);
+	static void ModifyDbChangeFolderParent(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts);
+	static void ModifyDbDeleteAttribute(DeserializationBuffer& buf, TextsDatabase& db);
+
 	STextsToolApp* _app = nullptr;
 
 private:
