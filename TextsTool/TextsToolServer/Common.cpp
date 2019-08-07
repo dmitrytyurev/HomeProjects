@@ -139,12 +139,12 @@ void SClientMessagesMgr::Update(double dt)
 		TextsDatabasePtr db = GetDbPtrByDbName(client->_dbName);
 		for (const auto& buf : client->_msgsQueueIn) {
 			uint8_t actionType = buf->GetUint<uint8_t>();
+			uint32_t ts = GetTime();
 			switch (actionType) {
 			case DbSerializer::ActionCreateFolder:
 			{
 				db->_folders.emplace_back();                            // Изменения в базе
 				Folder& folder = db->_folders.back();
-				uint32_t ts = GetTime();
 				folder.CreateFromPacket(*buf, ts, db->_newFolderId++);
 				folder.SaveToHistory(db, client->_login);               // Запись в файл истории
 				SerializationBufferPtr bufPtr = folder.SaveToPacket();  // Разослать пакеты другим клиентам 
@@ -154,14 +154,12 @@ void SClientMessagesMgr::Update(double dt)
 			case DbSerializer::ActionDeleteFolder:
 			{
 				ModifyDbDeleteFolder(*buf, *db);
-				uint32_t ts = GetTime();
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
 				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам
 			}
 			break;
 			case DbSerializer::ActionChangeFolderParent:
 			{
-				uint32_t ts = GetTime();
 				ModifyDbChangeFolderParent(*buf, *db, ts);
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
 				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам
@@ -169,7 +167,6 @@ void SClientMessagesMgr::Update(double dt)
 			break;
 			case DbSerializer::ActionRenameFolder:
 			{
-				uint32_t ts = GetTime();
 				ModifyDbRenameFolder(*buf, *db, ts);              // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
 				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам
@@ -179,7 +176,6 @@ void SClientMessagesMgr::Update(double dt)
 			{
 				db->_attributeProps.emplace_back();                 // Изменения в базе
 				AttributeProperty& ap = db->_attributeProps.back();
-				uint32_t ts = GetTime();
 				ap.CreateFromPacket(*buf, ts, db->_newAttributeId++);
 				ap.SaveToHistory(db, client->_login);               // Запись в файл истории
 				SerializationBufferPtr bufPtr = ap.SaveToPacket();  // Разослать пакеты другим клиентам 
@@ -189,18 +185,23 @@ void SClientMessagesMgr::Update(double dt)
 			break;
 			case DbSerializer::ActionDeleteAttribute:
 			{
-				ModifyDbDeleteAttribute(*buf, *db);               // Изменения в базе
-				uint32_t ts = GetTime();
+				ModifyDbDeleteAttribute(*buf, *db, ts);           // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
 				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам			
 			}
 			break;
 			case DbSerializer::ActionRenameAttribute:
 			{
+				ModifyDbRenameAttribute(*buf, *db);               // Изменения в базе
+				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
+				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам			
 			}
 			break;
 			case DbSerializer::ActionChangeAttributeVis:
 			{
+				ModifyDbChangeAttributeVis(*buf, *db);            // Изменения в базе
+				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
+				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам			
 			}
 			default:
 				ExitMsg("Wrong actionType");
@@ -271,7 +272,7 @@ void SClientMessagesMgr::ModifyDbRenameFolder(DeserializationBuffer& buf, TextsD
 //
 //===============================================================================
 
-void SClientMessagesMgr::ModifyDbDeleteAttribute(DeserializationBuffer& buf, TextsDatabase& db)
+void SClientMessagesMgr::ModifyDbDeleteAttribute(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts)
 {
 	uint8_t attributeId = buf.GetUint<uint8_t>();
 	uint8_t visPosOfDeletedAttr = 0;                   // Изменения в базе
@@ -292,8 +293,52 @@ void SClientMessagesMgr::ModifyDbDeleteAttribute(DeserializationBuffer& buf, Tex
 	for (auto& folder : db._folders) {  // Удалить атрибуты с таким id из всех текстов
 		for (auto& text : folder.texts) {
 			auto& attribs = text->attributes;
+			int prevSize = attribs.size();
 			attribs.erase(std::remove_if(attribs.begin(), attribs.end(), [attributeId](const auto& el) { return el.id == attributeId; }), attribs.end());
+			if (attribs.size() != prevSize) {
+				text->timestampModified = ts;
+				folder.timestampModified = ts;
+			}
 		}
+	}
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void SClientMessagesMgr::ModifyDbRenameAttribute(DeserializationBuffer& buf, TextsDatabase& db)
+{
+	uint8_t attributeId = buf.GetUint<uint8_t>();
+	std::string newAttributeName;
+	buf.GetString<uint8_t>(newAttributeName);
+	auto& ap = db._attributeProps;
+	auto result = std::find_if(std::begin(ap), std::end(ap), [attributeId](const AttributeProperty& el) { return el.id == attributeId; });
+	if (result != std::end(ap)) {
+		result->name = newAttributeName;
+	}
+	else {
+		ExitMsg("ModifyDbRenameAttribute: attribute id not found");
+	}
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void SClientMessagesMgr::ModifyDbChangeAttributeVis(DeserializationBuffer& buf, TextsDatabase& db)
+{
+	uint8_t attributeId = buf.GetUint<uint8_t>();
+	uint8_t newVisiblePosition = buf.GetUint<uint8_t>();
+	uint8_t newVisibilityFlag = buf.GetUint<uint8_t>();
+	auto& ap = db._attributeProps;
+	auto result = std::find_if(std::begin(ap), std::end(ap), [attributeId](const AttributeProperty& el) { return el.id == attributeId; });
+	if (result != std::end(ap)) {
+		result->visiblePosition = newVisiblePosition;
+		result->isVisible = static_cast<bool>(newVisibilityFlag);
+	}
+	else {
+		ExitMsg("ModifyDbChangeAttributeVis: attribute id not found");
 	}
 }
 

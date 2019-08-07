@@ -43,7 +43,9 @@ public:
 	static void ModifyDbRenameFolder(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts);
 	static void ModifyDbDeleteFolder(DeserializationBuffer& buf, TextsDatabase& db);
 	static void ModifyDbChangeFolderParent(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts);
-	static void ModifyDbDeleteAttribute(DeserializationBuffer& buf, TextsDatabase& db);
+	static void ModifyDbDeleteAttribute(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts);
+	static void ModifyDbRenameAttribute(DeserializationBuffer& buf, TextsDatabase& db);
+	static void ModifyDbChangeAttributeVis(DeserializationBuffer& buf, TextsDatabase& db);
 
 	STextsToolApp* _app = nullptr;
 

@@ -285,51 +285,24 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 		break;
 		case ActionChangeFolderParent:
 			SClientMessagesMgr::ModifyDbChangeFolderParent(buf, *_pDataBase, ts);
-		break;
+			break;
 		case ActionRenameFolder:
 			SClientMessagesMgr::ModifyDbRenameFolder(buf, *_pDataBase, ts);
-		break;
+			break;
 		case ActionCreateAttribute:
-		{
 			_pDataBase->_attributeProps.emplace_back();
 			_pDataBase->_attributeProps.back().CreateFromHistory(buf, ts);
 			_pDataBase->_newAttributeId = _pDataBase->_attributeProps.back().id + 1;
-		}
-		break;
+			break;
 		case ActionDeleteAttribute:
-			SClientMessagesMgr::ModifyDbDeleteAttribute(buf, *_pDataBase);
-		break;
+			SClientMessagesMgr::ModifyDbDeleteAttribute(buf, *_pDataBase, ts);
+			break;
 		case ActionRenameAttribute:
-		{
-			uint8_t attributeId = buf.GetUint<uint8_t>();
-			std::string newAttributeName;
-			buf.GetString<uint8_t>(newAttributeName);
-			auto& ap = _pDataBase->_attributeProps;
-			auto result = std::find_if(std::begin(ap), std::end(ap), [attributeId](const AttributeProperty& el) { return el.id == attributeId; });
-			if (result != std::end(ap)) {
-				result->name = newAttributeName;
-			}
-			else {
-				ExitMsg("LoadFromHistory: ActionRenameAttribute: attribute id not found");
-			}
-		}
-		break;
+			SClientMessagesMgr::ModifyDbRenameAttribute(buf, *_pDataBase);
+			break;
 		case ActionChangeAttributeVis:
-		{
-			uint8_t attributeId = buf.GetUint<uint8_t>();
-			uint8_t newVisiblePosition = buf.GetUint<uint8_t>();
-			uint8_t newVisibilityFlag = buf.GetUint<uint8_t>();
-			auto& ap = _pDataBase->_attributeProps;
-			auto result = std::find_if(std::begin(ap), std::end(ap), [attributeId](const AttributeProperty& el) { return el.id == attributeId; });
-			if (result != std::end(ap)) {
-				result->visiblePosition = newVisiblePosition;
-				result->isVisible = static_cast<bool>(newVisibilityFlag);
-			}
-			else {
-				ExitMsg("LoadFromHistory: ActionChangeAttributeVis: attribute id not found");
-			}
-		}
-		break;
+			SClientMessagesMgr::ModifyDbChangeAttributeVis(buf, *_pDataBase);
+			break;
 		default:
 			ExitMsg("Unknown action type");
 			break;
