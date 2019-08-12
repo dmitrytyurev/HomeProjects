@@ -218,7 +218,8 @@ void SClientMessagesMgr::Update(double dt)
 					tt.loginOfLastModifier = client->_login;
 					tt.timestampCreated = ts;
 					tt.timestampModified = ts;
-					tt.SaveToHistory(db, folderId);                     // Запись в файл истории
+					tt.offsLastModified = db->GetCurrentPosInHistoryFile();
+					tt.SaveToHistory(db, folderId);                             // Запись в файл истории
 					SerializationBufferPtr bufPtr = tt.SaveToPacket(folderId);  // Разослать пакеты другим клиентам 
 					AddPacketToClients(bufPtr, client->_dbName);
 				}
@@ -227,6 +228,17 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
+			case DbSerializer::ActionDeleteText:
+			{
+				ModifyDbDeleteText(*buf, *db);                 // Изменения в базе
+				SaveToHistory(db, client->_login, ts, *buf);   
+				SendToClients(client->_dbName, ts, *buf);      // Разослать пакеты другим клиентам			
+			}
+
+
+// ??? В SendToClients событий о текстах должен посылаться логин - чтобы заполнять на клиенте поле - логина модификатора!
+// !!!! В SaveToHistory событий об изменении текстов. Сначала сохраняем в файл-истории включая значение offsLastModified, а потом в объекте offsLastModified = смещение перед началом записи события
+
 			default:
 				ExitMsg("Wrong actionType");
 			}

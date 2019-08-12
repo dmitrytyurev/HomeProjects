@@ -290,8 +290,6 @@ void TextTranslated::SaveToBase(SerializationBuffer& buffer) const
 
 void TextTranslated::SaveToHistory(TextsDatabasePtr db, uint32_t folderId)
 {
-	offsLastModified = db->GetCurrentPosInHistoryFile();
-
 	auto& buffer = db->GetHistoryBuffer();
 	buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
 	buffer.Push(timestampCreated);
