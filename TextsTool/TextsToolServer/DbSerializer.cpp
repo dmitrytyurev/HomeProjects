@@ -37,8 +37,10 @@ void DbSerializer::HistoryFlush()
 		if (file.rdstate()) {
 			ExitMsg("Error creating file " + fullFileName);
 		}
-		file.write("TDHF0001", 8);
+		const int HEADER_SIZE = 8;
+		file.write("TDHF0001", HEADER_SIZE);
 		isJustCreated = true;
+		_historyFile.savedFileSize = HEADER_SIZE;
 	}
 	if (!isJustCreated) {
 		std::string fullFileName = _path + _historyFile.name;
@@ -50,6 +52,7 @@ void DbSerializer::HistoryFlush()
 
 	file.write(reinterpret_cast<const char*>(_historyFile.buffer.buffer.data()), _historyFile.buffer.buffer.size());
 	file.close();
+	_historyFile.savedFileSize += _historyFile.buffer.buffer.size();
 	_historyFile.buffer.buffer.clear();
 }
 
@@ -269,6 +272,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 
 	while (true)
 	{
+		uint32_t offsToEventBegin = buf.offset;
 		std::string modifierLogin;
 		buf.GetString<uint8_t>(modifierLogin);
 		uint32_t ts = buf.GetUint<uint32_t>();
@@ -303,8 +307,42 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 		case ActionChangeAttributeVis:
 			SClientMessagesMgr::ModifyDbChangeAttributeVis(buf, *_pDataBase);
 			break;
+		case ActionCreateText:
+		{
+			uint32_t folderId = buf.GetUint<uint32_t>();
+			std::string textId;
+			buf.GetString<uint8_t>(textId);
+			auto& f = _pDataBase->_folders;
+			auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+			if (result != std::end(f)) {
+				result->texts.emplace_back();
+				TextTranslated& tt = *(result->texts.back());
+				tt.id = textId;
+				tt.timestampCreated = ts;
+				tt.timestampModified = ts;
+				tt.loginOfLastModifier = modifierLogin;
+				tt.offsLastModified = offsToEventBegin;
+			}
+			else {
+				ExitMsg("DbSerializer::LoadHistoryInner: ActionCreateText: folder not found");
+			}
+		}
+		break;
+		case ActionDeleteText:
+			SClientMessagesMgr::ModifyDbDeleteText(buf, *_pDataBase);
+			break;
+
+
+
+
+
+		 // !!! ѕосле чтени€ любого изменени€ текста нужно заполнить offsLastModified - откуда прочитали!!!    tt.offsLastModified = offsToEventBegin;
+
+
+
+			// !!!!!!!!!!!!!!!!! ѕосмотреть все пол€ текста - там нужно запомнить последнее изменение, смещение в файле истории до предыдущего изменени€ и т.п.
 		default:
-			ExitMsg("Unknown action type");
+			ExitMsg("DbSerializer::LoadHistoryInner: Unknown action type");
 			break;
 		}
 		if (buf.IsEmpty()) {
@@ -337,4 +375,13 @@ void DbSerializer::LoadDatabaseAndHistory()
 	}
 	LoadHistoryInner(_path + _historyFile.name);
 }
+
+//===============================================================================
+//===============================================================================
+
+uint32_t DbSerializer::GetCurrentPosInHistoryFile()
+{
+	return _historyFile.savedFileSize + _historyFile.buffer.buffer.size();
+}
+
 

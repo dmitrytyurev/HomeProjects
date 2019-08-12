@@ -203,6 +203,30 @@ void SClientMessagesMgr::Update(double dt)
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
 				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам			
 			}
+			break;
+			case DbSerializer::ActionCreateText:
+			{
+				uint32_t folderId = buf->GetUint<uint32_t>();     // Изменения в базе
+				std::string textId;
+				buf->GetString<uint8_t>(textId);
+				auto& f = db->_folders;
+				auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+				if (result != std::end(f)) {
+					result->texts.emplace_back();
+					TextTranslated& tt = *(result->texts.back());
+					tt.id = textId;
+					tt.loginOfLastModifier = client->_login;
+					tt.timestampCreated = ts;
+					tt.timestampModified = ts;
+					tt.SaveToHistory(db, folderId);                     // Запись в файл истории
+					SerializationBufferPtr bufPtr = tt.SaveToPacket(folderId);  // Разослать пакеты другим клиентам 
+					AddPacketToClients(bufPtr, client->_dbName);
+				}
+				else {
+					LogMsg("SClientMessagesMgr::Update: ActionCreateText: folder not found");
+				}
+			}
+			break;
 			default:
 				ExitMsg("Wrong actionType");
 			}
@@ -340,6 +364,24 @@ void SClientMessagesMgr::ModifyDbChangeAttributeVis(DeserializationBuffer& buf, 
 	else {
 		ExitMsg("ModifyDbChangeAttributeVis: attribute id not found");
 	}
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void SClientMessagesMgr::ModifyDbDeleteText(DeserializationBuffer& buf, TextsDatabase& db)
+{
+	std::string textId;
+	buf.GetString<uint8_t>(textId);
+	for (auto& f: db._folders) {
+		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslated::Ptr& el) { return el->id == textId; });
+		if (result != std::end(f.texts)) {
+			f.texts.erase(result);
+			return;
+		}
+	}
+	ExitMsg("ModifyDbDeleteText: text id not found");
 }
 
 //===============================================================================

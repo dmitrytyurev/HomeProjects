@@ -45,6 +45,15 @@ SerializationBuffer& TextsDatabase::GetHistoryBuffer()
 //
 //===============================================================================
 
+uint32_t TextsDatabase::GetCurrentPosInHistoryFile()
+{
+	return _dbSerializer->GetCurrentPosInHistoryFile();
+}
+
+//===============================================================================
+//
+//===============================================================================
+
 void AttributeProperty::CreateFromBase(DeserializationBuffer& buffer)
 {
 	id = buffer.GetUint<uint8_t>();
@@ -273,6 +282,38 @@ void TextTranslated::SaveToBase(SerializationBuffer& buffer) const
 	for (const auto& attrib : attributes) {
 		attrib.SaveToBase(buffer);
 	}
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void TextTranslated::SaveToHistory(TextsDatabasePtr db, uint32_t folderId)
+{
+	offsLastModified = db->GetCurrentPosInHistoryFile();
+
+	auto& buffer = db->GetHistoryBuffer();
+	buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
+	buffer.Push(timestampCreated);
+	buffer.Push(static_cast<uint8_t>(DbSerializer::ActionCreateText));
+	buffer.Push(folderId);
+	buffer.PushStringWithoutZero<uint8_t>(id);
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+SerializationBufferPtr TextTranslated::SaveToPacket(uint32_t folderId) const
+{
+	auto bufPtr = std::make_shared<SerializationBuffer>();
+
+	bufPtr->Push(timestampCreated);
+	bufPtr->Push(static_cast<uint8_t>(DbSerializer::ActionCreateText));
+	bufPtr->PushStringWithoutZero<uint8_t>(loginOfLastModifier);
+	bufPtr->PushStringWithoutZero<uint8_t>(id);
+
+	return bufPtr;
 }
 
 //===============================================================================

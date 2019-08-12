@@ -79,6 +79,11 @@ public:
 	void CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);
 	void SaveToBase(SerializationBuffer& buffer) const;
 
+	void SaveToHistory(TextsDatabasePtr db, uint32_t folderId);
+
+	SerializationBufferPtr SaveToPacket(uint32_t folderId) const;      // Запись объекта в пакет для рассылки всем клиентам, работающим с этой базой
+
+
 	std::string id;                   // ID текста
 	uint32_t timestampCreated = 0;    // Время создания
 	uint32_t timestampModified = 0;   // Время последнего изменения
@@ -124,6 +129,7 @@ public:
 	void CreateFromBase(const std::string path, const std::string dbName); // Загружает в объект базу из свежих файлов
 	void Update(double dt);
 	SerializationBuffer& GetHistoryBuffer();
+	uint32_t GetCurrentPosInHistoryFile();
 
 	std::string _dbName;           // Имя базы данных текстов
 	uint8_t _newAttributeId = 0;   // Когда пользователь создаёт новый атрибут, берём этот номер. Поле инкрементим.

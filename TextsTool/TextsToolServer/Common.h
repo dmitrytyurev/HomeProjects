@@ -46,6 +46,7 @@ public:
 	static void ModifyDbDeleteAttribute(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts);
 	static void ModifyDbRenameAttribute(DeserializationBuffer& buf, TextsDatabase& db);
 	static void ModifyDbChangeAttributeVis(DeserializationBuffer& buf, TextsDatabase& db);
+	static void ModifyDbDeleteText(DeserializationBuffer& buf, TextsDatabase& db);
 
 	STextsToolApp* _app = nullptr;
 

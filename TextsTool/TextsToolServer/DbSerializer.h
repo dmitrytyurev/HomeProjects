@@ -25,12 +25,15 @@ public:
 		ActionDeleteAttribute = 5,      // Удаление атрибута таблицы
 		ActionRenameAttribute = 6,      // Переименование атрибута таблицы
 		ActionChangeAttributeVis = 7,   // Изменение отображаемого порядкового номера атрибута в таблице текстов или видимость атрибута
+		ActionCreateText = 8,           // Создание текста
+		ActionDeleteText = 9,           // Удаление текста
 	};
 
 	struct HistoryFile
 	{
 		std::string name;                // Имя файла истории текущей базы (пустая строка, если файл истории ещё не создавался - с момента чтения/записи основного файла не было событий)
 		double timeToFlush = 0;          // Время в секундах до флаша буфера истории на диск
+		uint32_t savedFileSize = 0;      // Объём файла истории, который уже записан на диск
 		SerializationBuffer buffer;
 	};
 
@@ -43,6 +46,7 @@ public:
 
 	void HistoryFlush();
 	SerializationBuffer& GetHistoryBuffer();
+	uint32_t GetCurrentPosInHistoryFile();  // Возвращает текущее смещение от начала файла истории (включая содержимое буфера)
 
 private:
 	std::string FindFreshBaseFileName(uint32_t& resultTimestamp);
