@@ -236,8 +236,17 @@ void SClientMessagesMgr::Update(double dt)
 			}
 
 
-// ??? В SendToClients событий о текстах должен посылаться логин - чтобы заполнять на клиенте поле - логина модификатора!
-// !!!! В SaveToHistory событий об изменении текстов. Сначала сохраняем в файл-истории включая значение offsLastModified, а потом в объекте offsLastModified = смещение перед началом записи события
+	
+
+/* Логин модификатора
+       - В SaveToHistory пишется всегда в заголовке
+	   - В SaveToPacket пишется во все события над текстами кроме удаления (в создание пишется!)
+   Offset
+	   - В SaveToHistory пишется во все события над текстами кроме создания и удаления
+            - Сначала сохраняем инфу о событии в файл-истории включая значение offsLastModified
+			- А потом в объекте offsLastModified = смещение перед началом записи события	      !!!!!!!! Это делаем в создании текста тоже, хотя offset туда не сохраняем !!!!!!
+	   - В SaveToPacket не пишется
+*/
 
 			default:
 				ExitMsg("Wrong actionType");
@@ -394,6 +403,41 @@ void SClientMessagesMgr::ModifyDbDeleteText(DeserializationBuffer& buf, TextsDat
 		}
 	}
 	ExitMsg("ModifyDbDeleteText: text id not found");
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void SClientMessagesMgr::ModifyDbMoveTextToFolder(DeserializationBuffer& buf, TextsDatabase& db, const std::string& modifierLogin, uint32_t offsToEventBegin)
+{
+	uint32_t tsModified = buf.GetUint<uint32_t>();
+	uint32_t offsLastModified = buf.GetUint<uint32_t>();
+	std::string textId;
+	buf.GetString<uint8_t>(textId);
+	uint32_t newFolderId = buf.GetUint<uint32_t>();
+
+	for (auto& f : db._folders) {
+		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslated::Ptr& el) { return el->id == textId; });
+		if (result != std::end(f.texts)) {
+			std::shared_ptr<TextTranslated> tmpTextPtr = *result;
+			f.texts.erase(result);
+			f.timestampModified = tsModified;
+			for (auto& f2 : db._folders) {
+				if (f2.id == newFolderId) {
+					f2.texts.emplace_back(tmpTextPtr);
+					f2.timestampModified = tsModified;
+					tmpTextPtr->timestampModified = tsModified;
+					tmpTextPtr->loginOfLastModifier = modifierLogin;
+					tmpTextPtr->offsLastModified = offsToEventBegin;
+					return;
+				}
+			}
+			ExitMsg("ModifyDbMoveTextToFolder: folder not found");
+			return;
+		}
+	}
+	ExitMsg("ModifyDbMoveTextToFolder: text id not found");
 }
 
 //===============================================================================

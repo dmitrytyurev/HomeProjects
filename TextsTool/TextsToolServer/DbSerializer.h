@@ -27,6 +27,7 @@ public:
 		ActionChangeAttributeVis = 7,   // Изменение отображаемого порядкового номера атрибута в таблице текстов или видимость атрибута
 		ActionCreateText = 8,           // Создание текста
 		ActionDeleteText = 9,           // Удаление текста
+		ActionMoveTextToFolder = 10,    // Текст переместился в другую папку
 	};
 
 	struct HistoryFile

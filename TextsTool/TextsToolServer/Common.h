@@ -47,6 +47,7 @@ public:
 	static void ModifyDbRenameAttribute(DeserializationBuffer& buf, TextsDatabase& db);
 	static void ModifyDbChangeAttributeVis(DeserializationBuffer& buf, TextsDatabase& db);
 	static void ModifyDbDeleteText(DeserializationBuffer& buf, TextsDatabase& db);
+	static void ModifyDbMoveTextToFolder(DeserializationBuffer& buf, TextsDatabase& db, const std::string& modifierLogin, uint32_t offsToEventBegin);
 
 	STextsToolApp* _app = nullptr;
 

@@ -331,16 +331,20 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 		case ActionDeleteText:
 			SClientMessagesMgr::ModifyDbDeleteText(buf, *_pDataBase);
 			break;
+		case ActionMoveTextToFolder:
+			SClientMessagesMgr::ModifyDbMoveTextToFolder(buf, *_pDataBase, modifierLogin, offsToEventBegin);
+			break;
+
+			
 
 
 
+		// !!!!!!!!!!!!!!!!
+		// После чтения любого изменения текста, у него нужно заполнить следующие поля:
+		//   timestampModified = tsModified;
+		//   loginOfLastModifier = modifierLogin;
+		//   offsLastModified = offsToEventBegin;
 
-
-		 // !!! После чтения любого изменения текста нужно заполнить offsLastModified - откуда прочитали!!!    tt.offsLastModified = offsToEventBegin;
-
-
-
-			// !!!!!!!!!!!!!!!!! Посмотреть все поля текста - там нужно запомнить последнее изменение, смещение в файле истории до предыдущего изменения и т.п.
 		default:
 			ExitMsg("DbSerializer::LoadHistoryInner: Unknown action type");
 			break;
