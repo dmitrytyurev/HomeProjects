@@ -332,7 +332,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 			SClientMessagesMgr::ModifyDbDeleteText(buf, *_pDataBase);
 			break;
 		case ActionMoveTextToFolder:
-			SClientMessagesMgr::ModifyDbMoveTextToFolder(buf, *_pDataBase, modifierLogin, offsToEventBegin);
+			SClientMessagesMgr::ModifyDbMoveTextToFolder(buf, *_pDataBase, modifierLogin, offsToEventBegin, ts);
 			break;
 
 			

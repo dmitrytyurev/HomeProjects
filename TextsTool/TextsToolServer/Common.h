@@ -47,13 +47,13 @@ public:
 	static void ModifyDbRenameAttribute(DeserializationBuffer& buf, TextsDatabase& db);
 	static void ModifyDbChangeAttributeVis(DeserializationBuffer& buf, TextsDatabase& db);
 	static void ModifyDbDeleteText(DeserializationBuffer& buf, TextsDatabase& db);
-	static void ModifyDbMoveTextToFolder(DeserializationBuffer& buf, TextsDatabase& db, const std::string& modifierLogin, uint32_t offsToEventBegin);
+	static TextTranslated::Ptr ModifyDbMoveTextToFolder(DeserializationBuffer& buf, TextsDatabase& db, const std::string& modifierLogin, uint32_t ts);
 
 	STextsToolApp* _app = nullptr;
 
 private:
 	void SaveToHistory(TextsDatabasePtr db, const std::string& login, uint8_t ts, const DeserializationBuffer& buf);
-	void SendToClients(const std::string& dbName, uint8_t ts, const DeserializationBuffer& buf);
+	void SendToClients(const std::string& dbName, uint8_t ts, const DeserializationBuffer& buf, const std::string& loginOfLastModifier);
 	TextsDatabasePtr GetDbPtrByDbName(const std::string& dbName);
 };
 

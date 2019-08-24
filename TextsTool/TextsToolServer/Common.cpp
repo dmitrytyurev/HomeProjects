@@ -119,9 +119,10 @@ void SClientMessagesMgr::SaveToHistory(TextsDatabasePtr db, const std::string& l
 // Разослать пакеты другим клиентам
 //===============================================================================
 
-void SClientMessagesMgr::SendToClients(const std::string& dbName, uint8_t ts, const DeserializationBuffer& buf)
+void SClientMessagesMgr::SendToClients(const std::string& dbName, uint8_t ts, const DeserializationBuffer& buf, const std::string& loginOfLastModifier)
 {
 	auto bufPtr = std::make_shared<SerializationBuffer>();       
+	bufPtr->PushStringWithoutZero<uint8_t>(loginOfLastModifier);
 	bufPtr->Push(ts);
 	bufPtr->Push(buf);
 	AddPacketToClients(bufPtr, dbName);
@@ -155,21 +156,21 @@ void SClientMessagesMgr::Update(double dt)
 			{
 				ModifyDbDeleteFolder(*buf, *db);
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
-				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам
+				SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам
 			}
 			break;
 			case DbSerializer::ActionChangeFolderParent:
 			{
 				ModifyDbChangeFolderParent(*buf, *db, ts);
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
-				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам
+				SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам
 			}
 			break;
 			case DbSerializer::ActionRenameFolder:
 			{
 				ModifyDbRenameFolder(*buf, *db, ts);              // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
-				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам
+				SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам
 			}
 			break;			
 			case DbSerializer::ActionCreateAttribute:
@@ -187,21 +188,21 @@ void SClientMessagesMgr::Update(double dt)
 			{
 				ModifyDbDeleteAttribute(*buf, *db, ts);           // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
-				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам			
+				SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам			
 			}
 			break;
 			case DbSerializer::ActionRenameAttribute:
 			{
 				ModifyDbRenameAttribute(*buf, *db);               // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
-				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам			
+				SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам			
 			}
 			break;
 			case DbSerializer::ActionChangeAttributeVis:
 			{
 				ModifyDbChangeAttributeVis(*buf, *db);            // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
-				SendToClients(client->_dbName, ts, *buf);         // Разослать пакеты другим клиентам			
+				SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам			
 			}
 			break;
 			case DbSerializer::ActionCreateText:
@@ -231,14 +232,26 @@ void SClientMessagesMgr::Update(double dt)
 			case DbSerializer::ActionDeleteText:
 			{
 				ModifyDbDeleteText(*buf, *db);                 // Изменения в базе
-				SaveToHistory(db, client->_login, ts, *buf);   
-				SendToClients(client->_dbName, ts, *buf);      // Разослать пакеты другим клиентам			
+				SaveToHistory(db, client->_login, ts, *buf);   // Запись в файл истории
+				SendToClients(client->_dbName, ts, *buf, "");  // Разослать пакеты другим клиентам			
 			}
+			break;
+			case DbSerializer::ActionMoveTextToFolder:
+			{
+				uint32_t offsInHistoryFile = db->GetCurrentPosInHistoryFile();
+				TextTranslated::Ptr textPtr = ModifyDbMoveTextToFolder(*buf, *db, client->_login, ts); // Изменения в базе
+				SaveToHistory(db, client->_login, ts, *buf);               // Запись в файл истории
+				db->GetHistoryBuffer().Push(textPtr->offsLastModified);
+				textPtr->offsLastModified = offsInHistoryFile;             // Обновление смещения до инфы о предыдущем изменении текста в файле истории 
+				SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
+			}
+			break;
 
 
 	
 
-/* Логин модификатора
+/*
+  Логин модификатора
        - В SaveToHistory пишется всегда в заголовке
 	   - В SaveToPacket пишется во все события над текстами кроме удаления (в создание пишется!)
    Offset
@@ -409,10 +422,8 @@ void SClientMessagesMgr::ModifyDbDeleteText(DeserializationBuffer& buf, TextsDat
 //
 //===============================================================================
 
-void SClientMessagesMgr::ModifyDbMoveTextToFolder(DeserializationBuffer& buf, TextsDatabase& db, const std::string& modifierLogin, uint32_t offsToEventBegin)
+TextTranslated::Ptr SClientMessagesMgr::ModifyDbMoveTextToFolder(DeserializationBuffer& buf, TextsDatabase& db, const std::string& modifierLogin, uint32_t ts)
 {
-	uint32_t tsModified = buf.GetUint<uint32_t>();
-	uint32_t offsLastModified = buf.GetUint<uint32_t>();
 	std::string textId;
 	buf.GetString<uint8_t>(textId);
 	uint32_t newFolderId = buf.GetUint<uint32_t>();
@@ -420,17 +431,16 @@ void SClientMessagesMgr::ModifyDbMoveTextToFolder(DeserializationBuffer& buf, Te
 	for (auto& f : db._folders) {
 		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslated::Ptr& el) { return el->id == textId; });
 		if (result != std::end(f.texts)) {
-			std::shared_ptr<TextTranslated> tmpTextPtr = *result;
+			TextTranslated::Ptr tmpTextPtr = *result;
 			f.texts.erase(result);
-			f.timestampModified = tsModified;
+			f.timestampModified = ts;
 			for (auto& f2 : db._folders) {
 				if (f2.id == newFolderId) {
 					f2.texts.emplace_back(tmpTextPtr);
-					f2.timestampModified = tsModified;
-					tmpTextPtr->timestampModified = tsModified;
+					f2.timestampModified = ts;
+					tmpTextPtr->timestampModified = ts;
 					tmpTextPtr->loginOfLastModifier = modifierLogin;
-					tmpTextPtr->offsLastModified = offsToEventBegin;
-					return;
+					return tmpTextPtr;
 				}
 			}
 			ExitMsg("ModifyDbMoveTextToFolder: folder not found");

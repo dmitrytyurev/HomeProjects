@@ -41,8 +41,10 @@ void SerializationBuffer::PushStringWithoutZero(const std::string& v)
 	T nameLength = static_cast<T>(v.length());
 	Push(nameLength);
 
-	const uint8_t* beg = reinterpret_cast<const uint8_t*>(v.c_str());
-	const uint8_t* end = beg + v.length();
+	if (nameLength) {
+		const uint8_t* beg = reinterpret_cast<const uint8_t*>(v.c_str());
+		const uint8_t* end = beg + v.length();
 
-	buffer.insert(buffer.end(), beg, end);
+		buffer.insert(buffer.end(), beg, end);
+	}
 }
