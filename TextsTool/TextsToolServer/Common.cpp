@@ -470,11 +470,19 @@ void SClientMessagesMgr::ModifyDbMoveTextToFolder(
 //
 //===============================================================================
 
-uint32_t  SClientMessagesMgr::ModifyDbChangeBaseText(DeserializationBuffer& buf, TextsDatabase& db, const std::string& modifierLogin, uint32_t ts, uint32_t offsInHistoryFile)
+void  SClientMessagesMgr::ModifyDbChangeBaseText(
+	DeserializationBuffer& buf, 
+	TextsDatabase& db, 
+	const std::string& modifierLogin, 
+	uint32_t ts, 
+	uint32_t offsInHistoryFile,
+	uint32_t& prevTsModified,
+	uint32_t& prevOffsModified)
 {
 
+
+
 	ExitMsg("ModifyDbChangeBaseText: text id not found");
-	return 0;
 }
 
 //===============================================================================
