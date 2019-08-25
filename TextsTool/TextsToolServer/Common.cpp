@@ -128,7 +128,6 @@ void SClientMessagesMgr::SendToClients(const std::string& dbName, uint8_t ts, co
 	AddPacketToClients(bufPtr, dbName);
 }
 
-
 //===============================================================================
 //
 //===============================================================================
@@ -231,18 +230,23 @@ void SClientMessagesMgr::Update(double dt)
 			break;
 			case DbSerializer::ActionDeleteText:
 			{
-				ModifyDbDeleteText(*buf, *db);                 // Изменения в базе
+				uint32_t prevTsModified = 0;
+				uint32_t prevOffsModified = 0;
+				ModifyDbDeleteText(*buf, *db, prevTsModified, prevOffsModified);                 // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);   // Запись в файл истории
+				db->GetHistoryBuffer().Push(prevTsModified);
+				db->GetHistoryBuffer().Push(prevOffsModified);
 				SendToClients(client->_dbName, ts, *buf, "");  // Разослать пакеты другим клиентам			
 			}
 			break;
 			case DbSerializer::ActionMoveTextToFolder:
 			{
-				uint32_t offsInHistoryFile = db->GetCurrentPosInHistoryFile();
-				TextTranslated::Ptr textPtr = ModifyDbMoveTextToFolder(*buf, *db, client->_login, ts); // Изменения в базе
+				uint32_t prevTsModified = 0;
+				uint32_t prevOffsModified = 0;
+				ModifyDbMoveTextToFolder(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);               // Запись в файл истории
-				db->GetHistoryBuffer().Push(textPtr->offsLastModified);
-				textPtr->offsLastModified = offsInHistoryFile;             // Обновление смещения до инфы о предыдущем изменении текста в файле истории 
+				db->GetHistoryBuffer().Push(prevTsModified);
+				db->GetHistoryBuffer().Push(prevOffsModified);
 				SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
 			}
 			break;
@@ -404,13 +408,15 @@ void SClientMessagesMgr::ModifyDbChangeAttributeVis(DeserializationBuffer& buf, 
 //
 //===============================================================================
 
-void SClientMessagesMgr::ModifyDbDeleteText(DeserializationBuffer& buf, TextsDatabase& db)
+void SClientMessagesMgr::ModifyDbDeleteText(DeserializationBuffer& buf, TextsDatabase& db, uint32_t& prevTsModified, uint32_t& prevOffsModified)
 {
 	std::string textId;
 	buf.GetString<uint8_t>(textId);
 	for (auto& f: db._folders) {
 		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslated::Ptr& el) { return el->id == textId; });
 		if (result != std::end(f.texts)) {
+			prevTsModified = (*result)->timestampModified;
+			prevOffsModified = (*result)->offsLastModified;
 			f.texts.erase(result);
 			return;
 		}
@@ -422,7 +428,14 @@ void SClientMessagesMgr::ModifyDbDeleteText(DeserializationBuffer& buf, TextsDat
 //
 //===============================================================================
 
-TextTranslated::Ptr SClientMessagesMgr::ModifyDbMoveTextToFolder(DeserializationBuffer& buf, TextsDatabase& db, const std::string& modifierLogin, uint32_t ts)
+void SClientMessagesMgr::ModifyDbMoveTextToFolder(
+	DeserializationBuffer& buf, 
+	TextsDatabase& db, 
+	const std::string& modifierLogin, 
+	uint32_t ts, 
+	uint32_t offsInHistoryFile, 
+	uint32_t& prevTsModified, 
+	uint32_t& prevOffsModified)
 {
 	std::string textId;
 	buf.GetString<uint8_t>(textId);
@@ -438,9 +451,12 @@ TextTranslated::Ptr SClientMessagesMgr::ModifyDbMoveTextToFolder(Deserialization
 				if (f2.id == newFolderId) {
 					f2.texts.emplace_back(tmpTextPtr);
 					f2.timestampModified = ts;
-					tmpTextPtr->timestampModified = ts;
 					tmpTextPtr->loginOfLastModifier = modifierLogin;
-					return tmpTextPtr;
+					prevTsModified = tmpTextPtr->timestampModified;
+					tmpTextPtr->timestampModified = ts;
+					prevOffsModified = tmpTextPtr->offsLastModified;
+					tmpTextPtr->offsLastModified = offsInHistoryFile;
+					return;
 				}
 			}
 			ExitMsg("ModifyDbMoveTextToFolder: folder not found");
@@ -448,6 +464,17 @@ TextTranslated::Ptr SClientMessagesMgr::ModifyDbMoveTextToFolder(Deserialization
 		}
 	}
 	ExitMsg("ModifyDbMoveTextToFolder: text id not found");
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+uint32_t  SClientMessagesMgr::ModifyDbChangeBaseText(DeserializationBuffer& buf, TextsDatabase& db, const std::string& modifierLogin, uint32_t ts, uint32_t offsInHistoryFile)
+{
+
+	ExitMsg("ModifyDbChangeBaseText: text id not found");
+	return 0;
 }
 
 //===============================================================================

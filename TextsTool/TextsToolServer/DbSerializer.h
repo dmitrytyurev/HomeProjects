@@ -28,6 +28,7 @@ public:
 		ActionCreateText = 8,           // Создание текста
 		ActionDeleteText = 9,           // Удаление текста
 		ActionMoveTextToFolder = 10,    // Текст переместился в другую папку
+		ActionChangeBaseText = 11,      // Изменился основной текст
 	};
 
 	struct HistoryFile
