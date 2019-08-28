@@ -431,7 +431,7 @@ void SClientMessagesMgr::ModifyDbDeleteText(DeserializationBuffer& buf, TextsDat
 			return;
 		}
 	}
-	ExitMsg("ModifyDbDeleteText: text id not found");
+	ExitMsg("ModifyDbDeleteText: text not found by id");
 }
 
 //===============================================================================
@@ -473,7 +473,7 @@ void SClientMessagesMgr::ModifyDbMoveTextToFolder(
 			return;
 		}
 	}
-	ExitMsg("ModifyDbMoveTextToFolder: text id not found");
+	ExitMsg("ModifyDbMoveTextToFolder: text not found by id");
 }
 
 //===============================================================================
@@ -508,7 +508,67 @@ void  SClientMessagesMgr::ModifyDbChangeBaseText(
 			return;
 		}
 	}
-	ExitMsg("ModifyDbChangeBaseText: text id not found");
+	ExitMsg("ModifyDbChangeBaseText: text not found by id");
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void  SClientMessagesMgr::ModifyDbAddAttributeToText(
+	DeserializationBuffer& buf,
+	TextsDatabase& db,
+	const std::string& modifierLogin,
+	uint32_t ts,
+	uint32_t offsInHistoryFile,
+	uint32_t& prevTsModified,
+	uint32_t& prevOffsModified)
+{
+	std::string textId;
+	buf.GetString<uint8_t>(textId);
+	uint8_t attributeId = buf.GetUint<uint8_t>();
+
+	TextTranslated::Ptr tmpTextPtr;
+	for (auto& f : db._folders) {
+		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslated::Ptr& el) { return el->id == textId; });
+		if (result != std::end(f.texts)) {
+			TextTranslated::Ptr tmpTextPtr = *result;
+			f.timestampModified = ts;
+			break;
+		}
+	}
+	if (!tmpTextPtr) {
+		ExitMsg("ModifyDbAddAttributeToText: text not found by id");
+	}
+
+	tmpTextPtr->loginOfLastModifier = modifierLogin;
+	prevTsModified = tmpTextPtr->timestampModified;
+	tmpTextPtr->timestampModified = ts;
+	prevOffsModified = tmpTextPtr->offsLastModified;
+	tmpTextPtr->offsLastModified = offsInHistoryFile;
+
+	auto result = std::find_if(std::begin(db._attributeProps), std::end(db._attributeProps), [&attributeId](const AttributeProperty& el) { return el.id == attributeId; });
+	if (result == std::end(db._attributeProps)) {
+		ExitMsg("ModifyDbAddAttributeToText: attribute not found by id");
+	}
+
+	tmpTextPtr->attributes.emplace_back();
+	auto& attributeInText = tmpTextPtr->attributes.back();
+	attributeInText.id = attributeId;
+	attributeInText.type = result->type;
+
+	switch (result->type)
+	{
+	case AttributeProperty::Translation_t:
+	case AttributeProperty::CommonText_t:
+		buf.GetString<uint16_t>(attributeInText.text);
+		break;
+	case AttributeProperty::Checkbox_t:
+		attributeInText.flagState = buf.GetUint<uint8_t>();
+		break;
+	default:
+		break;
+	}
 }
 
 //===============================================================================
