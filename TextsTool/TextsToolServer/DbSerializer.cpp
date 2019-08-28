@@ -346,7 +346,10 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 		break;
 		case ActionChangeBaseText:
 		{
-			SClientMessagesMgr::ModifyDbChangeBaseText(buf, *_pDataBase, modifierLogin, ts, offsToEventBegin);
+			uint32_t prevTsModified = 0;
+			uint32_t prevOffsModified = 0;
+			SClientMessagesMgr::ModifyDbChangeBaseText(buf, *_pDataBase, modifierLogin, ts, offsToEventBegin, prevTsModified, prevOffsModified);
+			buf.offset += sizeof(uint32_t) + sizeof(uint32_t); // Пропускаем ts предыдущего изменения текста текста (для поиска файла истории с инфой о нём) и смещение в файле истории до него
 		}
 		break;
 

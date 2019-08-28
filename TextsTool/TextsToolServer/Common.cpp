@@ -250,7 +250,17 @@ void SClientMessagesMgr::Update(double dt)
 				SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
 			}
 			break;
-
+			case DbSerializer::ActionChangeBaseText:
+			{
+				uint32_t prevTsModified = 0;
+				uint32_t prevOffsModified = 0;
+				ModifyDbChangeBaseText(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
+				SaveToHistory(db, client->_login, ts, *buf);               // Запись в файл истории
+				db->GetHistoryBuffer().Push(prevTsModified);
+				db->GetHistoryBuffer().Push(prevOffsModified);
+				SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
+			}
+			break;
 
 	
 
@@ -479,9 +489,25 @@ void  SClientMessagesMgr::ModifyDbChangeBaseText(
 	uint32_t& prevTsModified,
 	uint32_t& prevOffsModified)
 {
+	std::string textId;
+	buf.GetString<uint8_t>(textId);
+	std::string newBaseText;
+	buf.GetString<uint16_t>(newBaseText);
 
-
-
+	for (auto& f : db._folders) {
+		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslated::Ptr& el) { return el->id == textId; });
+		if (result != std::end(f.texts)) {
+			TextTranslated::Ptr tmpTextPtr = *result;
+			f.timestampModified = ts;
+			tmpTextPtr->baseText = newBaseText;
+			tmpTextPtr->loginOfLastModifier = modifierLogin;
+			prevTsModified = tmpTextPtr->timestampModified;
+			tmpTextPtr->timestampModified = ts;
+			prevOffsModified = tmpTextPtr->offsLastModified;
+			tmpTextPtr->offsLastModified = offsInHistoryFile;
+			return;
+		}
+	}
 	ExitMsg("ModifyDbChangeBaseText: text id not found");
 }
 
