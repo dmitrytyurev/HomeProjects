@@ -15,7 +15,7 @@ public:
 	void Push(uint8_t v);
 	void Push(uint16_t v);
 	void Push(uint32_t v);
-	void Push(const DeserializationBuffer& buf);
+	void Push(const DeserializationBuffer& buf, bool useAllBuffer); // если useAllBuffer == true, то используем весь буффер, иначе только то, что ещё не прочитано из буфера
 	//	void Push(const std::string& v);
 	void PushStringWithoutZero(const std::string& v);
 

@@ -112,7 +112,7 @@ void SClientMessagesMgr::SaveToHistory(TextsDatabasePtr db, const std::string& l
 	auto& bufOut = db->GetHistoryBuffer();
 	bufOut.PushStringWithoutZero<uint8_t>(login);
 	bufOut.Push(ts);
-	bufOut.Push(bufIn); // !!! Как это по ссылке на константу вызывается неконстантная функция??
+	bufOut.Push(bufIn, true); // Заберём все данные из буфера, не важно сколько было из него уже прочитано // !!! Как это по ссылке на константу вызывается неконстантная функция??
 }
 
 //===============================================================================
@@ -124,7 +124,7 @@ void SClientMessagesMgr::SendToClients(const std::string& dbName, uint8_t ts, co
 	auto bufPtr = std::make_shared<SerializationBuffer>();       
 	bufPtr->PushStringWithoutZero<uint8_t>(loginOfLastModifier);
 	bufPtr->Push(ts);
-	bufPtr->Push(buf);
+	bufPtr->Push(buf, true); // Заберём все данные из буфера, не важно сколько было из него уже прочитано
 	AddPacketToClients(bufPtr, dbName);
 }
 
@@ -258,6 +258,23 @@ void SClientMessagesMgr::Update(double dt)
 				SaveToHistory(db, client->_login, ts, *buf);               // Запись в файл истории
 				db->GetHistoryBuffer().Push(prevTsModified);
 				db->GetHistoryBuffer().Push(prevOffsModified);
+				SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
+			}
+			break;
+			case DbSerializer::ActionAddAttributeToText:
+			{
+				uint32_t prevTsModified = 0;
+				uint32_t prevOffsModified = 0;
+				uint32_t keepOffset = buf->offset;
+				ModifyDbAddAttributeToText(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
+				buf->offset = keepOffset; // Восстнавливаем буфер на состояние "прочитан только тип операции"
+				auto& historyBuf = db->GetHistoryBuffer();                     // Запись в файл истории
+				historyBuf.PushStringWithoutZero<uint8_t>(client->_login);
+				historyBuf.Push(ts);
+				historyBuf.Push(actionType);
+				historyBuf.Push(prevTsModified);
+				historyBuf.Push(prevOffsModified);
+				historyBuf.Push(*buf, false); // Заберём только непрочитанные данные (всё кроме типа операции)
 				SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
 			}
 			break;

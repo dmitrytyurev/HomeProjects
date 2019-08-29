@@ -65,10 +65,10 @@ void SerializationBuffer::Push(uint32_t v)
 //
 //===============================================================================
 
-void SerializationBuffer::Push(const DeserializationBuffer& buf)
+void SerializationBuffer::Push(const DeserializationBuffer& buf, bool useAllBuffer)
 {
-	const uint8_t* beg = buf._buffer.data();
-	const uint8_t* end = beg + buf._buffer.size();
+	const uint8_t* beg = buf._buffer.data() + (useAllBuffer ? 0 : buf.offset);
+	const uint8_t* end = buf._buffer.data() + buf._buffer.size();
 
 	buffer.insert(buffer.end(), beg, end);
 }
