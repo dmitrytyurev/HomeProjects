@@ -178,7 +178,7 @@ public:
 
 	std::string _login;
 	std::string _dbName;  // »м€ база, с которой сейчас работает клиент
-	bool _startSyncFinished = false; // —тавитс€ в true, когда в _msgsQueueOut записаны все сообщени€ стартовой синхронизации и значит можно добавл€ть сообщени€ синхронизации с других клиентов
+	bool _syncFinished = false; // —тавитс€ в true, когда в _msgsQueueOut записаны все сообщени€ стартовой синхронизации и значит можно добавл€ть сообщени€ синхронизации с других клиентов
 	std::vector<SerializationBufferPtr>   _msgsQueueOut; // ќчередь сообщений, которые нужно отослать клиенту
 	std::vector<DeserializationBuffer::Ptr> _msgsQueueIn;  // ќчередь пришедших от клиента сообщений
 };

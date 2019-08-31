@@ -792,7 +792,7 @@ SClientMessagesMgr::SClientMessagesMgr(STextsToolApp* app): _app(app)
 void SClientMessagesMgr::AddPacketToClients(SerializationBufferPtr& bufPtr, const std::string& srcDbName)
 {
 	for (auto client: _app->_clients) {
-		if (client->_dbName == srcDbName) {
+		if (client->_syncFinished && client->_dbName == srcDbName) {
 			client->_msgsQueueOut.emplace_back(bufPtr);
 		}
 	}
