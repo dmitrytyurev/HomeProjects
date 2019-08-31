@@ -31,6 +31,7 @@ public:
 		ActionChangeBaseText = 11,      // Изменился основной текст
 		ActionAddAttributeToText = 12,  // В текст добавился атрибут
 		ActionDelAttributeFromText = 13,  // Удалился атрибут из текста
+		ActionChangeAttributeInText = 14, // Изменилось значение атрибута в тексте
 	};
 
 	struct HistoryFile

@@ -236,7 +236,7 @@ void SClientMessagesMgr::Update(double dt)
 				SaveToHistory(db, client->_login, ts, *buf);   // Запись в файл истории
 				db->GetHistoryBuffer().Push(prevTsModified);
 				db->GetHistoryBuffer().Push(prevOffsModified);
-				SendToClients(client->_dbName, ts, *buf, "");  // Разослать пакеты другим клиентам			
+				SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
 			}
 			break;
 			case DbSerializer::ActionMoveTextToFolder:
@@ -295,25 +295,30 @@ void SClientMessagesMgr::Update(double dt)
 				SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
 			}
 			break;
-
-
-			
-
-
-
-
-
-	
+			case DbSerializer::ActionChangeAttributeInText:
+			{
+				uint32_t prevTsModified = 0;
+				uint32_t prevOffsModified = 0;
+				uint32_t keepOffset = buf->offset;
+				ModifyDbChangeAttributeInText(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
+				buf->offset = keepOffset; // Восстнавливаем буфер на состояние "прочитан только тип операции"
+				auto& historyBuf = db->GetHistoryBuffer();                     // Запись в файл истории
+				historyBuf.PushStringWithoutZero<uint8_t>(client->_login);
+				historyBuf.Push(ts);
+				historyBuf.Push(actionType);
+				historyBuf.Push(prevTsModified);
+				historyBuf.Push(prevOffsModified);
+				historyBuf.Push(*buf, false); // Заберём только непрочитанные данные (всё кроме типа операции)
+				SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
+			}
+			break;
 
 /*
-  Логин модификатора
-       - В SaveToHistory пишется всегда в заголовке
-	   - В SaveToPacket пишется во все события над текстами кроме удаления (в создание пишется!)
-   Offset
-	   - В SaveToHistory пишется во все события над текстами кроме создания и удаления
+   OffsModified
+	   - В SaveToHistory пишется во все события над текстами кроме создания
             - Сначала сохраняем инфу о событии в файл-истории включая значение offsLastModified
 			- А потом в объекте offsLastModified = смещение перед началом записи события	      !!!!!!!! Это делаем в создании текста тоже, хотя offset туда не сохраняем !!!!!!
-	   - В SaveToPacket не пишется
+	   - В SaveToPacket не пишется - на клиенте оно не нужно
 */
 
 			default:
@@ -568,6 +573,7 @@ void  SClientMessagesMgr::ModifyDbAddAttributeToText(
 	std::string textId;
 	buf.GetString<uint8_t>(textId);
 	uint8_t attributeId = buf.GetUint<uint8_t>();
+	uint8_t attributeDataType = buf.GetUint<uint8_t>();
 
 	TextTranslated::Ptr tmpTextPtr;
 	for (auto& f : db._folders) {
@@ -597,6 +603,10 @@ void  SClientMessagesMgr::ModifyDbAddAttributeToText(
 	auto& attributeInText = tmpTextPtr->attributes.back();
 	attributeInText.id = attributeId;
 	attributeInText.type = result->type;
+
+	if (attributeDataType != result->type) {
+		ExitMsg("ModifyDbAddAttributeToText: attributeDataType != result->type");
+	}
 
 	switch (result->type)
 	{
@@ -655,6 +665,67 @@ void  SClientMessagesMgr::ModifyDbDelAttributeFromText(
 
 	tmpTextPtr->attributes.erase(result);
 }
+
+//===============================================================================
+//
+//===============================================================================
+
+void  SClientMessagesMgr::ModifyDbChangeAttributeInText(
+	DeserializationBuffer& buf,
+	TextsDatabase& db,
+	const std::string& modifierLogin,
+	uint32_t ts,
+	uint32_t offsInHistoryFile,
+	uint32_t& prevTsModified,
+	uint32_t& prevOffsModified)
+{
+	std::string textId;
+	buf.GetString<uint8_t>(textId);
+	uint8_t attributeId = buf.GetUint<uint8_t>();
+	uint8_t attributeDataType = buf.GetUint<uint8_t>();
+
+	TextTranslated::Ptr tmpTextPtr;
+	for (auto& f : db._folders) {
+		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslated::Ptr& el) { return el->id == textId; });
+		if (result != std::end(f.texts)) {
+			TextTranslated::Ptr tmpTextPtr = *result;
+			f.timestampModified = ts;
+			break;
+		}
+	}
+	if (!tmpTextPtr) {
+		ExitMsg("ModifyDbChangeAttributeInText: text not found by id");
+	}
+
+	tmpTextPtr->loginOfLastModifier = modifierLogin;
+	prevTsModified = tmpTextPtr->timestampModified;
+	tmpTextPtr->timestampModified = ts;
+	prevOffsModified = tmpTextPtr->offsLastModified;
+	tmpTextPtr->offsLastModified = offsInHistoryFile;
+
+	auto result = std::find_if(std::begin(tmpTextPtr->attributes), std::end(tmpTextPtr->attributes), [&attributeId](const AttributeInText& el) { return el.id == attributeId; });
+	if (result == std::end(tmpTextPtr->attributes)) {
+		ExitMsg("ModifyDbChangeAttributeInText: attribute not found by id");
+	}
+
+	if (attributeDataType != result->type) {
+		ExitMsg("ModifyDbAddAttributeToText: attributeDataType != result->type");
+	}
+
+	switch (result->type)
+	{
+	case AttributeProperty::Translation_t:
+	case AttributeProperty::CommonText_t:
+		buf.GetString<uint16_t>(result->text);
+		break;
+	case AttributeProperty::Checkbox_t:
+		result->flagState = buf.GetUint<uint8_t>();
+		break;
+	default:
+		break;
+	}
+}
+
 
 //===============================================================================
 //

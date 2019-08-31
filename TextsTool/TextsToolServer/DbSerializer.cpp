@@ -368,8 +368,16 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 			SClientMessagesMgr::ModifyDbDelAttributeFromText(buf, *_pDataBase, modifierLogin, ts, offsToEventBegin, prevTsModified, prevOffsModified);
 		}
 		break;
+		case ActionChangeAttributeInText:
+		{
+			buf.offset += sizeof(uint32_t) + sizeof(uint32_t); // Пропускаем ts предыдущего изменения текста текста (для поиска файла истории с инфой о нём) и смещение в файле истории до него
+			uint32_t prevTsModified = 0;  // Модифицируем базу
+			uint32_t prevOffsModified = 0;
+			SClientMessagesMgr::ModifyDbChangeAttributeInText(buf, *_pDataBase, modifierLogin, ts, offsToEventBegin, prevTsModified, prevOffsModified);
+		}
+		break;
+			
 
-		
 
 		// !!!!!!!!!!!!!!!!
 		// После чтения любого изменения текста, у него нужно заполнить следующие поля:
