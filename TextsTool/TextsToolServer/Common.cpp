@@ -153,23 +153,29 @@ void SClientMessagesMgr::Update(double dt)
 			break;
 			case DbSerializer::ActionDeleteFolder:
 			{
-				ModifyDbDeleteFolder(*buf, *db);
-				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
-				SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам
+				bool isSucces = ModifyDbDeleteFolder(*buf, *db);
+				SaveToHistory(db, client->_login, ts, *buf);          // Запись в файл истории
+				if (isSucces) {
+					SendToClients(client->_dbName, ts, *buf, "");     // Разослать пакеты другим клиентам
+				}
 			}
 			break;
 			case DbSerializer::ActionChangeFolderParent:
 			{
-				ModifyDbChangeFolderParent(*buf, *db, ts);
+				bool isSucces = ModifyDbChangeFolderParent(*buf, *db, ts);
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
-				SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам
+				if (isSucces) {
+					SendToClients(client->_dbName, ts, *buf, "");     // Разослать пакеты другим клиентам
+				}
 			}
 			break;
 			case DbSerializer::ActionRenameFolder:
 			{
-				ModifyDbRenameFolder(*buf, *db, ts);              // Изменения в базе
+				bool isSucces = ModifyDbRenameFolder(*buf, *db, ts);              // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
-				SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам
+				if (isSucces) {
+					SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам
+				}
 			}
 			break;			
 			case DbSerializer::ActionCreateAttribute:
@@ -185,23 +191,29 @@ void SClientMessagesMgr::Update(double dt)
 			break;
 			case DbSerializer::ActionDeleteAttribute:
 			{
-				ModifyDbDeleteAttribute(*buf, *db, ts);           // Изменения в базе
+				bool isSucces = ModifyDbDeleteAttribute(*buf, *db, ts);           // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
-				SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам			
+				if (isSucces) {
+					SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам			
+				}
 			}
 			break;
 			case DbSerializer::ActionRenameAttribute:
 			{
-				ModifyDbRenameAttribute(*buf, *db);               // Изменения в базе
+				bool isSucces = ModifyDbRenameAttribute(*buf, *db);               // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
-				SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам			
+				if (isSucces) {
+					SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам			
+				}
 			}
 			break;
 			case DbSerializer::ActionChangeAttributeVis:
 			{
-				ModifyDbChangeAttributeVis(*buf, *db);            // Изменения в базе
+				bool isSucces = ModifyDbChangeAttributeVis(*buf, *db);            // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
-				SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам			
+				if (isSucces) {
+					SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам			
+				}
 			}
 			break;
 			case DbSerializer::ActionCreateText:
@@ -232,33 +244,39 @@ void SClientMessagesMgr::Update(double dt)
 			{
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
-				ModifyDbDeleteText(*buf, *db, prevTsModified, prevOffsModified);                 // Изменения в базе
+				bool isSucces = ModifyDbDeleteText(*buf, *db, prevTsModified, prevOffsModified);                 // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);   // Запись в файл истории
 				db->GetHistoryBuffer().Push(prevTsModified);
 				db->GetHistoryBuffer().Push(prevOffsModified);
-				SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
+				if (isSucces) {
+					SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
+				}
 			}
 			break;
 			case DbSerializer::ActionMoveTextToFolder:
 			{
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
-				ModifyDbMoveTextToFolder(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
+				bool isSucces = ModifyDbMoveTextToFolder(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);               // Запись в файл истории
 				db->GetHistoryBuffer().Push(prevTsModified);
 				db->GetHistoryBuffer().Push(prevOffsModified);
-				SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
+				if (isSucces) {
+					SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
+				}
 			}
 			break;
 			case DbSerializer::ActionChangeBaseText:
 			{
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
-				ModifyDbChangeBaseText(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
+				bool isSucces = ModifyDbChangeBaseText(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);               // Запись в файл истории
 				db->GetHistoryBuffer().Push(prevTsModified);
 				db->GetHistoryBuffer().Push(prevOffsModified);
-				SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
+				if (isSucces) {
+					SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
+				}
 			}
 			break;
 			case DbSerializer::ActionAddAttributeToText:
@@ -266,7 +284,7 @@ void SClientMessagesMgr::Update(double dt)
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
 				uint32_t keepOffset = buf->offset;
-				ModifyDbAddAttributeToText(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
+				bool isSucces = ModifyDbAddAttributeToText(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
 				buf->offset = keepOffset; // Восстнавливаем буфер на состояние "прочитан только тип операции"
 				auto& historyBuf = db->GetHistoryBuffer();                     // Запись в файл истории
 				historyBuf.PushStringWithoutZero<uint8_t>(client->_login);
@@ -275,7 +293,9 @@ void SClientMessagesMgr::Update(double dt)
 				historyBuf.Push(prevTsModified);
 				historyBuf.Push(prevOffsModified);
 				historyBuf.Push(*buf, false); // Заберём только непрочитанные данные (всё кроме типа операции)
-				SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
+				if (isSucces) {
+					SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
+				}
 			}
 			break;
 			case DbSerializer::ActionDelAttributeFromText:
@@ -283,7 +303,7 @@ void SClientMessagesMgr::Update(double dt)
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
 				uint32_t keepOffset = buf->offset;
-				ModifyDbDelAttributeFromText(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
+				bool isSucces = ModifyDbDelAttributeFromText(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
 				buf->offset = keepOffset; // Восстнавливаем буфер на состояние "прочитан только тип операции"
 				auto& historyBuf = db->GetHistoryBuffer();                     // Запись в файл истории
 				historyBuf.PushStringWithoutZero<uint8_t>(client->_login);
@@ -292,7 +312,9 @@ void SClientMessagesMgr::Update(double dt)
 				historyBuf.Push(prevTsModified);
 				historyBuf.Push(prevOffsModified);
 				historyBuf.Push(*buf, false); // Заберём только непрочитанные данные (всё кроме типа операции)
-				SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
+				if (isSucces) {
+					SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
+				}
 			}
 			break;
 			case DbSerializer::ActionChangeAttributeInText:
@@ -300,7 +322,7 @@ void SClientMessagesMgr::Update(double dt)
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
 				uint32_t keepOffset = buf->offset;
-				ModifyDbChangeAttributeInText(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
+				bool isSucces = ModifyDbChangeAttributeInText(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
 				buf->offset = keepOffset; // Восстнавливаем буфер на состояние "прочитан только тип операции"
 				auto& historyBuf = db->GetHistoryBuffer();                     // Запись в файл истории
 				historyBuf.PushStringWithoutZero<uint8_t>(client->_login);
@@ -309,7 +331,9 @@ void SClientMessagesMgr::Update(double dt)
 				historyBuf.Push(prevTsModified);
 				historyBuf.Push(prevOffsModified);
 				historyBuf.Push(*buf, false); // Заберём только непрочитанные данные (всё кроме типа операции)
-				SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
+				if (isSucces) {
+					SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
+				}
 			}
 			break;
 
@@ -333,7 +357,7 @@ void SClientMessagesMgr::Update(double dt)
 //
 //===============================================================================
 
-void SClientMessagesMgr::ModifyDbDeleteFolder(DeserializationBuffer& buf, TextsDatabase& db)
+bool SClientMessagesMgr::ModifyDbDeleteFolder(DeserializationBuffer& buf, TextsDatabase& db)
 {
 	uint32_t folderId = buf.GetUint<uint32_t>();
 	auto& f = db._folders;                                 // Изменения в базе
@@ -343,14 +367,16 @@ void SClientMessagesMgr::ModifyDbDeleteFolder(DeserializationBuffer& buf, TextsD
 	}
 	else {
 		LogMsg("SClientMessagesMgr::Update::ActionDeleteFolder: folder not found");
+		return false;
 	}
+	return true;
 }
 
 //===============================================================================
 //
 //===============================================================================
 
-void SClientMessagesMgr::ModifyDbChangeFolderParent(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts)
+bool SClientMessagesMgr::ModifyDbChangeFolderParent(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts)
 {
 	uint32_t folderId = buf.GetUint<uint32_t>();
 	uint32_t newParentFolderId = buf.GetUint<uint32_t>();
@@ -362,7 +388,9 @@ void SClientMessagesMgr::ModifyDbChangeFolderParent(DeserializationBuffer& buf, 
 	}
 	else {
 		LogMsg("SClientMessagesMgr::Update::ActionChangeFolderParent: folder not found");
+		return false;
 	}
+	return true;
 }
 
 //===============================================================================
@@ -370,7 +398,7 @@ void SClientMessagesMgr::ModifyDbChangeFolderParent(DeserializationBuffer& buf, 
 //===============================================================================
 
 
-void SClientMessagesMgr::ModifyDbRenameFolder(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts)
+bool SClientMessagesMgr::ModifyDbRenameFolder(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts)
 {
 	uint32_t folderId = buf.GetUint<uint32_t>();
 	std::string newFolderName;
@@ -383,14 +411,16 @@ void SClientMessagesMgr::ModifyDbRenameFolder(DeserializationBuffer& buf, TextsD
 	}
 	else {
 		LogMsg("SClientMessagesMgr::Update::ActionRenameFolder: folder not found");
+		return false;
 	}
+	return true;
 }
 
 //===============================================================================
 //
 //===============================================================================
 
-void SClientMessagesMgr::ModifyDbDeleteAttribute(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts)
+bool SClientMessagesMgr::ModifyDbDeleteAttribute(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts)
 {
 	uint8_t attributeId = buf.GetUint<uint8_t>();
 	uint8_t visPosOfDeletedAttr = 0;                   // Изменения в базе
@@ -402,6 +432,7 @@ void SClientMessagesMgr::ModifyDbDeleteAttribute(DeserializationBuffer& buf, Tex
 	}
 	else {
 		LogMsg("SClientMessagesMgr::Update::ActionDeleteAttribute: attribute id not found");
+		return false;
 	}
 	for (auto it = ap.begin(); it != ap.end(); ) {  // Сдвинуть позицию всех атрибутов справа от удаляемого
 		if (it->visiblePosition > visPosOfDeletedAttr) {
@@ -419,13 +450,14 @@ void SClientMessagesMgr::ModifyDbDeleteAttribute(DeserializationBuffer& buf, Tex
 			}
 		}
 	}
+	return true;
 }
 
 //===============================================================================
 //
 //===============================================================================
 
-void SClientMessagesMgr::ModifyDbRenameAttribute(DeserializationBuffer& buf, TextsDatabase& db)
+bool SClientMessagesMgr::ModifyDbRenameAttribute(DeserializationBuffer& buf, TextsDatabase& db)
 {
 	uint8_t attributeId = buf.GetUint<uint8_t>();
 	std::string newAttributeName;
@@ -436,15 +468,17 @@ void SClientMessagesMgr::ModifyDbRenameAttribute(DeserializationBuffer& buf, Tex
 		result->name = newAttributeName;
 	}
 	else {
-		ExitMsg("ModifyDbRenameAttribute: attribute id not found");
+		LogMsg("ModifyDbRenameAttribute: attribute id not found");
+		return false;
 	}
+	return true;
 }
 
 //===============================================================================
 //
 //===============================================================================
 
-void SClientMessagesMgr::ModifyDbChangeAttributeVis(DeserializationBuffer& buf, TextsDatabase& db)
+bool SClientMessagesMgr::ModifyDbChangeAttributeVis(DeserializationBuffer& buf, TextsDatabase& db)
 {
 	uint8_t attributeId = buf.GetUint<uint8_t>();
 	uint8_t newVisiblePosition = buf.GetUint<uint8_t>();
@@ -456,15 +490,17 @@ void SClientMessagesMgr::ModifyDbChangeAttributeVis(DeserializationBuffer& buf, 
 		result->isVisible = static_cast<bool>(newVisibilityFlag);
 	}
 	else {
-		ExitMsg("ModifyDbChangeAttributeVis: attribute id not found");
+		LogMsg("ModifyDbChangeAttributeVis: attribute id not found");
+		return false;
 	}
+	return true;
 }
 
 //===============================================================================
 //
 //===============================================================================
 
-void SClientMessagesMgr::ModifyDbDeleteText(DeserializationBuffer& buf, TextsDatabase& db, uint32_t& prevTsModified, uint32_t& prevOffsModified)
+bool SClientMessagesMgr::ModifyDbDeleteText(DeserializationBuffer& buf, TextsDatabase& db, uint32_t& prevTsModified, uint32_t& prevOffsModified)
 {
 	std::string textId;
 	buf.GetString<uint8_t>(textId);
@@ -474,17 +510,18 @@ void SClientMessagesMgr::ModifyDbDeleteText(DeserializationBuffer& buf, TextsDat
 			prevTsModified = (*result)->timestampModified;
 			prevOffsModified = (*result)->offsLastModified;
 			f.texts.erase(result);
-			return;
+			return true;
 		}
 	}
-	ExitMsg("ModifyDbDeleteText: text not found by id");
+	LogMsg("ModifyDbDeleteText: text not found by id");
+	return false;
 }
 
 //===============================================================================
 //
 //===============================================================================
 
-void SClientMessagesMgr::ModifyDbMoveTextToFolder(
+bool SClientMessagesMgr::ModifyDbMoveTextToFolder(
 	DeserializationBuffer& buf, 
 	TextsDatabase& db, 
 	const std::string& modifierLogin, 
@@ -512,21 +549,22 @@ void SClientMessagesMgr::ModifyDbMoveTextToFolder(
 					tmpTextPtr->timestampModified = ts;
 					prevOffsModified = tmpTextPtr->offsLastModified;
 					tmpTextPtr->offsLastModified = offsInHistoryFile;
-					return;
+					return true;
 				}
 			}
-			ExitMsg("ModifyDbMoveTextToFolder: folder not found");
-			return;
+			LogMsg("ModifyDbMoveTextToFolder: folder not found");
+			return false;
 		}
 	}
-	ExitMsg("ModifyDbMoveTextToFolder: text not found by id");
+	LogMsg("ModifyDbMoveTextToFolder: text not found by id");
+	return false;
 }
 
 //===============================================================================
 //
 //===============================================================================
 
-void  SClientMessagesMgr::ModifyDbChangeBaseText(
+bool  SClientMessagesMgr::ModifyDbChangeBaseText(
 	DeserializationBuffer& buf, 
 	TextsDatabase& db, 
 	const std::string& modifierLogin, 
@@ -551,17 +589,18 @@ void  SClientMessagesMgr::ModifyDbChangeBaseText(
 			tmpTextPtr->timestampModified = ts;
 			prevOffsModified = tmpTextPtr->offsLastModified;
 			tmpTextPtr->offsLastModified = offsInHistoryFile;
-			return;
+			return true;
 		}
 	}
-	ExitMsg("ModifyDbChangeBaseText: text not found by id");
+	LogMsg("ModifyDbChangeBaseText: text not found by id");
+	return false;
 }
 
 //===============================================================================
 //
 //===============================================================================
 
-void  SClientMessagesMgr::ModifyDbAddAttributeToText(
+bool  SClientMessagesMgr::ModifyDbAddAttributeToText(
 	DeserializationBuffer& buf,
 	TextsDatabase& db,
 	const std::string& modifierLogin,
@@ -585,7 +624,8 @@ void  SClientMessagesMgr::ModifyDbAddAttributeToText(
 		}
 	}
 	if (!tmpTextPtr) {
-		ExitMsg("ModifyDbAddAttributeToText: text not found by id");
+		LogMsg("ModifyDbAddAttributeToText: text not found by id");
+		return false;
 	}
 
 	tmpTextPtr->loginOfLastModifier = modifierLogin;
@@ -596,7 +636,8 @@ void  SClientMessagesMgr::ModifyDbAddAttributeToText(
 
 	auto result = std::find_if(std::begin(db._attributeProps), std::end(db._attributeProps), [&attributeId](const AttributeProperty& el) { return el.id == attributeId; });
 	if (result == std::end(db._attributeProps)) {
-		ExitMsg("ModifyDbAddAttributeToText: attribute not found by id");
+		LogMsg("ModifyDbAddAttributeToText: attribute not found by id");
+		return false;
 	}
 
 	tmpTextPtr->attributes.emplace_back();
@@ -605,7 +646,8 @@ void  SClientMessagesMgr::ModifyDbAddAttributeToText(
 	attributeInText.type = result->type;
 
 	if (attributeDataType != result->type) {
-		ExitMsg("ModifyDbAddAttributeToText: attributeDataType != result->type");
+		LogMsg("ModifyDbAddAttributeToText: attributeDataType != result->type");
+		return false;
 	}
 
 	switch (result->type)
@@ -620,13 +662,14 @@ void  SClientMessagesMgr::ModifyDbAddAttributeToText(
 	default:
 		break;
 	}
+	return true;
 }
 
 //===============================================================================
 //
 //===============================================================================
 
-void  SClientMessagesMgr::ModifyDbDelAttributeFromText(
+bool  SClientMessagesMgr::ModifyDbDelAttributeFromText(
 	DeserializationBuffer& buf,
 	TextsDatabase& db,
 	const std::string& modifierLogin,
@@ -649,7 +692,8 @@ void  SClientMessagesMgr::ModifyDbDelAttributeFromText(
 		}
 	}
 	if (!tmpTextPtr) {
-		ExitMsg("ModifyDbDelAttributeFromText: text not found by id");
+		LogMsg("ModifyDbDelAttributeFromText: text not found by id");
+		return false;
 	}
 
 	tmpTextPtr->loginOfLastModifier = modifierLogin;
@@ -660,17 +704,19 @@ void  SClientMessagesMgr::ModifyDbDelAttributeFromText(
 
 	auto result = std::find_if(std::begin(tmpTextPtr->attributes), std::end(tmpTextPtr->attributes), [&attributeId](const AttributeInText& el) { return el.id == attributeId; });
 	if (result == std::end(tmpTextPtr->attributes)) {
-		ExitMsg("ModifyDbDelAttributeFromText: attribute not found by id");
+		LogMsg("ModifyDbDelAttributeFromText: attribute not found by id");
+		return false;
 	}
 
 	tmpTextPtr->attributes.erase(result);
+	return true;
 }
 
 //===============================================================================
 //
 //===============================================================================
 
-void  SClientMessagesMgr::ModifyDbChangeAttributeInText(
+bool  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 	DeserializationBuffer& buf,
 	TextsDatabase& db,
 	const std::string& modifierLogin,
@@ -694,7 +740,8 @@ void  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 		}
 	}
 	if (!tmpTextPtr) {
-		ExitMsg("ModifyDbChangeAttributeInText: text not found by id");
+		LogMsg("ModifyDbChangeAttributeInText: text not found by id");
+		return false;
 	}
 
 	tmpTextPtr->loginOfLastModifier = modifierLogin;
@@ -705,11 +752,13 @@ void  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 
 	auto result = std::find_if(std::begin(tmpTextPtr->attributes), std::end(tmpTextPtr->attributes), [&attributeId](const AttributeInText& el) { return el.id == attributeId; });
 	if (result == std::end(tmpTextPtr->attributes)) {
-		ExitMsg("ModifyDbChangeAttributeInText: attribute not found by id");
+		LogMsg("ModifyDbChangeAttributeInText: attribute not found by id");
+		return false;
 	}
 
 	if (attributeDataType != result->type) {
-		ExitMsg("ModifyDbAddAttributeToText: attributeDataType != result->type");
+		LogMsg("ModifyDbAddAttributeToText: attributeDataType != result->type");
+		return false;
 	}
 
 	switch (result->type)
@@ -724,6 +773,7 @@ void  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 	default:
 		break;
 	}
+	return true;
 }
 
 
