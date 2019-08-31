@@ -236,7 +236,7 @@ public:
 	std::vector<SConnectedClient::Ptr> _clients;
 
 	SClientMessagesMgr _messagesMgr;
-	SHttpManager       _httpManager;
+	SHttpManager       _httpMgr;
 	SMessagesRepaker   _messagesRepaker;
 };
 

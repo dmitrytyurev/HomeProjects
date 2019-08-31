@@ -812,10 +812,10 @@ SMessagesRepaker::SMessagesRepaker(STextsToolApp* app): _app(app)
 
 void SMessagesRepaker::Update(double dt)
 {
-	MutexLock lock(_app->_httpManager._mtClients.mutex);
+	MutexLock lock(_app->_httpMgr._mtClients.mutex);
 	for (auto& client : _app->_clients) {
 		SConnectedClientLow* clLow = nullptr;
-		for (auto& clientLow : _app->_httpManager._mtClients.clients) {
+		for (auto& clientLow : _app->_httpMgr._mtClients.clients) {
 			if (client->_login == clientLow->login) {
 				clLow = clientLow.get();
 				break;
@@ -825,7 +825,7 @@ void SMessagesRepaker::Update(double dt)
 			continue;
 		}
 		{
-			MutexLock lock(_app->_httpManager._mtClients.mutex);
+			MutexLock lock(_app->_httpMgr._mtClients.mutex);
 			for (auto& buf : client->_msgsQueueOut) {
 				clLow->packetsQueueOut.PushPacket(buf->buffer);
 			}
