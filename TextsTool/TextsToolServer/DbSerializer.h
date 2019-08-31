@@ -30,6 +30,7 @@ public:
 		ActionMoveTextToFolder = 10,    // Текст переместился в другую папку
 		ActionChangeBaseText = 11,      // Изменился основной текст
 		ActionAddAttributeToText = 12,  // В текст добавился атрибут
+		ActionDelAttributeFromText = 13,  // Удалился атрибут из текста
 	};
 
 	struct HistoryFile

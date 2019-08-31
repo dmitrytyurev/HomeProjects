@@ -278,6 +278,30 @@ void SClientMessagesMgr::Update(double dt)
 				SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
 			}
 			break;
+			case DbSerializer::ActionDelAttributeFromText:
+			{
+				uint32_t prevTsModified = 0;
+				uint32_t prevOffsModified = 0;
+				uint32_t keepOffset = buf->offset;
+				ModifyDbDelAttributeFromText(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
+				buf->offset = keepOffset; // Восстнавливаем буфер на состояние "прочитан только тип операции"
+				auto& historyBuf = db->GetHistoryBuffer();                     // Запись в файл истории
+				historyBuf.PushStringWithoutZero<uint8_t>(client->_login);
+				historyBuf.Push(ts);
+				historyBuf.Push(actionType);
+				historyBuf.Push(prevTsModified);
+				historyBuf.Push(prevOffsModified);
+				historyBuf.Push(*buf, false); // Заберём только непрочитанные данные (всё кроме типа операции)
+				SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
+			}
+			break;
+
+
+			
+
+
+
+
 
 	
 
@@ -586,6 +610,50 @@ void  SClientMessagesMgr::ModifyDbAddAttributeToText(
 	default:
 		break;
 	}
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void  SClientMessagesMgr::ModifyDbDelAttributeFromText(
+	DeserializationBuffer& buf,
+	TextsDatabase& db,
+	const std::string& modifierLogin,
+	uint32_t ts,
+	uint32_t offsInHistoryFile,
+	uint32_t& prevTsModified,
+	uint32_t& prevOffsModified)
+{
+	std::string textId;
+	buf.GetString<uint8_t>(textId);
+	uint8_t attributeId = buf.GetUint<uint8_t>();
+
+	TextTranslated::Ptr tmpTextPtr;
+	for (auto& f : db._folders) {
+		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslated::Ptr& el) { return el->id == textId; });
+		if (result != std::end(f.texts)) {
+			TextTranslated::Ptr tmpTextPtr = *result;
+			f.timestampModified = ts;
+			break;
+		}
+	}
+	if (!tmpTextPtr) {
+		ExitMsg("ModifyDbDelAttributeFromText: text not found by id");
+	}
+
+	tmpTextPtr->loginOfLastModifier = modifierLogin;
+	prevTsModified = tmpTextPtr->timestampModified;
+	tmpTextPtr->timestampModified = ts;
+	prevOffsModified = tmpTextPtr->offsLastModified;
+	tmpTextPtr->offsLastModified = offsInHistoryFile;
+
+	auto result = std::find_if(std::begin(tmpTextPtr->attributes), std::end(tmpTextPtr->attributes), [&attributeId](const AttributeInText& el) { return el.id == attributeId; });
+	if (result == std::end(tmpTextPtr->attributes)) {
+		ExitMsg("ModifyDbDelAttributeFromText: attribute not found by id");
+	}
+
+	tmpTextPtr->attributes.erase(result);
 }
 
 //===============================================================================
