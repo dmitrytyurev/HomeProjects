@@ -123,7 +123,7 @@ void AttributeProperty::SaveToHistory(TextsDatabasePtr db, const std::string& lo
 	auto& buffer = db->GetHistoryBuffer();
 	buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
 	buffer.Push(timestampCreated);
-	buffer.Push(static_cast<uint8_t>(DbSerializer::ActionCreateAttribute));
+	buffer.Push(static_cast<uint8_t>(EventCreateAttribute));
 	buffer.Push(id);
 	buffer.Push(visiblePosition);
 	buffer.Push(static_cast<uint8_t>(isVisible));
@@ -144,7 +144,7 @@ SerializationBufferPtr AttributeProperty::SaveToPacket(const std::string& loginO
 
 	bufPtr->PushStringWithoutZero<uint8_t>(loginOfModifier);
 	bufPtr->Push(timestampCreated);
-	bufPtr->Push(static_cast<uint8_t>(DbSerializer::ActionCreateAttribute));
+	bufPtr->Push(static_cast<uint8_t>(EventCreateAttribute));
 	bufPtr->Push(id);
 	bufPtr->Push(visiblePosition);
 	bufPtr->Push(static_cast<uint8_t>(isVisible));
@@ -224,7 +224,7 @@ void Folder::SaveToHistory(TextsDatabasePtr db, const std::string& loginOfLastMo
 	auto& buffer = db->GetHistoryBuffer();
 	buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
 	buffer.Push(timestampCreated);
-	buffer.Push(static_cast<uint8_t>(DbSerializer::ActionCreateFolder));
+	buffer.Push(static_cast<uint8_t>(EventCreateFolder));
 	buffer.Push(id);
 	buffer.Push(parentId);
 	buffer.PushStringWithoutZero<uint8_t>(name);
@@ -240,7 +240,7 @@ SerializationBufferPtr Folder::SaveToPacket(const std::string& loginOfModifier) 
 
 	bufPtr->PushStringWithoutZero<uint8_t>(loginOfModifier);
 	bufPtr->Push(timestampCreated);
-	bufPtr->Push(static_cast<uint8_t>(DbSerializer::ActionCreateFolder));
+	bufPtr->Push(static_cast<uint8_t>(EventCreateFolder));
 	bufPtr->Push(id);
 	bufPtr->Push(parentId);
 	bufPtr->PushStringWithoutZero<uint8_t>(name);
@@ -294,7 +294,7 @@ void TextTranslated::SaveToHistory(TextsDatabasePtr db, uint32_t folderId)
 	auto& buffer = db->GetHistoryBuffer();
 	buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
 	buffer.Push(timestampCreated);
-	buffer.Push(static_cast<uint8_t>(DbSerializer::ActionCreateText));
+	buffer.Push(static_cast<uint8_t>(EventCreateText));
 	buffer.Push(folderId);
 	buffer.PushStringWithoutZero<uint8_t>(id);
 }
@@ -309,7 +309,7 @@ SerializationBufferPtr TextTranslated::SaveToPacket(uint32_t folderId, const std
 
 	bufPtr->PushStringWithoutZero<uint8_t>(loginOfModifier);
 	bufPtr->Push(timestampCreated);
-	bufPtr->Push(static_cast<uint8_t>(DbSerializer::ActionCreateText));
+	bufPtr->Push(static_cast<uint8_t>(EventCreateText));
 	bufPtr->PushStringWithoutZero<uint8_t>(loginOfLastModifier);
 	bufPtr->PushStringWithoutZero<uint8_t>(id);
 

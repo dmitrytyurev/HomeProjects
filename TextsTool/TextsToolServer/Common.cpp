@@ -141,7 +141,7 @@ void SClientMessagesMgr::Update(double dt)
 			uint8_t actionType = buf->GetUint<uint8_t>();
 			uint32_t ts = GetTime();
 			switch (actionType) {
-			case DbSerializer::ActionCreateFolder:
+			case EventCreateFolder:
 			{
 				db->_folders.emplace_back();                            // Изменения в базе
 				Folder& folder = db->_folders.back();
@@ -151,7 +151,7 @@ void SClientMessagesMgr::Update(double dt)
 				AddPacketToClients(bufPtr, client->_dbName);
 			}
 			break;
-			case DbSerializer::ActionDeleteFolder:
+			case EventDeleteFolder:
 			{
 				bool isSucces = ModifyDbDeleteFolder(*buf, *db);
 				SaveToHistory(db, client->_login, ts, *buf);          // Запись в файл истории
@@ -160,7 +160,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case DbSerializer::ActionChangeFolderParent:
+			case EventChangeFolderParent:
 			{
 				bool isSucces = ModifyDbChangeFolderParent(*buf, *db, ts);
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
@@ -169,7 +169,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case DbSerializer::ActionRenameFolder:
+			case EventRenameFolder:
 			{
 				bool isSucces = ModifyDbRenameFolder(*buf, *db, ts);              // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
@@ -178,7 +178,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;			
-			case DbSerializer::ActionCreateAttribute:
+			case EventCreateAttribute:
 			{
 				db->_attributeProps.emplace_back();                 // Изменения в базе
 				AttributeProperty& ap = db->_attributeProps.back();
@@ -189,7 +189,7 @@ void SClientMessagesMgr::Update(double dt)
 				db->_newAttributeId = db->_attributeProps.back().id + 1;
 			}
 			break;
-			case DbSerializer::ActionDeleteAttribute:
+			case EventDeleteAttribute:
 			{
 				bool isSucces = ModifyDbDeleteAttribute(*buf, *db, ts);           // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
@@ -198,7 +198,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case DbSerializer::ActionRenameAttribute:
+			case EventRenameAttribute:
 			{
 				bool isSucces = ModifyDbRenameAttribute(*buf, *db);               // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
@@ -207,7 +207,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case DbSerializer::ActionChangeAttributeVis:
+			case EventChangeAttributeVis:
 			{
 				bool isSucces = ModifyDbChangeAttributeVis(*buf, *db);            // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
@@ -216,7 +216,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case DbSerializer::ActionCreateText:
+			case EventCreateText:
 			{
 				uint32_t folderId = buf->GetUint<uint32_t>();     // Изменения в базе
 				std::string textId;
@@ -236,11 +236,11 @@ void SClientMessagesMgr::Update(double dt)
 					AddPacketToClients(bufPtr, client->_dbName);
 				}
 				else {
-					LogMsg("SClientMessagesMgr::Update: ActionCreateText: folder not found");
+					LogMsg("SClientMessagesMgr::Update: EventCreateText: folder not found");
 				}
 			}
 			break;
-			case DbSerializer::ActionDeleteText:
+			case EventDeleteText:
 			{
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
@@ -253,7 +253,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case DbSerializer::ActionMoveTextToFolder:
+			case EventMoveTextToFolder:
 			{
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
@@ -266,7 +266,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case DbSerializer::ActionChangeBaseText:
+			case EventChangeBaseText:
 			{
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
@@ -279,7 +279,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case DbSerializer::ActionAddAttributeToText:
+			case EventAddAttributeToText:
 			{
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
@@ -298,7 +298,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case DbSerializer::ActionDelAttributeFromText:
+			case EventDelAttributeFromText:
 			{
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
@@ -317,7 +317,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case DbSerializer::ActionChangeAttributeInText:
+			case EventChangeAttributeInText:
 			{
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
@@ -366,7 +366,7 @@ bool SClientMessagesMgr::ModifyDbDeleteFolder(DeserializationBuffer& buf, TextsD
 		f.erase(result);
 	}
 	else {
-		LogMsg("SClientMessagesMgr::Update::ActionDeleteFolder: folder not found");
+		LogMsg("SClientMessagesMgr::ModifyDbDeleteFolder: folder not found");
 		return false;
 	}
 	return true;
@@ -387,7 +387,7 @@ bool SClientMessagesMgr::ModifyDbChangeFolderParent(DeserializationBuffer& buf, 
 		result->timestampModified = ts;
 	}
 	else {
-		LogMsg("SClientMessagesMgr::Update::ActionChangeFolderParent: folder not found");
+		LogMsg("SClientMessagesMgr::ModifyDbChangeFolderParent: folder not found");
 		return false;
 	}
 	return true;
@@ -410,7 +410,7 @@ bool SClientMessagesMgr::ModifyDbRenameFolder(DeserializationBuffer& buf, TextsD
 		result->timestampModified = ts;
 	}
 	else {
-		LogMsg("SClientMessagesMgr::Update::ActionRenameFolder: folder not found");
+		LogMsg("SClientMessagesMgr::ModifyDbRenameFolder: folder not found");
 		return false;
 	}
 	return true;

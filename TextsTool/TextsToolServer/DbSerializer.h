@@ -15,25 +15,6 @@ class Folder;
 class DbSerializer
 {
 public:
-	enum ActionType
-	{
-		ActionCreateFolder = 0,         // Создание каталога для текстов
-		ActionDeleteFolder = 1,         // Удаление каталога (должен не иметь текстов и вложенных каталогов)
-		ActionChangeFolderParent = 2,   // Изменение родительского каталога
-		ActionRenameFolder = 3,         // Переименование каталога
-		ActionCreateAttribute = 4,      // Создание атрибута таблицы
-		ActionDeleteAttribute = 5,      // Удаление атрибута таблицы
-		ActionRenameAttribute = 6,      // Переименование атрибута таблицы
-		ActionChangeAttributeVis = 7,   // Изменение отображаемого порядкового номера атрибута в таблице текстов или видимость атрибута
-		ActionCreateText = 8,           // Создание текста
-		ActionDeleteText = 9,           // Удаление текста
-		ActionMoveTextToFolder = 10,    // Текст переместился в другую папку
-		ActionChangeBaseText = 11,      // Изменился основной текст
-		ActionAddAttributeToText = 12,  // В текст добавился атрибут
-		ActionDelAttributeFromText = 13,  // Удалился атрибут из текста
-		ActionChangeAttributeInText = 14, // Изменилось значение атрибута в тексте
-	};
-
 	struct HistoryFile
 	{
 		std::string name;                // Имя файла истории текущей базы (пустая строка, если файл истории ещё не создавался - с момента чтения/записи основного файла не было событий)
