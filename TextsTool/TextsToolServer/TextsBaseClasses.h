@@ -36,7 +36,7 @@ public:
 	void SaveToHistory(TextsDatabasePtr db, const std::string& loginOfLastModifier) const;
 
 	void CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32_t newId);   // Создание объекта из сообщения от клиента 
-	SerializationBufferPtr SaveToPacket() const;      // Запись объекта в пакет для рассылки всем клиентам, работающим с этой базой
+	SerializationBufferPtr SaveToPacket(const std::string& loginOfModifier) const;      // Запись объекта в пакет для рассылки всем клиентам, работающим с этой базой
 
 	uint8_t id = 0;           // ID атрибута
 	std::string name;         // Имя атрибута
@@ -81,7 +81,7 @@ public:
 
 	void SaveToHistory(TextsDatabasePtr db, uint32_t folderId);
 
-	SerializationBufferPtr SaveToPacket(uint32_t folderId) const;      // Запись объекта в пакет для рассылки всем клиентам, работающим с этой базой
+	SerializationBufferPtr SaveToPacket(uint32_t folderId, const std::string& loginOfModifier) const;      // Запись объекта в пакет для рассылки всем клиентам, работающим с этой базой
 
 
 	std::string id;                   // ID текста
@@ -109,7 +109,7 @@ public:
 	void SaveToHistory(TextsDatabasePtr db, const std::string& loginOfLastModifier) const;
 
 	void CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32_t newId);   // Создание объекта из сообщения от клиента 
-	SerializationBufferPtr SaveToPacket() const;      // Запись объекта в пакет для рассылки всем клиентам, работающим с этой базой
+	SerializationBufferPtr SaveToPacket(const std::string& loginOfModifier) const;      // Запись объекта в пакет для рассылки всем клиентам, работающим с этой базой
 
 	uint32_t id = 0;                 // ID папки
 	uint32_t timestampCreated = 0;   // Время создания

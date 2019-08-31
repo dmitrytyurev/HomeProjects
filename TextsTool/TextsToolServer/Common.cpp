@@ -147,7 +147,7 @@ void SClientMessagesMgr::Update(double dt)
 				Folder& folder = db->_folders.back();
 				folder.CreateFromPacket(*buf, ts, db->_newFolderId++);
 				folder.SaveToHistory(db, client->_login);               // Запись в файл истории
-				SerializationBufferPtr bufPtr = folder.SaveToPacket();  // Разослать пакеты другим клиентам 
+				SerializationBufferPtr bufPtr = folder.SaveToPacket(client->_login);  // Разослать пакеты другим клиентам 
 				AddPacketToClients(bufPtr, client->_dbName);
 			}
 			break;
@@ -156,7 +156,7 @@ void SClientMessagesMgr::Update(double dt)
 				bool isSucces = ModifyDbDeleteFolder(*buf, *db);
 				SaveToHistory(db, client->_login, ts, *buf);          // Запись в файл истории
 				if (isSucces) {
-					SendToClients(client->_dbName, ts, *buf, "");     // Разослать пакеты другим клиентам
+					SendToClients(client->_dbName, ts, *buf, client->_login);     // Разослать пакеты другим клиентам
 				}
 			}
 			break;
@@ -165,7 +165,7 @@ void SClientMessagesMgr::Update(double dt)
 				bool isSucces = ModifyDbChangeFolderParent(*buf, *db, ts);
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
 				if (isSucces) {
-					SendToClients(client->_dbName, ts, *buf, "");     // Разослать пакеты другим клиентам
+					SendToClients(client->_dbName, ts, *buf, client->_login);     // Разослать пакеты другим клиентам
 				}
 			}
 			break;
@@ -174,7 +174,7 @@ void SClientMessagesMgr::Update(double dt)
 				bool isSucces = ModifyDbRenameFolder(*buf, *db, ts);              // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
 				if (isSucces) {
-					SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам
+					SendToClients(client->_dbName, ts, *buf, client->_login);         // Разослать пакеты другим клиентам
 				}
 			}
 			break;			
@@ -184,7 +184,7 @@ void SClientMessagesMgr::Update(double dt)
 				AttributeProperty& ap = db->_attributeProps.back();
 				ap.CreateFromPacket(*buf, ts, db->_newAttributeId++);
 				ap.SaveToHistory(db, client->_login);               // Запись в файл истории
-				SerializationBufferPtr bufPtr = ap.SaveToPacket();  // Разослать пакеты другим клиентам 
+				SerializationBufferPtr bufPtr = ap.SaveToPacket(client->_login);  // Разослать пакеты другим клиентам 
 				AddPacketToClients(bufPtr, client->_dbName);
 				db->_newAttributeId = db->_attributeProps.back().id + 1;
 			}
@@ -194,7 +194,7 @@ void SClientMessagesMgr::Update(double dt)
 				bool isSucces = ModifyDbDeleteAttribute(*buf, *db, ts);           // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
 				if (isSucces) {
-					SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам			
+					SendToClients(client->_dbName, ts, *buf, client->_login);         // Разослать пакеты другим клиентам			
 				}
 			}
 			break;
@@ -203,7 +203,7 @@ void SClientMessagesMgr::Update(double dt)
 				bool isSucces = ModifyDbRenameAttribute(*buf, *db);               // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
 				if (isSucces) {
-					SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам			
+					SendToClients(client->_dbName, ts, *buf, client->_login);         // Разослать пакеты другим клиентам			
 				}
 			}
 			break;
@@ -212,7 +212,7 @@ void SClientMessagesMgr::Update(double dt)
 				bool isSucces = ModifyDbChangeAttributeVis(*buf, *db);            // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
 				if (isSucces) {
-					SendToClients(client->_dbName, ts, *buf, "");         // Разослать пакеты другим клиентам			
+					SendToClients(client->_dbName, ts, *buf, client->_login);         // Разослать пакеты другим клиентам			
 				}
 			}
 			break;
@@ -232,7 +232,7 @@ void SClientMessagesMgr::Update(double dt)
 					tt.timestampModified = ts;
 					tt.offsLastModified = db->GetCurrentPosInHistoryFile();
 					tt.SaveToHistory(db, folderId);                             // Запись в файл истории
-					SerializationBufferPtr bufPtr = tt.SaveToPacket(folderId);  // Разослать пакеты другим клиентам 
+					SerializationBufferPtr bufPtr = tt.SaveToPacket(folderId, client->_login);  // Разослать пакеты другим клиентам 
 					AddPacketToClients(bufPtr, client->_dbName);
 				}
 				else {

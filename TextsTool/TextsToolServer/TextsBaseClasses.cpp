@@ -111,7 +111,7 @@ void AttributeProperty::CreateFromPacket(DeserializationBuffer& buffer, uint32_t
 	buffer.GetString<uint8_t>(name);
 	type = buffer.GetUint<uint8_t>();
 	param1 = buffer.GetUint<uint32_t>();
-	param2 = buffer.GetUint<uint32_t>();
+	param2 = 0;
 }
 
 //===============================================================================
@@ -138,10 +138,11 @@ void AttributeProperty::SaveToHistory(TextsDatabasePtr db, const std::string& lo
 //
 //===============================================================================
 
-SerializationBufferPtr AttributeProperty::SaveToPacket() const
+SerializationBufferPtr AttributeProperty::SaveToPacket(const std::string& loginOfModifier) const
 {
 	auto bufPtr = std::make_shared<SerializationBuffer>();
 
+	bufPtr->PushStringWithoutZero<uint8_t>(loginOfModifier);
 	bufPtr->Push(timestampCreated);
 	bufPtr->Push(static_cast<uint8_t>(DbSerializer::ActionCreateAttribute));
 	bufPtr->Push(id);
@@ -150,7 +151,6 @@ SerializationBufferPtr AttributeProperty::SaveToPacket() const
 	bufPtr->PushStringWithoutZero<uint8_t>(name);
 	bufPtr->Push(type);
 	bufPtr->Push(param1);
-	bufPtr->Push(param2);
 	return bufPtr;
 }
 
@@ -234,10 +234,11 @@ void Folder::SaveToHistory(TextsDatabasePtr db, const std::string& loginOfLastMo
 //
 //===============================================================================
 
-SerializationBufferPtr Folder::SaveToPacket() const
+SerializationBufferPtr Folder::SaveToPacket(const std::string& loginOfModifier) const
 {
 	auto bufPtr = std::make_shared<SerializationBuffer>();
 
+	bufPtr->PushStringWithoutZero<uint8_t>(loginOfModifier);
 	bufPtr->Push(timestampCreated);
 	bufPtr->Push(static_cast<uint8_t>(DbSerializer::ActionCreateFolder));
 	bufPtr->Push(id);
@@ -302,10 +303,11 @@ void TextTranslated::SaveToHistory(TextsDatabasePtr db, uint32_t folderId)
 //
 //===============================================================================
 
-SerializationBufferPtr TextTranslated::SaveToPacket(uint32_t folderId) const
+SerializationBufferPtr TextTranslated::SaveToPacket(uint32_t folderId, const std::string& loginOfModifier) const
 {
 	auto bufPtr = std::make_shared<SerializationBuffer>();
 
+	bufPtr->PushStringWithoutZero<uint8_t>(loginOfModifier);
 	bufPtr->Push(timestampCreated);
 	bufPtr->Push(static_cast<uint8_t>(DbSerializer::ActionCreateText));
 	bufPtr->PushStringWithoutZero<uint8_t>(loginOfLastModifier);
