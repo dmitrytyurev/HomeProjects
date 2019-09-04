@@ -22,6 +22,8 @@ public:
 	T GetUint();
 	template <typename T>
 	void GetString(std::string& result);
+	template <typename T>
+	std::vector<uint8_t> GetVector();
 	bool IsEmpty() { return _buffer.size() - 1 == offset; }
 
 	uint32_t offset = 0;
@@ -42,19 +44,41 @@ void DeserializationBuffer::GetString(std::string& result)
 #endif
 	T textLength = *(reinterpret_cast<T*>(_buffer.data() + offset));
 	offset += sizeof(T);
-	uint8_t keep = _buffer[offset + textLength];
-	_buffer[offset + textLength] = 0;
-
 #if CHECK_BUFFER
-	if (offset + 1 > _buffer.size()) {
+	if (offset + textLength >= _buffer.size()) {
 		ExitMsg("GetString _buffer overrun");
 	}
 #endif
+	uint8_t keep = _buffer[offset + textLength];
+	_buffer[offset + textLength] = 0;
 	result = reinterpret_cast<const char*>(_buffer.data() + offset);
 	_buffer[offset + textLength] = keep;
 	offset += textLength;
 }
 
+//===============================================================================
+//
+//===============================================================================
+
+template <typename T>
+std::vector<uint8_t> DeserializationBuffer::GetVector()
+{
+#if CHECK_BUFFER
+	if (offset + sizeof(T) > _buffer.size()) {
+		ExitMsg("GetVector _buffer overrun");
+	}
+#endif
+	T vectLength = *(reinterpret_cast<T*>(_buffer.data() + offset));
+	offset += sizeof(T);
+#if CHECK_BUFFER
+	if (offset + vectLength > _buffer.size()) {
+		ExitMsg("GetVector _buffer overrun");
+	}
+#endif
+
+	offset += vectLength;
+	return std::vector<uint8_t>(_buffer.data() + offset - vectLength, _buffer.data() + offset);
+}
 
 //===============================================================================
 //

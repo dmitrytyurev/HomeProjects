@@ -14,21 +14,22 @@ class Folder;
 
 enum EventType
 {
-	EventCreateFolder = 0,         // Создание каталога для текстов
-	EventDeleteFolder = 1,         // Удаление каталога (должен не иметь текстов и вложенных каталогов)
-	EventChangeFolderParent = 2,   // Изменение родительского каталога
-	EventRenameFolder = 3,         // Переименование каталога
-	EventCreateAttribute = 4,      // Создание атрибута таблицы
-	EventDeleteAttribute = 5,      // Удаление атрибута таблицы
-	EventRenameAttribute = 6,      // Переименование атрибута таблицы
-	EventChangeAttributeVis = 7,   // Изменение отображаемого порядкового номера атрибута в таблице текстов или видимость атрибута
-	EventCreateText = 8,           // Создание текста
-	EventDeleteText = 9,           // Удаление текста
-	EventMoveTextToFolder = 10,    // Текст переместился в другую папку
-	EventChangeBaseText = 11,      // Изменился основной текст
-	EventAddAttributeToText = 12,  // В текст добавился атрибут
-	EventDelAttributeFromText = 13,  // Удалился атрибут из текста
-	EventChangeAttributeInText = 14, // Изменилось значение атрибута в тексте
+	EventRequestSync = 0,          // Запрос синхронизации при подключении нового клиента
+	EventCreateFolder = 1,         // Создание каталога для текстов
+	EventDeleteFolder = 2,         // Удаление каталога (должен не иметь текстов и вложенных каталогов)
+	EventChangeFolderParent = 3,   // Изменение родительского каталога
+	EventRenameFolder = 4,         // Переименование каталога
+	EventCreateAttribute = 5,      // Создание атрибута таблицы
+	EventDeleteAttribute = 6,      // Удаление атрибута таблицы
+	EventRenameAttribute = 7,      // Переименование атрибута таблицы
+	EventChangeAttributeVis = 8,   // Изменение отображаемого порядкового номера атрибута в таблице текстов или видимость атрибута
+	EventCreateText = 9,           // Создание текста
+	EventDeleteText = 10,           // Удаление текста
+	EventMoveTextToFolder = 11,    // Текст переместился в другую папку
+	EventChangeBaseText = 12,      // Изменился основной текст
+	EventAddAttributeToText = 13,  // В текст добавился атрибут
+	EventDelAttributeFromText = 14,  // Удалился атрибут из текста
+	EventChangeAttributeInText = 15, // Изменилось значение атрибута в тексте
 };
 
 //===============================================================================
@@ -62,6 +63,9 @@ public:
 	SClientMessagesMgr(STextsToolApp* app);
 	void Update(double dt);
 	void AddPacketToClients(SerializationBufferPtr& bufPtr, const std::string& srcDbName);
+	void ProcessSync(DeserializationBuffer& buf, TextsDatabase& db);
+	void ConnectClient();    // Вызывается из HttpMgr::Update при разборе очереди подключений/отключений. Создаёт SConnectedClient.
+	void DisconnectClient(); // Вызывается из HttpMgr::Update при разборе очереди подключений/отключений. Удаляет SConnectedClient.
 
 	static bool ModifyDbRenameFolder(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts);
 	static bool ModifyDbDeleteFolder(DeserializationBuffer& buf, TextsDatabase& db);

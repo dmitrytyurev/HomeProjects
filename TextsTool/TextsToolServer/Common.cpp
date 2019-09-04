@@ -4,6 +4,8 @@
 #include <ctime>
 #include <iostream>
 #include <experimental/filesystem>
+#include <algorithm>
+#include <iterator>
 
 #include "Common.h"
 #include "DbSerializer.h"
@@ -99,7 +101,6 @@ TextsDatabasePtr SClientMessagesMgr::GetDbPtrByDbName(const std::string& dbName)
 			return db;
 		}
 	}
-	ExitMsg("Database not found: " + dbName);  
 	return nullptr;
 }
 
@@ -135,12 +136,18 @@ void SClientMessagesMgr::SendToClients(const std::string& dbName, uint8_t ts, co
 void SClientMessagesMgr::Update(double dt)
 {
 	for (auto& client: _app->_clients) {
-		// !!! Вероятно, тут надо проверить наличие базы и если нету, то запустить фоновую загрузку, а выполнение запроса отложить
 		TextsDatabasePtr db = GetDbPtrByDbName(client->_dbName);
 		for (const auto& buf : client->_msgsQueueIn) {
 			uint8_t actionType = buf->GetUint<uint8_t>();
 			uint32_t ts = GetTime();
 			switch (actionType) {
+			case EventRequestSync:
+			{
+				buf->GetString<uint8_t>(client->_dbName);
+				TextsDatabasePtr db2 = GetDbPtrByDbName(client->_dbName);  // !!! Вероятно, тут надо проверить наличие базы и если нету, то запустить фоновую загрузку, а выполнение запроса отложить
+				ProcessSync(*buf, *db2); // Накидать сообщения с диффами клиенту - для синхронизации его базы (он подключился)
+			}
+			break;
 			case EventCreateFolder:
 			{
 				db->_folders.emplace_back();                            // Изменения в базе
@@ -796,6 +803,83 @@ void SClientMessagesMgr::AddPacketToClients(SerializationBufferPtr& bufPtr, cons
 			client->_msgsQueueOut.emplace_back(bufPtr);
 		}
 	}
+}
+
+class ClientFolder
+{
+public:
+	struct Interval
+	{
+		Interval(uint32_t textsNum, uint64_t keysHash) : textsInIntervalNum(textsNum), hashOfKeys(keysHash) {}
+		uint32_t textsInIntervalNum = 0;
+		uint64_t hashOfKeys = 0;
+	};
+
+	ClientFolder(DeserializationBuffer& buf)
+	{
+		id = buf.GetUint<uint32_t>();
+		tsModified = buf.GetUint<uint32_t>();
+		keysNum = buf.GetUint<uint32_t>();
+		for (uint32_t keyIdx = 0; keyIdx < keysNum; ++keyIdx) {
+			keys.emplace_back(buf.GetVector<uint8_t>());
+		}
+		for (uint32_t intervalIdx = 0; intervalIdx < keysNum + 1; ++intervalIdx) {
+			uint32_t textsInIntervalNum = buf.GetUint<uint32_t>();    // Число текстов в интервале
+			uint64_t hashOfKeys = buf.GetUint<uint64_t>();            // CRC64 ключей входящих в группу текстов
+			intervals.emplace_back(textsInIntervalNum, hashOfKeys);
+		}
+	}
+
+	uint32_t id = 0;   // Id папки
+	uint32_t tsModified = 0; // Ts изменения папки на клиенте
+	uint32_t keysNum = 0;    // Количество отобранных ключей для текстов папки (ts текста + id текста)
+	std::vector<std::vector<uint8_t>> keys;      // Ключи, разбивающие тексты на интервалы. Ключ - бинарная строка: 4 байта ts + текстовый id-текста 
+	std::vector<Interval> intervals;     // Параметры интервалов, задаваемых ключами (интервалов на один больше чем ключей)
+};
+
+//===============================================================================
+//
+//===============================================================================
+
+void SClientMessagesMgr::ProcessSync(DeserializationBuffer& buf, TextsDatabase& db)
+{
+	auto buffer = std::make_shared<SerializationBuffer>();
+
+	// Посылаем аттрибуты таблицы целиком
+	buffer->Push(db._attributeProps.size());
+	for (const auto& atribProp : db._attributeProps) {
+		atribProp.SaveToBase(*buffer);
+	}
+
+	// Считать из пакета в clientFolders информацию о папках на клиенте
+	std::vector<ClientFolder> clientFolders;
+	uint32_t CltFoldersNum = buf.GetUint<uint32_t>();  // Количество папок на клиенте
+	for (uint32_t folderIdx = 0; folderIdx < CltFoldersNum; ++folderIdx) {
+		clientFolders.emplace_back(buf);
+	}
+
+	// Заполнить айдишники папок клиента
+	std::vector<uint32_t> clientFoldersIds;
+	for (const auto& folder : clientFolders) {
+		clientFoldersIds.emplace_back(folder.id);
+	}
+	std::sort(clientFoldersIds.begin(), clientFoldersIds.end());
+
+	// Заполнить айдишники папок сервера
+	std::vector<uint32_t> serverFoldersIds;
+	for (const auto& folder : db._folders) {
+		serverFoldersIds.emplace_back(folder.id);
+	}
+	std::sort(serverFoldersIds.begin(), serverFoldersIds.end());
+
+	// Найдём каталоги клиента подлежащие удалению (в клиентском списке есть, а в серверном их нет)
+	std::vector<uint32_t> foldersToDelete;
+	std::set_difference(clientFoldersIds.begin(), clientFoldersIds.end(), serverFoldersIds.begin(), serverFoldersIds.end(),
+		std::inserter(foldersToDelete, foldersToDelete.begin()));
+
+
+
+
 }
 
 //===============================================================================
