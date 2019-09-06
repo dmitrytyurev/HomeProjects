@@ -83,6 +83,7 @@ public:
 	STextsToolApp* _app = nullptr;
 
 private:
+	void MakeKey(uint32_t tsModified, const std::string& textId, std::vector<uint8_t>& result);
 	void SaveToHistory(TextsDatabasePtr db, const std::string& login, uint8_t ts, const DeserializationBuffer& buf);
 	void SendToClients(const std::string& dbName, uint8_t ts, const DeserializationBuffer& buf, const std::string& loginOfLastModifier);
 	TextsDatabasePtr GetDbPtrByDbName(const std::string& dbName);

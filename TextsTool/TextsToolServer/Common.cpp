@@ -811,15 +811,15 @@ public:
 	struct Interval
 	{
 		Interval(uint32_t textsNum, uint64_t keysHash) : textsInIntervalNum(textsNum), hashOfKeys(keysHash) {}
-		uint32_t textsInIntervalNum = 0;
-		uint64_t hashOfKeys = 0;
+		uint32_t textsInIntervalNum = 0;  // Количество текстов в интервале
+		uint64_t hashOfKeys = 0;          // Хэш ключей текстов интервала
 	};
 
 	ClientFolder(DeserializationBuffer& buf)
 	{
 		id = buf.GetUint<uint32_t>();
 		tsModified = buf.GetUint<uint32_t>();
-		keysNum = buf.GetUint<uint32_t>();
+		uint32_t keysNum = buf.GetUint<uint32_t>();
 		for (uint32_t keyIdx = 0; keyIdx < keysNum; ++keyIdx) {
 			keys.emplace_back(buf.GetVector<uint8_t>());
 		}
@@ -832,10 +832,53 @@ public:
 
 	uint32_t id = 0;   // Id папки
 	uint32_t tsModified = 0; // Ts изменения папки на клиенте
-	uint32_t keysNum = 0;    // Количество отобранных ключей для текстов папки (ts текста + id текста)
 	std::vector<std::vector<uint8_t>> keys;      // Ключи, разбивающие тексты на интервалы. Ключ - бинарная строка: 4 байта ts + текстовый id-текста 
 	std::vector<Interval> intervals;     // Параметры интервалов, задаваемых ключами (интервалов на один больше чем ключей)
 };
+
+
+struct TextKey
+{
+	std::vector<uint8_t> key;   // Ключ - бинарная строка: 4 байта ts + текстовый id-текста 
+	TextTranslated* textRef = nullptr;    // Указатель на текст, для которого этот ключ
+};
+
+struct Interval
+{
+	int firstTextIdx = 0; // Индекс первого текста интервала
+	int textsNum = 0; // Количество текстов в интервале
+	uint64_t hash = 0;  // Хэш ключей текстов интервала
+};
+
+
+
+int KeysCompare(uint8_t* p1, int size1, uint8_t* p2, int size2)
+{
+	while (true) {
+		if (*p1 < *p2) {
+			return -1;
+		}
+		else {
+			if (*p1 > *p2) {
+				return 1;
+			}
+		}
+		--size1;
+		--size2;
+		if (size1 == 0 && size2 == 0) {
+			return 0;
+		}
+		if (size1 == 0) {
+			return -1;
+		}
+		if (size2 == 0) {
+			return 1;
+		}
+		++p1;
+		++p2;
+	}
+	return 0;
+}
 
 //===============================================================================
 //
@@ -858,14 +901,14 @@ void SClientMessagesMgr::ProcessSync(DeserializationBuffer& buf, TextsDatabase& 
 		clientFolders.emplace_back(buf);
 	}
 
-	// Заполнить айдишники папок клиента
+	// Заполнить айдишники папок клиента, отсортировать их
 	std::vector<uint32_t> clientFoldersIds;
 	for (const auto& folder : clientFolders) {
 		clientFoldersIds.emplace_back(folder.id);
 	}
 	std::sort(clientFoldersIds.begin(), clientFoldersIds.end());
 
-	// Заполнить айдишники папок сервера
+	// Заполнить айдишники папок сервера, отсортировать их
 	std::vector<uint32_t> serverFoldersIds;
 	for (const auto& folder : db._folders) {
 		serverFoldersIds.emplace_back(folder.id);
@@ -877,9 +920,119 @@ void SClientMessagesMgr::ProcessSync(DeserializationBuffer& buf, TextsDatabase& 
 	std::set_difference(clientFoldersIds.begin(), clientFoldersIds.end(), serverFoldersIds.begin(), serverFoldersIds.end(),
 		std::inserter(foldersToDelete, foldersToDelete.begin()));
 
+	// Добавим в пакет айдишники папок на удаление
+	buffer->Push(foldersToDelete.size());
+	for (auto id: foldersToDelete) {
+		buffer->Push(id);
+	}
+
+	// Найдём каталоги сервера подлежащие созданию на клиенте (в серверном списке есть, а в клиентском их нет)
+	std::vector<uint32_t> foldersToCreate;
+	std::set_difference(serverFoldersIds.begin(), serverFoldersIds.end(), clientFoldersIds.begin(), clientFoldersIds.end(),
+		std::inserter(foldersToCreate, foldersToCreate.begin()));
+
+	// Добавим в пакет инфу о папках на создание
+	buffer->Push(foldersToCreate.size());
+	for (auto folderId : foldersToCreate) {
+		auto& f = db._folders;
+		auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+		if (result == std::end(f)) {
+			ExitMsg("result == std::end(f)");
+		}
+		result->SaveToBase(*buffer);
+	}
+
+	// Найдём каталоги сервера, которые есть и на сервер и на клиенте. Чтобы проверить какие из них совпадают, а где есть отличия
+	std::vector<uint32_t> foldersSameIds;
+	std::set_intersection(serverFoldersIds.begin(), serverFoldersIds.end(), clientFoldersIds.begin(), clientFoldersIds.end(),
+		std::inserter(foldersSameIds, foldersSameIds.begin()));
+
+	// Сравниваем папки, которые есть и на клиенете и на сервере. Считаем число папок с разными временем модификации (будем посылать по ним инфу)
+	uint32_t foldersDifferentNum = 0;
+	for (auto folderId : foldersSameIds) {
+		auto& f = db._folders;
+		auto srvFoldrItr = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+		if (srvFoldrItr == std::end(f)) {
+			ExitMsg("result == std::end(f)");
+		}
+		auto cltFoldrItr = std::find_if(std::begin(clientFolders), std::end(clientFolders), [folderId](const ClientFolder& el) { return el.id == folderId; });
+		if (cltFoldrItr == std::end(clientFolders)) {
+			ExitMsg("cltFoldrItr == std::end(clientFolders)");
+		}
+		if (srvFoldrItr->timestampModified == cltFoldrItr->tsModified)   // Если время модификации одинаковое на клиенте и сервере, то изменения по этой папке не нужно посылать на клиент
+			continue;
+		++foldersDifferentNum;
+	}
+
+	buffer->Push(foldersDifferentNum);
+
+	// Обрабатываем отличающиеся папки
+
+	for (auto folderId : foldersSameIds) {
+		auto srvFoldrItr = std::find_if(std::begin(db._folders), std::end(db._folders), [folderId](const Folder& el) { return el.id == folderId; });
+		auto cltFoldrItr = std::find_if(std::begin(clientFolders), std::end(clientFolders), [folderId](const ClientFolder& el) { return el.id == folderId; });
+		if (srvFoldrItr->timestampModified == cltFoldrItr->tsModified)   // Если время модификации одинаковое на клиенте и сервере, то изменения по этой папке не нужно посылать на клиент
+			continue;
+
+		// Начали записывать инфу об отличающейся папке
+
+		buffer->Push(srvFoldrItr->id);
+		buffer->PushStringWithoutZero<uint16_t>(srvFoldrItr->name);
+		buffer->Push(srvFoldrItr->parentId);
+		buffer->Push(srvFoldrItr->timestampModified);
+
+		// Заполняем ключи серверных текстов и ссылки на них для быстрой сортировки по ключам
+
+		std::vector<TextKey> textsKeys;       // Ключи серверных текстов текущей папки (для сортировки и разбиения на интевалы)
+		std::vector<TextKey*> textsKeysRefs;  // Указатели на эти ключи для быстрой сортировки
+
+		textsKeys.reserve(srvFoldrItr->texts.size());
+		textsKeysRefs.reserve(srvFoldrItr->texts.size());
+
+		for (const auto& t : srvFoldrItr->texts) {
+			textsKeys.emplace_back();
+			auto& textKey = textsKeys.back();
+			textKey.textRef = &*t;
+			MakeKey(t->timestampModified, t->id, textKey.key);
+		}
+
+		// Сортируем ссылки на заполненные ключи серверных текстов
+		std::sort(textsKeysRefs.begin(), textsKeysRefs.end(), [](TextKey* el1, TextKey* el2) { return KeysCompare(&el1->key[0], el1->key.size(), &el2->key[0], el2->key.size()); });
+
+		// Заполнение интервалов отсортированных серверных текстов текущей папки
+		std::vector<Interval> intervals;
+		intervals.resize(cltFoldrItr->intervals.size());
+
+		int cltKeyIdx = 0;
+
+		for (int i = 0; i < textsKeysRefs.size(); ++i) {
+			while (KeysCompare(&textsKeysRefs[i]->key[0], textsKeysRefs[i]->key.size(), &cltFoldrItr->keys[cltKeyIdx][0], cltFoldrItr->keys[cltKeyIdx].size()) >= 0) {
+				++cltKeyIdx;
+				if (cltKeyIdx == cltFoldrItr->keys.size()) {
+					intervals[cltKeyIdx].textsNum = textsKeysRefs.size() - i;
+					goto out;
+				}
+			}
+			++(intervals[cltKeyIdx].textsNum);
+		}
+out:;
 
 
 
+	}
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void SClientMessagesMgr::MakeKey(uint32_t tsModified, const std::string& textId, std::vector<uint8_t>& result)
+{
+	result.reserve(sizeof(uint32_t) + textId.size());
+	uint8_t* p = &result[0];
+
+	*(reinterpret_cast<uint32_t*>(p)) = tsModified;
+	memcpy(p + sizeof(uint32_t), textId.c_str(), textId.size());
 }
 
 //===============================================================================
