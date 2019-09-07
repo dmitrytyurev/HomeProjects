@@ -845,8 +845,8 @@ struct TextKey
 
 struct Interval
 {
-	int firstTextIdx = 0; // Индекс первого текста интервала
-	int textsNum = 0; // Количество текстов в интервале
+	uint32_t firstTextIdx = 0; // Индекс первого текста интервала
+	uint32_t textsNum = 0; // Количество текстов в интервале
 	uint64_t hash = 0;  // Хэш ключей текстов интервала
 };
 
@@ -879,6 +879,15 @@ int KeysCompare(uint8_t* p1, int size1, uint8_t* p2, int size2)
 	}
 	return 0;
 }
+
+uint64_t AddHash(uint64_t curHash, std::vector<uint8_t>& key)  // !!! Заменить на нормальную хэш-функцию
+{
+	for (uint8_t el : key) {
+		curHash += el;
+	}
+	return curHash;
+}
+
 
 //===============================================================================
 //
@@ -1004,10 +1013,13 @@ void SClientMessagesMgr::ProcessSync(DeserializationBuffer& buf, TextsDatabase& 
 		intervals.resize(cltFoldrItr->intervals.size());
 
 		int cltKeyIdx = 0;
+		int sum = 0;
 
 		for (int i = 0; i < textsKeysRefs.size(); ++i) {
 			while (KeysCompare(&textsKeysRefs[i]->key[0], textsKeysRefs[i]->key.size(), &cltFoldrItr->keys[cltKeyIdx][0], cltFoldrItr->keys[cltKeyIdx].size()) >= 0) {
+				sum += intervals[cltKeyIdx].textsNum;
 				++cltKeyIdx;
+				intervals[cltKeyIdx].firstTextIdx = sum;
 				if (cltKeyIdx == cltFoldrItr->keys.size()) {
 					intervals[cltKeyIdx].textsNum = textsKeysRefs.size() - i;
 					goto out;
@@ -1015,10 +1027,36 @@ void SClientMessagesMgr::ProcessSync(DeserializationBuffer& buf, TextsDatabase& 
 			}
 			++(intervals[cltKeyIdx].textsNum);
 		}
-out:;
+out:    // Заполняем значения хэшей в интервалах (хэш интервала считается, как хэш ключей всех текстов интервала)
+		for (auto& interval: intervals) {
+			uint64_t hash = 0;
+			for (int i = interval.firstTextIdx; i < interval.firstTextIdx+interval.textsNum; ++i) {
+				hash = AddHash(hash, textsKeysRefs[i]->key);
+			}
+			interval.hash = hash;
+		}
 
+		// Сравниваем интервалы текущего каталога у сервера и клиента. Если текущий интервал отличается, то для него будут посланы все тексты
 
+		uint32_t intervalsDifferNum = 0;  // Подсчитать количество отличающихся интервалов
+		for (int i = 0; i < intervals.size(); ++i) {
+			if (intervals[i].textsNum != cltFoldrItr->intervals[i].textsInIntervalNum ||
+				intervals[i].hash != cltFoldrItr->intervals[i].hashOfKeys) {
+				++intervalsDifferNum;
+			}
+		}
+		buffer->Push(intervalsDifferNum);
+		for (uint32_t i = 0; i < intervals.size(); ++i) {
+			if (intervals[i].textsNum != cltFoldrItr->intervals[i].textsInIntervalNum ||
+				intervals[i].hash != cltFoldrItr->intervals[i].hashOfKeys) {
+				buffer->Push(i);
+				buffer->Push(intervals[i].textsNum);
 
+				for (int i2 = intervals[i].firstTextIdx; i2 < intervals[i].firstTextIdx + intervals[i].textsNum; ++i2) {
+					textsKeysRefs[i2]->textRef->SaveToBase(*buffer);
+				}
+			}
+		}
 	}
 }
 
