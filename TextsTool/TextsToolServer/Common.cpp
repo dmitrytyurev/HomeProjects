@@ -817,6 +817,7 @@ public:
 		uint64_t hashOfKeys = 0;          // Хэш ключей текстов интервала
 	};
 
+	ClientFolder() {}
 	ClientFolder(DeserializationBuffer& buf)
 	{
 		id = buf.GetUint<uint32_t>();
@@ -1017,7 +1018,7 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 		int cltKeyIdx = 0;
 		int sum = 0;
 
-		for (int i = 0; i < textsKeysRefs.size(); ++i) {
+		for (int i = 0; i < (int)textsKeysRefs.size(); ++i) {
 			while (KeysCompare(&textsKeysRefs[i]->key[0], textsKeysRefs[i]->key.size(), &cltFoldrItr->keys[cltKeyIdx][0], cltFoldrItr->keys[cltKeyIdx].size()) >= 0) {
 				sum += intervals[cltKeyIdx].textsNum;
 				++cltKeyIdx;
@@ -1032,7 +1033,7 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 out:    // Заполняем значения хэшей в интервалах (хэш интервала считается, как хэш ключей всех текстов интервала)
 		for (auto& interval: intervals) {
 			uint64_t hash = 0;
-			for (int i = interval.firstTextIdx; i < interval.firstTextIdx+interval.textsNum; ++i) {
+			for (uint32_t i = interval.firstTextIdx; i < (int)interval.firstTextIdx+interval.textsNum; ++i) {
 				hash = AddHash(hash, textsKeysRefs[i]->key);
 			}
 			interval.hash = hash;
@@ -1041,7 +1042,7 @@ out:    // Заполняем значения хэшей в интервалах (хэш интервала считается, как х
 		// Сравниваем интервалы текущего каталога у сервера и клиента. Если текущий интервал отличается, то для него будут посланы все тексты
 
 		uint32_t intervalsDifferNum = 0;  // Подсчитать количество отличающихся интервалов
-		for (int i = 0; i < intervals.size(); ++i) {
+		for (int i = 0; i < (int)intervals.size(); ++i) {
 			if (intervals[i].textsNum != cltFoldrItr->intervals[i].textsInIntervalNum ||
 				intervals[i].hash != cltFoldrItr->intervals[i].hashOfKeys) {
 				++intervalsDifferNum;
@@ -1054,13 +1055,101 @@ out:    // Заполняем значения хэшей в интервалах (хэш интервала считается, как х
 				buffer->Push(i);
 				buffer->Push(intervals[i].textsNum);
 
-				for (int i2 = intervals[i].firstTextIdx; i2 < intervals[i].firstTextIdx + intervals[i].textsNum; ++i2) {
+				for (uint32_t i2 = intervals[i].firstTextIdx; i2 < intervals[i].firstTextIdx + intervals[i].textsNum; ++i2) {
 					textsKeysRefs[i2]->textRef->SaveToBase(*buffer);
 				}
 			}
 		}
 	}
 	return buffer;
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void SClientMessagesMgr::test()
+{
+	auto buffer = std::make_shared<SerializationBuffer>();
+	Folder srvFolder;
+	ClientFolder cltFolder;
+	auto srvFoldrItr = &srvFolder;
+	auto cltFoldrItr = &cltFolder;
+
+	// Начали записывать инфу об отличающейся папке
+
+	buffer->Push(srvFoldrItr->id);
+	buffer->PushStringWithoutZero<uint16_t>(srvFoldrItr->name);
+	buffer->Push(srvFoldrItr->parentId);
+	buffer->Push(srvFoldrItr->timestampModified);
+
+	// Заполняем ключи серверных текстов и ссылки на них для быстрой сортировки по ключам
+
+	std::vector<TextKey> textsKeys;       // Ключи серверных текстов текущей папки (для сортировки и разбиения на интевалы)
+	std::vector<TextKey*> textsKeysRefs;  // Указатели на эти ключи для быстрой сортировки
+
+	textsKeys.reserve(srvFoldrItr->texts.size());
+	textsKeysRefs.reserve(srvFoldrItr->texts.size());
+
+	for (const auto& t : srvFoldrItr->texts) {
+		textsKeys.emplace_back();
+		auto& textKey = textsKeys.back();
+		textKey.textRef = &*t;
+		MakeKey(t->timestampModified, t->id, textKey.key); // Склеивает ts модификации текста и текстовый айдишник текста в "ключ"
+	}
+
+	// Сортируем ссылки на заполненные ключи серверных текстов
+	std::sort(textsKeysRefs.begin(), textsKeysRefs.end(), [](TextKey* el1, TextKey* el2) { return KeysCompare(&el1->key[0], el1->key.size(), &el2->key[0], el2->key.size()); });
+
+	// Заполнение интервалов отсортированных серверных текстов текущей папки
+	std::vector<Interval> intervals;
+	intervals.resize(cltFoldrItr->intervals.size());
+
+	int cltKeyIdx = 0;
+	int sum = 0;
+
+	for (int i = 0; i < (int)textsKeysRefs.size(); ++i) {
+		while (KeysCompare(&textsKeysRefs[i]->key[0], textsKeysRefs[i]->key.size(), &cltFoldrItr->keys[cltKeyIdx][0], cltFoldrItr->keys[cltKeyIdx].size()) >= 0) {
+			sum += intervals[cltKeyIdx].textsNum;
+			++cltKeyIdx;
+			intervals[cltKeyIdx].firstTextIdx = sum;
+			if (cltKeyIdx == cltFoldrItr->keys.size()) {
+				intervals[cltKeyIdx].textsNum = textsKeysRefs.size() - i;
+				goto out;
+			}
+		}
+		++(intervals[cltKeyIdx].textsNum);
+	}
+out:    // Заполняем значения хэшей в интервалах (хэш интервала считается, как хэш ключей всех текстов интервала)
+	for (auto& interval : intervals) {
+		uint64_t hash = 0;
+		for (uint32_t i = interval.firstTextIdx; i < interval.firstTextIdx + interval.textsNum; ++i) {
+			hash = AddHash(hash, textsKeysRefs[i]->key);
+		}
+		interval.hash = hash;
+	}
+
+	// Сравниваем интервалы текущего каталога у сервера и клиента. Если текущий интервал отличается, то для него будут посланы все тексты
+
+	uint32_t intervalsDifferNum = 0;  // Подсчитать количество отличающихся интервалов
+	for (int i = 0; i < (int)intervals.size(); ++i) {
+		if (intervals[i].textsNum != cltFoldrItr->intervals[i].textsInIntervalNum ||
+			intervals[i].hash != cltFoldrItr->intervals[i].hashOfKeys) {
+			++intervalsDifferNum;
+		}
+	}
+	buffer->Push(intervalsDifferNum);
+	for (uint32_t i = 0; i < intervals.size(); ++i) {
+		if (intervals[i].textsNum != cltFoldrItr->intervals[i].textsInIntervalNum ||
+			intervals[i].hash != cltFoldrItr->intervals[i].hashOfKeys) {
+			buffer->Push(i);
+			buffer->Push(intervals[i].textsNum);
+
+			for (uint32_t i2 = intervals[i].firstTextIdx; i2 < intervals[i].firstTextIdx + intervals[i].textsNum; ++i2) {
+				textsKeysRefs[i2]->textRef->SaveToBase(*buffer);
+			}
+		}
+	}
 }
 
 //===============================================================================

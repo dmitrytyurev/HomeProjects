@@ -66,6 +66,7 @@ public:
 	SerializationBufferPtr MakeSyncMessage(DeserializationBuffer& buf, TextsDatabase& db);
 	void ConnectClient();    // Вызывается из HttpMgr::Update при разборе очереди подключений/отключений. Создаёт SConnectedClient.
 	void DisconnectClient(); // Вызывается из HttpMgr::Update при разборе очереди подключений/отключений. Удаляет SConnectedClient.
+	void test();
 
 	static bool ModifyDbRenameFolder(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts);
 	static bool ModifyDbDeleteFolder(DeserializationBuffer& buf, TextsDatabase& db);
