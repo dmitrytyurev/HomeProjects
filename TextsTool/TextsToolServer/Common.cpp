@@ -854,7 +854,7 @@ struct Interval
 
 
 
-int KeysCompare(uint8_t* p1, int size1, uint8_t* p2, int size2)
+int KeysCompare(const uint8_t* p1, int size1, const uint8_t* p2, int size2)
 {
 	while (true) {
 		if (*p1 < *p2) {
@@ -1004,7 +1004,7 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 			textsKeys.emplace_back();
 			auto& textKey = textsKeys.back();
 			textKey.textRef = &*t;
-			MakeKey(t->timestampModified, t->id, textKey.key);
+			MakeKey(t->timestampModified, t->id, textKey.key); // Склеивает ts модификации текста и текстовый айдишник текста в "ключ"
 		}
 
 		// Сортируем ссылки на заполненные ключи серверных текстов
