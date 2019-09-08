@@ -63,7 +63,7 @@ public:
 	SClientMessagesMgr(STextsToolApp* app);
 	void Update(double dt);
 	void AddPacketToClients(SerializationBufferPtr& bufPtr, const std::string& srcDbName);
-	void ProcessSync(DeserializationBuffer& buf, TextsDatabase& db);
+	SerializationBufferPtr MakeSyncMessage(DeserializationBuffer& buf, TextsDatabase& db);
 	void ConnectClient();    // Вызывается из HttpMgr::Update при разборе очереди подключений/отключений. Создаёт SConnectedClient.
 	void DisconnectClient(); // Вызывается из HttpMgr::Update при разборе очереди подключений/отключений. Удаляет SConnectedClient.
 

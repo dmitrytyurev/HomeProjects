@@ -145,7 +145,9 @@ void SClientMessagesMgr::Update(double dt)
 			{
 				buf->GetString<uint8_t>(client->_dbName);
 				TextsDatabasePtr db2 = GetDbPtrByDbName(client->_dbName);  // !!! Вероятно, тут надо проверить наличие базы и если нету, то запустить фоновую загрузку, а выполнение запроса отложить
-				ProcessSync(*buf, *db2); // Накидать сообщения с диффами клиенту - для синхронизации его базы (он подключился)
+				SerializationBufferPtr bufPtr = MakeSyncMessage(*buf, *db2); // Сформировать сообщение клиенту - для синхронизации его базы (он подключился)
+				client->_msgsQueueOut.emplace_back(bufPtr);
+				client->_syncFinished = true;
 			}
 			break;
 			case EventCreateFolder:
@@ -893,7 +895,7 @@ uint64_t AddHash(uint64_t curHash, std::vector<uint8_t>& key)  // !!! Заменить н
 //
 //===============================================================================
 
-void SClientMessagesMgr::ProcessSync(DeserializationBuffer& buf, TextsDatabase& db)
+SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer& buf, TextsDatabase& db)
 {
 	auto buffer = std::make_shared<SerializationBuffer>();
 
@@ -1058,6 +1060,7 @@ out:    // Заполняем значения хэшей в интервалах (хэш интервала считается, как х
 			}
 		}
 	}
+	return buffer;
 }
 
 //===============================================================================
