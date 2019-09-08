@@ -855,32 +855,40 @@ struct Interval
 
 
 
-int KeysCompare(const uint8_t* p1, int size1, const uint8_t* p2, int size2)
+bool IfKeyALess(const uint8_t* p1, int size1, const uint8_t* p2, int size2)
 {
+	if (*((uint32_t*)p1) < *((uint32_t*)p2)) {
+		return true;
+	}
+	if (*((uint32_t*)p1) > *((uint32_t*)p2)) {
+		return false;
+	}
+	p1 += sizeof(uint32_t);
+	p2 += sizeof(uint32_t);
 	while (true) {
 		if (*p1 < *p2) {
-			return -1;
+			return true;
 		}
 		else {
 			if (*p1 > *p2) {
-				return 1;
+				return false;
 			}
 		}
 		--size1;
 		--size2;
 		if (size1 == 0 && size2 == 0) {
-			return 0;
+			return false;
 		}
 		if (size1 == 0) {
-			return -1;
+			return true;
 		}
 		if (size2 == 0) {
-			return 1;
+			return false;
 		}
 		++p1;
 		++p2;
 	}
-	return 0;
+	return false;
 }
 
 uint64_t AddHash(uint64_t curHash, std::vector<uint8_t>& key)  // !!! Заменить на нормальную хэш-функцию
@@ -1009,7 +1017,7 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 		}
 
 		// Сортируем ссылки на заполненные ключи серверных текстов
-		std::sort(textsKeysRefs.begin(), textsKeysRefs.end(), [](TextKey* el1, TextKey* el2) { return KeysCompare(&el1->key[0], el1->key.size(), &el2->key[0], el2->key.size()); });
+		std::sort(textsKeysRefs.begin(), textsKeysRefs.end(), [](TextKey* el1, TextKey* el2) { return IfKeyALess(&el1->key[0], el1->key.size(), &el2->key[0], el2->key.size()); });
 
 		// Заполнение интервалов отсортированных серверных текстов текущей папки
 		std::vector<Interval> intervals;
@@ -1019,7 +1027,7 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 		int sum = 0;
 
 		for (int i = 0; i < (int)textsKeysRefs.size(); ++i) {
-			while (KeysCompare(&textsKeysRefs[i]->key[0], textsKeysRefs[i]->key.size(), &cltFoldrItr->keys[cltKeyIdx][0], cltFoldrItr->keys[cltKeyIdx].size()) >= 0) {
+			while (!IfKeyALess(&textsKeysRefs[i]->key[0], textsKeysRefs[i]->key.size(), &cltFoldrItr->keys[cltKeyIdx][0], cltFoldrItr->keys[cltKeyIdx].size())) {
 				sum += intervals[cltKeyIdx].textsNum;
 				++cltKeyIdx;
 				intervals[cltKeyIdx].firstTextIdx = sum;
@@ -1070,18 +1078,102 @@ out:    // Заполняем значения хэшей в интервалах (хэш интервала считается, как х
 
 void SClientMessagesMgr::test()
 {
+	// Заполнение тестовых данных
+	std::vector<TextTranslated> cltTexts;  // "Как бы" клиентские тексты
+
+	cltTexts.emplace_back();
+	cltTexts.back().id = "test_text_id0";
+	cltTexts.back().timestampModified = 11746908;
+
+	cltTexts.emplace_back();
+	cltTexts.back().id = "test_text_id1";
+	cltTexts.back().timestampModified = 12746908;
+
+	cltTexts.emplace_back();
+	cltTexts.back().id = "test_text_id2";             // Это ключ 0
+	cltTexts.back().timestampModified = 23746908;     //
+
+	cltTexts.emplace_back();
+	cltTexts.back().id = "test_text_id3";
+	cltTexts.back().timestampModified = 33746908;
+
+	cltTexts.emplace_back();
+	cltTexts.back().id = "test_text_id4";
+	cltTexts.back().timestampModified = 43746908;
+
+	cltTexts.emplace_back();
+	cltTexts.back().id = "test_text_id5";
+	cltTexts.back().timestampModified = 53746908;
+
+	cltTexts.emplace_back();
+	cltTexts.back().id = "test_text_id6";            // Это ключ 1
+	cltTexts.back().timestampModified = 63746908;    // 
+
+	cltTexts.emplace_back();
+	cltTexts.back().id = "test_text_id7";
+	cltTexts.back().timestampModified = 73746908;
+
+	cltTexts.emplace_back();
+	cltTexts.back().id = "test_text_id8";
+	cltTexts.back().timestampModified = 83746908;
+
+	cltTexts.emplace_back();
+	cltTexts.back().id = "test_text_id9";
+	cltTexts.back().timestampModified = 93746908;
+
+
+	std::vector<std::vector<uint8_t>> textKeys;
+	for (auto& text : cltTexts) {
+		textKeys.emplace_back();
+		MakeKey(text.timestampModified, text.id, textKeys.back());
+	}
+
+	ClientFolder cltFolder;  // Для теста нужны: keys, intervals
+
+	cltFolder.keys.emplace_back(textKeys[2]);
+	cltFolder.keys.emplace_back(textKeys[6]);
+
+	uint64_t hash = 0;
+	hash = AddHash(hash, textKeys[0]);
+	hash = AddHash(hash, textKeys[1]);
+	cltFolder.intervals.emplace_back(2, hash);
+
+	hash = 0;
+	hash = AddHash(hash, textKeys[2]);
+	hash = AddHash(hash, textKeys[3]);
+	hash = AddHash(hash, textKeys[4]);
+	hash = AddHash(hash, textKeys[5]);
+	cltFolder.intervals.emplace_back(4, hash);
+
+	hash = 0;
+	hash = AddHash(hash, textKeys[6]);
+	hash = AddHash(hash, textKeys[7]);
+	hash = AddHash(hash, textKeys[8]);
+	hash = AddHash(hash, textKeys[9]);
+	cltFolder.intervals.emplace_back(4, hash);
+
+	Folder srvFolder;  // Для теста нужны: тексты. Из текстов нужны timestampModified, id
+
+	srvFolder.texts.emplace_back(new TextTranslated);
+	srvFolder.texts.back()->id = "test_text_id2";
+	srvFolder.texts.back()->timestampModified = 23746908;
+
+	srvFolder.texts.emplace_back(new TextTranslated);
+	srvFolder.texts.back()->id = "test_text_id3";
+	srvFolder.texts.back()->timestampModified = 33746908;
+
+	srvFolder.texts.emplace_back(new TextTranslated);
+	srvFolder.texts.back()->id = "test_text_id4";
+	srvFolder.texts.back()->timestampModified = 43746908;
+
+	srvFolder.texts.emplace_back(new TextTranslated);
+	srvFolder.texts.back()->id = "test_text_id5";
+	srvFolder.texts.back()->timestampModified = 53746908;
+
+	// Начинаем тест
 	auto buffer = std::make_shared<SerializationBuffer>();
-	Folder srvFolder;
-	ClientFolder cltFolder;
 	auto srvFoldrItr = &srvFolder;
 	auto cltFoldrItr = &cltFolder;
-
-	// Начали записывать инфу об отличающейся папке
-
-	buffer->Push(srvFoldrItr->id);
-	buffer->PushStringWithoutZero<uint16_t>(srvFoldrItr->name);
-	buffer->Push(srvFoldrItr->parentId);
-	buffer->Push(srvFoldrItr->timestampModified);
 
 	// Заполняем ключи серверных текстов и ссылки на них для быстрой сортировки по ключам
 
@@ -1095,11 +1187,18 @@ void SClientMessagesMgr::test()
 		textsKeys.emplace_back();
 		auto& textKey = textsKeys.back();
 		textKey.textRef = &*t;
+		textsKeysRefs.emplace_back(&textKey);
 		MakeKey(t->timestampModified, t->id, textKey.key); // Склеивает ts модификации текста и текстовый айдишник текста в "ключ"
 	}
 
 	// Сортируем ссылки на заполненные ключи серверных текстов
-	std::sort(textsKeysRefs.begin(), textsKeysRefs.end(), [](TextKey* el1, TextKey* el2) { return KeysCompare(&el1->key[0], el1->key.size(), &el2->key[0], el2->key.size()); });
+	std::sort(textsKeysRefs.begin(), textsKeysRefs.end(), [](TextKey* el1, TextKey* el2) { return IfKeyALess(&el1->key[0], el1->key.size(), &el2->key[0], el2->key.size()); });
+
+	//for (auto el : textsKeysRefs) {
+	//	printf("%s\n", el->key.data()+4);
+	//}
+	//return;
+
 
 	// Заполнение интервалов отсортированных серверных текстов текущей папки
 	std::vector<Interval> intervals;
@@ -1109,7 +1208,7 @@ void SClientMessagesMgr::test()
 	int sum = 0;
 
 	for (int i = 0; i < (int)textsKeysRefs.size(); ++i) {
-		while (KeysCompare(&textsKeysRefs[i]->key[0], textsKeysRefs[i]->key.size(), &cltFoldrItr->keys[cltKeyIdx][0], cltFoldrItr->keys[cltKeyIdx].size()) >= 0) {
+		while (!IfKeyALess(&textsKeysRefs[i]->key[0], textsKeysRefs[i]->key.size(), &cltFoldrItr->keys[cltKeyIdx][0], cltFoldrItr->keys[cltKeyIdx].size())) {
 			sum += intervals[cltKeyIdx].textsNum;
 			++cltKeyIdx;
 			intervals[cltKeyIdx].firstTextIdx = sum;
@@ -1158,7 +1257,7 @@ out:    // Заполняем значения хэшей в интервалах (хэш интервала считается, как х
 
 void SClientMessagesMgr::MakeKey(uint32_t tsModified, const std::string& textId, std::vector<uint8_t>& result)
 {
-	result.reserve(sizeof(uint32_t) + textId.size());
+	result.resize(sizeof(uint32_t) + textId.size());
 	uint8_t* p = &result[0];
 
 	*(reinterpret_cast<uint32_t*>(p)) = tsModified;
