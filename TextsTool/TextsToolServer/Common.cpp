@@ -900,7 +900,7 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 	auto buffer = std::make_shared<SerializationBuffer>();
 
 	// Посылаем аттрибуты таблицы целиком
-	buffer->Push(db._attributeProps.size());
+	buffer->Push((uint32_t)db._attributeProps.size());
 	for (const auto& atribProp : db._attributeProps) {
 		atribProp.SaveToBase(*buffer);
 	}
@@ -932,7 +932,7 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 		std::inserter(foldersToDelete, foldersToDelete.begin()));
 
 	// Добавим в пакет айдишники папок на удаление
-	buffer->Push(foldersToDelete.size());
+	buffer->Push((uint32_t)foldersToDelete.size());
 	for (auto id: foldersToDelete) {
 		buffer->Push(id);
 	}
@@ -943,7 +943,7 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 		std::inserter(foldersToCreate, foldersToCreate.begin()));
 
 	// Добавим в пакет инфу о папках на создание
-	buffer->Push(foldersToCreate.size());
+	buffer->Push((uint32_t)foldersToCreate.size());
 	for (auto folderId : foldersToCreate) {
 		auto& f = db._folders;
 		auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
@@ -958,32 +958,32 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 	std::set_intersection(serverFoldersIds.begin(), serverFoldersIds.end(), clientFoldersIds.begin(), clientFoldersIds.end(),
 		std::inserter(foldersSameIds, foldersSameIds.begin()));
 
-	// Сравниваем папки, которые есть и на клиенете и на сервере. Считаем число папок с разными временем модификации (будем посылать по ним инфу)
-	uint32_t foldersDifferentNum = 0;
-	for (auto folderId : foldersSameIds) {
+	// Сравниваем папки, которые есть и на клиенете и на сервере. Удалим айдишники папок с одинаковым временем модификации. 
+	for (auto it = foldersSameIds.begin(); it != foldersSameIds.end();) {
 		auto& f = db._folders;
-		auto srvFoldrItr = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+		auto srvFoldrItr = std::find_if(std::begin(f), std::end(f), [folderId = *it](const Folder& el) { return el.id == folderId; });
 		if (srvFoldrItr == std::end(f)) {
 			ExitMsg("result == std::end(f)");
 		}
-		auto cltFoldrItr = std::find_if(std::begin(clientFolders), std::end(clientFolders), [folderId](const ClientFolder& el) { return el.id == folderId; });
+		auto cltFoldrItr = std::find_if(std::begin(clientFolders), std::end(clientFolders), [folderId = *it](const ClientFolder& el) { return el.id == folderId; });
 		if (cltFoldrItr == std::end(clientFolders)) {
 			ExitMsg("cltFoldrItr == std::end(clientFolders)");
 		}
-		if (srvFoldrItr->timestampModified == cltFoldrItr->tsModified)   // Если время модификации одинаковое на клиенте и сервере, то изменения по этой папке не нужно посылать на клиент
-			continue;
-		++foldersDifferentNum;
+		if (srvFoldrItr->timestampModified == cltFoldrItr->tsModified) {  // Если время модификации одинаковое на клиенте и сервере, то изменения по этой папке не нужно посылать на клиент
+			it = foldersSameIds.erase(it);
+		}
+		else {
+			++it;
+		}
 	}
 
-	buffer->Push(foldersDifferentNum);
+	buffer->Push((uint32_t)foldersSameIds.size());
 
-	// Обрабатываем отличающиеся папки
+	// Обрабатываем папки, которые есть на клиенте и сервере, но время модификации у них разное
 
 	for (auto folderId : foldersSameIds) {
 		auto srvFoldrItr = std::find_if(std::begin(db._folders), std::end(db._folders), [folderId](const Folder& el) { return el.id == folderId; });
 		auto cltFoldrItr = std::find_if(std::begin(clientFolders), std::end(clientFolders), [folderId](const ClientFolder& el) { return el.id == folderId; });
-		if (srvFoldrItr->timestampModified == cltFoldrItr->tsModified)   // Если время модификации одинаковое на клиенте и сервере, то изменения по этой папке не нужно посылать на клиент
-			continue;
 
 		// Начали записывать инфу об отличающейся папке
 

@@ -209,7 +209,7 @@ void Folder::SaveToBase(SerializationBuffer& buffer) const
 	buffer.Push(timestampModified);
 	buffer.PushStringWithoutZero<uint16_t>(name);
 	buffer.Push(parentId);
-	buffer.Push(texts.size());
+	buffer.Push((uint32_t)texts.size());
 	for (const auto& text : texts) {
 		text->SaveToBase(buffer);
 	}
