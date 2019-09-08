@@ -1013,6 +1013,7 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 			textsKeys.emplace_back();
 			auto& textKey = textsKeys.back();
 			textKey.textRef = &*t;
+			textsKeysRefs.emplace_back(&textKey);
 			MakeKey(t->timestampModified, t->id, textKey.key); // Склеивает ts модификации текста и текстовый айдишник текста в "ключ"
 		}
 
@@ -1155,6 +1156,14 @@ void SClientMessagesMgr::test()
 	Folder srvFolder;  // Для теста нужны: тексты. Из текстов нужны timestampModified, id
 
 	srvFolder.texts.emplace_back(new TextTranslated);
+	srvFolder.texts.back()->id = "test_text_id0";
+	srvFolder.texts.back()->timestampModified = 11746908;
+
+	srvFolder.texts.emplace_back(new TextTranslated);
+	srvFolder.texts.back()->id = "test_text_id1";
+	srvFolder.texts.back()->timestampModified = 12746908;
+
+	srvFolder.texts.emplace_back(new TextTranslated);
 	srvFolder.texts.back()->id = "test_text_id2";
 	srvFolder.texts.back()->timestampModified = 23746908;
 
@@ -1169,6 +1178,23 @@ void SClientMessagesMgr::test()
 	srvFolder.texts.emplace_back(new TextTranslated);
 	srvFolder.texts.back()->id = "test_text_id5";
 	srvFolder.texts.back()->timestampModified = 53746908;
+
+	srvFolder.texts.emplace_back(new TextTranslated);
+	srvFolder.texts.back()->id = "test_text_id6";
+	srvFolder.texts.back()->timestampModified = 63746908;
+
+	srvFolder.texts.emplace_back(new TextTranslated);
+	srvFolder.texts.back()->id = "test_text_id7";
+	srvFolder.texts.back()->timestampModified = 73746908;
+
+	srvFolder.texts.emplace_back(new TextTranslated);
+	srvFolder.texts.back()->id = "test_text_id8";
+	srvFolder.texts.back()->timestampModified = 83746908;
+
+	srvFolder.texts.emplace_back(new TextTranslated);
+	srvFolder.texts.back()->id = "test_text_id9";
+	srvFolder.texts.back()->timestampModified = 93746908;
+
 
 	// Начинаем тест
 	auto buffer = std::make_shared<SerializationBuffer>();
