@@ -156,8 +156,10 @@
     <ClInclude Include="DbSerializer.h" />
     <ClInclude Include="DeserializationBuffer.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="SClientMessagesMgr.h" />
     <ClInclude Include="SerializationBuffer.h" />
     <ClInclude Include="TextsBaseClasses.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common.cpp" />
@@ -169,9 +171,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SClientMessagesMgr.cpp" />
     <ClCompile Include="SerializationBuffer.cpp" />
     <ClCompile Include="TextsBaseClasses.cpp" />
     <ClCompile Include="TextsToolServer.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

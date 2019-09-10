@@ -110,9 +110,9 @@ void test2()
 
 void test3()
 {
-	STextsToolApp app;
-	SClientMessagesMgr messagesMgr(&app);
-	messagesMgr.test();
+	//STextsToolApp app;
+	//SClientMessagesMgr messagesMgr(&app);
+	//messagesMgr.test();
 }
 
 //===============================================================================
@@ -123,6 +123,6 @@ int main()
 {
 //	test();
 //	test2();
-	test3();
+//	test3();
 }
 
