@@ -17,6 +17,42 @@
 //
 //===============================================================================
 
+class ClientFolder
+{
+public:
+	struct Interval
+	{
+		Interval(uint32_t textsNum, uint64_t keysHash) : textsInIntervalNum(textsNum), hashOfKeys(keysHash) {}
+		uint32_t textsInIntervalNum = 0;  // Количество текстов в интервале
+		uint64_t hashOfKeys = 0;          // Хэш ключей текстов интервала
+	};
+
+	ClientFolder() {}
+	ClientFolder(DeserializationBuffer& buf)
+	{
+		id = buf.GetUint<uint32_t>();
+		tsModified = buf.GetUint<uint32_t>();
+		uint32_t keysNum = buf.GetUint<uint32_t>();
+		for (uint32_t keyIdx = 0; keyIdx < keysNum; ++keyIdx) {
+			keys.emplace_back(buf.GetVector<uint8_t>());
+		}
+		for (uint32_t intervalIdx = 0; intervalIdx < keysNum + 1; ++intervalIdx) {
+			uint32_t textsInIntervalNum = buf.GetUint<uint32_t>();    // Число текстов в интервале
+			uint64_t hashOfKeys = buf.GetUint<uint64_t>();            // CRC64 ключей входящих в группу текстов
+			intervals.emplace_back(textsInIntervalNum, hashOfKeys);
+		}
+	}
+
+	uint32_t id = 0;   // Id папки
+	uint32_t tsModified = 0; // Ts изменения папки на клиенте
+	std::vector<std::vector<uint8_t>> keys;      // Ключи, разбивающие тексты на интервалы. Ключ - бинарная строка: 4 байта ts + текстовый id-текста 
+	std::vector<Interval> intervals;     // Параметры интервалов, задаваемых ключами (интервалов на один больше чем ключей)
+};
+
+//===============================================================================
+//
+//===============================================================================
+
 void SClientMessagesMgr::SaveToHistory(TextsDatabasePtr db, const std::string& login, uint8_t ts, const DeserializationBuffer& bufIn)
 {
 	auto& bufOut = db->GetHistoryBuffer();
@@ -961,7 +997,11 @@ void SClientMessagesMgr::MakeKey(uint32_t tsModified, const std::string& textId,
 
 void SClientMessagesMgr::ConnectClient(const std::string& login)
 {
-
+	auto result = std::find_if(std::begin(_app->_clients), std::end(_app->_clients), [login](const SConnectedClient::Ptr& el) { return el->_login == login; });
+	if (result != std::end(_app->_clients)) {
+		_app->_clients.erase(result);
+	}
+	_app->_clients.emplace_back(std::make_shared<SConnectedClient>(login));
 }
 
 //===============================================================================
@@ -970,6 +1010,9 @@ void SClientMessagesMgr::ConnectClient(const std::string& login)
 
 void SClientMessagesMgr::DisconnectClient(const std::string& login)
 {
-
+	auto result = std::find_if(std::begin(_app->_clients), std::end(_app->_clients), [login](const SConnectedClient::Ptr& el) { return el->_login == login; });
+	if (result != std::end(_app->_clients)) {
+		_app->_clients.erase(result);
+	}
 }
 

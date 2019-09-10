@@ -58,57 +58,6 @@ private:
 
 class STextsToolApp;
 
-
-
-//===============================================================================
-//
-//===============================================================================
-
-class MutexLock
-{
-public:
-	MutexLock(std::mutex& mutex) { pMutex = &mutex; mutex.lock(); }
-	~MutexLock() { pMutex->unlock();  }
-private:
-	std::mutex* pMutex = nullptr;
-};
-
-//===============================================================================
-//
-//===============================================================================
-
-class ClientFolder
-{
-public:
-	struct Interval
-	{
-		Interval(uint32_t textsNum, uint64_t keysHash) : textsInIntervalNum(textsNum), hashOfKeys(keysHash) {}
-		uint32_t textsInIntervalNum = 0;  // Количество текстов в интервале
-		uint64_t hashOfKeys = 0;          // Хэш ключей текстов интервала
-	};
-
-	ClientFolder() {}
-	ClientFolder(DeserializationBuffer& buf)
-	{
-		id = buf.GetUint<uint32_t>();
-		tsModified = buf.GetUint<uint32_t>();
-		uint32_t keysNum = buf.GetUint<uint32_t>();
-		for (uint32_t keyIdx = 0; keyIdx < keysNum; ++keyIdx) {
-			keys.emplace_back(buf.GetVector<uint8_t>());
-		}
-		for (uint32_t intervalIdx = 0; intervalIdx < keysNum + 1; ++intervalIdx) {
-			uint32_t textsInIntervalNum = buf.GetUint<uint32_t>();    // Число текстов в интервале
-			uint64_t hashOfKeys = buf.GetUint<uint64_t>();            // CRC64 ключей входящих в группу текстов
-			intervals.emplace_back(textsInIntervalNum, hashOfKeys);
-		}
-	}
-
-	uint32_t id = 0;   // Id папки
-	uint32_t tsModified = 0; // Ts изменения папки на клиенте
-	std::vector<std::vector<uint8_t>> keys;      // Ключи, разбивающие тексты на интервалы. Ключ - бинарная строка: 4 байта ts + текстовый id-текста 
-	std::vector<Interval> intervals;     // Параметры интервалов, задаваемых ключами (интервалов на один больше чем ключей)
-};
-
 //===============================================================================
 //
 //===============================================================================
@@ -211,6 +160,8 @@ class SConnectedClient
 public:
 	using Ptr = std::shared_ptr<SConnectedClient>;
 
+	SConnectedClient(const std::string& login);
+
 	std::string _login;
 	std::string _dbName;  // Имя база, с которой сейчас работает клиент
 	bool _syncFinished = false; // Ставится в true, когда в _msgsQueueOut записаны все сообщения стартовой синхронизации и значит можно добавлять сообщения синхронизации с других клиентов
@@ -274,22 +225,3 @@ public:
 	SHttpManager       _httpMgr;
 	SMessagesRepaker   _messagesRepaker;
 };
-
-//===============================================================================
-// FNV-1a algorithm https://softwareengineering.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed
-//===============================================================================
-
-inline uint64_t AddHash(uint64_t curHash, std::vector<uint8_t>& key, bool isFirstPart)  
-{
-	if (isFirstPart) {
-		curHash = 14695981039346656037;
-	}
-
-	for (uint8_t el : key) {
-		curHash = curHash ^ el;
-		curHash *= 1099511628211;
-	}
-	return curHash;
-}
-
-

@@ -133,4 +133,15 @@ void MTQueueOut::PushPacket(std::vector<uint8_t>& data)
 	queue.push(std::make_unique<HttpPacket>(lastSentPacketN++, data));
 }
 
+//===============================================================================
+//
+//===============================================================================
+
+SConnectedClient::SConnectedClient(const std::string& login): _login(login)
+{
+
+}
+
+
+
 
