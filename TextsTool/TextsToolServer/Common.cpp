@@ -47,6 +47,7 @@ void STextsToolApp::Update(double dt)
 {
 	_messagesMgr.Update(dt);
 	_messagesRepaker.Update(dt);
+	_httpMgr.Update(dt);
 
 	for (const auto& db : _dbs) {
 		db->Update(dt);
@@ -57,7 +58,11 @@ void STextsToolApp::Update(double dt)
 //
 //===============================================================================
 
-STextsToolApp::STextsToolApp(): _messagesMgr(this), _messagesRepaker(this)
+STextsToolApp::STextsToolApp(): 
+	_messagesMgr(this), 
+	_messagesRepaker(this), 
+	_httpMgr(std::bind(&SClientMessagesMgr::ConnectClient, _messagesMgr, std::placeholders::_1), 
+		     std::bind(&SClientMessagesMgr::DisconnectClient, _messagesMgr, std::placeholders::_1))
 {
 }
 
@@ -142,6 +147,24 @@ SConnectedClient::SConnectedClient(const std::string& login): _login(login)
 
 }
 
+//===============================================================================
+//
+//===============================================================================
+
+SHttpManager::SHttpManager(std::function<void(const std::string&)> connectClient, std::function<void(const std::string&)> diconnectClient): 
+	_connectClient(connectClient), _diconnectClient(diconnectClient)
+{
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void SHttpManager::Update(double dt)
+{
+
+//!!! После вызова SClientMessagesMgr::ConnectClient, запоминаем в инфе об аккаунте ID текущей установленной сессии !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+}
 
 
 

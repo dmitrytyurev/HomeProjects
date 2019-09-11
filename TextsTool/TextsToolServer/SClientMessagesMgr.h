@@ -31,12 +31,13 @@ public:
 	static bool ModifyDbDelAttributeFromText(DeserializationBuffer& buf, TextsDatabase& db, const std::string& modifierLogin, uint32_t ts, uint32_t offsInHistoryFile, uint32_t& prevTsModified, uint32_t& prevOffsModified);
 	static bool ModifyDbChangeAttributeInText(DeserializationBuffer& buf, TextsDatabase& db, const std::string& modifierLogin, uint32_t ts, uint32_t offsInHistoryFile, uint32_t& prevTsModified, uint32_t& prevOffsModified);
 
-	STextsToolApp* _app = nullptr;
-
 private:
 	static bool IfKeyALess(const uint8_t* p1, int size1, const uint8_t* p2, int size2);
 	void MakeKey(uint32_t tsModified, const std::string& textId, std::vector<uint8_t>& result);
 	void SaveToHistory(TextsDatabasePtr db, const std::string& login, uint8_t ts, const DeserializationBuffer& buf);
 	void SendToClients(const std::string& dbName, uint8_t ts, const DeserializationBuffer& buf, const std::string& loginOfLastModifier);
 	TextsDatabasePtr GetDbPtrByDbName(const std::string& dbName);
+
+public:
+	STextsToolApp* _app = nullptr;
 };

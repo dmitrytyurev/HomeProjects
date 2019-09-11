@@ -188,6 +188,19 @@ public:
 class SHttpManager
 {
 public:
+	struct Account
+	{
+		std::string login;
+		uint32_t currentSessionId;  // ID текущей установленной сессии
+	};
+
+	SHttpManager(std::function<void (const std::string&)> connectClient, std::function<void(const std::string&)> diconnectClient);
+	void Update(double dt);
+
+public:
+	std::function<void(const std::string&)> _connectClient;
+	std::function<void(const std::string&)> _diconnectClient;
+	std::vector<Account> accounts;
 	MTClientsLow _mtClients;        // Низкоуровневая информация о подключенных клиентах
 	MTQueueConDiscon _conDiscon;  // Очередь событий о подключении новых клиентов и отключении старых
 };
