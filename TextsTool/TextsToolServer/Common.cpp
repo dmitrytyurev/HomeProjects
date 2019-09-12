@@ -162,8 +162,17 @@ SHttpManager::SHttpManager(std::function<void(const std::string&)> connectClient
 
 void SHttpManager::Update(double dt)
 {
-
-//!!! После вызова SClientMessagesMgr::ConnectClient, запоминаем в инфе об аккаунте ID текущей установленной сессии !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	MutexLock lock(_conDiscon.mutex);
+	for (auto& conDisconEvent : _conDiscon.queue) {
+		if (conDisconEvent.eventType == EventConDiscon::CONNECT) {
+			_connectClient(conDisconEvent.login);
+		}
+		else
+			if (conDisconEvent.eventType == EventConDiscon::DISCONNECT) {
+				_diconnectClient(conDisconEvent.login);
+			}
+	}
+	_conDiscon.queue.resize(0);
 }
 
 

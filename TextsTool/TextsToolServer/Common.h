@@ -88,14 +88,13 @@ public:
 class EventConDiscon
 {
 public:
-	using Ptr = std::unique_ptr<EventConDiscon>;
-
-	enum class EventType {
+	enum EventType {
 		CONNECT,
 		DISCONNECT
 	};
 
 	EventType eventType;
+	std::string login;  // Ћогин клиента, который подключаетс€ или отключаетс€
 };
 
 //===============================================================================
@@ -128,7 +127,7 @@ public:
 class MTQueueConDiscon
 {
 public:
-	std::vector<EventConDiscon::Ptr> queue;
+	std::vector<EventConDiscon> queue;
 	std::mutex mutex;
 };
 
@@ -155,24 +154,6 @@ public:
 //
 //===============================================================================
 
-class SConnectedClient
-{
-public:
-	using Ptr = std::shared_ptr<SConnectedClient>;
-
-	SConnectedClient(const std::string& login);
-
-	std::string _login;
-	std::string _dbName;  // »м€ база, с которой сейчас работает клиент
-	bool _syncFinished = false; // —тавитс€ в true, когда в _msgsQueueOut записаны все сообщени€ стартовой синхронизации и значит можно добавл€ть сообщени€ синхронизации с других клиентов
-	std::vector<SerializationBufferPtr>   _msgsQueueOut; // ќчередь сообщений, которые нужно отослать клиенту
-	std::vector<DeserializationBuffer::Ptr> _msgsQueueIn;  // ќчередь пришедших от клиента сообщений
-};
-
-//===============================================================================
-//
-//===============================================================================
-
 class MTClientsLow
 {
 public:
@@ -191,7 +172,8 @@ public:
 	struct Account
 	{
 		std::string login;
-		uint32_t currentSessionId;  // ID текущей установленной сессии
+		std::string password;
+		uint32_t sessionId;  // ID текущей сессии, если в _mtClients есть клиент с таким login. ј если нету, значит здесь ID последней завершившейс€ сессии
 	};
 
 	SHttpManager(std::function<void (const std::string&)> connectClient, std::function<void(const std::string&)> diconnectClient);
@@ -218,6 +200,25 @@ public:
 	void Update(double dt);
 
 	STextsToolApp* _app = nullptr;
+};
+
+
+//===============================================================================
+//
+//===============================================================================
+
+class SConnectedClient
+{
+public:
+	using Ptr = std::shared_ptr<SConnectedClient>;
+
+	SConnectedClient(const std::string& login);
+
+	std::string _login;
+	std::string _dbName;  // »м€ база, с которой сейчас работает клиент
+	bool _syncFinished = false; // —тавитс€ в true, когда в _msgsQueueOut записаны все сообщени€ стартовой синхронизации и значит можно добавл€ть сообщени€ синхронизации с других клиентов
+	std::vector<SerializationBufferPtr>   _msgsQueueOut; // ќчередь сообщений, которые нужно отослать клиенту
+	std::vector<DeserializationBuffer::Ptr> _msgsQueueIn;  // ќчередь пришедших от клиента сообщений
 };
 
 
