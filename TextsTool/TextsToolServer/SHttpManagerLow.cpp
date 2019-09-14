@@ -35,3 +35,12 @@ void SHttpManagerLow::StartHttpListening()
 SHttpManagerLow::~SHttpManagerLow()
 {
 }
+
+//===============================================================================
+//
+//===============================================================================
+
+void SHttpManagerLow::Update(double dt)
+{
+	_pImpl->Update(dt);
+}

@@ -164,6 +164,8 @@ SHttpManager::SHttpManager(std::function<void(const std::string&)> connectClient
 
 void SHttpManager::Update(double dt)
 {
+	_sHttpManagerLow.Update(dt);
+
 	MutexLock lock(_conDiscon.mutex);
 	for (auto& conDisconEvent : _conDiscon.queue) {
 		if (conDisconEvent.eventType == EventConDiscon::CONNECT) {
