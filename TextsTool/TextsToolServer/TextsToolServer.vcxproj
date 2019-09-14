@@ -158,6 +158,8 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="SClientMessagesMgr.h" />
     <ClInclude Include="SerializationBuffer.h" />
+    <ClInclude Include="SHttpManagerLow.h" />
+    <ClInclude Include="SHttpManagerLowImpl.h" />
     <ClInclude Include="TextsBaseClasses.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
@@ -173,6 +175,8 @@
     </ClCompile>
     <ClCompile Include="SClientMessagesMgr.cpp" />
     <ClCompile Include="SerializationBuffer.cpp" />
+    <ClCompile Include="SHttpManagerLow.cpp" />
+    <ClCompile Include="SHttpManagerLowImpl.cpp" />
     <ClCompile Include="TextsBaseClasses.cpp" />
     <ClCompile Include="TextsToolServer.cpp" />
     <ClCompile Include="Utils.cpp" />

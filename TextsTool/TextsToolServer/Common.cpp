@@ -152,7 +152,9 @@ SConnectedClient::SConnectedClient(const std::string& login): _login(login)
 //===============================================================================
 
 SHttpManager::SHttpManager(std::function<void(const std::string&)> connectClient, std::function<void(const std::string&)> diconnectClient): 
-	_connectClient(connectClient), _diconnectClient(diconnectClient)
+	_connectClient(connectClient), 
+	_diconnectClient(diconnectClient),
+	_sHttpManagerLow(std::bind(&SHttpManager::RequestProcessor, this, std::placeholders::_1, std::placeholders::_2))
 {
 }
 
@@ -175,5 +177,11 @@ void SHttpManager::Update(double dt)
 	_conDiscon.queue.resize(0);
 }
 
+//===============================================================================
+//
+//===============================================================================
 
+void SHttpManager::RequestProcessor(std::vector<uint8_t>& request, std::vector<uint8_t>& response)
+{
 
+}

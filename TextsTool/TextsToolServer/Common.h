@@ -5,6 +5,7 @@
 #include "SerializationBuffer.h"
 #include "DeserializationBuffer.h"
 #include "SClientMessagesMgr.h"
+#include "SHttpManagerLow.h"
 
 class TextsDatabase;
 class Folder;
@@ -178,8 +179,10 @@ public:
 
 	SHttpManager(std::function<void (const std::string&)> connectClient, std::function<void(const std::string&)> diconnectClient);
 	void Update(double dt);
+	void RequestProcessor(std::vector<uint8_t>& request, std::vector<uint8_t>& response); // Вызывается из неосновного потока, должа обработать http-запрос и сформировать ответ
 
 public:
+	SHttpManagerLow _sHttpManagerLow;
 	std::function<void(const std::string&)> _connectClient;
 	std::function<void(const std::string&)> _diconnectClient;
 	std::vector<Account> accounts;

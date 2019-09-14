@@ -121,8 +121,13 @@ void test3()
 
 int main()
 {
-//	test();
-//	test2();
-//	test3();
+	try {
+		//	test();
+		//	test2();
+		//	test3();
+	}
+	catch (std::exception& e) {
+		std::cerr << "Outter catch exception: " << e.what() << std::endl;
+	}
 }
 

@@ -10,7 +10,7 @@ void ExitMsg(const std::string& message)
 {
 	// !!! Сделать запись в лог
 	std::cout << "Fatal: " << message << std::endl;
-	exit(1);
+	throw std::exception("Exiting app exception");
 }
 
 //===============================================================================
