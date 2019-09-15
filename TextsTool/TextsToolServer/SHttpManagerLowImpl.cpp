@@ -53,6 +53,7 @@ void SHttpManagerLowImpl::StartHttpListening()
 	hints.ai_protocol = IPPROTO_TCP; // Используем протокол TCP
 	hints.ai_flags = AI_PASSIVE; // Сокет будет биндиться на адрес, чтобы принимать входящие соединения
 
+	struct addrinfo* _addr = nullptr; // структура, хранящая информацию об IP-адресе  слущающего сокета
 	// Инициализируем структуру, хранящую адрес сокета - addr
 	// Наш HTTP-сервер будет висеть на 8000-м порту локалхоста
 	result = getaddrinfo("127.0.0.1", "8000", &hints, &_addr);
@@ -69,11 +70,13 @@ void SHttpManagerLowImpl::StartHttpListening()
 	// освобождаем память, выделенную под структуру addr,
 	// выгружаем dll-библиотеку и закрываем программу
 	if (_listen_socket == INVALID_SOCKET) {
+		freeaddrinfo(_addr);
 		ExitMsg("Error at socket: " + std::to_string(WSAGetLastError()));
 	}
 
 	// Привязываем сокет к IP-адресу
 	result = bind(_listen_socket, _addr->ai_addr, (int)_addr->ai_addrlen);
+	freeaddrinfo(_addr);
 
 	// Если привязать адрес к сокету не удалось, то выводим сообщение
 	// об ошибке, освобождаем память, выделенную под структуру addr.
@@ -97,15 +100,13 @@ void SHttpManagerLowImpl::StartHttpListening()
 
 SHttpManagerLowImpl::~SHttpManagerLowImpl()
 {
-	// Остановить потоки
-
+	// Остановить поток
+	_isRequestThreadToFinish = true;
+	_listenSocketThread.join();
 
 	// Деинициализировать всё
 	if (_listen_socket != INVALID_SOCKET) {
 		closesocket(_listen_socket);
-	}
-	if (_addr) {
-		freeaddrinfo(_addr);
 	}
 
 	if (_isWsaInited) {
@@ -117,10 +118,17 @@ SHttpManagerLowImpl::~SHttpManagerLowImpl()
 //
 //===============================================================================
 
+void SHttpManagerLowImpl::ThreadExitMsg(const std::string& errorMsg)
+{
+	MutexLock lock(_fatalErrorInTheradTextMutex);
+	if (_fatalErrorInTheradText.empty()) {
+		_fatalErrorInTheradText = errorMsg;
+	}
+}
 
-//!!! Попробовать асинхронный сокет, чтобы можно было выйти из потока при вызове деструктора класса. Вероятно, тогда и поток для слушающего сокета не потребуется. 
-// Можно будет проверять в Update новые соединения
-// Мождет вызов WSACleanup в основном потоке заставляет accept вернуть управление в неосновном потоке?
+//===============================================================================
+//
+//===============================================================================
 
 void SHttpManagerLowImpl::ThreadListenSocketFunc()  
 {
@@ -128,65 +136,56 @@ void SHttpManagerLowImpl::ThreadListenSocketFunc()
 	int client_socket = INVALID_SOCKET;
 
 	while(true) {
-		// Принимаем входящие соединения
+		// Ждём входящего подключения
+		int socketsReadyNum = 0;
+		do {
+			if (_isRequestThreadToFinish) {
+				return;
+			}
+			fd_set readSet;
+			FD_ZERO(&readSet);
+			FD_SET(_listen_socket, &readSet);
+			timeval timeout;
+			timeout.tv_sec = 0; 
+			timeout.tv_usec = 200000;  // Таймаут ожидания в микросекундах. Для того, чтобы при выходе увидеть флаг запроса завершения потока
+			socketsReadyNum = select(_listen_socket, &readSet, NULL, NULL, &timeout);
+		} while (socketsReadyNum == 0);
+		if (socketsReadyNum == -1) {
+			ThreadExitMsg("select failed: " + std::to_string(WSAGetLastError()));
+			return;
+		}
+
+		// Дождались. Обрабатываем входящее подключение. Поскольку select уже показал, что оно есть, то accept не будет блокирующим
 		client_socket = accept(_listen_socket, NULL, NULL);
 		if (client_socket == INVALID_SOCKET) {
-			{
-				MutexLock lock(_fatalErrorInTheradTextMutex);
-				if (_fatalErrorInTheradText.empty()) {
-					_fatalErrorInTheradText = "accept failed: " + std::to_string(WSAGetLastError());
-				}
-			}
+			ThreadExitMsg("accept failed: " + std::to_string(WSAGetLastError()));
 			return;
 		}
 
 		int result = recv(client_socket, buf, MAX_CLIENT_BUFFER_SIZE, 0);
-
-		std::stringstream response; // сюда будет записываться ответ клиенту
-		std::stringstream response_body; // тело ответа
-
 		if (result == SOCKET_ERROR) {
-			// ошибка получения данных
-			cerr << "recv failed: " << result << "\n";
-			closesocket(client_socket);
+			ThreadExitMsg("recv failed: " + std::to_string(WSAGetLastError()));
+			return;
 		}
-		else if (result == 0) {
-			// соединение закрыто клиентом
-			cerr << "connection closed...\n";
+		if (result == 0) {
+			continue;   // соединение закрыто клиентом
 		}
-		else if (result > 0) {
-			// Мы знаем фактический размер полученных данных, поэтому ставим метку конца строки
-			// В буфере запроса.
-			buf[result] = '\0';
 
-			// Данные успешно получены
-			// формируем тело ответа (HTML)
-			response_body << "<title>Test C++ HTTP Server</title>\n"
-				<< "<h1>MY Test page</h1>\n"
-				<< "<p>This is body of the test page...</p>\n"
-				<< "<h2>Request headers</h2>\n"
-				<< "<pre>" << buf << "</pre>\n"
-				<< "<em><small>Test C++ Http Server</small></em>\n";
+		std::vector<uint8_t> request;
+		request.resize(result);
+		memcpy(request.data(), buf, result);
 
-			// Формируем весь ответ вместе с заголовками
-			response << "HTTP/1.1 200 OK\r\n"
-				<< "Version: HTTP/1.1\r\n"
-				<< "Content-Type: text/html; charset=utf-8\r\n"
-				<< "Content-Length: " << response_body.str().length()
-				<< "\r\n\r\n"
-				<< response_body.str();
+		std::vector<uint8_t> response;
+
+		_requestCallback(request, response); // Вызываем коллбек из потока для обработки запроса и формирования ответа
 
 			// Отправляем ответ клиенту с помощью функции send
-			result = send(client_socket, response.str().c_str(),
-				response.str().length(), 0);
-
-			if (result == SOCKET_ERROR) {
-				// произошла ошибка при отправле данных
-				cerr << "send failed: " << WSAGetLastError() << "\n";
-			}
-			// Закрываем соединение к клиентом
-			closesocket(client_socket);
+		result = send(client_socket, (const char*)response.data(), response.size(), 0);
+		if (result == SOCKET_ERROR) {
+			LogMsg("send failed: " + std::to_string(WSAGetLastError()));  // произошла ошибка при отправке данных
 		}
+		// Закрываем соединение к клиентом
+		closesocket(client_socket);
 	}
 }
 
@@ -196,12 +195,12 @@ void SHttpManagerLowImpl::ThreadListenSocketFunc()
 
 void SHttpManagerLowImpl::Update(double dt)
 {
+	// Если поток завершился с ошибкой, то завершить приложение с этой ошибкой
 	std::string copyStr;
 	{
 		MutexLock lock(_fatalErrorInTheradTextMutex);
 		copyStr = _fatalErrorInTheradText;
 	}
-
 	if (!copyStr.empty()) {
 		ExitMsg(copyStr);
 	}
