@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <string>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -15,10 +16,26 @@ MainWindow::MainWindow(QWidget *parent) :
                 return;
             }
 
-            QString answer = reply->readAll();
+            //QString answer = reply->readAll();
+            //unsigned char arr[10];
+            //memcpy(arr, answer.toLocal8Bit().constData(), 4);
 
-            qDebug() << answer;
-            ui->textEdit->setText(answer);
+            char arr[2048];
+            qint64 size = reply->read(arr, sizeof(arr));
+
+
+            std::string sstr;
+            for (int i=0; i < 4; ++i) {
+                unsigned int  n = arr[i];
+                sstr += std::to_string(n);
+                sstr += " ";
+            }
+
+
+ui->textEdit->setText(QString::fromStdString(sstr));
+
+
+//            ui->textEdit->setText(answer);
             reply->deleteLater();
         }
     );

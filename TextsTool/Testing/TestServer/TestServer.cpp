@@ -159,25 +159,41 @@ int main()
 
 		if (readBytesNum > 0) {
 			std::stringstream response; // сюда будет записываться ответ клиенту
-			std::stringstream response_body; // тело ответа
+			//std::stringstream response_body; // тело ответа
 			// Данные успешно получены
 			// формируем тело ответа (HTML)
-			response_body << "<title>Test C++ HTTP Server</title>\n"
-				<< "<h1>MY Test page</h1>\n"
-				<< "<p>This is body of the test page...</p>\n"
-				<< "<h2>Request headers</h2>\n"
-				//			<< "<pre>" << buf << "</pre>\n"
-				<< "<em><small>Test C++ Http Server</small></em>\n";
+			//response_body << "<title>Test C++ HTTP Server</title>\n"
+			//	<< "<h1>MY Test page</h1>\n"
+			//	<< "<p>This is body of the test page...</p>\n"
+			//	<< "<h2>Request headers</h2>\n"
+			//	//			<< "<pre>" << buf << "</pre>\n"
+			//	<< "<em><small>Test C++ Http Server</small></em>\n";
+			//// Формируем весь ответ вместе с заголовками
+			//response << "HTTP/1.1 200 OK\r\n"
+			//	<< "Version: HTTP/1.1\r\n"
+			//	<< "Content-Type: text/html; charset=utf-8\r\n"
+			//	<< "Content-Length: " << response_body.str().length()
+			//	<< "\r\n\r\n"
+			//	<< response_body.str();
+
+			std::string response_body = "0123";
+			response_body[0] = 0;
+			response_body[1] = 1;
+			response_body[2] = 2;
+			response_body[3] = 3;
 
 			// Формируем весь ответ вместе с заголовками
 			response << "HTTP/1.1 200 OK\r\n"
 				<< "Version: HTTP/1.1\r\n"
 				<< "Content-Type: text/html; charset=utf-8\r\n"
-				<< "Content-Length: " << response_body.str().length()
+				<< "Content-Length: " << response_body.size()
 				<< "\r\n\r\n"
-				<< response_body.str();
+				<< response_body;
 
 			// Отправляем ответ клиенту с помощью функции send
+			//unsigned char arr[10] = {48, 49, 50, 51};
+			//result = send(client_socket, (const char*)&arr[0], 4, 0);
+
 			result = send(client_socket, response.str().c_str(), response.str().length(), 0);
 
 			if (result == SOCKET_ERROR) {
