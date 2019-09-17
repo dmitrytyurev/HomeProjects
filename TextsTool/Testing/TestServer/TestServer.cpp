@@ -26,6 +26,17 @@ using std::cerr;
 
 int main()
 {
+	std::string bigString;
+	for (int i = 0; i < 5000; ++i) {
+		bigString += "02345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
+	}
+	int sum = 0;
+	for (int i = 0; i < bigString.size(); ++i) {
+		bigString[i] = rand();
+		sum += (unsigned char)bigString[i];
+	}
+	printf("sum = %d\n", sum);
+
 	WSADATA wsaData; // служебная структура для хранение информации
 	// о реализации Windows Sockets
 	// старт использования библиотеки сокетов процессом
@@ -176,19 +187,13 @@ int main()
 			//	<< "\r\n\r\n"
 			//	<< response_body.str();
 
-			std::string response_body = "0123";
-			response_body[0] = 0;
-			response_body[1] = 1;
-			response_body[2] = 2;
-			response_body[3] = 3;
-
 			// Формируем весь ответ вместе с заголовками
 			response << "HTTP/1.1 200 OK\r\n"
 				<< "Version: HTTP/1.1\r\n"
 				<< "Content-Type: text/html; charset=utf-8\r\n"
-				<< "Content-Length: " << response_body.size()
+				<< "Content-Length: " << bigString.size()
 				<< "\r\n\r\n"
-				<< response_body;
+				<< bigString;
 
 			// Отправляем ответ клиенту с помощью функции send
 			//unsigned char arr[10] = {48, 49, 50, 51};

@@ -2,6 +2,9 @@
 #include "ui_mainwindow.h"
 #include <string>
 
+char arr[1000000];
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -16,23 +19,24 @@ MainWindow::MainWindow(QWidget *parent) :
                 return;
             }
 
-            //QString answer = reply->readAll();
-            //unsigned char arr[10];
-            //memcpy(arr, answer.toLocal8Bit().constData(), 4);
-
-            char arr[2048];
             qint64 size = reply->read(arr, sizeof(arr));
-
-
-            std::string sstr;
-            for (int i=0; i < 4; ++i) {
-                unsigned int  n = arr[i];
-                sstr += std::to_string(n);
-                sstr += " ";
+            std::string sstr = std::to_string(size);
+            ui->textEdit->setText(QString::fromStdString(sstr));
+            int sum = 0;
+            for (int i = 0; i < size; ++i) {
+                sum += (unsigned char)arr[i];
             }
+            printf("sum = %d\n", sum);
 
 
-ui->textEdit->setText(QString::fromStdString(sstr));
+
+//            std::string sstr;
+//            for (int i=0; i < 4; ++i) {
+//                unsigned int  n = arr[i];
+//                sstr += std::to_string(n);
+//                sstr += " ";
+//            }
+//ui->textEdit->setText(QString::fromStdString(sstr));
 
 
 //            ui->textEdit->setText(answer);
