@@ -135,7 +135,7 @@ void SHttpManagerLowImpl::ThreadListenSocketFunc()
 	char buf[MAX_CLIENT_BUFFER_SIZE];
 	int client_socket = INVALID_SOCKET;
 
-	while(true) {
+	while (true) {
 		// Ждём входящего подключения
 		int socketsReadyNum = 0;
 		do {
@@ -146,8 +146,8 @@ void SHttpManagerLowImpl::ThreadListenSocketFunc()
 			FD_ZERO(&readSet);
 			FD_SET(_listen_socket, &readSet);
 			timeval timeout;
-			timeout.tv_sec = 0; 
-			timeout.tv_usec = 200000;  // Таймаут ожидания в микросекундах. Для того, чтобы при выходе увидеть флаг запроса завершения потока
+			timeout.tv_sec = 0;
+			timeout.tv_usec = 200000;  // Таймаут ожидания в микросекундах. Для того, чтобы при выходе из приложения увидеть флаг запроса завершения потока
 			socketsReadyNum = select(_listen_socket, &readSet, NULL, NULL, &timeout);
 		} while (socketsReadyNum == 0);
 		if (socketsReadyNum == -1) {
@@ -162,25 +162,51 @@ void SHttpManagerLowImpl::ThreadListenSocketFunc()
 			return;
 		}
 
-		int result = recv(client_socket, buf, MAX_CLIENT_BUFFER_SIZE, 0);
-		if (result == SOCKET_ERROR) {
-			ThreadExitMsg("recv failed: " + std::to_string(WSAGetLastError()));
-			return;
+		// Читаем данные из полученного сокета. Сначала заголовок, потом тело 
+		int readBytesNum = 0;
+		for (int i = 0; i < 2; ++i) { 
+			readBytesNum = recv(client_socket, buf, MAX_CLIENT_BUFFER_SIZE, 0);
+
+			if (readBytesNum == MAX_CLIENT_BUFFER_SIZE) {
+				ThreadExitMsg("recv buffer overflow: " + std::to_string(WSAGetLastError()));
+				return;
+			}
+			else if (readBytesNum == SOCKET_ERROR) {
+					ThreadExitMsg("recv failed: " + std::to_string(WSAGetLastError()));
+					return;
+				}
+				else if (readBytesNum == 0) {
+					// соединение закрыто клиентом
+					break;
+				}
 		}
-		if (result == 0) {
-			continue;   // соединение закрыто клиентом
+
+		if (readBytesNum <= 0) {
+			continue;
 		}
 
 		std::vector<uint8_t> request;
-		request.resize(result);
-		memcpy(request.data(), buf, result);
+		request.resize(readBytesNum);
+		memcpy(request.data(), buf, readBytesNum);
 
-		std::vector<uint8_t> response;
+		std::vector<uint8_t> responseRaw;
 
-		_requestCallback(request, response); // Вызываем коллбек из потока для обработки запроса и формирования ответа
+		_requestCallback(request, responseRaw); // Вызываем коллбек из потока для обработки запроса и формирования ответа
 
-			// Отправляем ответ клиенту с помощью функции send
-		result = send(client_socket, (const char*)response.data(), response.size(), 0);
+		std::stringstream responseHeader; // Заголовок ответа
+		responseHeader << "HTTP/1.1 200 OK\r\n"
+			<< "Version: HTTP/1.1\r\n"
+			<< "Content-Type: text/html; charset=utf-8\r\n"
+			<< "Content-Length: " << responseRaw.size()
+			<< "\r\n\r\n";
+
+		std::vector<uint8_t> responseFull; // Здесь склеиваем заголовок и тело
+		responseFull.resize(responseHeader.str().length() + responseRaw.size());
+		memcpy(responseFull.data(), responseHeader.str().c_str(), responseHeader.str().length());
+		memcpy(responseFull.data() + responseHeader.str().length(), responseRaw.data(), responseRaw.size());
+
+		// Отправляем ответ клиенту с помощью функции send
+		int result = send(client_socket, (const char*)responseFull.data(), responseFull.size(), 0);
 		if (result == SOCKET_ERROR) {
 			LogMsg("send failed: " + std::to_string(WSAGetLastError()));  // произошла ошибка при отправке данных
 		}
