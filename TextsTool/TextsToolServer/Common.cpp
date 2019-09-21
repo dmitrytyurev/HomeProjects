@@ -99,7 +99,7 @@ void SMessagesRepaker::Update(double dt)
 	for (auto& client : _app->_clients) {
 		SConnectedClientLow* clLow = nullptr;
 		for (auto& clientLow : _app->_httpMgr._mtClients.clients) {
-			if (client->_login == clientLow->login) {
+			if (client->_login == clientLow->_login) {
 				clLow = clientLow.get();
 				break;
 			}
@@ -110,13 +110,13 @@ void SMessagesRepaker::Update(double dt)
 		{
 			MutexLock lock(_app->_httpMgr._mtClients.mutex);
 			for (auto& buf : client->_msgsQueueOut) {
-				clLow->packetsQueueOut.PushPacket(buf->buffer);
+				clLow->_packetsQueueOut.PushPacket(buf->buffer);
 			}
 			client->_msgsQueueOut.resize(0);
-			for (auto& packetPtr : clLow->packetsQueueIn.queue) {
+			for (auto& packetPtr : clLow->_packetsQueueIn.queue) {
 				client->_msgsQueueIn.push_back(std::make_unique<DeserializationBuffer>(packetPtr->_packetData));
 			}
-			clLow->packetsQueueIn.queue.resize(0);
+			clLow->_packetsQueueIn.queue.resize(0);
 		}
 	}
 }
@@ -135,7 +135,7 @@ HttpPacket::HttpPacket(uint32_t packetIndex, std::vector<uint8_t>& packetData): 
 
 void MTQueueOut::PushPacket(std::vector<uint8_t>& data)
 {
-	queue.push(std::make_unique<HttpPacket>(lastSentPacketN++, data));
+	queue.emplace_back(std::make_unique<HttpPacket>(lastSentPacketN++, data));
 }
 
 //===============================================================================
@@ -168,12 +168,12 @@ void SHttpManager::Update(double dt)
 
 	MutexLock lock(_conDiscon.mutex);
 	for (auto& conDisconEvent : _conDiscon.queue) {
-		if (conDisconEvent.eventType == EventConDiscon::CONNECT) {
-			_connectClient(conDisconEvent.login);
+		if (conDisconEvent._eventType == EventConDiscon::CONNECT) {
+			_connectClient(conDisconEvent._login);
 		}
 		else
-			if (conDisconEvent.eventType == EventConDiscon::DISCONNECT) {
-				_diconnectClient(conDisconEvent.login);
+			if (conDisconEvent._eventType == EventConDiscon::DISCONNECT) {
+				_diconnectClient(conDisconEvent._login);
 			}
 	}
 	_conDiscon.queue.resize(0);
@@ -185,5 +185,101 @@ void SHttpManager::Update(double dt)
 
 void SHttpManager::RequestProcessor(DeserializationBuffer& request, SerializationBuffer& response)
 {
+	uint8_t requestType = request.GetUint<uint8_t>();
 
+	switch (requestType)
+	{
+	case RequestConnect:
+	{
+		uint32_t sessionId = request.GetUint<uint32_t>();
+		std::string login;
+		request.GetString<uint8_t>(login);
+		std::string password;
+		request.GetString<uint8_t>(password);
+		Account* pAccount = FindAccount(login, password);
+		if (!pAccount) {
+			response.Push((uint8_t)WrongLoginOrPassword);
+			return;
+		}
+		{
+			MutexLock lock(_mtClients.mutex);
+			CreateClientLow(login);
+		}
+		{
+			MutexLock lock(_conDiscon.mutex);
+			_conDiscon.queue.emplace_back(EventConDiscon::CONNECT, login);
+		}
+		response.Push((uint8_t)Connected);
+		++(pAccount->sessionId);
+		response.Push(pAccount->sessionId);
+		return;
+	}
+	break;
+	case RequestPacket:
+	{
+
+	}
+	break;
+	case ProvidePacket:
+	{
+
+	}
+	break;
+	default:
+		LogMsg("SHttpManager::RequestProcessor: unknown requestType");
+		response.Push((uint8_t)UnknownRequest);
+		return;
+	}
 }
+
+//===============================================================================
+//
+//===============================================================================
+
+SHttpManager::Account* SHttpManager::FindAccount(const std::string& login, const std::string& password)
+{
+	auto result = std::find_if(std::begin(_accounts), std::end(_accounts), [login, password](const Account& el) { return el.login == login && el.password == password; });
+	if (result == std::end(_accounts)) {
+		return nullptr;
+	}
+
+	return &*result;
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void SHttpManager::CreateClientLow(const std::string& login)
+{
+	auto result = std::find_if(std::begin(_mtClients.clients), std::end(_mtClients.clients), [login](const SConnectedClientLow::Ptr& el) { return el->_login == login; });
+	if (result != std::end(_mtClients.clients)) {
+		(*result)->reinit();
+	}
+	else {
+		_mtClients.clients.emplace_back(std::make_unique<SConnectedClientLow>(login));
+	}
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+SConnectedClientLow::SConnectedClientLow(const std::string& login): _login(login)
+{
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void SConnectedClientLow::reinit()
+{
+	_lastRecievedPacketN = 0;
+	_timestampLastRequest = 0;
+	_packetsQueueIn.queue.resize(0);
+	_packetsQueueOut.lastSentPacketN = 0;
+	_packetsQueueOut.queue.resize(0);
+}
+
+

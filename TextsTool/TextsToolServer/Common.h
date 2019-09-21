@@ -90,12 +90,16 @@ class EventConDiscon
 {
 public:
 	enum EventType {
+		NONE,
 		CONNECT,
 		DISCONNECT
 	};
 
-	EventType eventType;
-	std::string login;  // Логин клиента, который подключается или отключается
+	EventConDiscon() {}
+	EventConDiscon(EventType eventType, const std::string& login): _eventType(eventType), _login(login) {}
+
+	EventType _eventType = NONE;
+	std::string _login;  // Логин клиента, который подключается или отключается
 };
 
 //===============================================================================
@@ -105,7 +109,7 @@ public:
 class MTQueueOut
 {
 public:
-	std::queue<HttpPacket::Ptr> queue;
+	std::vector<HttpPacket::Ptr> queue;
 	uint32_t lastSentPacketN = 0;     // Номер последнего добавленного в эту очередь пакета
 
 	void PushPacket(std::vector<uint8_t>& data);
@@ -140,15 +144,17 @@ class SConnectedClientLow
 {
 public:
 	using Ptr = std::unique_ptr<SConnectedClientLow>;
+	SConnectedClientLow(const std::string& login);
+	void reinit();
 
-	std::string login;
-	std::string password;
+public:
+	std::string _login;
 
-	MTQueueIn packetsQueueIn;          // Очередь пакетов пришедших от клиента 
-	uint32_t lastRecievedPacketN = 0;  // Номер последнего полученного с клиента пакета (защита от дублирования входящих пакетов)
+	MTQueueIn _packetsQueueIn;          // Очередь пакетов пришедших от клиента 
+	uint32_t _lastRecievedPacketN = 0;  // Номер последнего полученного с клиента пакета (защита от дублирования входящих пакетов)
 
-	MTQueueOut packetsQueueOut;        // Очередь пакетов, которые нужно отослать клиенту
-	uint32_t timestampLastRequest = 0; // Когда от этого клиента приходил последний запрос
+	MTQueueOut _packetsQueueOut;        // Очередь пакетов, которые нужно отослать клиенту
+	uint32_t _timestampLastRequest = 0; // Когда от этого клиента приходил последний запрос
 };
 
 //===============================================================================
@@ -170,6 +176,21 @@ public:
 class SHttpManager
 {
 public:
+	enum // Типы запросов от клиента
+	{
+		RequestConnect,
+		RequestPacket,
+		ProvidePacket
+	};
+
+	enum // Коды ответов
+	{
+		UnknownRequest,
+		WrongLoginOrPassword,
+		Connected
+
+	};
+
 	struct Account
 	{
 		std::string login;
@@ -181,13 +202,17 @@ public:
 	void Update(double dt);
 	void RequestProcessor(DeserializationBuffer& request, SerializationBuffer& response); // Вызывается из неосновного потока, должа обработать http-запрос и сформировать ответ
 
+private:
+	Account* FindAccount(const std::string& login, const std::string& password);
+	void CreateClientLow(const std::string& login);
+
 public:
 	SHttpManagerLow _sHttpManagerLow;
 	std::function<void(const std::string&)> _connectClient;
 	std::function<void(const std::string&)> _diconnectClient;
-	std::vector<Account> accounts;
-	MTClientsLow _mtClients;        // Низкоуровневая информация о подключенных клиентах
-	MTQueueConDiscon _conDiscon;  // Очередь событий о подключении новых клиентов и отключении старых
+	std::vector<Account> _accounts;  // Аккаунты, с которых могут подключаться клиенты
+	MTClientsLow _mtClients;         // Низкоуровневая информация о подключенных клиентах
+	MTQueueConDiscon _conDiscon;     // Очередь событий о подключении новых клиентов и отключении старых
 };
 
 
@@ -242,3 +267,4 @@ public:
 	SHttpManager       _httpMgr;
 	SMessagesRepaker   _messagesRepaker;
 };
+
