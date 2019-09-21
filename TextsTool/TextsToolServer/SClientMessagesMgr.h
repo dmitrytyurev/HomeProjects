@@ -15,8 +15,8 @@ public:
 	void Update(double dt);
 	void AddPacketToClients(SerializationBufferPtr& bufPtr, const std::string& srcDbName);
 	SerializationBufferPtr MakeSyncMessage(DeserializationBuffer& buf, TextsDatabase& db);
-	void ConnectClient(const std::string& login);    // Вызывается из HttpMgr::Update при разборе очереди подключений/отключений. Создаёт SConnectedClient.
-	void DisconnectClient(const std::string& login); // Вызывается из HttpMgr::Update при разборе очереди подключений/отключений. Удаляет SConnectedClient.
+	void ConnectClient(const std::string& login, uint32_t sessionId);    // Вызывается из HttpMgr::Update при разборе очереди подключений/отключений. Создаёт SConnectedClient.
+	void DisconnectClient(const std::string& login, uint32_t sessionId); // Вызывается из HttpMgr::Update при разборе очереди подключений/отключений. Удаляет SConnectedClient.
 
 	static bool ModifyDbRenameFolder(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts);
 	static bool ModifyDbDeleteFolder(DeserializationBuffer& buf, TextsDatabase& db);

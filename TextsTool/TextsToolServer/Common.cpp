@@ -61,8 +61,8 @@ void STextsToolApp::Update(double dt)
 STextsToolApp::STextsToolApp(): 
 	_messagesMgr(this), 
 	_messagesRepaker(this), 
-	_httpMgr(std::bind(&SClientMessagesMgr::ConnectClient, _messagesMgr, std::placeholders::_1), 
-		     std::bind(&SClientMessagesMgr::DisconnectClient, _messagesMgr, std::placeholders::_1))
+	_httpMgr(std::bind(&SClientMessagesMgr::ConnectClient, _messagesMgr, std::placeholders::_1, std::placeholders::_2),
+		     std::bind(&SClientMessagesMgr::DisconnectClient, _messagesMgr, std::placeholders::_1, std::placeholders::_2))
 {
 }
 
@@ -95,10 +95,10 @@ SMessagesRepaker::SMessagesRepaker(STextsToolApp* app): _app(app)
 
 void SMessagesRepaker::Update(double dt)
 {
-	MutexLock lock(_app->_httpMgr._mtClients.mutex);
+	MutexLock lock(_app->_httpMgr._connections.mutex);
 	for (auto& client : _app->_clients) {
 		SConnectedClientLow* clLow = nullptr;
-		for (auto& clientLow : _app->_httpMgr._mtClients.clients) {
+		for (auto& clientLow : _app->_httpMgr._connections.clients) {
 			if (client->_login == clientLow->_login) {
 				clLow = clientLow.get();
 				break;
@@ -107,17 +107,18 @@ void SMessagesRepaker::Update(double dt)
 		if (!clLow) {
 			continue;
 		}
-		{
-			MutexLock lock(_app->_httpMgr._mtClients.mutex);
+
+		if (client->_sessionId == clLow->_sessionId) {
 			for (auto& buf : client->_msgsQueueOut) {
 				clLow->_packetsQueueOut.PushPacket(buf->buffer);
 			}
-			client->_msgsQueueOut.resize(0);
-			for (auto& packetPtr : clLow->_packetsQueueIn.queue) {
-				client->_msgsQueueIn.push_back(std::make_unique<DeserializationBuffer>(packetPtr->_packetData));
-			}
-			clLow->_packetsQueueIn.queue.resize(0);
 		}
+		client->_msgsQueueOut.resize(0);
+
+		for (auto& packetPtr : clLow->_packetsQueueIn.queue) {
+			client->_msgsQueueIn.push_back(std::make_unique<DeserializationBuffer>(packetPtr->_packetData));
+		}
+		clLow->_packetsQueueIn.queue.resize(0);
 	}
 }
 
@@ -142,16 +143,15 @@ void MTQueueOut::PushPacket(std::vector<uint8_t>& data)
 //
 //===============================================================================
 
-SConnectedClient::SConnectedClient(const std::string& login): _login(login)
+SConnectedClient::SConnectedClient(const std::string& login, uint32_t sessionId): _login(login), _sessionId(sessionId)
 {
-
 }
 
 //===============================================================================
 //
 //===============================================================================
 
-SHttpManager::SHttpManager(std::function<void(const std::string&)> connectClient, std::function<void(const std::string&)> diconnectClient): 
+SHttpManager::SHttpManager(std::function<void(const std::string&, uint32_t)> connectClient, std::function<void(const std::string&, uint32_t)> diconnectClient):
 	_connectClient(connectClient), 
 	_diconnectClient(diconnectClient),
 	_sHttpManagerLow(std::bind(&SHttpManager::RequestProcessor, this, std::placeholders::_1, std::placeholders::_2))
@@ -169,11 +169,11 @@ void SHttpManager::Update(double dt)
 	MutexLock lock(_conDiscon.mutex);
 	for (auto& conDisconEvent : _conDiscon.queue) {
 		if (conDisconEvent._eventType == EventConDiscon::CONNECT) {
-			_connectClient(conDisconEvent._login);
+			_connectClient(conDisconEvent._login, conDisconEvent._sessionId);
 		}
 		else
 			if (conDisconEvent._eventType == EventConDiscon::DISCONNECT) {
-				_diconnectClient(conDisconEvent._login);
+				_diconnectClient(conDisconEvent._login, conDisconEvent._sessionId);
 			}
 	}
 	_conDiscon.queue.resize(0);
@@ -196,22 +196,23 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 		request.GetString<uint8_t>(login);
 		std::string password;
 		request.GetString<uint8_t>(password);
-		Account* pAccount = FindAccount(login, password);
-		if (!pAccount) {
-			response.Push((uint8_t)WrongLoginOrPassword);
-			return;
-		}
 		{
-			MutexLock lock(_mtClients.mutex);
-			CreateClientLow(login);
+			MutexLock lock(_connections.mutex);
+			MTConnections::Account* pAccount = FindAccount(login, password);
+			if (!pAccount) {
+				response.Push((uint8_t)WrongLoginOrPassword);
+				return;
+			}
+			++(pAccount->sessionId);
+			CreateClientLow(login, pAccount->sessionId);
+			{
+				MutexLock lock(_conDiscon.mutex);
+				_conDiscon.queue.emplace_back(EventConDiscon::CONNECT, login, pAccount->sessionId);
+			}
+			response.Push((uint8_t)Connected);
+			response.Push(pAccount->sessionId);
 		}
-		{
-			MutexLock lock(_conDiscon.mutex);
-			_conDiscon.queue.emplace_back(EventConDiscon::CONNECT, login);
-		}
-		response.Push((uint8_t)Connected);
-		++(pAccount->sessionId);
-		response.Push(pAccount->sessionId);
+
 		return;
 	}
 	break;
@@ -236,10 +237,10 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 //
 //===============================================================================
 
-SHttpManager::Account* SHttpManager::FindAccount(const std::string& login, const std::string& password)
+MTConnections::Account* SHttpManager::FindAccount(const std::string& login, const std::string& password)
 {
-	auto result = std::find_if(std::begin(_accounts), std::end(_accounts), [login, password](const Account& el) { return el.login == login && el.password == password; });
-	if (result == std::end(_accounts)) {
+	auto result = std::find_if(std::begin(_connections._accounts), std::end(_connections._accounts), [login, password](const MTConnections::Account& el) { return el.login == login && el.password == password; });
+	if (result == std::end(_connections._accounts)) {
 		return nullptr;
 	}
 
@@ -250,14 +251,14 @@ SHttpManager::Account* SHttpManager::FindAccount(const std::string& login, const
 //
 //===============================================================================
 
-void SHttpManager::CreateClientLow(const std::string& login)
+void SHttpManager::CreateClientLow(const std::string& login, uint32_t sessionId)
 {
-	auto result = std::find_if(std::begin(_mtClients.clients), std::end(_mtClients.clients), [login](const SConnectedClientLow::Ptr& el) { return el->_login == login; });
-	if (result != std::end(_mtClients.clients)) {
+	auto result = std::find_if(std::begin(_connections.clients), std::end(_connections.clients), [login](const SConnectedClientLow::Ptr& el) { return el->_login == login; });
+	if (result != std::end(_connections.clients)) {
 		(*result)->reinit();
 	}
 	else {
-		_mtClients.clients.emplace_back(std::make_unique<SConnectedClientLow>(login));
+		_connections.clients.emplace_back(std::make_unique<SConnectedClientLow>(login, sessionId));
 	}
 }
 
@@ -265,7 +266,7 @@ void SHttpManager::CreateClientLow(const std::string& login)
 //
 //===============================================================================
 
-SConnectedClientLow::SConnectedClientLow(const std::string& login): _login(login)
+SConnectedClientLow::SConnectedClientLow(const std::string& login, uint32_t sessionId): _login(login), _sessionId(sessionId)
 {
 }
 

@@ -995,20 +995,20 @@ void SClientMessagesMgr::MakeKey(uint32_t tsModified, const std::string& textId,
 //
 //===============================================================================
 
-void SClientMessagesMgr::ConnectClient(const std::string& login)
+void SClientMessagesMgr::ConnectClient(const std::string& login, uint32_t sessionId)
 {
 	auto result = std::find_if(std::begin(_app->_clients), std::end(_app->_clients), [login](const SConnectedClient::Ptr& el) { return el->_login == login; });
 	if (result != std::end(_app->_clients)) {
 		_app->_clients.erase(result);
 	}
-	_app->_clients.emplace_back(std::make_shared<SConnectedClient>(login));
+	_app->_clients.emplace_back(std::make_shared<SConnectedClient>(login, sessionId));
 }
 
 //===============================================================================
 //
 //===============================================================================
 
-void SClientMessagesMgr::DisconnectClient(const std::string& login)
+void SClientMessagesMgr::DisconnectClient(const std::string& login, uint32_t sessionId)
 {
 	auto result = std::find_if(std::begin(_app->_clients), std::end(_app->_clients), [login](const SConnectedClient::Ptr& el) { return el->_login == login; });
 	if (result != std::end(_app->_clients)) {

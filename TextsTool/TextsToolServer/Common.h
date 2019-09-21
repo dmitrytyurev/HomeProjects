@@ -96,10 +96,11 @@ public:
 	};
 
 	EventConDiscon() {}
-	EventConDiscon(EventType eventType, const std::string& login): _eventType(eventType), _login(login) {}
+	EventConDiscon(EventType eventType, const std::string& login, uint32_t sessionId): _eventType(eventType), _login(login), _sessionId(sessionId) {}
 
 	EventType _eventType = NONE;
 	std::string _login;  // Логин клиента, который подключается или отключается
+	uint32_t _sessionId; 
 };
 
 //===============================================================================
@@ -139,16 +140,18 @@ public:
 //===============================================================================
 //
 //===============================================================================
+class Account;
 
 class SConnectedClientLow
 {
 public:
 	using Ptr = std::unique_ptr<SConnectedClientLow>;
-	SConnectedClientLow(const std::string& login);
+	SConnectedClientLow(const std::string& login, uint32_t sessionId);
 	void reinit();
 
 public:
 	std::string _login;
+	uint32_t _sessionId = 0;
 
 	MTQueueIn _packetsQueueIn;          // Очередь пакетов пришедших от клиента 
 	uint32_t _lastRecievedPacketN = 0;  // Номер последнего полученного с клиента пакета (защита от дублирования входящих пакетов)
@@ -161,11 +164,18 @@ public:
 //
 //===============================================================================
 
-class MTClientsLow
+class MTConnections
 {
 public:
+	struct Account
+	{
+		std::string login;
+		std::string password;
+		uint32_t sessionId;  // ID текущей сессии, если в _connections есть клиент с таким login. А если нету, значит здесь ID последней завершившейся сессии
+	};
 
 	std::vector<SConnectedClientLow::Ptr> clients; // Низкоуровневая информация о подключенных клиентах
+	std::vector<Account> _accounts;  // Аккаунты, с которых могут подключаться клиенты
 	std::mutex mutex;
 };
 
@@ -188,30 +198,21 @@ public:
 		UnknownRequest,
 		WrongLoginOrPassword,
 		Connected
-
 	};
 
-	struct Account
-	{
-		std::string login;
-		std::string password;
-		uint32_t sessionId;  // ID текущей сессии, если в _mtClients есть клиент с таким login. А если нету, значит здесь ID последней завершившейся сессии
-	};
-
-	SHttpManager(std::function<void (const std::string&)> connectClient, std::function<void(const std::string&)> diconnectClient);
+	SHttpManager(std::function<void (const std::string&, uint32_t)> connectClient, std::function<void(const std::string&, uint32_t)> diconnectClient);
 	void Update(double dt);
 	void RequestProcessor(DeserializationBuffer& request, SerializationBuffer& response); // Вызывается из неосновного потока, должа обработать http-запрос и сформировать ответ
 
 private:
-	Account* FindAccount(const std::string& login, const std::string& password);
-	void CreateClientLow(const std::string& login);
+	MTConnections::Account* FindAccount(const std::string& login, const std::string& password);
+	void CreateClientLow(const std::string& login, uint32_t sessionId);
 
 public:
 	SHttpManagerLow _sHttpManagerLow;
-	std::function<void(const std::string&)> _connectClient;
-	std::function<void(const std::string&)> _diconnectClient;
-	std::vector<Account> _accounts;  // Аккаунты, с которых могут подключаться клиенты
-	MTClientsLow _mtClients;         // Низкоуровневая информация о подключенных клиентах
+	std::function<void(const std::string&, uint32_t)> _connectClient;
+	std::function<void(const std::string&, uint32_t)> _diconnectClient;
+	MTConnections _connections;         // Низкоуровневая информация о подключенных клиентах
 	MTQueueConDiscon _conDiscon;     // Очередь событий о подключении новых клиентов и отключении старых
 };
 
@@ -240,9 +241,10 @@ class SConnectedClient
 public:
 	using Ptr = std::shared_ptr<SConnectedClient>;
 
-	SConnectedClient(const std::string& login);
+	SConnectedClient(const std::string& login, uint32_t sessionId);
 
 	std::string _login;
+	uint32_t _sessionId;
 	std::string _dbName;  // Имя база, с которой сейчас работает клиент
 	bool _syncFinished = false; // Ставится в true, когда в _msgsQueueOut записаны все сообщения стартовой синхронизации и значит можно добавлять сообщения синхронизации с других клиентов
 	std::vector<SerializationBufferPtr>   _msgsQueueOut; // Очередь сообщений, которые нужно отослать клиенту
