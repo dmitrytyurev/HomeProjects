@@ -24,7 +24,7 @@ void ExitMsg(const std::string& message);
 //
 //===============================================================================
 
-SHttpManagerLowImpl::SHttpManagerLowImpl(std::function<void(std::vector<uint8_t>&, std::vector<uint8_t>&)> requestCallback) :
+SHttpManagerLowImpl::SHttpManagerLowImpl(std::function<void(DeserializationBuffer&, SerializationBuffer&)> requestCallback) :
 	_requestCallback(requestCallback)
 {
 }
@@ -185,25 +185,22 @@ void SHttpManagerLowImpl::ThreadListenSocketFunc()
 			continue;
 		}
 
-		std::vector<uint8_t> request;
-		request.resize(readBytesNum);
-		memcpy(request.data(), buf, readBytesNum);
+		DeserializationBuffer deserialBuf((const uint8_t*)buf, readBytesNum);
+		SerializationBuffer serialBuf;
 
-		std::vector<uint8_t> responseRaw;
-
-		_requestCallback(request, responseRaw); // Вызываем коллбек из потока для обработки запроса и формирования ответа
+		_requestCallback(deserialBuf, serialBuf); // Вызываем коллбек из потока для обработки запроса и формирования ответа
 
 		std::stringstream responseHeader; // Заголовок ответа
 		responseHeader << "HTTP/1.1 200 OK\r\n"
 			<< "Version: HTTP/1.1\r\n"
 			<< "Content-Type: text/html; charset=utf-8\r\n"
-			<< "Content-Length: " << responseRaw.size()
+			<< "Content-Length: " << serialBuf.GetSize()
 			<< "\r\n\r\n";
 
 		std::vector<uint8_t> responseFull; // Здесь склеиваем заголовок и тело
-		responseFull.resize(responseHeader.str().length() + responseRaw.size());
+		responseFull.resize(responseHeader.str().length() + serialBuf.GetSize());
 		memcpy(responseFull.data(), responseHeader.str().c_str(), responseHeader.str().length());
-		memcpy(responseFull.data() + responseHeader.str().length(), responseRaw.data(), responseRaw.size());
+		memcpy(responseFull.data() + responseHeader.str().length(), serialBuf.GetData(), serialBuf.GetSize());
 
 		// Отправляем ответ клиенту с помощью функции send
 		int result = send(client_socket, (const char*)responseFull.data(), responseFull.size(), 0);

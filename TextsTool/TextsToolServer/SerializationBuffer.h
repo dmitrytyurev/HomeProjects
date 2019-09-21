@@ -24,6 +24,8 @@ public:
 
 
 	void PushBytes(const void* bytes, int size);
+	int GetSize() {	return buffer.size(); }
+	uint8_t* GetData() { return buffer.data(); }
 
 	std::vector<uint8_t> buffer;
 };

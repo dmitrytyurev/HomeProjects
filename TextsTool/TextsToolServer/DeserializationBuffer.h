@@ -18,6 +18,7 @@ public:
 
 	DeserializationBuffer() {}
 	DeserializationBuffer(std::vector<uint8_t>& buffer);
+	DeserializationBuffer(const uint8_t* buf, int bufSize);
 	template <typename T>
 	T GetUint();
 	template <typename T>

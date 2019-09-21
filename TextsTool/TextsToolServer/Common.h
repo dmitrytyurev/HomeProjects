@@ -179,7 +179,7 @@ public:
 
 	SHttpManager(std::function<void (const std::string&)> connectClient, std::function<void(const std::string&)> diconnectClient);
 	void Update(double dt);
-	void RequestProcessor(std::vector<uint8_t>& request, std::vector<uint8_t>& response); // Вызывается из неосновного потока, должа обработать http-запрос и сформировать ответ
+	void RequestProcessor(DeserializationBuffer& request, SerializationBuffer& response); // Вызывается из неосновного потока, должа обработать http-запрос и сформировать ответ
 
 public:
 	SHttpManagerLow _sHttpManagerLow;

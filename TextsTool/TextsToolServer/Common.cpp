@@ -183,7 +183,7 @@ void SHttpManager::Update(double dt)
 //
 //===============================================================================
 
-void SHttpManager::RequestProcessor(std::vector<uint8_t>& request, std::vector<uint8_t>& response)
+void SHttpManager::RequestProcessor(DeserializationBuffer& request, SerializationBuffer& response)
 {
 
 }

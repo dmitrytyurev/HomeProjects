@@ -50,9 +50,9 @@ void DbSerializer::HistoryFlush()
 		}
 	}
 
-	file.write(reinterpret_cast<const char*>(_historyFile.buffer.buffer.data()), _historyFile.buffer.buffer.size());
+	file.write(reinterpret_cast<const char*>(_historyFile.buffer.GetData()), _historyFile.buffer.GetSize());
 	file.close();
-	_historyFile.savedFileSize += _historyFile.buffer.buffer.size();
+	_historyFile.savedFileSize += _historyFile.buffer.GetSize();
 	_historyFile.buffer.buffer.clear();
 }
 
@@ -121,7 +121,7 @@ void DbSerializer::SaveDatabase()
 		folder.SaveToBase(buffer);
 	}
 
-	file.write(reinterpret_cast<const char*>(buffer.buffer.data()), buffer.buffer.size());
+	file.write(reinterpret_cast<const char*>(buffer.GetData()), buffer.GetSize());
 	file.close();
 }
 
@@ -425,7 +425,7 @@ void DbSerializer::LoadDatabaseAndHistory()
 
 uint32_t DbSerializer::GetCurrentPosInHistoryFile()
 {
-	return _historyFile.savedFileSize + _historyFile.buffer.buffer.size();
+	return _historyFile.savedFileSize + _historyFile.buffer.GetSize();
 }
 
 

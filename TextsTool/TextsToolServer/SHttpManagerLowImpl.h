@@ -6,6 +6,8 @@
 #include <mutex> 
 
 #include <WinSock2.h>
+#include "DeserializationBuffer.h"
+#include "SerializationBuffer.h"
 
 
 //===============================================================================
@@ -14,7 +16,7 @@
 class SHttpManagerLowImpl
 {
 public:
-	SHttpManagerLowImpl(std::function<void(std::vector<uint8_t>&, std::vector<uint8_t>&)> requestCallback); // Запоминает функцию, которую будет дёргать при каждом входящем http-запросе (неосновной поток!). Функция должна сформировать ответ на запрос
+	SHttpManagerLowImpl(std::function<void(DeserializationBuffer&, SerializationBuffer&)> requestCallback); // Запоминает функцию, которую будет дёргать при каждом входящем http-запросе (неосновной поток!). Функция должна сформировать ответ на запрос
 	void StartHttpListening();
 	~SHttpManagerLowImpl();
 	void Update(double dt);
@@ -24,7 +26,7 @@ private:
 	void ThreadExitMsg(const std::string& errorMsg);
 
 private:
-	std::function<void(std::vector<uint8_t>&, std::vector<uint8_t>&)> _requestCallback;
+	std::function<void(DeserializationBuffer&, SerializationBuffer&)> _requestCallback;
 	bool _isWsaInited = false;
 	int _listen_socket = INVALID_SOCKET;
 	std::thread _listenSocketThread;

@@ -14,7 +14,7 @@ void ExitMsg(const std::string& message);
 //
 //===============================================================================
 
-SHttpManagerLow::SHttpManagerLow(std::function<void(std::vector<uint8_t>&, std::vector<uint8_t>&)> requestCallback)
+SHttpManagerLow::SHttpManagerLow(std::function<void(DeserializationBuffer&, SerializationBuffer&)> requestCallback)
 {
 	_pImpl = std::make_unique<SHttpManagerLowImpl>(requestCallback);
 }
