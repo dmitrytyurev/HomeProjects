@@ -10,7 +10,7 @@
 #include "Common.h"
 #include "DbSerializer.h"
 
-
+const static uint32_t TIMEOUT_CLIENT_NOT_CONNECTED = 300;  // Таймаут в миллисекундах, в ответе когда приходит пакеты с клиента, которым уже разорвано соединение
 
 //===============================================================================
 //
@@ -110,15 +110,15 @@ void SMessagesRepaker::Update(double dt)
 
 		if (client->_sessionId == clLow->_sessionId) {
 			for (auto& buf : client->_msgsQueueOut) {
-				clLow->_packetsQueueOut.PushPacket(buf->buffer);
+				clLow->_packetsQueueOut.PushPacket(buf->buffer, HttpPacket::Status::WAITING_FOR_PACKING);
 			}
 		}
 		client->_msgsQueueOut.resize(0);
 
-		for (auto& packetPtr : clLow->_packetsQueueIn.queue) {
+		for (auto& packetPtr : clLow->_packetsQueueIn) {
 			client->_msgsQueueIn.push_back(std::make_unique<DeserializationBuffer>(packetPtr->_packetData));
 		}
-		clLow->_packetsQueueIn.queue.resize(0);
+		clLow->_packetsQueueIn.resize(0);
 	}
 }
 
@@ -126,7 +126,7 @@ void SMessagesRepaker::Update(double dt)
 //
 //===============================================================================
 
-HttpPacket::HttpPacket(uint32_t packetIndex, std::vector<uint8_t>& packetData): _packetIndex(packetIndex), _packetData(packetData)
+HttpPacket::HttpPacket( std::vector<uint8_t>& packetData, Status status): _packetData(packetData), _status(status)
 {
 }
 
@@ -134,9 +134,23 @@ HttpPacket::HttpPacket(uint32_t packetIndex, std::vector<uint8_t>& packetData): 
 //
 //===============================================================================
 
-void MTQueueOut::PushPacket(std::vector<uint8_t>& data)
+
+HttpPacket::HttpPacket(DeserializationBuffer& request, Status status): _status(status)
 {
-	queue.emplace_back(std::make_unique<HttpPacket>(lastSentPacketN++, data));
+	uint32_t remainDataSize = request._buffer.size() - request.offset;
+	_packetData.resize(remainDataSize);
+	memcpy(_packetData.data(), request._buffer.data() + request.offset, remainDataSize);
+}
+
+
+//===============================================================================
+//
+//===============================================================================
+
+void MTQueueOut::PushPacket(std::vector<uint8_t>& data, HttpPacket::Status status)
+{
+	//++lastSentPacketN;
+	queue.emplace_back(std::make_unique<HttpPacket>(data, status));
 }
 
 //===============================================================================
@@ -185,24 +199,26 @@ void SHttpManager::Update(double dt)
 
 void SHttpManager::RequestProcessor(DeserializationBuffer& request, SerializationBuffer& response)
 {
+	std::string login;
+	request.GetString<uint8_t>(login);
+	std::string password;
+	request.GetString<uint8_t>(password);
+	uint32_t sessionId = request.GetUint<uint32_t>();
+	uint32_t packetN = request.GetUint<uint32_t>();
 	uint8_t requestType = request.GetUint<uint8_t>();
+
+	MutexLock lock(_connections.mutex);
+
+	MTConnections::Account* pAccount = FindAccount(login, password);
+	if (!pAccount) {
+		response.Push((uint8_t)WrongLoginOrPassword);
+		return;
+	}
 
 	switch (requestType)
 	{
 	case RequestConnect:
-	{
-		uint32_t sessionId = request.GetUint<uint32_t>();
-		std::string login;
-		request.GetString<uint8_t>(login);
-		std::string password;
-		request.GetString<uint8_t>(password);
 		{
-			MutexLock lock(_connections.mutex);
-			MTConnections::Account* pAccount = FindAccount(login, password);
-			if (!pAccount) {
-				response.Push((uint8_t)WrongLoginOrPassword);
-				return;
-			}
 			++(pAccount->sessionId);
 			CreateClientLow(login, pAccount->sessionId);
 			{
@@ -211,21 +227,34 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 			}
 			response.Push((uint8_t)Connected);
 			response.Push(pAccount->sessionId);
+			return;
 		}
-
-		return;
-	}
-	break;
+		break;
 	case RequestPacket:
-	{
-
-	}
-	break;
+		{
+	
+		}
+		break;
 	case ProvidePacket:
-	{
-
-	}
-	break;
+		{
+			if (pAccount->sessionId != sessionId) {
+				response.Push((uint8_t)WrongSession);
+				return;
+			}
+			auto itClientLow = std::find_if(std::begin(_connections.clients), std::end(_connections.clients), [login](const SConnectedClientLow::Ptr& el) { return el->_login == login; });
+			if (itClientLow == std::end(_connections.clients)) {
+				response.Push((uint8_t)ClientNotConnected);
+				response.Push(pAccount->sessionId);
+				response.Push(TIMEOUT_CLIENT_NOT_CONNECTED);
+				return;
+			}
+			if ((*itClientLow)->_lastRecievedPacketN != UINT32_MAX && packetN > (*itClientLow)->_lastRecievedPacketN) {
+				(*itClientLow)->_lastRecievedPacketN = packetN;
+				(*itClientLow)->_packetsQueueIn.emplace_back(std::make_shared<HttpPacket>(request, HttpPacket::Status::RECEIVED));
+			}
+			response.Push((uint8_t)PacketReceived);
+		}
+		break;
 	default:
 		LogMsg("SHttpManager::RequestProcessor: unknown requestType");
 		response.Push((uint8_t)UnknownRequest);
@@ -255,7 +284,7 @@ void SHttpManager::CreateClientLow(const std::string& login, uint32_t sessionId)
 {
 	auto result = std::find_if(std::begin(_connections.clients), std::end(_connections.clients), [login](const SConnectedClientLow::Ptr& el) { return el->_login == login; });
 	if (result != std::end(_connections.clients)) {
-		(*result)->reinit();
+		(*result)->reinit(sessionId);
 	}
 	else {
 		_connections.clients.emplace_back(std::make_unique<SConnectedClientLow>(login, sessionId));
@@ -274,12 +303,14 @@ SConnectedClientLow::SConnectedClientLow(const std::string& login, uint32_t sess
 //
 //===============================================================================
 
-void SConnectedClientLow::reinit()
+void SConnectedClientLow::reinit(uint32_t sessionId)
 {
+	_sessionId = sessionId;
+	_sessionId = UINT32_MAX;
 	_lastRecievedPacketN = 0;
-	_timestampLastRequest = 0;
-	_packetsQueueIn.queue.resize(0);
-	_packetsQueueOut.lastSentPacketN = 0;
+	//_timestampLastRequest = 0;
+	_packetsQueueIn.resize(0);
+	//_packetsQueueOut.lastSentPacketN = 0;
 	_packetsQueueOut.queue.resize(0);
 }
 

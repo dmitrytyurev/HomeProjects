@@ -70,16 +70,17 @@ public:
 
 	enum class Status
 	{
+		RECEIVED,
 		WAITING_FOR_PACKING,
 		PAKING,
 		PACKED
 	};
 
-	HttpPacket(uint32_t packetIndex, std::vector<uint8_t>& packetData);
+	HttpPacket(std::vector<uint8_t>& packetData, Status status);
+	HttpPacket(DeserializationBuffer& request, Status status);
 
-	uint32_t _packetIndex = 0; // Порядковый номер пакета
 	std::vector<uint8_t> _packetData;
-	Status status;
+	Status _status;
 };
 
 //===============================================================================
@@ -111,19 +112,9 @@ class MTQueueOut
 {
 public:
 	std::vector<HttpPacket::Ptr> queue;
-	uint32_t lastSentPacketN = 0;     // Номер последнего добавленного в эту очередь пакета
+	//uint32_t lastSentPacketN = 0;     // Номер последнего добавленного в эту очередь пакета
 
-	void PushPacket(std::vector<uint8_t>& data);
-};
-
-//===============================================================================
-//
-//===============================================================================
-
-class MTQueueIn
-{
-public:
-	std::vector<HttpPacket::Ptr> queue;
+	void PushPacket(std::vector<uint8_t>& data, HttpPacket::Status status);
 };
 
 //===============================================================================
@@ -140,24 +131,23 @@ public:
 //===============================================================================
 //
 //===============================================================================
-class Account;
 
 class SConnectedClientLow
 {
 public:
 	using Ptr = std::unique_ptr<SConnectedClientLow>;
 	SConnectedClientLow(const std::string& login, uint32_t sessionId);
-	void reinit();
+	void reinit(uint32_t sessionId);
 
 public:
 	std::string _login;
-	uint32_t _sessionId = 0;
+	uint32_t _sessionId = 0; // Копия поля MTConnections::Account::sessionId для быстрого доступа
 
-	MTQueueIn _packetsQueueIn;          // Очередь пакетов пришедших от клиента 
-	uint32_t _lastRecievedPacketN = 0;  // Номер последнего полученного с клиента пакета (защита от дублирования входящих пакетов)
+	std::vector<HttpPacket::Ptr> _packetsQueueIn;          // Очередь пакетов пришедших от клиента 
+	uint32_t _lastRecievedPacketN = UINT32_MAX;  // Номер последнего полученного пакета в рамках данной сессии или UINT32_MAX, если в рамках данной сессии ещё не были получены пакеты (защита от дублирования входящих пакетов)
 
 	MTQueueOut _packetsQueueOut;        // Очередь пакетов, которые нужно отослать клиенту
-	uint32_t _timestampLastRequest = 0; // Когда от этого клиента приходил последний запрос
+//	uint32_t _timestampLastRequest = 0; // Когда от этого клиента приходил последний запрос   ??? Для чего нужно было это поле?
 };
 
 //===============================================================================
@@ -197,7 +187,10 @@ public:
 	{
 		UnknownRequest,
 		WrongLoginOrPassword,
-		Connected
+		WrongSession,
+		ClientNotConnected,
+		Connected,
+		PacketReceived
 	};
 
 	SHttpManager(std::function<void (const std::string&, uint32_t)> connectClient, std::function<void(const std::string&, uint32_t)> diconnectClient);
