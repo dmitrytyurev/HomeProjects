@@ -112,8 +112,8 @@ class MTQueueOut
 {
 public:
 	std::vector<HttpPacket::Ptr> queue;
-	//uint32_t lastSentPacketN = 0;     // Ќомер последнего добавленного в эту очередь пакета
-
+	uint32_t lastPushedPacketN = UINT32_MAX;     // Ќомер последнего добавленного в эту очередь пакета. ѕо нему можем определить номера пакетов в очереди. ј их используем дл€ удалени€ из очереди пакетов, которые успешно дошли на клиент (им запрошен следущий пакет)
+	                                             // !!! —делать логику дл€ этого пол€
 	void PushPacket(std::vector<uint8_t>& data, HttpPacket::Status status);
 };
 
@@ -147,7 +147,7 @@ public:
 	uint32_t _lastRecievedPacketN = UINT32_MAX;  // Ќомер последнего полученного пакета в рамках данной сессии или UINT32_MAX, если в рамках данной сессии ещЄ не были получены пакеты (защита от дублировани€ вход€щих пакетов)
 
 	MTQueueOut _packetsQueueOut;        // ќчередь пакетов, которые нужно отослать клиенту
-//	uint32_t _timestampLastRequest = 0; //  огда от этого клиента приходил последний запрос   ??? ƒл€ чего нужно было это поле?
+	uint32_t _timestampLastRequest = 0; //  огда от этого клиента приходил последний запрос. ƒл€ разрыва соедиенени€. !!! —делать заполнение и использование
 };
 
 //===============================================================================
@@ -189,8 +189,10 @@ public:
 		WrongLoginOrPassword,
 		WrongSession,
 		ClientNotConnected,
+		NoSuchPacketYet,
 		Connected,
-		PacketReceived
+		PacketReceived,
+		PacketSent
 	};
 
 	SHttpManager(std::function<void (const std::string&, uint32_t)> connectClient, std::function<void(const std::string&, uint32_t)> diconnectClient);
