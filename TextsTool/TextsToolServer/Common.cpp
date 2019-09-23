@@ -99,6 +99,7 @@ SMessagesRepaker::SMessagesRepaker(STextsToolApp* app): _app(app)
 void SMessagesRepaker::Update(double dt)
 {
 	MutexLock lock(_app->_httpMgr._connections.mutex);
+
 	for (auto& client : _app->_clients) {
 		SConnectedClientLow* clLow = nullptr;
 		for (auto& clientLow : _app->_httpMgr._connections.clients) {
@@ -116,12 +117,14 @@ void SMessagesRepaker::Update(double dt)
 				clLow->_packetsQueueOut.PushPacket(buf->buffer, HttpPacket::Status::WAITING_FOR_PACKING);
 			}
 		}
-		client->_msgsQueueOut.resize(0);
+		client->_msgsQueueOut.resize(0); // ќчистим, даже если не скопировали (это был старый SConnectedClient ведь SConnectedClientLow уже подключилс€ новый, так что из SConnectedClient не нужно было брать старые сообщени€, они уже не актуальны)
 
-		for (auto& packetPtr : clLow->_packetsQueueIn) {
-			client->_msgsQueueIn.push_back(std::make_unique<DeserializationBuffer>(packetPtr->_packetData));
+		if (client->_sessionId == clLow->_sessionId) { // ≈сли они не созвпадут, значит создалс€ новый SConnectedClientLow, а SConnectedClient ещЄ не успел пересоздатьс€, он сделает это на следующем Update и тогда мы снова придЄт сюда и скопируем пакеты уже в нового SConnectedClient
+			for (auto& packetPtr : clLow->_packetsQueueIn) {
+				client->_msgsQueueIn.push_back(std::make_unique<DeserializationBuffer>(packetPtr->_packetData));
+			}
+			clLow->_packetsQueueIn.resize(0);
 		}
-		clLow->_packetsQueueIn.resize(0);
 	}
 }
 
@@ -184,6 +187,7 @@ void SHttpManager::Update(double dt)
 	_sHttpManagerLow.Update(dt);
 
 	MutexLock lock(_conDiscon.mutex);
+
 	for (auto& conDisconEvent : _conDiscon.queue) {
 		if (conDisconEvent._eventType == EventConDiscon::CONNECT) {
 			_connectClient(conDisconEvent._login, conDisconEvent._sessionId);
