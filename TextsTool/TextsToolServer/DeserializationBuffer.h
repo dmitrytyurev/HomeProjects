@@ -19,6 +19,8 @@ public:
 	DeserializationBuffer() {}
 	DeserializationBuffer(std::vector<uint8_t>& buffer);
 	DeserializationBuffer(const uint8_t* buf, int bufSize);
+	void AddBytes(const uint8_t* buf, int bufSize);
+
 	template <typename T>
 	T GetUint();
 	template <typename T>
@@ -26,6 +28,7 @@ public:
 	template <typename T>
 	std::vector<uint8_t> GetVector();
 	bool IsEmpty() { return _buffer.size() - 1 == offset; }
+	uint8_t* GetNextBytes(uint32_t size) { return  _buffer.data() + offset; offset += size; }
 
 	uint32_t offset = 0;
 	std::vector<uint8_t> _buffer;

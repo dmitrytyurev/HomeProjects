@@ -119,11 +119,74 @@ void SMessagesRepaker::Update(double dt)
 		}
 		client->_msgsQueueOut.resize(0); // ќчистим, даже если не скопировали (это был старый SConnectedClient ведь SConnectedClientLow уже подключилс€ новый, так что из SConnectedClient не нужно было брать старые сообщени€, они уже не актуальны)
 
-		if (client->_sessionId == clLow->_sessionId) { // ≈сли они не созвпадут, значит создалс€ новый SConnectedClientLow, а SConnectedClient ещЄ не успел пересоздатьс€, он сделает это на следующем Update и тогда мы снова придЄт сюда и скопируем пакеты уже в нового SConnectedClient
-			for (auto& packetPtr : clLow->_packetsQueueIn) {
-				client->_msgsQueueIn.push_back(std::make_unique<DeserializationBuffer>(packetPtr->_packetData));
+		if (client->_sessionId == clLow->_sessionId) { // ≈сли они не совпадут, значит создалс€ новый SConnectedClientLow, а SConnectedClient ещЄ не успел пересоздатьс€, он сделает это на следующем Update и тогда мы снова придЄт сюда и скопируем пакеты уже в нового SConnectedClient
+			for (int iPckt = 0; iPckt < (int)clLow->_packetsQueueIn.size(); ++iPckt) {
+				auto& packetPtr = clLow->_packetsQueueIn[iPckt];
+				DeserializationBuffer buffer(packetPtr->_packetData); // !!! Ќеоптимально. —делать возможность в DeserializationBuffer хранить указатель на вектор, а не копировать в него вектор целиком
+				uint8_t pType = buffer.GetUint<uint8_t>();
+				if (pType == PacketDataType::WholeMessages) { // ¬ данном пакете один или несколько целых сообщений
+					uint32_t messagesNum = buffer.GetUint<uint32_t>();
+					for (int iMsg = 0; iMsg < messagesNum; ++iMsg) {
+						uint32_t messageSize = buffer.GetUint<uint32_t>();
+						client->_msgsQueueIn.push_back(std::make_unique<DeserializationBuffer>(buffer.GetNextBytes(messageSize), messageSize));
+						if (!buffer.IsEmpty()) {
+							LogMsg("!buffer.IsEmpty()");
+						}
+					}
+					clLow->_packetsQueueIn.erase(clLow->_packetsQueueIn.begin() + iPckt);
+					--iPckt;
+				} 
+				else if (pType == PacketDataType::PartOfMessage) { // ¬ данном пакете первый фрагмент неполного сообщени€
+					uint32_t messageSize = buffer.GetUint<uint32_t>();
+					uint32_t partMessageSize = buffer.GetUint<uint32_t>();
+					uint32_t sum = partMessageSize;
+					int iPckt2 = 0;
+					for (iPckt2 = iPckt+1; iPckt2 < (int)clLow->_packetsQueueIn.size(); ++iPckt2) { // ѕросмотрим следующие пакеты, чтобы вы€снить есть ли в них все фрагменты дл€ сбора сообщени€ iPckt
+						auto& packetPtr2 = clLow->_packetsQueueIn[iPckt2];
+						DeserializationBuffer buffer2(packetPtr2->_packetData); // !!! Ќеоптимально. —делать возможность в DeserializationBuffer хранить указатель на вектор, а не копировать в него вектор целиком
+						uint8_t pType2 = buffer2.GetUint<uint8_t>();
+						if (pType2 != PacketDataType::PartOfMessage) {
+							LogMsg("pType2 != PacketDataType::PartOfMessage"); // !!! —делать корректный выход, если возможно
+						}
+						uint32_t messageSize2 = buffer2.GetUint<uint32_t>();
+						if (messageSize != messageSize2) {
+							ExitMsg("messageSize != messageSize2");
+						}
+						uint32_t partMessageSize2 = buffer2.GetUint<uint32_t>();
+						sum += partMessageSize2;
+						if (sum > messageSize) {
+							ExitMsg("sum > messageSize");
+						}
+						if (sum == messageSize) {
+							break; // Ќашли последний пакет, содержащий данное сообщение. ¬ыходим досрочно.
+						}
+					}
+					if (iPckt2 < (int)clLow->_packetsQueueIn.size()) { // ¬ышли досрочно, значит найдены все пакеты с данным сообщением. —клеем его и удалим содержащие его пакеты
+						int lastMsgPckt = iPckt2; // ѕоследний пакет, содержащий данные текущего пакета
+						client->_msgsQueueIn.emplace_back(std::make_unique<DeserializationBuffer>(buffer.GetNextBytes(partMessageSize), partMessageSize)); // ЌачнЄм склейку вз€в данные сообщени€ из первого пакета
+						DeserializationBuffer* pBuf = client->_msgsQueueIn.back().get();
+						for (iPckt2 = iPckt+1; iPckt2 <= lastMsgPckt; ++iPckt2) { // ƒобавим данные из остальных пакетов (сразу будем удал€ть их)
+							auto& packetPtr2 = clLow->_packetsQueueIn[iPckt2];
+							DeserializationBuffer buffer2(packetPtr2->_packetData); // !!! Ќеоптимально. —делать возможность в DeserializationBuffer хранить указатель на вектор, а не копировать в него вектор целиком
+							uint8_t pType2 = buffer2.GetUint<uint8_t>();
+							uint32_t messageSize2 = buffer2.GetUint<uint32_t>();
+							uint32_t partMessageSize2 = buffer2.GetUint<uint32_t>();
+							pBuf->AddBytes(buffer2.GetNextBytes(partMessageSize2), partMessageSize2);
+							clLow->_packetsQueueIn.erase(clLow->_packetsQueueIn.begin() + iPckt2);
+							--iPckt2;
+							--lastMsgPckt;
+						}
+						clLow->_packetsQueueIn.erase(clLow->_packetsQueueIn.begin() + iPckt);
+						--iPckt;
+					}
+					else { // ѕеребрали все оставшиес€ пакеты, но всЄ сообщение склеить пока не получитс€. ¬ыходим из разбора пакетов текущего клиента. 
+						break;
+					}
+				}
+				else {
+					LogMsg("Unknown packet type");
+				}
 			}
-			clLow->_packetsQueueIn.resize(0);
 		}
 	}
 }
