@@ -14,6 +14,7 @@ const static uint32_t TIMEOUT_CLIENT_NOT_CONNECTED = 300;   // Таймаут в миллисе
 const static uint32_t TIMEOUT_NO_SUCH_PACKET = 3000;        // Таймаут в миллисекундах, в ответе когда клиент запрашивает пакет на сервере, которого ещё нет
 const static uint32_t TIMEOUT_NEXT_PACKET_READY = 0;        // Таймаут в миллисекундах, в ответе когда клиент запрашивает пакет на сервере, а уже готов следующий пакет
 const static uint32_t TIMEOUT_NEXT_PACKET_NOT_READY = 3000; // Таймаут в миллисекундах, в ответе когда клиент запрашивает пакет на сервере, а ещё не готов следующий пакет
+const static uint32_t TIMEOUT_DISCONNECT_CLIENT = 30;       // Таймаут через сколько секунд неприхода запросов от клиента дисконнектим его
 
 //===============================================================================
 //
@@ -249,18 +250,33 @@ void SHttpManager::Update(double dt)
 {
 	_sHttpManagerLow.Update(dt);
 
-	MutexLock lock(_conDiscon.mutex);
+	// Обработка дисконнектов по времени
+	{
+		uint32_t curTime = (uint32_t)std::time(0);
+		MutexLock lock(_connections.mutex);
 
-	for (auto& conDisconEvent : _conDiscon.queue) {
-		if (conDisconEvent._eventType == EventConDiscon::CONNECT) {
-			_connectClient(conDisconEvent._login, conDisconEvent._sessionId);
-		}
-		else
-			if (conDisconEvent._eventType == EventConDiscon::DISCONNECT) {
-				_diconnectClient(conDisconEvent._login, conDisconEvent._sessionId);
+		for (auto it = _connections.clients.begin(); it != _connections.clients.end(); ) {
+			if (curTime > (*it)->_timestampLastRequest + TIMEOUT_DISCONNECT_CLIENT)
+			{
+				_diconnectClient((*it)->_login, (*it)->_sessionId);
+				it = _connections.clients.erase(it);
 			}
+			else
+				++it;
+		}
 	}
-	_conDiscon.queue.resize(0);
+
+	// Обработка коннектов
+	{
+		MutexLock lock(_conDiscon.mutex);
+
+		for (auto& conDisconEvent : _conDiscon.queue) {
+			if (conDisconEvent._eventType == EventConDiscon::CONNECT) {
+				_connectClient(conDisconEvent._login, conDisconEvent._sessionId);
+			}
+		}
+		_conDiscon.queue.resize(0);
+	}
 }
 
 //===============================================================================

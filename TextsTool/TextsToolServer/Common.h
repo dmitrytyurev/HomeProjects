@@ -99,13 +99,12 @@ public:
 //
 //===============================================================================
 
-class EventConDiscon
+class EventConDiscon // !!! Переименовать класс, поскольку он представляет только коннекты, но не дисконнекты
 {
 public:
 	enum EventType {
 		NONE,
 		CONNECT,
-		DISCONNECT
 	};
 
 	EventConDiscon() {}
@@ -219,8 +218,9 @@ public:
 	SHttpManagerLow _sHttpManagerLow;
 	std::function<void(const std::string&, uint32_t)> _connectClient;
 	std::function<void(const std::string&, uint32_t)> _diconnectClient;
-	MTConnections _connections;         // Низкоуровневая информация о подключенных клиентах
-	MTQueueConDiscon _conDiscon;     // Очередь событий о подключении новых клиентов и отключении старых
+	MTConnections _connections;      // Низкоуровневая информация о подключенных клиентах
+									 // !!! Переименовать поле, поскольку оно представляет только коннекты, но не дисконнекты
+	MTQueueConDiscon _conDiscon;     // Очередь событий о подключении новых клиентов
 };
 
 
