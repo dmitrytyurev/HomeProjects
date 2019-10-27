@@ -19,8 +19,8 @@ enum class PacketDataType
 	WholeMessages = 0,  // В пакете одно или несколько целых сообщений
 	PartOfMessage = 1,  //  В пакете одно незавершённое сообщение
 };
-bool operator==(const uint8_t& v1, const PacketDataType& v2) { return v1 == (uint8_t)v2; }
-bool operator!=(const uint8_t& v1, const PacketDataType& v2) { return v1 != (uint8_t)v2; }
+inline bool operator==(const uint8_t& v1, const PacketDataType& v2) { return v1 == (uint8_t)v2; }
+inline bool operator!=(const uint8_t& v1, const PacketDataType& v2) { return v1 != (uint8_t)v2; }
 
 //===============================================================================
 //
