@@ -14,7 +14,7 @@
 #pragma comment(lib, "Ws2_32.lib")
 
 
-const int MAX_CLIENT_BUFFER_SIZE = 1024;  // !!! Ќастроить правильную длинну (максимальную, которую сокет позвол€ет пересылать. ѕри конвертации сообщени€ в пакеты должны резать, если сообщение больше, чем это число)
+const int MAX_CLIENT_BUFFER_SIZE = 500000;  // !!! ѕри конвертации сообщени€ в пакеты должны резать, если сообщение больше, чем это число
 
 
 
@@ -132,7 +132,8 @@ void SHttpManagerLowImpl::ThreadExitMsg(const std::string& errorMsg)
 
 void SHttpManagerLowImpl::ThreadListenSocketFunc()  
 {
-	char buf[MAX_CLIENT_BUFFER_SIZE];
+	std::vector<char> buf;
+	buf.resize(MAX_CLIENT_BUFFER_SIZE);
 	int client_socket = INVALID_SOCKET;
 
 	while (true) {
@@ -165,7 +166,7 @@ void SHttpManagerLowImpl::ThreadListenSocketFunc()
 		// „итаем данные из полученного сокета. —начала заголовок, потом тело 
 		int readBytesNum = 0;
 		for (int i = 0; i < 2; ++i) { 
-			readBytesNum = recv(client_socket, buf, MAX_CLIENT_BUFFER_SIZE, 0);
+			readBytesNum = recv(client_socket, buf.data(), MAX_CLIENT_BUFFER_SIZE, 0);
 
 			if (readBytesNum == MAX_CLIENT_BUFFER_SIZE) {
 				ThreadExitMsg("recv buffer overflow: " + std::to_string(WSAGetLastError()));
@@ -185,7 +186,7 @@ void SHttpManagerLowImpl::ThreadListenSocketFunc()
 			continue;
 		}
 
-		DeserializationBuffer deserialBuf((const uint8_t*)buf, readBytesNum);
+		DeserializationBuffer deserialBuf((const uint8_t*)buf.data(), readBytesNum);
 		SerializationBuffer serialBuf;
 
 		_requestCallback(deserialBuf, serialBuf); // ¬ызываем коллбек из потока дл€ обработки запроса и формировани€ ответа
