@@ -126,7 +126,7 @@ void SMessagesRepaker::Update(double dt)
 				uint8_t pType = buffer.GetUint<uint8_t>();
 				if (pType == PacketDataType::WholeMessages) { // В данном пакете один или несколько целых сообщений
 					uint32_t messagesNum = buffer.GetUint<uint32_t>();
-					for (int iMsg = 0; iMsg < messagesNum; ++iMsg) {
+					for (int iMsg = 0; iMsg < (int)messagesNum; ++iMsg) {
 						uint32_t messageSize = buffer.GetUint<uint32_t>();
 						client->_msgsQueueIn.push_back(std::make_unique<DeserializationBuffer>(buffer.GetNextBytes(messageSize), messageSize));
 						if (!buffer.IsEmpty()) {
@@ -314,6 +314,8 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 				response.Push(TIMEOUT_CLIENT_NOT_CONNECTED);
 				return;
 			}
+			// Обновим время последнего запроса от данного клиента
+			(*itClientLow)->_timestampLastRequest = (uint32_t)std::time(0);
 			// Сначала удалим из очереди пакеты, которые успешно дошли на клиент (клиент запросил следующий после них пакет)
 			auto& queue = (*itClientLow)->_packetsQueueOut.queue;
 			int elementsToErase = requestedPacketN - (*itClientLow)->_packetsQueueOut.lastPushedPacketN + queue.size() - 1;
@@ -353,6 +355,9 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 				response.Push(TIMEOUT_CLIENT_NOT_CONNECTED);
 				return;
 			}
+			// Обновим время последнего запроса от данного клиента
+			(*itClientLow)->_timestampLastRequest = (uint32_t)std::time(0);
+			// Положим в очередь полученный пакет
 			if ((*itClientLow)->_lastRecievedPacketN != UINT32_MAX && packetN > (*itClientLow)->_lastRecievedPacketN) {
 				(*itClientLow)->_lastRecievedPacketN = packetN;
 				(*itClientLow)->_packetsQueueIn.emplace_back(std::make_shared<HttpPacket>(request, HttpPacket::Status::RECEIVED));
@@ -402,6 +407,7 @@ void SHttpManager::CreateClientLow(const std::string& login, uint32_t sessionId)
 
 SConnectedClientLow::SConnectedClientLow(const std::string& login, uint32_t sessionId): _login(login), _sessionId(sessionId)
 {
+	_timestampLastRequest = (uint32_t)std::time(0);
 }
 
 //===============================================================================
@@ -411,9 +417,8 @@ SConnectedClientLow::SConnectedClientLow(const std::string& login, uint32_t sess
 void SConnectedClientLow::reinit(uint32_t sessionId)
 {
 	_sessionId = sessionId;
-	_sessionId = UINT32_MAX;
 	_lastRecievedPacketN = 0;
-	_timestampLastRequest = 0;
+	_timestampLastRequest = (uint32_t)std::time(0);
 	_packetsQueueIn.resize(0);
 	_packetsQueueOut.lastPushedPacketN = UINT32_MAX;
 	_packetsQueueOut.queue.resize(0);
