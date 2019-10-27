@@ -99,18 +99,12 @@ public:
 //
 //===============================================================================
 
-class EventConDiscon // !!! Переименовать класс, поскольку он представляет только коннекты, но не дисконнекты
+class EventConnect
 {
 public:
-	enum EventType {
-		NONE,
-		CONNECT,
-	};
+	EventConnect() {}
+	EventConnect(const std::string& login, uint32_t sessionId): _login(login), _sessionId(sessionId) {}
 
-	EventConDiscon() {}
-	EventConDiscon(EventType eventType, const std::string& login, uint32_t sessionId): _eventType(eventType), _login(login), _sessionId(sessionId) {}
-
-	EventType _eventType = NONE;
 	std::string _login;  // Логин клиента, который подключается или отключается
 	uint32_t _sessionId; 
 };
@@ -132,10 +126,10 @@ public:
 //
 //===============================================================================
 
-class MTQueueConDiscon
+class MTQueueConnect
 {
 public:
-	std::vector<EventConDiscon> queue;
+	std::vector<EventConnect> queue;
 	std::mutex mutex;
 };
 
@@ -218,9 +212,8 @@ public:
 	SHttpManagerLow _sHttpManagerLow;
 	std::function<void(const std::string&, uint32_t)> _connectClient;
 	std::function<void(const std::string&, uint32_t)> _diconnectClient;
-	MTConnections _connections;      // Низкоуровневая информация о подключенных клиентах
-									 // !!! Переименовать поле, поскольку оно представляет только коннекты, но не дисконнекты
-	MTQueueConDiscon _conDiscon;     // Очередь событий о подключении новых клиентов
+	MTConnections _connections;       // Низкоуровневая информация о подключенных клиентах
+	MTQueueConnect _connectQueue;     // Очередь событий о подключении новых клиентов
 };
 
 

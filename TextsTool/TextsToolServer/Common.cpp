@@ -268,14 +268,12 @@ void SHttpManager::Update(double dt)
 
 	// Обработка коннектов
 	{
-		MutexLock lock(_conDiscon.mutex);
+		MutexLock lock(_connectQueue.mutex);
 
-		for (auto& conDisconEvent : _conDiscon.queue) {
-			if (conDisconEvent._eventType == EventConDiscon::CONNECT) {
-				_connectClient(conDisconEvent._login, conDisconEvent._sessionId);
-			}
+		for (auto& conDisconEvent : _connectQueue.queue) {
+			_connectClient(conDisconEvent._login, conDisconEvent._sessionId);
 		}
-		_conDiscon.queue.resize(0);
+		_connectQueue.queue.resize(0);
 	}
 }
 
@@ -308,8 +306,8 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 			++(pAccount->sessionId);
 			CreateClientLow(login, pAccount->sessionId);
 			{
-				MutexLock lock(_conDiscon.mutex);
-				_conDiscon.queue.emplace_back(EventConDiscon::CONNECT, login, pAccount->sessionId);
+				MutexLock lock(_connectQueue.mutex);
+				_connectQueue.queue.emplace_back(login, pAccount->sessionId);
 			}
 			response.Push((uint8_t)Connected);
 			response.Push(pAccount->sessionId);
