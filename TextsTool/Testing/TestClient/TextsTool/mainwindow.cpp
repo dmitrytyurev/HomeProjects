@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
             qint64 size = reply->read(arr, sizeof(arr));
             std::string sstr = std::to_string(size);
-            ui->textEdit->setText(QString::fromStdString(sstr));
+//            ui->textEdit->setText(QString::fromStdString(sstr));
             int sum = 0;
             for (int i = 0; i < size; ++i) {
                 sum += (unsigned char)arr[i];
@@ -69,6 +69,13 @@ void MainWindow::on_pushButton_clicked()
 
     //request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
  //   manager->get(request);
+
+static int q=0;
+++q;
+std::string sstr = std::to_string(q);
+ui->textEdit->setText(QString::fromStdString(sstr));
+
+
 
     manager->post(request, postData);
 }

@@ -119,12 +119,37 @@ void test3()
 //
 //===============================================================================
 
+void MainLoop()
+{
+	using namespace std::chrono_literals;
+
+	STextsToolApp app;
+
+	app._dbs.emplace_back(std::make_shared<TextsDatabase>());
+	//app._dbs.back()->CreateFromBase("D:/Dimka/HomeProjects/", "TestDB");
+
+	//std::cout << "TS:" << app._dbs.back()->_folders[0].timestampCreated;
+
+	auto prevTime = std::chrono::high_resolution_clock::now();
+	while (true)
+	{
+		auto curTime = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double, std::milli> elapsed = curTime - prevTime;
+		prevTime = curTime;
+		app.Update(elapsed.count() / 1000.f);
+		std::this_thread::sleep_for(50ms);
+	}
+}
+
+
+//===============================================================================
+//
+//===============================================================================
+
 int main()
 {
 	try {
-		//	test();
-		//	test2();
-		//	test3();
+		MainLoop();
 	}
 	catch (std::exception& e) {
 		std::cerr << "Outter catch exception: " << e.what() << std::endl;
