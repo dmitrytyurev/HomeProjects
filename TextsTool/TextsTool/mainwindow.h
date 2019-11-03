@@ -8,6 +8,9 @@
 #include <QUrl>
 #include <QTextCodec>
 
+#include "DeserializationBuffer.h"
+
+
 class CHttpPacket
 {
 public:
@@ -22,6 +25,7 @@ public:
     };
 
     CHttpPacket(std::vector<uint8_t>& packetData, Status status);
+    CHttpPacket(DeserializationBuffer& request, Status status);
 
     std::vector<uint8_t> _packetData;
     Status _status;
@@ -54,28 +58,31 @@ public:
     void PutPacketToSendQueue(const CHttpPacket& packet);
 
 public:
-    std::vector<CHttpPacket::Ptr> _packetsIn;
+    std::vector<CHttpPacket::Ptr> _packetsIn; // Пакеты, полученные с сервера. Их обработает Repacker, перепакует и положит в очередь входящих сообщений
 
 private:
+    void CHttpManager::ConnectInner();
     void HttpRequestFinishedCallback(QNetworkReply *reply);
     void CallbackConnecting(QNetworkReply *reply);
     void CallbackSendPacket(QNetworkReply *reply);
     void CallbackRequestPacket(QNetworkReply *reply);
     void SendPacket(const std::vector<uint8_t>& packet);
-    void DebugPrintServerReply(int size);
+    void DebugLogServerReply(int size);
 
-    std::vector<CHttpPacket::Ptr> _packetsOut;
+    std::vector<CHttpPacket::Ptr> _packetsOut; // Пакеты для отсылки на сервер
     STATE _state = STATE::NOT_CONNECTED;
     QString _lastError;
     int _sendPacketN = 0;
     int _rcvPacketN = 0;
-    int _sessionId = 0;
+    uint32_t _sessionId = 0;
     LAST_POST_WAS _lastTryPostWas = LAST_POST_WAS::NONE;
     LAST_POST_WAS _lastSuccesPostWas = LAST_POST_WAS::NONE;
-    uint _timeOfRequestPacket = 0;
+    uint _timeOfRequestPacket = 0;  // Время следующего запроса пакета с сервера
     QNetworkAccessManager* _manager = nullptr;
     QNetworkRequest _request;
     std::vector<uint8_t> _httpBuf;
+    std::string _login;
+    std::string _password;
 };
 
 namespace Ui {

@@ -12,7 +12,7 @@
 #include "Utils.h"
 
 
-const static uint32_t TIMEOUT_CLIENT_NOT_CONNECTED = 300;   // “аймаут в миллисекундах, в ответе когда приходит пакет с клиента, которым уже разорвано соединение
+//const static uint32_t TIMEOUT_CLIENT_NOT_CONNECTED = 300;   // “аймаут в миллисекундах, в ответе когда приходит пакет с клиента, которым уже разорвано соединение
 const static uint32_t TIMEOUT_NO_SUCH_PACKET = 3000;        // “аймаут в миллисекундах, в ответе когда клиент запрашивает пакет на сервере, которого ещЄ нет
 const static uint32_t TIMEOUT_NEXT_PACKET_READY = 0;        // “аймаут в миллисекундах, в ответе когда клиент запрашивает пакет на сервере, а уже готов следующий пакет
 const static uint32_t TIMEOUT_NEXT_PACKET_NOT_READY = 3000; // “аймаут в миллисекундах, в ответе когда клиент запрашивает пакет на сервере, а ещЄ не готов следующий пакет
@@ -142,8 +142,8 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 		auto itClientLow = std::find_if(std::begin(_connections.clients), std::end(_connections.clients), [login](const SConnectedClientLow::Ptr& el) { return el->_login == login; });
 		if (itClientLow == std::end(_connections.clients)) {
 			response.Push((uint8_t)ClientNotConnected);
-			response.Push(pAccount->sessionId);
-			response.Push(TIMEOUT_CLIENT_NOT_CONNECTED);
+			//response.Push(pAccount->sessionId);     —ложилось впечатление, что эти параметры не нужны на клиенте. ѕолучении такого ответа, клиент должен просто сделать reconnect
+			//response.Push(TIMEOUT_CLIENT_NOT_CONNECTED);
 			return;
 		}
 		// ќбновим врем€ последнего запроса от данного клиента
@@ -183,8 +183,8 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 		auto itClientLow = std::find_if(std::begin(_connections.clients), std::end(_connections.clients), [login](const SConnectedClientLow::Ptr& el) { return el->_login == login; });
 		if (itClientLow == std::end(_connections.clients)) {
 			response.Push((uint8_t)ClientNotConnected);
-			response.Push(pAccount->sessionId);
-			response.Push(TIMEOUT_CLIENT_NOT_CONNECTED);
+			//response.Push(pAccount->sessionId);     —ложилось впечатление, что эти параметры не нужны на клиенте. ѕолучении такого ответа, клиент должен просто сделать reconnect
+			//response.Push(TIMEOUT_CLIENT_NOT_CONNECTED);
 			return;
 		}
 		// ќбновим врем€ последнего запроса от данного клиента

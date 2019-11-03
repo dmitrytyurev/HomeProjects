@@ -26,11 +26,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        DeserializationBuffer.cpp \
         SerializationBuffer.cpp \
         main.cpp \
         mainwindow.cpp
 
 HEADERS += \
+        DeserializationBuffer.h \
         SerializationBuffer.h \
         Shared.h \
         mainwindow.h

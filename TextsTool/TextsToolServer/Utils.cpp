@@ -6,21 +6,27 @@
 //
 //===============================================================================
 
-void ExitMsg(const std::string& message)
+void LogMsg(const std::string& message)
 {
-	// !!! Сделать запись в лог
-	std::cout << "Fatal: " << message << std::endl;
-	throw std::exception("Exiting app exception");
+	std::cout << message << std::endl;
+
+    FILE* fp = nullptr;
+    errno_t err = fopen_s(&fp, "d:\\log.txt", "at");
+    if (err != 0) {
+        return;
+    }
+    fprintf(fp, "%s\n", message.c_str());
+    fclose(fp);
 }
 
 //===============================================================================
 //
 //===============================================================================
 
-void LogMsg(const std::string& message)
+void ExitMsg(const std::string& message)
 {
-	// !!! Сделать запись в лог
-	std::cout << message << std::endl;
+	LogMsg("Fatal: " + message);
+	throw std::exception("Exiting app exception");
 }
 
 //===============================================================================
