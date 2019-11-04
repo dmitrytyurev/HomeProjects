@@ -121,25 +121,6 @@ public:
 class SHttpManager
 {
 public:
-	enum // Типы запросов от клиента
-	{
-		RequestConnect,
-		RequestPacket,
-		ProvidePacket
-	};
-
-	enum // Коды ответов
-	{
-		UnknownRequest,
-		WrongLoginOrPassword,
-		WrongSession,
-		ClientNotConnected,
-		NoSuchPacketYet,
-		Connected,
-		PacketReceived,
-		PacketSent
-	};
-
 	SHttpManager(std::function<void(const std::string&, uint32_t)> connectClient, std::function<void(const std::string&, uint32_t)> diconnectClient);
 	void Update(double dt);
 	void RequestProcessor(DeserializationBuffer& request, SerializationBuffer& response); // Вызывается из неосновного потока, должа обработать http-запрос и сформировать ответ

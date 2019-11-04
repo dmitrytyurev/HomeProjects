@@ -8,15 +8,14 @@
 
 #include "SHttpManagerLowImpl.h"
 #include "Utils.h"
+#include "Shared.h"
 
 // Необходимо, чтобы линковка происходила с DLL-библиотекой
 // Для работы с сокетам
 #pragma comment(lib, "Ws2_32.lib")
 
 
-const int MAX_CLIENT_BUFFER_SIZE = 500000;  // !!! При конвертации сообщения в пакеты должны резать, если сообщение больше, чем это число
-
-
+// !!! При конвертации сообщения в пакеты должны резать, если сообщение больше, чем это число
 
 void ExitMsg(const std::string& message);
 
@@ -133,7 +132,7 @@ void SHttpManagerLowImpl::ThreadExitMsg(const std::string& errorMsg)
 void SHttpManagerLowImpl::ThreadListenSocketFunc()  
 {
 	std::vector<char> buf;
-	buf.resize(MAX_CLIENT_BUFFER_SIZE);
+	buf.resize(HTTP_BUF_SIZE);
 	int client_socket = INVALID_SOCKET;
 
 	while (true) {
@@ -166,9 +165,9 @@ void SHttpManagerLowImpl::ThreadListenSocketFunc()
 		// Читаем данные из полученного сокета. Сначала заголовок, потом тело 
 		int readBytesNum = 0;
 		for (int i = 0; i < 2; ++i) { 
-			readBytesNum = recv(client_socket, buf.data(), MAX_CLIENT_BUFFER_SIZE, 0);
+			readBytesNum = recv(client_socket, buf.data(), HTTP_BUF_SIZE, 0);
 
-			if (readBytesNum == MAX_CLIENT_BUFFER_SIZE) {
+			if (readBytesNum == HTTP_BUF_SIZE) {
 				ThreadExitMsg("recv buffer overflow: " + std::to_string(WSAGetLastError()));
 				return;
 			}
