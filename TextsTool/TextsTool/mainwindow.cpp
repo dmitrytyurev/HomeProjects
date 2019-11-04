@@ -36,7 +36,7 @@ void ExitMsg(const std::string& message)
 
 //---------------------------------------------------------------
 
-CHttpPacket::CHttpPacket(std::vector<uint8_t>& packetData, Status status) : _packetData(packetData), _status(status)
+CHttpPacket::CHttpPacket(const std::vector<uint8_t>& packetData, Status status) : _packetData(packetData), _status(status)
 {
 }
 
@@ -204,7 +204,7 @@ void CHttpManager::CallbackRequestPacket(QNetworkReply *reply)
         ++_rcvPacketN;
         uint32_t timeToNextRequest = buf.GetUint<uint32_t>();
         _timeOfRequestPacket = GetCurrentTimestamp() + timeToNextRequest;
-        _packetsIn.emplace_back(std::make_shared<CHttpPacket>(buf, CHttpPacket::Status::RECEIVED));
+        _packetsIn.emplace_back(std::make_shared<CHttpPacket>(buf, CHttpPacket::Status::WAITING_FOR_UNPACKING));
         return;
     }
     Log("CallbackRequestPacket unexpected response. code:" + std::to_string(code));
@@ -242,8 +242,6 @@ void CHttpManager::ConnectInner()
     SerializationBuffer buf;
     buf.PushStringWithoutZero<uint8_t>(_login);
     buf.PushStringWithoutZero<uint8_t>(_password);
-    buf.Push((uint32_t)0);
-    buf.Push((uint32_t)0);
     buf.Push((uint8_t)ClientRequestTypes::RequestConnect);
     SendPacket(buf.buffer);
 }
@@ -257,7 +255,81 @@ void CHttpManager::Connect(const std::string& login, const std::string& password
     ConnectInner();
 }
 
+//---------------------------------------------------------------
 
+void CHttpManager::PutPacketToSendQueue(const std::vector<uint8_t>& packet)
+{
+    _packetsOut.emplace_back(std::make_shared<CHttpPacket>(packet, CHttpPacket::Status::TO_SEND));
+}
+
+//---------------------------------------------------------------
+
+bool CHttpManager::IsTimeToRequestPacket()
+{
+    return _timeOfRequestPacket != 0 && GetCurrentTimestamp() >= _timeOfRequestPacket;
+}
+
+//---------------------------------------------------------------
+
+void CHttpManager::RequestPacket()
+{
+    _lastTryPostWas = LAST_POST_WAS::REQUEST_PACKET;
+
+    SerializationBuffer buf;
+    buf.PushStringWithoutZero<uint8_t>(_login);
+    buf.PushStringWithoutZero<uint8_t>(_password);
+    buf.Push((uint8_t)ClientRequestTypes::RequestPacket);
+    buf.Push(_sessionId);
+    buf.Push(_rcvPacketN);
+    SendPacket(buf.buffer);
+}
+
+//---------------------------------------------------------------
+
+void CHttpManager::SendPacket()
+{
+    if (_packetsOut.empty()) {
+        Log("SendPacket: _packetsOut.empty()");
+        return;
+    }
+
+    _lastTryPostWas = LAST_POST_WAS::SEND_PACKET;
+    SerializationBuffer buf;
+    buf.PushStringWithoutZero<uint8_t>(_login);
+    buf.PushStringWithoutZero<uint8_t>(_password);
+    buf.Push((uint8_t)ClientRequestTypes::ProvidePacket);
+    buf.Push(_sessionId);
+    buf.Push(_sendPacketN);
+    buf.PushBytes(_packetsOut[0]->_packetData.data(), _packetsOut[0]->_packetData.size());
+    SendPacket(buf.buffer);
+}
+
+//---------------------------------------------------------------
+
+void CHttpManager::Update()
+{
+    if (_state != STATE::CONNECTED || _lastTryPostWas != LAST_POST_WAS::NONE) {
+        return;
+    }
+    if (_packetsOut.empty()) {
+        if (IsTimeToRequestPacket()) {
+            RequestPacket();
+        }
+    }
+    else {
+        if (IsTimeToRequestPacket()) {
+            if (_lastSuccesPostWas == LAST_POST_WAS::SEND_PACKET) {
+                RequestPacket();
+            }
+            else {
+                SendPacket();
+            }
+        }
+        else {
+            SendPacket();
+        }
+    }
+}
 
 //---------------------------------------------------------------
 //---------------------------------------------------------------

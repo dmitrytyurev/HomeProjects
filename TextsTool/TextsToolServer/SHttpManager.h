@@ -20,10 +20,12 @@ public:
 
 	enum class Status
 	{
-		RECEIVED,
-		WAITING_FOR_PACKING,
-		PAKING,
-		PACKED
+		// ---- Для пакетов с клиента
+		RECEIVED, // Пакет пришёл с клиента
+		// ---- Для пакетов на клиент
+		WAITING_FOR_PACKING,  // Пакет добавлен в очередь на отсылку на клиент, но ещё не упакован
+		PAKING,  // Пакету упаковывается
+		PACKED  // Пакет упакован, можно посылать
 	};
 
 	HttpPacket(std::vector<uint8_t>& packetData, Status status);

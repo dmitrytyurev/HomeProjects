@@ -18,13 +18,15 @@ public:
 
     enum class Status
     {
-        RECEIVED,
+        // ---- Для пакетов подлежащих отсылке на сервер
+        TO_SEND,
+        // ---- Для пакетов пришедших с сервера
         WAITING_FOR_UNPACKING,
-        UNPAKING,
+        UNPACKING,
         UNPACKED
     };
 
-    CHttpPacket(std::vector<uint8_t>& packetData, Status status);
+    CHttpPacket(const std::vector<uint8_t>& packetData, Status status);
     CHttpPacket(DeserializationBuffer& request, Status status);
 
     std::vector<uint8_t> _packetData;
@@ -52,28 +54,32 @@ public:
 
     CHttpManager();
     ~CHttpManager();
+    void Update();
     void Connect(const std::string& login, const std::string& password);
     void TestSend();
     STATE GetStatus();
-    void PutPacketToSendQueue(const CHttpPacket& packet);
+    void PutPacketToSendQueue(const std::vector<uint8_t>& packet);
 
 public:
     std::vector<CHttpPacket::Ptr> _packetsIn; // Пакеты, полученные с сервера. Их обработает Repacker, перепакует и положит в очередь входящих сообщений
 
 private:
-    void CHttpManager::ConnectInner();
+    void ConnectInner();
     void HttpRequestFinishedCallback(QNetworkReply *reply);
     void CallbackConnecting(QNetworkReply *reply);
     void CallbackSendPacket(QNetworkReply *reply);
     void CallbackRequestPacket(QNetworkReply *reply);
     void SendPacket(const std::vector<uint8_t>& packet);
     void DebugLogServerReply(int size);
+    bool IsTimeToRequestPacket();
+    void RequestPacket();
+    void SendPacket();
 
     std::vector<CHttpPacket::Ptr> _packetsOut; // Пакеты для отсылки на сервер
     STATE _state = STATE::NOT_CONNECTED;
     QString _lastError;
-    int _sendPacketN = 0;
-    int _rcvPacketN = 0;
+    uint32_t _sendPacketN = 0;
+    uint32_t _rcvPacketN = 0;
     uint32_t _sessionId = 0;
     LAST_POST_WAS _lastTryPostWas = LAST_POST_WAS::NONE;
     LAST_POST_WAS _lastSuccesPostWas = LAST_POST_WAS::NONE;

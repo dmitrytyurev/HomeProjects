@@ -105,8 +105,6 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 	request.GetString<uint8_t>(login);
 	std::string password;
 	request.GetString<uint8_t>(password);
-	uint32_t sessionId = request.GetUint<uint32_t>();
-	uint32_t packetN = request.GetUint<uint32_t>();
 	uint8_t requestType = request.GetUint<uint8_t>();
 
 	MutexLock lock(_connections.mutex);
@@ -134,6 +132,7 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 	break;
 	case RequestPacket:
 	{
+		uint32_t sessionId = request.GetUint<uint32_t>();
 		uint32_t requestedPacketN = request.GetUint<uint32_t>();
 		if (pAccount->sessionId != sessionId) {
 			response.Push((uint8_t)WrongSession);
@@ -176,6 +175,8 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 	break;
 	case ProvidePacket:
 	{
+		uint32_t sessionId = request.GetUint<uint32_t>();
+		uint32_t packetN = request.GetUint<uint32_t>();
 		if (pAccount->sessionId != sessionId) {
 			response.Push((uint8_t)WrongSession);
 			return;
