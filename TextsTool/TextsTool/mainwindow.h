@@ -105,10 +105,11 @@ public:
 
 private slots:
     void on_pushButton_clicked();
+    void update();
 
 private:
-    Ui::MainWindow *ui;
-
+    Ui::MainWindow *ui = nullptr;
+    QTimer *timer = nullptr;
     CHttpManager httpManager;
 };
 

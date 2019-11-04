@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QTimer>
 #include <string>
+
 #include "SerializationBuffer.h"
 #include "DeserializationBuffer.h"
 #include "Shared.h"
@@ -339,18 +341,31 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    Log("111");
-    Log("222");
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    timer->start(1000);
+
     ui->setupUi(this);
     debugGlobalUi = ui;
 }
+
+//---------------------------------------------------------------
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
+//---------------------------------------------------------------
+
 void MainWindow::on_pushButton_clicked()
 {
     httpManager.Connect("mylogin", "mypassword");
+}
+
+//---------------------------------------------------------------
+
+void MainWindow::update()
+{
+    httpManager.Update();
 }

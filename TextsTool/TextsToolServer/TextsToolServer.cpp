@@ -6,6 +6,7 @@
 
 #include "Common.h"
 #include "DbSerializer.h"
+#include "Utils.h"
 
 //===============================================================================
 //
@@ -125,7 +126,7 @@ void MainLoop()
 
 	STextsToolApp app;
 
-	app._dbs.emplace_back(std::make_shared<TextsDatabase>());
+	//app._dbs.emplace_back(std::make_shared<TextsDatabase>());
 	//app._dbs.back()->CreateFromBase("D:/Dimka/HomeProjects/", "TestDB");
 
 	//std::cout << "TS:" << app._dbs.back()->_folders[0].timestampCreated;
@@ -152,7 +153,9 @@ int main()
 		MainLoop();
 	}
 	catch (std::exception& e) {
-		std::cerr << "Outter catch exception: " << e.what() << std::endl;
+		std::string errorStr = std::string("Outter catch exception: ") + e.what();
+		LogMsg(errorStr);
+		std::cerr << errorStr << std::endl;
 	}
 }
 
