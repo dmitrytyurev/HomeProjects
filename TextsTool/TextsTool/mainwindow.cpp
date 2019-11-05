@@ -73,21 +73,23 @@ CHttpManager::~CHttpManager()
 
 void CHttpManager::HttpRequestFinishedCallback(QNetworkReply *reply)
 {
+    LAST_POST_WAS lastTryPostWasCopy = _lastTryPostWas;
     _lastTryPostWas = LAST_POST_WAS::NONE;
+
     if (_state == STATE::CONNECTING) {
         CallbackConnecting(reply);
     }
     else {
         if (_state == STATE::CONNECTED) {
-            if (_lastTryPostWas == LAST_POST_WAS::SEND_PACKET) {
+            if (lastTryPostWasCopy == LAST_POST_WAS::SEND_PACKET) {
                 CallbackSendPacket(reply);
             }
             else {
-                if (_lastTryPostWas == LAST_POST_WAS::REQUEST_PACKET) {
+                if (lastTryPostWasCopy == LAST_POST_WAS::REQUEST_PACKET) {
                     CallbackRequestPacket(reply);
                 }
                 else {
-                    Log("Unexpected _lastTryPostWas:" + std::to_string((int)_lastTryPostWas));
+                    Log("Unexpected _lastTryPostWas:" + std::to_string((int)lastTryPostWasCopy));
                 }
             }
         }
@@ -101,15 +103,16 @@ void CHttpManager::HttpRequestFinishedCallback(QNetworkReply *reply)
 
 //---------------------------------------------------------------
 
-void CHttpManager::DebugLogServerReply(int size)
+void CHttpManager::DebugLogServerReply(const std::string& logHeader, int size)
 {
+    Log(logHeader);
     std::string sstr;
     for (int i = 0; i < size; ++i) {
         std::string s = std::to_string(_httpBuf[i]);
         sstr += s;
         sstr += " ";
     }
-    Log("Packet from server: " + sstr);
+    Log("  " + sstr);
     //debugGlobalUi->textEdit->setText(QString::fromStdString(sstr));
 }
 
@@ -126,7 +129,7 @@ void CHttpManager::CallbackConnecting(QNetworkReply *reply)
     }
 
     int sizeReceived = (int)reply->read((char*)_httpBuf.data(), _httpBuf.size());
-    DebugLogServerReply(sizeReceived);
+    DebugLogServerReply("Packet from server (Connecting)", sizeReceived);
     DeserializationBuffer buf(_httpBuf.data(), sizeReceived);
     uint8_t code = buf.GetUint<uint8_t>();
     if (code == (uint8_t)AnswersToClient::WrongLoginOrPassword) {
@@ -154,7 +157,7 @@ void CHttpManager::CallbackSendPacket(QNetworkReply *reply)
     }
 
     int sizeReceived = (int)reply->read((char*)_httpBuf.data(), _httpBuf.size());
-    DebugLogServerReply(sizeReceived);
+    DebugLogServerReply("Packet from server (Send Packet)", sizeReceived);
     DeserializationBuffer buf(_httpBuf.data(), sizeReceived);
     uint8_t code = buf.GetUint<uint8_t>();
 
@@ -186,7 +189,7 @@ void CHttpManager::CallbackRequestPacket(QNetworkReply *reply)
     }
 
     int sizeReceived = (int)reply->read((char*)_httpBuf.data(), _httpBuf.size());
-    DebugLogServerReply(sizeReceived);
+    DebugLogServerReply("Packet from server (Request Packet)", sizeReceived);
     DeserializationBuffer buf(_httpBuf.data(), sizeReceived);
     uint8_t code = buf.GetUint<uint8_t>();
 
@@ -198,7 +201,7 @@ void CHttpManager::CallbackRequestPacket(QNetworkReply *reply)
     if (code == (uint8_t)AnswersToClient::NoSuchPacketYet)
     {
         uint32_t timeToNextRequest = buf.GetUint<uint32_t>();
-        _timeOfRequestPacket = GetCurrentTimestamp() + timeToNextRequest;
+        _timeOfRequestPacket = GetCurrentTimestamp() + timeToNextRequest / 1000;
         return;
     }
     if (code == (uint8_t)AnswersToClient::PacketSent) {

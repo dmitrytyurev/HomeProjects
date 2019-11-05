@@ -125,6 +125,7 @@ void MainLoop()
 	using namespace std::chrono_literals;
 
 	STextsToolApp app;
+	app._httpMgr._connections._accounts.emplace_back("mylogin", "mypassword");
 
 	//app._dbs.emplace_back(std::make_shared<TextsDatabase>());
 	//app._dbs.back()->CreateFromBase("D:/Dimka/HomeProjects/", "TestDB");

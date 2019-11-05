@@ -70,7 +70,7 @@ private:
     void CallbackSendPacket(QNetworkReply *reply);
     void CallbackRequestPacket(QNetworkReply *reply);
     void SendPacket(const std::vector<uint8_t>& packet);
-    void DebugLogServerReply(int size);
+    void DebugLogServerReply(const std::string& logHeader, int size);
     bool IsTimeToRequestPacket();
     void RequestPacket();
     void SendPacket();

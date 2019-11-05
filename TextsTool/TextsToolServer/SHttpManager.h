@@ -104,9 +104,10 @@ class MTConnections
 public:
 	struct Account
 	{
+		Account(const std::string& login_, const std::string& password_) : login(login_), password(password_) {}
 		std::string login;
 		std::string password;
-		uint32_t sessionId;  // ID текущей сессии, если в _connections есть клиент с таким login. ј если нету, значит здесь ID последней завершившейс€ сессии
+		uint32_t sessionId = 0;  // ID текущей сессии, если в _connections есть клиент с таким login. ј если нету, значит здесь ID последней завершившейс€ сессии
 	};
 
 	std::vector<SConnectedClientLow::Ptr> clients; // Ќизкоуровнева€ информаци€ о подключенных клиентах
