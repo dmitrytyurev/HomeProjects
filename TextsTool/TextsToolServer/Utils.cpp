@@ -6,16 +6,26 @@
 //
 //===============================================================================
 
-void LogMsg(const std::string& message)
+uint32_t GetTime()
+{
+	return static_cast<uint32_t>(std::time(0));
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+void Log(const std::string& message)
 {
 	std::cout << message << std::endl;
 
     FILE* fp = nullptr;
-    errno_t err = fopen_s(&fp, "d:\\log.txt", "at");
+    errno_t err = fopen_s(&fp, "d:\\ServerLog.txt", "at");
     if (err != 0) {
         return;
     }
-    fprintf(fp, "%s\n", message.c_str());
+    fprintf(fp, "%d: %s\n", GetTime(), message.c_str());
+
     fclose(fp);
 }
 
@@ -25,19 +35,9 @@ void LogMsg(const std::string& message)
 
 void ExitMsg(const std::string& message)
 {
-	LogMsg("Fatal: " + message);
+	Log("Fatal: " + message);
 	throw std::exception("Exiting app exception");
 }
-
-//===============================================================================
-//
-//===============================================================================
-
-uint32_t GetTime()
-{
-	return static_cast<uint32_t>(std::time(0));
-}
-
 
 //===============================================================================
 // FNV-1a algorithm https://softwareengineering.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed

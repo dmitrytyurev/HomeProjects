@@ -20,11 +20,11 @@ uint GetCurrentTimestamp()
 void Log(const std::string& str)
 {
     FILE* fp = nullptr;
-    errno_t err = fopen_s(&fp, "d:\\log.txt", "at");
+    errno_t err = fopen_s(&fp, "d:\\ClientLog.txt", "at");
     if (err != 0) {
         return;
     }
-    fprintf(fp, "%s\n", str.c_str());
+    fprintf(fp, "%d: %s\n", GetCurrentTimestamp(), str.c_str());
     fclose(fp);
 }
 
@@ -105,8 +105,7 @@ void CHttpManager::HttpRequestFinishedCallback(QNetworkReply *reply)
 
 void CHttpManager::DebugLogServerReply(const std::string& logHeader, int size)
 {
-    Log(logHeader);
-    std::string sstr;
+    std::string sstr = logHeader + ": ";
     for (int i = 0; i < size; ++i) {
         std::string s = std::to_string(_httpBuf[i]);
         sstr += s;
@@ -229,6 +228,7 @@ void CHttpManager::SendPacket(const std::vector<uint8_t>& packet)
     QByteArray postDataSize = QByteArray::number(packet.size());
     _request.setRawHeader("Content-Length", postDataSize);
     _manager->post(_request, postData);
+    Log("SendPacket");
 }
 
 //---------------------------------------------------------------
@@ -344,9 +344,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    Log("\n\n=== Start App ===========================================================");
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start(1000);
+    timer->start(50);
 
     ui->setupUi(this);
     debugGlobalUi = ui;
@@ -363,6 +364,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
+    std::vector<uint8_t> packet1 = {2,3,4};
+    std::vector<uint8_t> packet2 = {5,6,7,8};
+    std::vector<uint8_t> packet3 = {12,13,14,15,16};
+    httpManager.PutPacketToSendQueue(packet1);
+    httpManager.PutPacketToSendQueue(packet2);
+    httpManager.PutPacketToSendQueue(packet3);
     httpManager.Connect("mylogin", "mypassword");
 }
 

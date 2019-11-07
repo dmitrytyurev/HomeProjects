@@ -205,7 +205,7 @@ void SHttpManagerLowImpl::ThreadListenSocketFunc()
 		// Отправляем ответ клиенту с помощью функции send
 		int result = send(client_socket, (const char*)responseFull.data(), responseFull.size(), 0);
 		if (result == SOCKET_ERROR) {
-			LogMsg("send failed: " + std::to_string(WSAGetLastError()));  // произошла ошибка при отправке данных
+			Log("send failed: " + std::to_string(WSAGetLastError()));  // произошла ошибка при отправке данных
 		}
 		// Закрываем соединение к клиентом
 		closesocket(client_socket);

@@ -124,6 +124,8 @@ void MainLoop()
 {
 	using namespace std::chrono_literals;
 
+	Log("\n\n=== Start App ===========================================================");
+
 	STextsToolApp app;
 	app._httpMgr._connections._accounts.emplace_back("mylogin", "mypassword");
 
@@ -155,7 +157,7 @@ int main()
 	}
 	catch (std::exception& e) {
 		std::string errorStr = std::string("Outter catch exception: ") + e.what();
-		LogMsg(errorStr);
+		Log(errorStr);
 		std::cerr << errorStr << std::endl;
 	}
 }

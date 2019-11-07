@@ -190,7 +190,7 @@ void SClientMessagesMgr::Update(double dt)
 					AddPacketToClients(bufPtr, client->_dbName);
 				}
 				else {
-					LogMsg("SClientMessagesMgr::Update: EventCreateText: folder not found");
+					Log("SClientMessagesMgr::Update: EventCreateText: folder not found");
 				}
 			}
 			break;
@@ -320,7 +320,7 @@ bool SClientMessagesMgr::ModifyDbDeleteFolder(DeserializationBuffer& buf, TextsD
 		f.erase(result);
 	}
 	else {
-		LogMsg("SClientMessagesMgr::ModifyDbDeleteFolder: folder not found");
+		Log("SClientMessagesMgr::ModifyDbDeleteFolder: folder not found");
 		return false;
 	}
 	return true;
@@ -341,7 +341,7 @@ bool SClientMessagesMgr::ModifyDbChangeFolderParent(DeserializationBuffer& buf, 
 		result->timestampModified = ts;
 	}
 	else {
-		LogMsg("SClientMessagesMgr::ModifyDbChangeFolderParent: folder not found");
+		Log("SClientMessagesMgr::ModifyDbChangeFolderParent: folder not found");
 		return false;
 	}
 	return true;
@@ -364,7 +364,7 @@ bool SClientMessagesMgr::ModifyDbRenameFolder(DeserializationBuffer& buf, TextsD
 		result->timestampModified = ts;
 	}
 	else {
-		LogMsg("SClientMessagesMgr::ModifyDbRenameFolder: folder not found");
+		Log("SClientMessagesMgr::ModifyDbRenameFolder: folder not found");
 		return false;
 	}
 	return true;
@@ -385,7 +385,7 @@ bool SClientMessagesMgr::ModifyDbDeleteAttribute(DeserializationBuffer& buf, Tex
 		ap.erase(result);
 	}
 	else {
-		LogMsg("SClientMessagesMgr::Update::ActionDeleteAttribute: attribute id not found");
+		Log("SClientMessagesMgr::Update::ActionDeleteAttribute: attribute id not found");
 		return false;
 	}
 	for (auto it = ap.begin(); it != ap.end(); ) {  // Сдвинуть позицию всех атрибутов справа от удаляемого
@@ -422,7 +422,7 @@ bool SClientMessagesMgr::ModifyDbRenameAttribute(DeserializationBuffer& buf, Tex
 		result->name = newAttributeName;
 	}
 	else {
-		LogMsg("ModifyDbRenameAttribute: attribute id not found");
+		Log("ModifyDbRenameAttribute: attribute id not found");
 		return false;
 	}
 	return true;
@@ -444,7 +444,7 @@ bool SClientMessagesMgr::ModifyDbChangeAttributeVis(DeserializationBuffer& buf, 
 		result->isVisible = static_cast<bool>(newVisibilityFlag);
 	}
 	else {
-		LogMsg("ModifyDbChangeAttributeVis: attribute id not found");
+		Log("ModifyDbChangeAttributeVis: attribute id not found");
 		return false;
 	}
 	return true;
@@ -467,7 +467,7 @@ bool SClientMessagesMgr::ModifyDbDeleteText(DeserializationBuffer& buf, TextsDat
 			return true;
 		}
 	}
-	LogMsg("ModifyDbDeleteText: text not found by id");
+	Log("ModifyDbDeleteText: text not found by id");
 	return false;
 }
 
@@ -506,11 +506,11 @@ bool SClientMessagesMgr::ModifyDbMoveTextToFolder(
 					return true;
 				}
 			}
-			LogMsg("ModifyDbMoveTextToFolder: folder not found");
+			Log("ModifyDbMoveTextToFolder: folder not found");
 			return false;
 		}
 	}
-	LogMsg("ModifyDbMoveTextToFolder: text not found by id");
+	Log("ModifyDbMoveTextToFolder: text not found by id");
 	return false;
 }
 
@@ -546,7 +546,7 @@ bool  SClientMessagesMgr::ModifyDbChangeBaseText(
 			return true;
 		}
 	}
-	LogMsg("ModifyDbChangeBaseText: text not found by id");
+	Log("ModifyDbChangeBaseText: text not found by id");
 	return false;
 }
 
@@ -578,7 +578,7 @@ bool  SClientMessagesMgr::ModifyDbAddAttributeToText(
 		}
 	}
 	if (!tmpTextPtr) {
-		LogMsg("ModifyDbAddAttributeToText: text not found by id");
+		Log("ModifyDbAddAttributeToText: text not found by id");
 		return false;
 	}
 
@@ -590,7 +590,7 @@ bool  SClientMessagesMgr::ModifyDbAddAttributeToText(
 
 	auto result = std::find_if(std::begin(db._attributeProps), std::end(db._attributeProps), [&attributeId](const AttributeProperty& el) { return el.id == attributeId; });
 	if (result == std::end(db._attributeProps)) {
-		LogMsg("ModifyDbAddAttributeToText: attribute not found by id");
+		Log("ModifyDbAddAttributeToText: attribute not found by id");
 		return false;
 	}
 
@@ -600,7 +600,7 @@ bool  SClientMessagesMgr::ModifyDbAddAttributeToText(
 	attributeInText.type = result->type;
 
 	if (attributeDataType != result->type) {
-		LogMsg("ModifyDbAddAttributeToText: attributeDataType != result->type");
+		Log("ModifyDbAddAttributeToText: attributeDataType != result->type");
 		return false;
 	}
 
@@ -646,7 +646,7 @@ bool  SClientMessagesMgr::ModifyDbDelAttributeFromText(
 		}
 	}
 	if (!tmpTextPtr) {
-		LogMsg("ModifyDbDelAttributeFromText: text not found by id");
+		Log("ModifyDbDelAttributeFromText: text not found by id");
 		return false;
 	}
 
@@ -658,7 +658,7 @@ bool  SClientMessagesMgr::ModifyDbDelAttributeFromText(
 
 	auto result = std::find_if(std::begin(tmpTextPtr->attributes), std::end(tmpTextPtr->attributes), [&attributeId](const AttributeInText& el) { return el.id == attributeId; });
 	if (result == std::end(tmpTextPtr->attributes)) {
-		LogMsg("ModifyDbDelAttributeFromText: attribute not found by id");
+		Log("ModifyDbDelAttributeFromText: attribute not found by id");
 		return false;
 	}
 
@@ -694,7 +694,7 @@ bool  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 		}
 	}
 	if (!tmpTextPtr) {
-		LogMsg("ModifyDbChangeAttributeInText: text not found by id");
+		Log("ModifyDbChangeAttributeInText: text not found by id");
 		return false;
 	}
 
@@ -706,12 +706,12 @@ bool  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 
 	auto result = std::find_if(std::begin(tmpTextPtr->attributes), std::end(tmpTextPtr->attributes), [&attributeId](const AttributeInText& el) { return el.id == attributeId; });
 	if (result == std::end(tmpTextPtr->attributes)) {
-		LogMsg("ModifyDbChangeAttributeInText: attribute not found by id");
+		Log("ModifyDbChangeAttributeInText: attribute not found by id");
 		return false;
 	}
 
 	if (attributeDataType != result->type) {
-		LogMsg("ModifyDbAddAttributeToText: attributeDataType != result->type");
+		Log("ModifyDbAddAttributeToText: attributeDataType != result->type");
 		return false;
 	}
 

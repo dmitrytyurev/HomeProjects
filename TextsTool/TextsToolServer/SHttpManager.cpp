@@ -176,8 +176,11 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 	break;
 	case (uint8_t)ClientRequestTypes::ProvidePacket:
 	{
+Log("ProvidePacket");
 		uint32_t sessionId = request.GetUint<uint32_t>();
 		uint32_t packetN = request.GetUint<uint32_t>();
+Log("  sessionId: " + std::to_string(sessionId) + " packetN: " + std::to_string(packetN));
+
 		if (pAccount->sessionId != sessionId) {
 			response.Push((uint8_t)AnswersToClient::WrongSession);
 			return;
@@ -192,15 +195,15 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 		// ќбновим врем€ последнего запроса от данного клиента
 		(*itClientLow)->_timestampLastRequest = (uint32_t)std::time(0);
 		// ѕоложим в очередь полученный пакет
-		if ((*itClientLow)->_lastRecievedPacketN != UINT32_MAX && packetN > (*itClientLow)->_lastRecievedPacketN) {
-			(*itClientLow)->_lastRecievedPacketN = packetN;
+		if (packetN == (*itClientLow)->_expectedClientPacketN) {
+			(*itClientLow)->_expectedClientPacketN++;
 			(*itClientLow)->_packetsQueueIn.emplace_back(std::make_shared<HttpPacket>(request, HttpPacket::Status::RECEIVED));
 		}
 		response.Push((uint8_t)AnswersToClient::PacketReceived);
 	}
 	break;
 	default:
-		LogMsg("SHttpManager::RequestProcessor: unknown requestType");
+		Log("SHttpManager::RequestProcessor: unknown requestType");
 		response.Push((uint8_t)AnswersToClient::UnknownRequest);
 		return;
 	}
@@ -251,7 +254,7 @@ SConnectedClientLow::SConnectedClientLow(const std::string& login, uint32_t sess
 void SConnectedClientLow::reinit(uint32_t sessionId)
 {
 	_sessionId = sessionId;
-	_lastRecievedPacketN = 0;
+	_expectedClientPacketN = 0;
 	_timestampLastRequest = (uint32_t)std::time(0);
 	_packetsQueueIn.resize(0);
 	_packetsQueueOut.lastPushedPacketN = UINT32_MAX;

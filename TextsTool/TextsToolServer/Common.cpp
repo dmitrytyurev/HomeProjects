@@ -118,6 +118,21 @@ void SMessagesRepaker::Update(double dt)
 			for (int iPckt = 0; iPckt < (int)clLow->_packetsQueueIn.size(); ++iPckt) {
 				auto& packetPtr = clLow->_packetsQueueIn[iPckt];
 				DeserializationBuffer buffer(packetPtr->_packetData); // !!! Неоптимально. Сделать возможность в DeserializationBuffer хранить указатель на вектор, а не копировать в него вектор целиком
+				
+std::string sstr;
+for (auto val : buffer._buffer) {
+sstr = sstr + std::to_string(val);
+sstr = sstr + " ";
+}
+Log(sstr);
+clLow->_packetsQueueIn.erase(clLow->_packetsQueueIn.begin() + iPckt);
+--iPckt;
+
+
+
+
+				
+/*
 				uint8_t pType = buffer.GetUint<uint8_t>();
 				if (pType == PacketDataType::WholeMessages) { // В данном пакете один или несколько целых сообщений
 					uint32_t messagesNum = buffer.GetUint<uint32_t>();
@@ -125,7 +140,7 @@ void SMessagesRepaker::Update(double dt)
 						uint32_t messageSize = buffer.GetUint<uint32_t>();
 						client->_msgsQueueIn.push_back(std::make_unique<DeserializationBuffer>(buffer.GetNextBytes(messageSize), messageSize));
 						if (!buffer.IsEmpty()) {
-							LogMsg("!buffer.IsEmpty()");
+							Log("!buffer.IsEmpty()");
 						}
 					}
 					clLow->_packetsQueueIn.erase(clLow->_packetsQueueIn.begin() + iPckt);
@@ -141,7 +156,7 @@ void SMessagesRepaker::Update(double dt)
 						DeserializationBuffer buffer2(packetPtr2->_packetData); // !!! Неоптимально. Сделать возможность в DeserializationBuffer хранить указатель на вектор, а не копировать в него вектор целиком
 						uint8_t pType2 = buffer2.GetUint<uint8_t>();
 						if (pType2 != PacketDataType::PartOfMessage) {
-							LogMsg("pType2 != PacketDataType::PartOfMessage"); // !!! Сделать корректный выход, если возможно
+							Log("pType2 != PacketDataType::PartOfMessage"); // !!! Сделать корректный выход, если возможно
 						}
 						uint32_t messageSize2 = buffer2.GetUint<uint32_t>();
 						if (messageSize != messageSize2) {
@@ -179,8 +194,11 @@ void SMessagesRepaker::Update(double dt)
 					}
 				}
 				else {
-					LogMsg("Unknown packet type");
+					Log("Unknown packet type");
 				}
+*/
+
+
 			}
 		}
 	}
