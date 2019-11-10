@@ -364,12 +364,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    std::vector<uint8_t> packet1 = {2,3,4};
-    std::vector<uint8_t> packet2 = {5,6,7,8};
-    std::vector<uint8_t> packet3 = {12,13,14,15,16};
-    httpManager.PutPacketToSendQueue(packet1);
-    httpManager.PutPacketToSendQueue(packet2);
-    httpManager.PutPacketToSendQueue(packet3);
+    std::vector<uint8_t> packet = {0, 1, 0, 0, 0, 1, 0, 0, 0,     EventRequestListOfDatabases};   // Первые байты - это обёртка для парсинга сообщения из пакетов
+    httpManager.PutPacketToSendQueue(packet);
     httpManager.Connect("mylogin", "mypassword");
 }
 

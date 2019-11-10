@@ -26,30 +26,6 @@ inline bool operator!=(const uint8_t& v1, const PacketDataType& v2) { return v1 
 //
 //===============================================================================
 
-enum EventType
-{
-	EventRequestSync = 0,          // Запрос синхронизации при подключении нового клиента
-	EventCreateFolder = 1,         // Создание каталога для текстов
-	EventDeleteFolder = 2,         // Удаление каталога (должен не иметь текстов и вложенных каталогов)
-	EventChangeFolderParent = 3,   // Изменение родительского каталога
-	EventRenameFolder = 4,         // Переименование каталога
-	EventCreateAttribute = 5,      // Создание атрибута таблицы
-	EventDeleteAttribute = 6,      // Удаление атрибута таблицы
-	EventRenameAttribute = 7,      // Переименование атрибута таблицы
-	EventChangeAttributeVis = 8,   // Изменение отображаемого порядкового номера атрибута в таблице текстов или видимость атрибута
-	EventCreateText = 9,           // Создание текста
-	EventDeleteText = 10,           // Удаление текста
-	EventMoveTextToFolder = 11,    // Текст переместился в другую папку
-	EventChangeBaseText = 12,      // Изменился основной текст
-	EventAddAttributeToText = 13,  // В текст добавился атрибут
-	EventDelAttributeFromText = 14,  // Удалился атрибут из текста
-	EventChangeAttributeInText = 15, // Изменилось значение атрибута в тексте
-};
-
-//===============================================================================
-//
-//===============================================================================
-
 class PeriodUpdater
 {
 public:

@@ -22,8 +22,27 @@ enum class AnswersToClient // Коды ответов
     PacketSent = 7
 };
 
-enum class RepackerDataType // Тип данных добавленных репакером перед пакетом 
+//===============================================================================
+//
+//===============================================================================
+
+enum EventType
 {
-	ONE_OR_MORE_ENTIRE_MESSAGES = 0,  // В этом пакете одно или несколько целых сообщений
-	PART_OF_ONE_MESSAGE = 1  // В этом пакете часть одного сообщения
+	EventRequestSync = 0,          // Запрос синхронизации при подключении нового клиента
+	EventCreateFolder = 1,         // Создание каталога для текстов
+	EventDeleteFolder = 2,         // Удаление каталога (должен не иметь текстов и вложенных каталогов)
+	EventChangeFolderParent = 3,   // Изменение родительского каталога
+	EventRenameFolder = 4,         // Переименование каталога
+	EventCreateAttribute = 5,      // Создание атрибута таблицы
+	EventDeleteAttribute = 6,      // Удаление атрибута таблицы
+	EventRenameAttribute = 7,      // Переименование атрибута таблицы
+	EventChangeAttributeVis = 8,   // Изменение отображаемого порядкового номера атрибута в таблице текстов или видимость атрибута
+	EventCreateText = 9,           // Создание текста
+	EventDeleteText = 10,           // Удаление текста
+	EventMoveTextToFolder = 11,    // Текст переместился в другую папку
+	EventChangeBaseText = 12,      // Изменился основной текст
+	EventAddAttributeToText = 13,  // В текст добавился атрибут
+	EventDelAttributeFromText = 14,  // Удалился атрибут из текста
+	EventChangeAttributeInText = 15, // Изменилось значение атрибута в тексте
+	EventRequestListOfDatabases = 16,       // Запрос список баз с текстами
 };

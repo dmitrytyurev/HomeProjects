@@ -11,6 +11,7 @@
 #include "DbSerializer.h"
 #include "SClientMessagesMgr.h"
 #include "Utils.h"
+#include "../SharedSrc/Shared.h"
 
 
 //===============================================================================
@@ -93,6 +94,12 @@ void SClientMessagesMgr::Update(double dt)
 				SerializationBufferPtr bufPtr = MakeSyncMessage(*buf, *db2); // —формировать сообщение клиенту - дл€ синхронизации его базы (он подключилс€)
 				client->_msgsQueueOut.emplace_back(bufPtr);
 				client->_syncFinished = true;
+			}
+			break;
+			case EventRequestListOfDatabases:
+			{
+				SerializationBufferPtr bufPtr = MakeDatabasesListMessage(); // —формировать сообщение клиенту - со списком загруженных сервером баз с текстами
+				client->_msgsQueueOut.emplace_back(bufPtr);
 			}
 			break;
 			case EventCreateFolder:
@@ -790,6 +797,18 @@ bool SClientMessagesMgr::IfKeyALess(const uint8_t* p1, int size1, const uint8_t*
 		++p2;
 	}
 	return false;
+}
+
+//===============================================================================
+//
+//===============================================================================
+
+SerializationBufferPtr SClientMessagesMgr::MakeDatabasesListMessage()
+{
+	auto buffer = std::make_shared<SerializationBuffer>();
+	buffer->Push((uint8_t)123);
+
+	return buffer;
 }
 
 //===============================================================================

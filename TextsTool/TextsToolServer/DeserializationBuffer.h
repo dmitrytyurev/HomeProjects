@@ -27,7 +27,7 @@ public:
 	void GetString(std::string& result);
 	template <typename T>
 	std::vector<uint8_t> GetVector();
-	bool IsEmpty() { return _buffer.size() - 1 == offset; }
+	bool IsEmpty() { return _buffer.size() == offset; }
 	uint8_t* GetNextBytes(uint32_t size) { offset += size; return  _buffer.data() + offset - size; }
 
 	uint32_t offset = 0;

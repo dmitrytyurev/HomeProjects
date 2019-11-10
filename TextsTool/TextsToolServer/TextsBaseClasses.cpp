@@ -7,6 +7,7 @@
 
 #include "Common.h"
 #include "DbSerializer.h"
+#include "../SharedSrc/Shared.h"
 
 void ExitMsg(const std::string& message);
 

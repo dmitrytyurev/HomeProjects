@@ -108,10 +108,11 @@ void SMessagesRepaker::Update(double dt)
 			continue;
 		}
 
+		// ѕерепаковываем данные из очереди сообщений "на отправку" в очередь пакетов "на отправку"
 		if (client->_sessionId == clLow->_sessionId) {
 			for (auto& buf : client->_msgsQueueOut) {
 				SerializationBuffer sbuf;
-				sbuf.Push((uint8_t)RepackerDataType::ONE_OR_MORE_ENTIRE_MESSAGES);
+				sbuf.Push((uint8_t)PacketDataType::WholeMessages);
 				sbuf.Push((uint32_t)1); //  оличество целых сообщений в пакете
 				sbuf.Push((uint32_t)buf->buffer.size());
 				sbuf.PushBytes(buf->buffer.data(), buf->buffer.size());
@@ -120,7 +121,8 @@ void SMessagesRepaker::Update(double dt)
 		}
 		client->_msgsQueueOut.resize(0); // ќчистим, даже если не скопировали (это был старый SConnectedClient ведь SConnectedClientLow уже подключилс€ новый, так что из SConnectedClient не нужно было брать старые сообщени€, они уже не актуальны)
 
-		if (client->_sessionId == clLow->_sessionId) { // ≈сли они не совпадут, значит создалс€ новый SConnectedClientLow, а SConnectedClient ещЄ не успел пересоздатьс€, он сделает это на следующем Update и тогда мы снова придЄт сюда и скопируем пакеты уже в нового SConnectedClient
+		// ѕерепаковываем данные из очереди пришедших пакетов в очередь пришедших сообщений
+		if (client->_sessionId == clLow->_sessionId) { // ≈сли они не совпадут, значит создалс€ новый SConnectedClientLow, а SConnectedClient ещЄ не успел пересоздатьс€, он сделает это на следующем Update и тогда мы снова придЄм сюда и скопируем пакеты уже в нового SConnectedClient
 			for (int iPckt = 0; iPckt < (int)clLow->_packetsQueueIn.size(); ++iPckt) {
 				auto& packetPtr = clLow->_packetsQueueIn[iPckt];
 				DeserializationBuffer buffer(packetPtr->_packetData); // !!! Ќеоптимально. —делать возможность в DeserializationBuffer хранить указатель на вектор, а не копировать в него вектор целиком

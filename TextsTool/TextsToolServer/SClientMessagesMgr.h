@@ -15,6 +15,7 @@ public:
 	void Update(double dt);
 	void AddPacketToClients(SerializationBufferPtr& bufPtr, const std::string& srcDbName);
 	SerializationBufferPtr MakeSyncMessage(DeserializationBuffer& buf, TextsDatabase& db);
+	SerializationBufferPtr MakeDatabasesListMessage();
 	void ConnectClient(const std::string& login, uint32_t sessionId);    // Вызывается из HttpMgr::Update при разборе очереди подключений/отключений. Создаёт SConnectedClient.
 	void DisconnectClient(const std::string& login, uint32_t sessionId); // Вызывается из HttpMgr::Update при разборе очереди подключений/отключений. Удаляет SConnectedClient.
 
