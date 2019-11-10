@@ -126,7 +126,7 @@ public:
 class TextsDatabase
 {
 public:
-	void CreateFromBase(const std::string path, const std::string dbName); // Загружает в объект базу из свежих файлов
+	void CreateBase(const std::string path, const std::string dbName); // Создаёт базу в памяти. Если она есть на диске, то загружает, а если нету, то создаёт пустую на диске
 	void Update(double dt);
 	SerializationBuffer& GetHistoryBuffer();
 	uint32_t GetCurrentPosInHistoryFile();

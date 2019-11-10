@@ -273,6 +273,9 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 
 	while (true)
 	{
+		if (buf.GetRestBytesNum() == 1) { // Потому, что выше добавили в конец один нулевой байт
+			break;
+		}
 		uint32_t offsToEventBegin = buf.offset;
 		std::string modifierLogin;
 		buf.GetString<uint8_t>(modifierLogin);
@@ -390,9 +393,6 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 			ExitMsg("DbSerializer::LoadHistoryInner: Unknown action type");
 			break;
 		}
-		if (buf.IsEmpty()) {
-			break;
-		}
 	}
 }
 
@@ -401,14 +401,14 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 // Имена файлов базы и истории конструирует из имени базы, выбирает самые свежие файлы
 //===============================================================================
 
-void DbSerializer::LoadDatabaseAndHistory()
+bool DbSerializer::LoadDatabaseAndHistory()
 {
 	// === Прочитать файл основной базы ==============================
 
 	uint32_t baseTimestamp = 0;
 	std::string fileName = FindFreshBaseFileName(baseTimestamp);
 	if (fileName.empty()) {
-		return;
+		return false;
 	}
 	LoadDatabaseInner(_path + fileName);
 
@@ -416,9 +416,10 @@ void DbSerializer::LoadDatabaseAndHistory()
 
 	_historyFile.name = FindHistoryFileName(baseTimestamp);
 	if (_historyFile.name.empty()) {
-		return;
+		return true;
 	}
 	LoadHistoryInner(_path + _historyFile.name);
+	return true;
 }
 
 //===============================================================================

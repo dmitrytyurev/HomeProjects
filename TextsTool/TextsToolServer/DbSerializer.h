@@ -28,7 +28,7 @@ public:
 	void Update(double dt);
 
 	void SaveDatabase();  // Имя файла базы конструирует из имени базы
-	void LoadDatabaseAndHistory(); // Имена файлов базы и истории конструирует из имени базы, выбирает самые свежие файлы
+	bool LoadDatabaseAndHistory(); // Имена файлов базы и истории конструирует из имени базы, выбирает самые свежие файлы
 
 	void HistoryFlush();
 	SerializationBuffer& GetHistoryBuffer();

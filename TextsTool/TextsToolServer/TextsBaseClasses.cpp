@@ -13,15 +13,18 @@ void ExitMsg(const std::string& message);
 
 
 //===============================================================================
-// Загружает в объект базу из свежих файлов
+//
 //===============================================================================
 
-void TextsDatabase::CreateFromBase(const std::string path, const std::string dbName)
+void TextsDatabase::CreateBase(const std::string path, const std::string dbName)
 {
 	_dbName = dbName;
 	_dbSerializer = std::make_unique<DbSerializer>(this);
 	_dbSerializer->SetPath(path);
-	_dbSerializer->LoadDatabaseAndHistory();
+	bool wasBaseLoaded = _dbSerializer->LoadDatabaseAndHistory();
+	if (!wasBaseLoaded) {
+		_dbSerializer->SaveDatabase();
+	}
 }
 
 //===============================================================================

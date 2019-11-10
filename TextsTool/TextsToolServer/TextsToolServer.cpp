@@ -16,7 +16,7 @@ void test()
 {
 	{
 		TextsDatabase db;
-		db.CreateFromBase("D:/Dimka/HomeProjects/", "TestDB");
+		db.CreateBase("D:/Dimka/HomeProjects/", "TestDB");
 
 		AttributeProperty ap;
 		ap.id = 99;
@@ -71,10 +71,10 @@ void test()
 		db._dbSerializer->SaveDatabase();
 	}
 
-	TextsDatabase db;
-	db.CreateFromBase("D:/Dimka/HomeProjects/", "TestDB");
-	db._dbSerializer->SetPath("D:/Dimka/");
-	db._dbSerializer->SaveDatabase();
+	//TextsDatabase db;
+	//db.CreateFromBase("D:/Dimka/HomeProjects/", "TestDB");
+	//db._dbSerializer->SetPath("D:/Dimka/");
+	//db._dbSerializer->SaveDatabase();
 }
 
 //===============================================================================
@@ -109,11 +109,17 @@ void test2()
 //
 //===============================================================================
 
-void test3()
+
+std::unique_ptr<STextsToolApp> app;
+
+void Init()
 {
-	//STextsToolApp app;
-	//SClientMessagesMgr messagesMgr(&app);
-	//messagesMgr.test();
+	Log("\n\n=== Start App ===========================================================");
+
+	app = std::make_unique<STextsToolApp>();
+	app->_httpMgr._connections._accounts.emplace_back("mylogin", "mypassword");
+	app->_dbs.emplace_back(std::make_shared<TextsDatabase>());
+	app->_dbs.back()->CreateBase("D:/Dimka/HomeProjects/", "TestDB");
 }
 
 //===============================================================================
@@ -124,23 +130,13 @@ void MainLoop()
 {
 	using namespace std::chrono_literals;
 
-	Log("\n\n=== Start App ===========================================================");
-
-	STextsToolApp app;
-	app._httpMgr._connections._accounts.emplace_back("mylogin", "mypassword");
-
-	//app._dbs.emplace_back(std::make_shared<TextsDatabase>());
-	//app._dbs.back()->CreateFromBase("D:/Dimka/HomeProjects/", "TestDB");
-
-	//std::cout << "TS:" << app._dbs.back()->_folders[0].timestampCreated;
-
 	auto prevTime = std::chrono::high_resolution_clock::now();
 	while (true)
 	{
 		auto curTime = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double, std::milli> elapsed = curTime - prevTime;
 		prevTime = curTime;
-		app.Update(elapsed.count() / 1000.f);
+		app->Update(elapsed.count() / 1000.f);
 		std::this_thread::sleep_for(50ms);
 	}
 }
@@ -153,6 +149,7 @@ void MainLoop()
 int main()
 {
 	try {
+		Init();
 		MainLoop();
 	}
 	catch (std::exception& e) {

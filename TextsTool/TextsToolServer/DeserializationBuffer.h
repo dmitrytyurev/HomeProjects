@@ -29,6 +29,7 @@ public:
 	std::vector<uint8_t> GetVector();
 	bool IsEmpty() { return _buffer.size() == offset; }
 	uint8_t* GetNextBytes(uint32_t size) { offset += size; return  _buffer.data() + offset - size; }
+	int GetRestBytesNum() { return _buffer.size() - offset; }
 
 	uint32_t offset = 0;
 	std::vector<uint8_t> _buffer;
