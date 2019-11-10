@@ -9,6 +9,7 @@
 #include "Utils.h"
 #include "Common.h"
 #include "DbSerializer.h"
+#include "../SharedSrc/Shared.h"
 
 //===============================================================================
 //
@@ -85,12 +86,12 @@ TextsDatabasePtr SClientMessagesMgr::GetDbPtrByDbName(const std::string& dbName)
 
 SMessagesRepaker::SMessagesRepaker(STextsToolApp* app): _app(app)
 {
+
 }
 
 //===============================================================================
 //
 //===============================================================================
-
 void SMessagesRepaker::Update(double dt)
 {
 	MutexLock lock(_app->_httpMgr._connections.mutex);
@@ -109,7 +110,12 @@ void SMessagesRepaker::Update(double dt)
 
 		if (client->_sessionId == clLow->_sessionId) {
 			for (auto& buf : client->_msgsQueueOut) {
-				clLow->_packetsQueueOut.PushPacket(buf->buffer, HttpPacket::Status::WAITING_FOR_PACKING);
+				SerializationBuffer sbuf;
+				sbuf.Push((uint8_t)RepackerDataType::ONE_OR_MORE_ENTIRE_MESSAGES);
+				sbuf.Push((uint32_t)1); //  оличество целых сообщений в пакете
+				sbuf.Push((uint32_t)buf->buffer.size());
+				sbuf.PushBytes(buf->buffer.data(), buf->buffer.size());
+				clLow->_packetsQueueOut.PushPacket(sbuf.buffer, HttpPacket::Status::WAITING_FOR_PACKING);
 			}
 		}
 		client->_msgsQueueOut.resize(0); // ќчистим, даже если не скопировали (это был старый SConnectedClient ведь SConnectedClientLow уже подключилс€ новый, так что из SConnectedClient не нужно было брать старые сообщени€, они уже не актуальны)
@@ -125,14 +131,10 @@ sstr = sstr + std::to_string(val);
 sstr = sstr + " ";
 }
 Log(sstr);
-clLow->_packetsQueueIn.erase(clLow->_packetsQueueIn.begin() + iPckt);
---iPckt;
-
 
 
 
 				
-/*
 				uint8_t pType = buffer.GetUint<uint8_t>();
 				if (pType == PacketDataType::WholeMessages) { // ¬ данном пакете один или несколько целых сообщений
 					uint32_t messagesNum = buffer.GetUint<uint32_t>();
@@ -196,9 +198,6 @@ clLow->_packetsQueueIn.erase(clLow->_packetsQueueIn.begin() + iPckt);
 				else {
 					Log("Unknown packet type");
 				}
-*/
-
-
 			}
 		}
 	}

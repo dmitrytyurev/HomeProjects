@@ -5,7 +5,7 @@
 
 #include "SerializationBuffer.h"
 #include "DeserializationBuffer.h"
-#include "Shared.h"
+#include "../SharedSrc/Shared.h"
 
 Ui::MainWindow* debugGlobalUi = nullptr;
 

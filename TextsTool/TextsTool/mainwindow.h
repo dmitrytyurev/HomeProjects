@@ -78,8 +78,8 @@ private:
     std::vector<CHttpPacket::Ptr> _packetsOut; // Пакеты для отсылки на сервер
     STATE _state = STATE::NOT_CONNECTED;
     QString _lastError;
-    uint32_t _sendPacketN = 0;
-    uint32_t _rcvPacketN = 0;
+    uint32_t _sendPacketN = 0; // Нумерация пакетов, которые клиент посылает на сервер
+    uint32_t _rcvPacketN = 0;  // Нумерация пакетов, которые клиент запрашивает у сервера (номер пакета, который будет запрашивать у сервера следующим)
     uint32_t _sessionId = 0;
     LAST_POST_WAS _lastTryPostWas = LAST_POST_WAS::NONE;
     LAST_POST_WAS _lastSuccesPostWas = LAST_POST_WAS::NONE;

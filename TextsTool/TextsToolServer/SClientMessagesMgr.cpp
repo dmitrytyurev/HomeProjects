@@ -1002,6 +1002,23 @@ void SClientMessagesMgr::ConnectClient(const std::string& login, uint32_t sessio
 		_app->_clients.erase(result);
 	}
 	_app->_clients.emplace_back(std::make_shared<SConnectedClient>(login, sessionId));
+
+	
+//std::vector<uint8_t> pack1 = {20, 21, 22, 23};
+//auto v1 = std::make_shared<SerializationBuffer>();
+//v1->buffer = pack1;
+
+//std::vector<uint8_t> pack2 = { 120, 121, 122 };
+//auto v2 = std::make_shared<SerializationBuffer>();
+//v2->buffer = pack2;
+
+//std::vector<uint8_t> pack3 = { 220, 221, 222, 223, 224 };
+//auto v3 = std::make_shared<SerializationBuffer>();
+//v3->buffer = pack3;
+
+//_app->_clients.back()->_msgsQueueOut.emplace_back(v1);
+//_app->_clients.back()->_msgsQueueOut.emplace_back(v2);
+//_app->_clients.back()->_msgsQueueOut.emplace_back(v3);
 }
 
 //===============================================================================

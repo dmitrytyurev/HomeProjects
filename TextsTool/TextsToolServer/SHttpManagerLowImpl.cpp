@@ -8,7 +8,7 @@
 
 #include "SHttpManagerLowImpl.h"
 #include "Utils.h"
-#include "Shared.h"
+#include "../SharedSrc/Shared.h"
 
 // Необходимо, чтобы линковка происходила с DLL-библиотекой
 // Для работы с сокетам

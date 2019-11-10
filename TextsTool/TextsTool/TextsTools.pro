@@ -32,9 +32,9 @@ SOURCES += \
         mainwindow.cpp
 
 HEADERS += \
+        ../SharedSrc/Shared.h \
         DeserializationBuffer.h \
         SerializationBuffer.h \
-        Shared.h \
         mainwindow.h
 
 FORMS += \

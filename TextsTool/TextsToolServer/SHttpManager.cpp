@@ -10,7 +10,7 @@
 
 #include "SHttpManager.h"
 #include "Utils.h"
-#include "Shared.h"
+#include "../SharedSrc/Shared.h"
 
 
 //const static uint32_t TIMEOUT_CLIENT_NOT_CONNECTED = 300;   // Таймаут в миллисекундах, в ответе когда приходит пакет с клиента, которым уже разорвано соединение
@@ -120,6 +120,7 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 	{
 	case (uint8_t)ClientRequestTypes::RequestConnect:
 	{
+		Log("Packet from client: RequestConnect");
 		++(pAccount->sessionId);
 		CreateClientLow(login, pAccount->sessionId);
 		{
@@ -133,6 +134,7 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 	break;
 	case (uint8_t)ClientRequestTypes::RequestPacket:
 	{
+		Log("Packet from client: RequestPacket");
 		uint32_t sessionId = request.GetUint<uint32_t>();
 		uint32_t requestedPacketN = request.GetUint<uint32_t>();
 		if (pAccount->sessionId != sessionId) {
@@ -159,14 +161,14 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 		}
 		// Расчитаем индекс в очереди пакета с запрашиваемым номером requestedPacketN
 		int requestedPacketIndex = requestedPacketN - (*itClientLow)->_packetsQueueOut.lastPushedPacketN + queue.size() - 1;
-		if (requestedPacketIndex < 0 || requestedPacketIndex >= (int)queue.size() || queue[requestedPacketIndex]->_status != HttpPacket::Status::PACKED) {
+		if (requestedPacketIndex < 0 || requestedPacketIndex >= (int)queue.size() || (NEED_PACK_PACKETS && queue[requestedPacketIndex]->_status != HttpPacket::Status::PACKED)) {
 			response.Push((uint8_t)AnswersToClient::NoSuchPacketYet);
 			response.Push(TIMEOUT_NO_SUCH_PACKET);
 			return;
 		}
 		// Проверим, готов ли на отсылку следующий по номеру пакет
 		int nextPacketIndex = (requestedPacketN + 1) - (*itClientLow)->_packetsQueueOut.lastPushedPacketN + queue.size() - 1;
-		bool isNextPacketReadyToSend = (nextPacketIndex >= 0 && nextPacketIndex < (int)queue.size() && queue[nextPacketIndex]->_status == HttpPacket::Status::PACKED);
+		bool isNextPacketReadyToSend = (nextPacketIndex >= 0 && nextPacketIndex < (int)queue.size() && (queue[nextPacketIndex]->_status == HttpPacket::Status::PACKED || !NEED_PACK_PACKETS));
 		uint32_t timeoutToSend = isNextPacketReadyToSend ? TIMEOUT_NEXT_PACKET_READY : TIMEOUT_NEXT_PACKET_NOT_READY;
 		response.Push((uint8_t)AnswersToClient::PacketSent);
 		response.Push(timeoutToSend);
@@ -176,10 +178,10 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 	break;
 	case (uint8_t)ClientRequestTypes::ProvidePacket:
 	{
-Log("ProvidePacket");
+		Log("Packet from client: ProvidePacket");
 		uint32_t sessionId = request.GetUint<uint32_t>();
 		uint32_t packetN = request.GetUint<uint32_t>();
-Log("  sessionId: " + std::to_string(sessionId) + " packetN: " + std::to_string(packetN));
+		Log("  sessionId: " + std::to_string(sessionId) + " packetN: " + std::to_string(packetN));
 
 		if (pAccount->sessionId != sessionId) {
 			response.Push((uint8_t)AnswersToClient::WrongSession);

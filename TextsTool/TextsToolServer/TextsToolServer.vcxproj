@@ -152,13 +152,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\SharedSrc\Shared.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="DbSerializer.h" />
     <ClInclude Include="DeserializationBuffer.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="SClientMessagesMgr.h" />
     <ClInclude Include="SerializationBuffer.h" />
-    <ClInclude Include="Shared.h" />
     <ClInclude Include="SHttpManager.h" />
     <ClInclude Include="SHttpManagerLow.h" />
     <ClInclude Include="SHttpManagerLowImpl.h" />
