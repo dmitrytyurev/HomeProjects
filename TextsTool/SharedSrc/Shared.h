@@ -28,21 +28,26 @@ enum class AnswersToClient // Коды ответов
 
 enum EventType
 {
-	EventRequestSync = 0,          // Запрос синхронизации при подключении нового клиента
-	EventCreateFolder = 1,         // Создание каталога для текстов
-	EventDeleteFolder = 2,         // Удаление каталога (должен не иметь текстов и вложенных каталогов)
-	EventChangeFolderParent = 3,   // Изменение родительского каталога
-	EventRenameFolder = 4,         // Переименование каталога
-	EventCreateAttribute = 5,      // Создание атрибута таблицы
-	EventDeleteAttribute = 6,      // Удаление атрибута таблицы
-	EventRenameAttribute = 7,      // Переименование атрибута таблицы
-	EventChangeAttributeVis = 8,   // Изменение отображаемого порядкового номера атрибута в таблице текстов или видимость атрибута
-	EventCreateText = 9,           // Создание текста
-	EventDeleteText = 10,           // Удаление текста
-	EventMoveTextToFolder = 11,    // Текст переместился в другую папку
-	EventChangeBaseText = 12,      // Изменился основной текст
-	EventAddAttributeToText = 13,  // В текст добавился атрибут
-	EventDelAttributeFromText = 14,  // Удалился атрибут из текста
-	EventChangeAttributeInText = 15, // Изменилось значение атрибута в тексте
-	EventRequestListOfDatabases = 16,       // Запрос список баз с текстами
+	EventRequestSync = 0,               // Запрос синхронизации при подключении нового клиента
+	EventReplySync = 1,                 // Ответ на запрос EventRequestSync
+	EventRequestListOfDatabases = 2,    // Запрос списка баз с текстами
+	EventReplyListOfDatabases = 3,      // Ответ на запрос EventRequestListOfDatabases
+
+	// Блок событий, приходящих с клиента на сервер, а потом рассылаемых с сервера на остальные клиенты подключенные к данной базе
+	// Используются в файлах базы и истории, поэтому не могут быть изменены
+	EventCreateFolder = 100,            // Создание каталога для текстов
+	EventDeleteFolder = 101,            // Удаление каталога (должен не иметь текстов и вложенных каталогов)
+	EventChangeFolderParent = 102,      // Изменение родительского каталога
+	EventRenameFolder = 103,            // Переименование каталога
+	EventCreateAttribute = 104,         // Создание атрибута таблицы
+	EventDeleteAttribute = 105,         // Удаление атрибута таблицы
+	EventRenameAttribute = 106,         // Переименование атрибута таблицы
+	EventChangeAttributeVis = 107,      // Изменение отображаемого порядкового номера атрибута в таблице текстов или видимость атрибута
+	EventCreateText = 108,              // Создание текста
+	EventDeleteText = 109,              // Удаление текста
+	EventMoveTextToFolder = 110,        // Текст переместился в другую папку
+	EventChangeBaseText = 111,          // Изменился основной текст
+	EventAddAttributeToText = 112,      // В текст добавился атрибут
+	EventDelAttributeFromText = 113,    // Удалился атрибут из текста
+	EventChangeAttributeInText = 114,   // Изменилось значение атрибута в тексте
 };

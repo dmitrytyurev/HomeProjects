@@ -806,7 +806,12 @@ bool SClientMessagesMgr::IfKeyALess(const uint8_t* p1, int size1, const uint8_t*
 SerializationBufferPtr SClientMessagesMgr::MakeDatabasesListMessage()
 {
 	auto buffer = std::make_shared<SerializationBuffer>();
-	buffer->Push((uint8_t)123);
+	buffer->Push((uint8_t)EventReplyListOfDatabases);
+	buffer->Push((uint32_t)_app->_dbs.size());
+
+	for (const auto& db : _app->_dbs) {
+		buffer->PushStringWithoutZero<uint8_t>(db->_dbName);
+	}
 
 	return buffer;
 }
@@ -831,6 +836,8 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 	};
 
 	auto buffer = std::make_shared<SerializationBuffer>();
+
+	buffer->Push((uint8_t)EventReplySync);
 
 	// Посылаем аттрибуты таблицы целиком
 	buffer->Push((uint32_t)db._attributeProps.size());
