@@ -13,22 +13,25 @@ void ExitMsg(const std::string& message);
 
 
 //===============================================================================
-//
-//===============================================================================
 
-void TextsDatabase::CreateBase(const std::string path, const std::string dbName)
+void TextsDatabase::CreateDatabase(const std::string path, const std::string dbName)
 {
 	_dbName = dbName;
 	_dbSerializer = std::make_unique<DbSerializer>(this);
 	_dbSerializer->SetPath(path);
-	bool wasBaseLoaded = _dbSerializer->LoadDatabaseAndHistory();
-	if (!wasBaseLoaded) {
-		_dbSerializer->SaveDatabase();
-	}
+	_dbSerializer->SaveDatabase();
 }
 
 //===============================================================================
-//
+
+void TextsDatabase::LoadDatabase(const std::string path, const std::string dbName)
+{
+	_dbName = dbName;
+	_dbSerializer = std::make_unique<DbSerializer>(this);
+	_dbSerializer->SetPath(path);
+	_dbSerializer->LoadDatabaseAndHistory();
+}
+
 //===============================================================================
 
 void TextsDatabase::Update(double dt)
@@ -37,8 +40,6 @@ void TextsDatabase::Update(double dt)
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 SerializationBuffer& TextsDatabase::GetHistoryBuffer()
 {
@@ -46,16 +47,12 @@ SerializationBuffer& TextsDatabase::GetHistoryBuffer()
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 uint32_t TextsDatabase::GetCurrentPosInHistoryFile()
 {
 	return _dbSerializer->GetCurrentPosInHistoryFile();
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void AttributeProperty::CreateFromBase(DeserializationBuffer& buffer)
@@ -70,8 +67,6 @@ void AttributeProperty::CreateFromBase(DeserializationBuffer& buffer)
 	param2 = buffer.GetUint<uint32_t>();
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void AttributeProperty::SaveToBase(SerializationBuffer& buffer) const
