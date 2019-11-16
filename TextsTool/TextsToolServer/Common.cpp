@@ -97,15 +97,50 @@ void SMessagesRepaker::RepackMessagesOutToPackets(std::shared_ptr<SConnectedClie
 		client->_msgsQueueOut.resize(0); 
 	}
 
-	for (auto& buf : client->_msgsQueueOut) {
-		SerializationBuffer sbuf;
-		sbuf.Push((uint8_t)PacketDataType::WholeMessages);
-		sbuf.Push((uint32_t)1); // Количество целых сообщений в пакете
-		sbuf.Push((uint32_t)buf->buffer.size());
-		sbuf.PushBytes(buf->buffer.data(), buf->buffer.size());
-		clLow->_packetsQueueOut.PushPacket(sbuf.buffer, HttpPacket::Status::WAITING_FOR_PACKING);
+	const int packetMaxSize = HTTP_BUF_SIZE - 200; // Максимальный размер данных сообщения в пакете. Берётся меньше размера буфера получения HTTP-запроса, потому, что к данным сообщения ещё добавляются данные репакера и данные HTTP-менеджера
+
+	auto& v = client->_msgsQueueOut;
+
+	while (v.size()) {
+		if (v[0]->buffer.size() > packetMaxSize) {
+			// Сообщение превышает максимальный размер пакета. Разбиваем его на несколько пакетов
+			int n = (v[0]->buffer.size() + packetMaxSize - 1) / packetMaxSize; // Число пакетов, на которое разобьём сообщение
+			int offs = 0;
+			for (int i = 0; i < n; ++i) {
+				int curSize = (i == n - 1 ? v[0]->buffer.size() - (n - 1) * packetMaxSize : packetMaxSize);
+				SerializationBuffer sbuf;
+				sbuf.Push((uint8_t)PacketDataType::PartOfMessage);
+				sbuf.Push((uint32_t)v[0]->buffer.size()); // Длина полного сообщений
+				sbuf.Push((uint32_t)curSize);  // Длина текущего куска сообщения
+				sbuf.PushBytes(v[0]->buffer.data() + offs, curSize);
+				offs += curSize;
+				clLow->_packetsQueueOut.PushPacket(sbuf.buffer, HttpPacket::Status::WAITING_FOR_PACKING);
+			}
+			v.erase(v.begin());
+		}
+		else {
+			// Объединяем по несколько сообщений в пакет (от 1 до N сообщений)
+			int n = 0;
+			int sum = 0;
+			// Считаем число сообщений n, который поместятся в один пакет
+			while (sum + v[n]->buffer.size() + sizeof(uint32_t) <= packetMaxSize) {  // Добавляется sizeof(uint32_t) потому, что к каждому сообщению
+				sum += v[n]->buffer.size() + sizeof(uint32_t);                       //                                                              в пакете допишется его длина - это добавочные расходы длины пакета
+				if (++n == v.size()) {
+					break;
+				}
+			};
+			// Заносим n очередных сообщений в один пакет
+			SerializationBuffer sbuf;
+			sbuf.Push((uint8_t)PacketDataType::WholeMessages);
+			sbuf.Push((uint32_t)n); // Количество целых сообщений в пакете
+			for (int i = 0; i < n; ++i) {
+				sbuf.Push((uint32_t)v[0]->buffer.size());
+				sbuf.PushBytes(v[0]->buffer.data(), v[0]->buffer.size());
+				v.erase(v.begin());
+			}
+			clLow->_packetsQueueOut.PushPacket(sbuf.buffer, HttpPacket::Status::WAITING_FOR_PACKING);
+		}
 	}
-	client->_msgsQueueOut.resize(0); // Очистим, даже если не скопировали (это был старый SConnectedClient ведь SConnectedClientLow уже подключился новый, так что из SConnectedClient не нужно было брать старые сообщения, они уже не актуальны)
 }
 
 //===============================================================================
