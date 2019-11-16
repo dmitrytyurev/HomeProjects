@@ -162,6 +162,7 @@
     <ClInclude Include="SHttpManager.h" />
     <ClInclude Include="SHttpManagerLow.h" />
     <ClInclude Include="SHttpManagerLowImpl.h" />
+    <ClInclude Include="SMessagesRepacker.h" />
     <ClInclude Include="TextsBaseClasses.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
@@ -180,6 +181,7 @@
     <ClCompile Include="SHttpManager.cpp" />
     <ClCompile Include="SHttpManagerLow.cpp" />
     <ClCompile Include="SHttpManagerLowImpl.cpp" />
+    <ClCompile Include="SMessagesRepacker.cpp" />
     <ClCompile Include="TextsBaseClasses.cpp" />
     <ClCompile Include="TextsToolServer.cpp" />
     <ClCompile Include="Utils.cpp" />

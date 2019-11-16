@@ -6,6 +6,7 @@
 #include "DeserializationBuffer.h"
 #include "SClientMessagesMgr.h"
 #include "SHttpManager.h"
+#include "SMessagesRepacker.h"
 
 class TextsDatabase;
 class Folder;
@@ -47,28 +48,6 @@ private:
 
 class STextsToolApp;
 
-
-
-//===============================================================================
-// Сообщения из очереди исходящих сообщений переносит в очередь пакетов, оптимально объединяя или разбивая
-// Также входящие пакеты перекладывает в очередь сообщений объединяя или разбивая
-//===============================================================================
-
-class SMessagesRepaker
-{
-public:
-	SMessagesRepaker(STextsToolApp* app);
-	void Update(double dt);
-
-private:
-	void RepackMessagesOutToPackets(std::shared_ptr<SConnectedClient>& client, SConnectedClientLow* clLow); // Перепаковываем данные из очереди сообщений "на отправку" в очередь пакетов "на отправку"
-	void RepackPacketsInToMessages(std::shared_ptr<SConnectedClient>& client, SConnectedClientLow* clLow);  // Перепаковываем данные из очереди пришедших пакетов в очередь пришедших сообщений
-	void LogBuffer(DeserializationBuffer& buffer);
-
-	STextsToolApp* _app = nullptr;
-};
-
-
 //===============================================================================
 //
 //===============================================================================
@@ -104,6 +83,6 @@ public:
 
 	SClientMessagesMgr _messagesMgr;
 	SHttpManager       _httpMgr;
-	SMessagesRepaker   _messagesRepaker;
+	SMessagesRepacker   _messagesRepaker;
 };
 
