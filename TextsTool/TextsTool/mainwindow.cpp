@@ -6,6 +6,7 @@
 #include "SerializationBuffer.h"
 #include "DeserializationBuffer.h"
 #include "../SharedSrc/Shared.h"
+#include "CMessagesRepacker.h"
 
 Ui::MainWindow* debugGlobalUi = nullptr;
 
@@ -374,4 +375,6 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::update()
 {
     httpManager.Update();
+    Repacker::RepackPacketsInToMessages(httpManager, _msgsQueueIn);
+    Repacker::RepackMessagesOutToPackets(_msgsQueueOut, httpManager);
 }

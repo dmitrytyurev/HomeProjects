@@ -62,7 +62,7 @@ void SHttpManager::Update(double dt)
 	// Обработка дисконнектов по времени
 	{
 		uint32_t curTime = (uint32_t)std::time(0);
-		MutexLock lock(_connections.mutex);
+		Utils::MutexLock lock(_connections.mutex);
 
 		for (auto it = _connections.clients.begin(); it != _connections.clients.end(); ) {
 			if (curTime > (*it)->_timestampLastRequest + TIMEOUT_DISCONNECT_CLIENT)
@@ -77,7 +77,7 @@ void SHttpManager::Update(double dt)
 
 	// Обработка коннектов
 	{
-		MutexLock lock(_connectQueue.mutex);
+		Utils::MutexLock lock(_connectQueue.mutex);
 
 		for (auto& conDisconEvent : _connectQueue.queue) {
 			_connectClient(conDisconEvent._login, conDisconEvent._sessionId);
@@ -96,7 +96,7 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 	request.GetString<uint8_t>(password);
 	uint8_t requestType = request.GetUint<uint8_t>();
 
-	MutexLock lock(_connections.mutex);
+	Utils::MutexLock lock(_connections.mutex);
 
 	MTConnections::Account* pAccount = FindAccount(login, password);
 	if (!pAccount) {
@@ -112,7 +112,7 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 		++(pAccount->sessionId);
 		CreateClientLow(login, pAccount->sessionId);
 		{
-			MutexLock lock(_connectQueue.mutex);
+			Utils::MutexLock lock(_connectQueue.mutex);
 			_connectQueue.queue.emplace_back(login, pAccount->sessionId);
 		}
 		response.Push((uint8_t)AnswersToClient::Connected);

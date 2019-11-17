@@ -9,6 +9,7 @@
 #include <QTextCodec>
 
 #include "DeserializationBuffer.h"
+#include "SerializationBuffer.h"
 
 
 class CHttpPacket
@@ -111,6 +112,8 @@ private:
     Ui::MainWindow *ui = nullptr;
     QTimer *timer = nullptr;
     CHttpManager httpManager;
+    std::vector<SerializationBufferPtr>   _msgsQueueOut; // Очередь сообщений, которые нужно отослать на сервер
+    std::vector<DeserializationBufferPtr> _msgsQueueIn;  // Очередь пришедших от сервера сообщений
 };
 
 #endif // MAINWINDOW_H

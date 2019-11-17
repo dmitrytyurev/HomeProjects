@@ -113,7 +113,7 @@ SHttpManagerLowImpl::~SHttpManagerLowImpl()
 
 void SHttpManagerLowImpl::ThreadExitMsg(const std::string& errorMsg)
 {
-	MutexLock lock(_fatalErrorInTheradTextMutex);
+	Utils::MutexLock lock(_fatalErrorInTheradTextMutex);
 	if (_fatalErrorInTheradText.empty()) {
 		_fatalErrorInTheradText = errorMsg;
 	}
@@ -211,7 +211,7 @@ void SHttpManagerLowImpl::Update(double dt)
 	// Если поток завершился с ошибкой, то завершить приложение с этой ошибкой
 	std::string copyStr;
 	{
-		MutexLock lock(_fatalErrorInTheradTextMutex);
+		Utils::MutexLock lock(_fatalErrorInTheradTextMutex);
 		copyStr = _fatalErrorInTheradText;
 	}
 	if (!copyStr.empty()) {

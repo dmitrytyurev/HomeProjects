@@ -77,7 +77,7 @@ void SClientMessagesMgr::Update(double dt)
 		TextsDatabasePtr db = GetDbPtrByDbName(client->_dbName);
 		for (const auto& buf : client->_msgsQueueIn) {
 			uint8_t actionType = buf->GetUint<uint8_t>();
-			uint32_t ts = GetTime();
+			uint32_t ts = Utils::GetTime();
 			switch (actionType) {
 			case EventRequestSync:
 			{
@@ -932,7 +932,7 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 		for (auto& interval : intervals) {
 			uint64_t hash = 0;
 			for (uint32_t i = interval.firstTextIdx; i < (int)interval.firstTextIdx + interval.textsNum; ++i) {
-				hash = AddHash(hash, textsKeysRefs[i]->key, i == interval.firstTextIdx);
+				hash = Utils::AddHash(hash, textsKeysRefs[i]->key, i == interval.firstTextIdx);
 			}
 			interval.hash = hash;
 		}

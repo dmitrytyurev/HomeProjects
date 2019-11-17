@@ -14,8 +14,6 @@ void ExitMsg(const std::string& message);
 class DeserializationBuffer
 {
 public:
-	using Ptr = std::unique_ptr<DeserializationBuffer>;
-
 	DeserializationBuffer() {}
 	DeserializationBuffer(std::vector<uint8_t>& buffer);
 	DeserializationBuffer(const uint8_t* buf, int bufSize);
@@ -33,6 +31,8 @@ public:
 	uint32_t offset = 0;
 	std::vector<uint8_t> _buffer;
 };
+
+using DeserializationBufferPtr = std::unique_ptr<DeserializationBuffer>;
 
 //===============================================================================
 //

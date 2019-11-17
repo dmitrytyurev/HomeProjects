@@ -19,7 +19,6 @@ public:
 private:
 	void RepackMessagesOutToPackets(std::shared_ptr<SConnectedClient>& client, SConnectedClientLow* clLow); // Перепаковываем данные из очереди сообщений "на отправку" в очередь пакетов "на отправку"
 	void RepackPacketsInToMessages(std::shared_ptr<SConnectedClient>& client, SConnectedClientLow* clLow);  // Перепаковываем данные из очереди пришедших пакетов в очередь пришедших сообщений
-	void LogBuffer(DeserializationBuffer& buffer);
 
 	STextsToolApp* _app = nullptr;
 };
