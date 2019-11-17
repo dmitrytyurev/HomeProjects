@@ -1059,3 +1059,17 @@ void SClientMessagesMgr::DisconnectClient(const std::string& login, uint32_t ses
 	}
 }
 
+
+//===============================================================================
+//
+//===============================================================================
+
+TextsDatabasePtr SClientMessagesMgr::GetDbPtrByDbName(const std::string& dbName)
+{
+	for (const auto& db : _app->_dbs) {
+		if (dbName == db->_dbName) {
+			return db;
+		}
+	}
+	return nullptr;
+}

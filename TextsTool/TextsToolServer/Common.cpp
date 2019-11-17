@@ -63,22 +63,6 @@ STextsToolApp::STextsToolApp():
 }
 
 //===============================================================================
-//
-//===============================================================================
-
-TextsDatabasePtr SClientMessagesMgr::GetDbPtrByDbName(const std::string& dbName)
-{
-	for (const auto& db : _app->_dbs) {
-		if (dbName == db->_dbName) {
-			return db;
-		}
-	}
-	return nullptr;
-}
-
-
-
-//===============================================================================
 
 SConnectedClient::SConnectedClient(const std::string& login, uint32_t sessionId) : _login(login), _sessionId(sessionId)
 {
