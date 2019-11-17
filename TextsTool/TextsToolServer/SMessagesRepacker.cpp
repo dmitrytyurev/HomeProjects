@@ -55,6 +55,9 @@ void SMessagesRepacker::RepackMessagesOutToPackets(std::shared_ptr<SConnectedCli
 					break;
 				}
 			};
+			if (n == 0) {
+				n = 1; // ≈сли длина данных пакета в интервале [packetMaxSize-sizeof(uint32_t)..packetMaxSize], то получим n == 0
+			}
 			// «аносим n очередных сообщений в один пакет
 			SerializationBuffer sbuf;
 			sbuf.Push((uint8_t)PacketDataType::WholeMessages);
@@ -162,6 +165,15 @@ void SMessagesRepacker::RepackPacketsInToMessages(std::shared_ptr<SConnectedClie
 }
 
 //===============================================================================
+void LogBuf(std::vector<uint8_t>& buffer)
+{
+	std::string sstr;
+	for (auto val : buffer) {
+		sstr = sstr + std::to_string(val);
+		sstr = sstr + " ";
+	}
+	Log(sstr);
+}
 
 void SMessagesRepacker::Update(double dt)
 {
@@ -178,7 +190,6 @@ void SMessagesRepacker::Update(double dt)
 		if (!clLow) {
 			continue;
 		}
-
 		RepackMessagesOutToPackets(client, clLow);
 		RepackPacketsInToMessages(client, clLow);
 	}
