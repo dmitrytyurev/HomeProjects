@@ -20,8 +20,6 @@
 void ExitMsg(const std::string& message);
 
 //===============================================================================
-//
-//===============================================================================
 
 SHttpManagerLowImpl::SHttpManagerLowImpl(std::function<void(DeserializationBuffer&, SerializationBuffer&)> requestCallback) :
 	_requestCallback(requestCallback)
@@ -94,8 +92,6 @@ void SHttpManagerLowImpl::StartHttpListening()
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 SHttpManagerLowImpl::~SHttpManagerLowImpl()
 {
@@ -114,8 +110,6 @@ SHttpManagerLowImpl::~SHttpManagerLowImpl()
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 void SHttpManagerLowImpl::ThreadExitMsg(const std::string& errorMsg)
 {
@@ -125,8 +119,6 @@ void SHttpManagerLowImpl::ThreadExitMsg(const std::string& errorMsg)
 	}
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void SHttpManagerLowImpl::ThreadListenSocketFunc()  
@@ -212,8 +204,6 @@ void SHttpManagerLowImpl::ThreadListenSocketFunc()
 	}
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void SHttpManagerLowImpl::Update(double dt)

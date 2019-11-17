@@ -15,8 +15,6 @@
 
 
 //===============================================================================
-//
-//===============================================================================
 
 class ClientFolder
 {
@@ -51,8 +49,6 @@ public:
 };
 
 //===============================================================================
-//
-//===============================================================================
 
 void SClientMessagesMgr::SaveToHistory(TextsDatabasePtr db, const std::string& login, uint8_t ts, const DeserializationBuffer& bufIn)
 {
@@ -62,8 +58,6 @@ void SClientMessagesMgr::SaveToHistory(TextsDatabasePtr db, const std::string& l
 	bufOut.Push(bufIn, true); // Заберём все данные из буфера, не важно сколько было из него уже прочитано // !!! Как это по ссылке на константу вызывается неконстантная функция??
 }
 
-//===============================================================================
-// Разослать пакеты другим клиентам
 //===============================================================================
 
 void SClientMessagesMgr::SendToClients(const std::string& dbName, uint8_t ts, const DeserializationBuffer& buf, const std::string& loginOfLastModifier)
@@ -75,8 +69,6 @@ void SClientMessagesMgr::SendToClients(const std::string& dbName, uint8_t ts, co
 	AddPacketToClients(bufPtr, dbName);
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void SClientMessagesMgr::Update(double dt)
@@ -315,8 +307,6 @@ void SClientMessagesMgr::Update(double dt)
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 bool SClientMessagesMgr::ModifyDbDeleteFolder(DeserializationBuffer& buf, TextsDatabase& db)
 {
@@ -333,8 +323,6 @@ bool SClientMessagesMgr::ModifyDbDeleteFolder(DeserializationBuffer& buf, TextsD
 	return true;
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 bool SClientMessagesMgr::ModifyDbChangeFolderParent(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts)
@@ -354,8 +342,6 @@ bool SClientMessagesMgr::ModifyDbChangeFolderParent(DeserializationBuffer& buf, 
 	return true;
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 
@@ -377,8 +363,6 @@ bool SClientMessagesMgr::ModifyDbRenameFolder(DeserializationBuffer& buf, TextsD
 	return true;
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 bool SClientMessagesMgr::ModifyDbDeleteAttribute(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts)
@@ -415,8 +399,6 @@ bool SClientMessagesMgr::ModifyDbDeleteAttribute(DeserializationBuffer& buf, Tex
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 bool SClientMessagesMgr::ModifyDbRenameAttribute(DeserializationBuffer& buf, TextsDatabase& db)
 {
@@ -435,8 +417,6 @@ bool SClientMessagesMgr::ModifyDbRenameAttribute(DeserializationBuffer& buf, Tex
 	return true;
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 bool SClientMessagesMgr::ModifyDbChangeAttributeVis(DeserializationBuffer& buf, TextsDatabase& db)
@@ -458,8 +438,6 @@ bool SClientMessagesMgr::ModifyDbChangeAttributeVis(DeserializationBuffer& buf, 
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 bool SClientMessagesMgr::ModifyDbDeleteText(DeserializationBuffer& buf, TextsDatabase& db, uint32_t& prevTsModified, uint32_t& prevOffsModified)
 {
@@ -478,8 +456,6 @@ bool SClientMessagesMgr::ModifyDbDeleteText(DeserializationBuffer& buf, TextsDat
 	return false;
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 bool SClientMessagesMgr::ModifyDbMoveTextToFolder(
@@ -522,8 +498,6 @@ bool SClientMessagesMgr::ModifyDbMoveTextToFolder(
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 bool  SClientMessagesMgr::ModifyDbChangeBaseText(
 	DeserializationBuffer& buf,
@@ -557,8 +531,6 @@ bool  SClientMessagesMgr::ModifyDbChangeBaseText(
 	return false;
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 bool  SClientMessagesMgr::ModifyDbAddAttributeToText(
@@ -627,8 +599,6 @@ bool  SClientMessagesMgr::ModifyDbAddAttributeToText(
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 bool  SClientMessagesMgr::ModifyDbDelAttributeFromText(
 	DeserializationBuffer& buf,
@@ -673,8 +643,6 @@ bool  SClientMessagesMgr::ModifyDbDelAttributeFromText(
 	return true;
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 bool  SClientMessagesMgr::ModifyDbChangeAttributeInText(
@@ -739,15 +707,11 @@ bool  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 
 
 //===============================================================================
-//
-//===============================================================================
 
 SClientMessagesMgr::SClientMessagesMgr(STextsToolApp* app) : _app(app)
 {
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void SClientMessagesMgr::AddPacketToClients(SerializationBufferPtr& bufPtr, const std::string& srcDbName)
@@ -759,8 +723,6 @@ void SClientMessagesMgr::AddPacketToClients(SerializationBufferPtr& bufPtr, cons
 	}
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 bool SClientMessagesMgr::IfKeyALess(const uint8_t* p1, int size1, const uint8_t* p2, int size2)
@@ -800,8 +762,6 @@ bool SClientMessagesMgr::IfKeyALess(const uint8_t* p1, int size1, const uint8_t*
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 SerializationBufferPtr SClientMessagesMgr::MakeDatabasesListMessage()
 {
@@ -816,8 +776,6 @@ SerializationBufferPtr SClientMessagesMgr::MakeDatabasesListMessage()
 	return buffer;
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer& buf, TextsDatabase& db)
@@ -1005,8 +963,6 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 void SClientMessagesMgr::MakeKey(uint32_t tsModified, const std::string& textId, std::vector<uint8_t>& result)
 {
@@ -1048,8 +1004,6 @@ void SClientMessagesMgr::ConnectClient(const std::string& login, uint32_t sessio
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 void SClientMessagesMgr::DisconnectClient(const std::string& login, uint32_t sessionId)
 {
@@ -1060,8 +1014,6 @@ void SClientMessagesMgr::DisconnectClient(const std::string& login, uint32_t ses
 }
 
 
-//===============================================================================
-//
 //===============================================================================
 
 TextsDatabasePtr SClientMessagesMgr::GetDbPtrByDbName(const std::string& dbName)

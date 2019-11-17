@@ -3,15 +3,11 @@
 #include "DeserializationBuffer.h"
 
 //===============================================================================
-//
-//===============================================================================
 
 DeserializationBuffer::DeserializationBuffer(std::vector<uint8_t>& buffer): _buffer(buffer)
 {
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 DeserializationBuffer::DeserializationBuffer(const uint8_t* buf, int bufSize)
@@ -20,8 +16,6 @@ DeserializationBuffer::DeserializationBuffer(const uint8_t* buf, int bufSize)
 	memcpy(_buffer.data(), buf, bufSize);
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void DeserializationBuffer::AddBytes(const uint8_t* buf, int bufSize)

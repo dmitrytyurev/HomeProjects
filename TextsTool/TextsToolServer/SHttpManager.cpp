@@ -20,15 +20,11 @@ const static uint32_t TIMEOUT_NEXT_PACKET_NOT_READY = 3000; // Таймаут в миллисе
 const static uint32_t TIMEOUT_DISCONNECT_CLIENT = 30;       // Таймаут через сколько секунд неприхода запросов от клиента дисконнектим его
 
 //===============================================================================
-//
-//===============================================================================
 
 HttpPacket::HttpPacket(std::vector<uint8_t>& packetData, Status status) : _packetData(packetData), _status(status)
 {
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 
@@ -41,8 +37,6 @@ HttpPacket::HttpPacket(DeserializationBuffer& request, Status status) : _status(
 
 
 //===============================================================================
-//
-//===============================================================================
 
 void MTQueueOut::PushPacket(std::vector<uint8_t>& data, HttpPacket::Status status)
 {
@@ -50,8 +44,6 @@ void MTQueueOut::PushPacket(std::vector<uint8_t>& data, HttpPacket::Status statu
 	queue.emplace_back(std::make_unique<HttpPacket>(data, status));
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 SHttpManager::SHttpManager(std::function<void(const std::string&, uint32_t)> connectClient, std::function<void(const std::string&, uint32_t)> diconnectClient) :
@@ -61,8 +53,6 @@ SHttpManager::SHttpManager(std::function<void(const std::string&, uint32_t)> con
 {
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void SHttpManager::Update(double dt)
@@ -96,8 +86,6 @@ void SHttpManager::Update(double dt)
 	}
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void SHttpManager::RequestProcessor(DeserializationBuffer& request, SerializationBuffer& response)
@@ -212,8 +200,6 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 MTConnections::Account* SHttpManager::FindAccount(const std::string& login, const std::string& password)
 {
@@ -225,8 +211,6 @@ MTConnections::Account* SHttpManager::FindAccount(const std::string& login, cons
 	return &*result;
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void SHttpManager::CreateClientLow(const std::string& login, uint32_t sessionId)
@@ -241,16 +225,12 @@ void SHttpManager::CreateClientLow(const std::string& login, uint32_t sessionId)
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 SConnectedClientLow::SConnectedClientLow(const std::string& login, uint32_t sessionId) : _login(login), _sessionId(sessionId)
 {
 	_timestampLastRequest = (uint32_t)std::time(0);
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void SConnectedClientLow::reinit(uint32_t sessionId)

@@ -27,8 +27,8 @@ public:
 	void SetPath(const std::string& path);
 	void Update(double dt);
 
-	void SaveDatabase();  // Имя файла базы конструирует из имени базы
-	bool LoadDatabaseAndHistory(); // Имена файлов базы и истории конструирует из имени базы, выбирает самые свежие файлы
+	void SaveDatabase();  //   Записывает всю базу в файл. Имя файла базы конструирует из имени базы
+	bool LoadDatabaseAndHistory(); // Читает базу из полного файла и файла истории. Имена файлов базы и истории конструирует из имени базы, выбирает самые свежие файлы
 
 	void HistoryFlush();
 	SerializationBuffer& GetHistoryBuffer();

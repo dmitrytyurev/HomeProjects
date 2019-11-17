@@ -2,8 +2,6 @@
 #include "SerializationBuffer.h"
 
 //===============================================================================
-//
-//===============================================================================
 
 //void SerializationBuffer::Push(const std::string& v)
 //{
@@ -13,8 +11,6 @@
 //	buffer.insert(buffer.end(), beg, end);
 //}
 
-//===============================================================================
-//
 //===============================================================================
 
 void SerializationBuffer::PushStringWithoutZero(const std::string& v)
@@ -26,8 +22,6 @@ void SerializationBuffer::PushStringWithoutZero(const std::string& v)
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 void SerializationBuffer::Push(uint8_t v)
 {
@@ -37,8 +31,6 @@ void SerializationBuffer::Push(uint8_t v)
 	buffer.insert(buffer.end(), beg, end);
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void SerializationBuffer::Push(uint16_t v)
@@ -50,8 +42,6 @@ void SerializationBuffer::Push(uint16_t v)
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 void SerializationBuffer::Push(uint32_t v)
 {
@@ -62,8 +52,6 @@ void SerializationBuffer::Push(uint32_t v)
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 void SerializationBuffer::Push(const DeserializationBuffer& buf, bool useAllBuffer)
 {
@@ -73,8 +61,6 @@ void SerializationBuffer::Push(const DeserializationBuffer& buf, bool useAllBuff
 	buffer.insert(buffer.end(), beg, end);
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void SerializationBuffer::PushBytes(const void* bytes, int size)

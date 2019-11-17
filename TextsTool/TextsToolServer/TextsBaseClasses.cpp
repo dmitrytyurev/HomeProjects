@@ -83,8 +83,6 @@ void AttributeProperty::SaveToBase(SerializationBuffer& buffer) const
 }
 
 //===============================================================================
-// Создание объекта из файла истории
-//===============================================================================
 
 void AttributeProperty::CreateFromHistory(DeserializationBuffer& buffer, uint32_t ts)
 {
@@ -99,8 +97,7 @@ void AttributeProperty::CreateFromHistory(DeserializationBuffer& buffer, uint32_
 }
 
 //===============================================================================
-// Создание объекта из сообщения от клиента 
-//===============================================================================
+
 void AttributeProperty::CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32_t newId)
 {
 	id = newId;
@@ -113,8 +110,6 @@ void AttributeProperty::CreateFromPacket(DeserializationBuffer& buffer, uint32_t
 	param2 = 0;
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void AttributeProperty::SaveToHistory(TextsDatabasePtr db, const std::string& loginOfLastModifier) const
@@ -132,9 +127,6 @@ void AttributeProperty::SaveToHistory(TextsDatabasePtr db, const std::string& lo
 	buffer.Push(param2);
 }
 
-
-//===============================================================================
-//
 //===============================================================================
 
 SerializationBufferPtr AttributeProperty::SaveToPacket(const std::string& loginOfModifier) const
@@ -154,8 +146,6 @@ SerializationBufferPtr AttributeProperty::SaveToPacket(const std::string& loginO
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 void Folder::CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
 {
@@ -172,8 +162,6 @@ void Folder::CreateFromBase(DeserializationBuffer& buffer, const std::vector<uin
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 void Folder::CreateFromHistory(DeserializationBuffer& buffer, uint32_t ts)
 {
@@ -185,8 +173,6 @@ void Folder::CreateFromHistory(DeserializationBuffer& buffer, uint32_t ts)
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 void Folder::CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32_t newId)
 {
@@ -197,8 +183,6 @@ void Folder::CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32
 	buffer.GetString<uint8_t>(name);
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void Folder::SaveToBase(SerializationBuffer& buffer) const
@@ -215,8 +199,6 @@ void Folder::SaveToBase(SerializationBuffer& buffer) const
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 void Folder::SaveToHistory(TextsDatabasePtr db, const std::string& loginOfLastModifier) const
 {
@@ -229,8 +211,6 @@ void Folder::SaveToHistory(TextsDatabasePtr db, const std::string& loginOfLastMo
 	buffer.PushStringWithoutZero<uint8_t>(name);
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 SerializationBufferPtr Folder::SaveToPacket(const std::string& loginOfModifier) const
@@ -246,8 +226,6 @@ SerializationBufferPtr Folder::SaveToPacket(const std::string& loginOfModifier) 
 	return bufPtr;
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void TextTranslated::CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
@@ -266,8 +244,6 @@ void TextTranslated::CreateFromBase(DeserializationBuffer& buffer, const std::ve
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 void TextTranslated::SaveToBase(SerializationBuffer& buffer) const
 {
@@ -285,8 +261,6 @@ void TextTranslated::SaveToBase(SerializationBuffer& buffer) const
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 void TextTranslated::SaveToHistory(TextsDatabasePtr db, uint32_t folderId)
 {
@@ -298,8 +272,6 @@ void TextTranslated::SaveToHistory(TextsDatabasePtr db, uint32_t folderId)
 	buffer.PushStringWithoutZero<uint8_t>(id);
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 SerializationBufferPtr TextTranslated::SaveToPacket(uint32_t folderId, const std::string& loginOfModifier) const
@@ -315,8 +287,6 @@ SerializationBufferPtr TextTranslated::SaveToPacket(uint32_t folderId, const std
 	return bufPtr;
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void AttributeInText::CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
@@ -342,8 +312,6 @@ void AttributeInText::CreateFromBase(DeserializationBuffer& buffer, const std::v
 	}
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void AttributeInText::SaveToBase(SerializationBuffer& buffer) const

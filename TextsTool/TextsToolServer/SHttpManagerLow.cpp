@@ -11,8 +11,6 @@
 void ExitMsg(const std::string& message);
 
 //===============================================================================
-//
-//===============================================================================
 
 SHttpManagerLow::SHttpManagerLow(std::function<void(DeserializationBuffer&, SerializationBuffer&)> requestCallback)
 {
@@ -21,8 +19,6 @@ SHttpManagerLow::SHttpManagerLow(std::function<void(DeserializationBuffer&, Seri
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 void SHttpManagerLow::StartHttpListening()
 {
@@ -30,15 +26,11 @@ void SHttpManagerLow::StartHttpListening()
 }
 
 //===============================================================================
-//
-//===============================================================================
 
 SHttpManagerLow::~SHttpManagerLow()
 {
 }
 
-//===============================================================================
-//
 //===============================================================================
 
 void SHttpManagerLow::Update(double dt)
