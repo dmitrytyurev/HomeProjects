@@ -50,21 +50,21 @@ public:
 
 //===============================================================================
 
-void SClientMessagesMgr::SaveToHistory(TextsDatabasePtr db, const std::string& login, uint8_t ts, const DeserializationBuffer& bufIn)
+void SClientMessagesMgr::SaveToHistory(TextsDatabasePtr db, const std::string& login, uint32_t ts, const DeserializationBuffer& bufIn)
 {
 	auto& bufOut = db->GetHistoryBuffer();
 	bufOut.PushStringWithoutZero<uint8_t>(login);
-	bufOut.Push(ts);
+	bufOut.Push2<uint32_t>(ts);
 	bufOut.Push(bufIn, true); // Заберём все данные из буфера, не важно сколько было из него уже прочитано // !!! Как это по ссылке на константу вызывается неконстантная функция??
 }
 
 //===============================================================================
 
-void SClientMessagesMgr::SendToClients(const std::string& dbName, uint8_t ts, const DeserializationBuffer& buf, const std::string& loginOfLastModifier)
+void SClientMessagesMgr::SendToClients(const std::string& dbName, uint32_t ts, const DeserializationBuffer& buf, const std::string& loginOfLastModifier)
 {
 	auto bufPtr = std::make_shared<SerializationBuffer>();
 	bufPtr->PushStringWithoutZero<uint8_t>(loginOfLastModifier);
-	bufPtr->Push(ts);
+	bufPtr->Push2<uint32_t>(ts);
 	bufPtr->Push(buf, true); // Заберём все данные из буфера, не важно сколько было из него уже прочитано
 	AddPacketToClients(bufPtr, dbName);
 }
@@ -199,8 +199,8 @@ void SClientMessagesMgr::Update(double dt)
 				uint32_t prevOffsModified = 0;
 				bool isSucces = ModifyDbDeleteText(*buf, *db, prevTsModified, prevOffsModified);                 // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);   // Запись в файл истории
-				db->GetHistoryBuffer().Push(prevTsModified);
-				db->GetHistoryBuffer().Push(prevOffsModified);
+				db->GetHistoryBuffer().Push2<uint32_t>(prevTsModified);
+				db->GetHistoryBuffer().Push2<uint32_t>(prevOffsModified);
 				if (isSucces) {
 					SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
 				}
@@ -212,8 +212,8 @@ void SClientMessagesMgr::Update(double dt)
 				uint32_t prevOffsModified = 0;
 				bool isSucces = ModifyDbMoveTextToFolder(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);               // Запись в файл истории
-				db->GetHistoryBuffer().Push(prevTsModified);
-				db->GetHistoryBuffer().Push(prevOffsModified);
+				db->GetHistoryBuffer().Push2<uint32_t>(prevTsModified);
+				db->GetHistoryBuffer().Push2<uint32_t>(prevOffsModified);
 				if (isSucces) {
 					SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
 				}
@@ -225,8 +225,8 @@ void SClientMessagesMgr::Update(double dt)
 				uint32_t prevOffsModified = 0;
 				bool isSucces = ModifyDbChangeBaseText(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);               // Запись в файл истории
-				db->GetHistoryBuffer().Push(prevTsModified);
-				db->GetHistoryBuffer().Push(prevOffsModified);
+				db->GetHistoryBuffer().Push2<uint32_t>(prevTsModified);
+				db->GetHistoryBuffer().Push2<uint32_t>(prevOffsModified);
 				if (isSucces) {
 					SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
 				}
@@ -241,10 +241,10 @@ void SClientMessagesMgr::Update(double dt)
 				buf->offset = keepOffset; // Восстнавливаем буфер на состояние "прочитан только тип операции"
 				auto& historyBuf = db->GetHistoryBuffer();                     // Запись в файл истории
 				historyBuf.PushStringWithoutZero<uint8_t>(client->_login);
-				historyBuf.Push(ts);
-				historyBuf.Push(actionType);
-				historyBuf.Push(prevTsModified);
-				historyBuf.Push(prevOffsModified);
+				historyBuf.Push2<uint32_t>(ts);
+				historyBuf.Push2<uint8_t>(actionType);
+				historyBuf.Push2<uint32_t>(prevTsModified);
+				historyBuf.Push2<uint32_t>(prevOffsModified);
 				historyBuf.Push(*buf, false); // Заберём только непрочитанные данные (всё кроме типа операции)
 				if (isSucces) {
 					SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
@@ -260,10 +260,10 @@ void SClientMessagesMgr::Update(double dt)
 				buf->offset = keepOffset; // Восстнавливаем буфер на состояние "прочитан только тип операции"
 				auto& historyBuf = db->GetHistoryBuffer();                     // Запись в файл истории
 				historyBuf.PushStringWithoutZero<uint8_t>(client->_login);
-				historyBuf.Push(ts);
-				historyBuf.Push(actionType);
-				historyBuf.Push(prevTsModified);
-				historyBuf.Push(prevOffsModified);
+				historyBuf.Push2<uint32_t>(ts);
+				historyBuf.Push2<uint8_t>(actionType);
+				historyBuf.Push2<uint32_t>(prevTsModified);
+				historyBuf.Push2<uint32_t>(prevOffsModified);
 				historyBuf.Push(*buf, false); // Заберём только непрочитанные данные (всё кроме типа операции)
 				if (isSucces) {
 					SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
@@ -279,10 +279,10 @@ void SClientMessagesMgr::Update(double dt)
 				buf->offset = keepOffset; // Восстнавливаем буфер на состояние "прочитан только тип операции"
 				auto& historyBuf = db->GetHistoryBuffer();                     // Запись в файл истории
 				historyBuf.PushStringWithoutZero<uint8_t>(client->_login);
-				historyBuf.Push(ts);
-				historyBuf.Push(actionType);
-				historyBuf.Push(prevTsModified);
-				historyBuf.Push(prevOffsModified);
+				historyBuf.Push2<uint32_t>(ts);
+				historyBuf.Push2<uint8_t>(actionType);
+				historyBuf.Push2<uint32_t>(prevTsModified);
+				historyBuf.Push2<uint32_t>(prevOffsModified);
 				historyBuf.Push(*buf, false); // Заберём только непрочитанные данные (всё кроме типа операции)
 				if (isSucces) {
 					SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
@@ -766,8 +766,8 @@ bool SClientMessagesMgr::IfKeyALess(const uint8_t* p1, int size1, const uint8_t*
 SerializationBufferPtr SClientMessagesMgr::MakeDatabasesListMessage()
 {
 	auto buffer = std::make_shared<SerializationBuffer>();
-	buffer->Push((uint8_t)EventType::ReplyListOfDatabases);
-	buffer->Push((uint32_t)_app->_dbs.size());
+	buffer->Push2<uint8_t>(EventType::ReplyListOfDatabases);
+	buffer->Push2<uint32_t>(_app->_dbs.size());
 
 	for (const auto& db : _app->_dbs) {
 		buffer->PushStringWithoutZero<uint8_t>(db->_dbName);
@@ -795,10 +795,10 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 
 	auto buffer = std::make_shared<SerializationBuffer>();
 
-	buffer->Push((uint8_t)EventType::ReplySync);
+	buffer->Push2<uint8_t>(EventType::ReplySync);
 
 	// Посылаем аттрибуты таблицы целиком
-	buffer->Push((uint32_t)db._attributeProps.size());
+	buffer->Push2<uint32_t>(db._attributeProps.size());
 	for (const auto& atribProp : db._attributeProps) {
 		atribProp.SaveToBase(*buffer);
 	}
@@ -830,9 +830,9 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 		std::inserter(foldersToDelete, foldersToDelete.begin()));
 
 	// Добавим в пакет айдишники папок на удаление
-	buffer->Push((uint32_t)foldersToDelete.size());
+	buffer->Push2<uint32_t>(foldersToDelete.size());
 	for (auto id : foldersToDelete) {
-		buffer->Push(id);
+		buffer->Push2<uint32_t>(id);
 	}
 
 	// Найдём каталоги сервера подлежащие созданию на клиенте (в серверном списке есть, а в клиентском их нет)
@@ -841,7 +841,7 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 		std::inserter(foldersToCreate, foldersToCreate.begin()));
 
 	// Добавим в пакет инфу о папках на создание
-	buffer->Push((uint32_t)foldersToCreate.size());
+	buffer->Push2<uint32_t>(foldersToCreate.size());
 	for (auto folderId : foldersToCreate) {
 		auto& f = db._folders;
 		auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
@@ -875,7 +875,7 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 		}
 	}
 
-	buffer->Push((uint32_t)foldersSameIds.size());
+	buffer->Push2<uint32_t>(foldersSameIds.size());
 
 	// Обрабатываем папки, которые есть на клиенте и сервере, но время модификации у них разное
 
@@ -885,10 +885,10 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 
 		// Начали записывать инфу об отличающейся папке
 
-		buffer->Push(srvFoldrItr->id);
+		buffer->Push2<uint32_t>(srvFoldrItr->id);
 		buffer->PushStringWithoutZero<uint16_t>(srvFoldrItr->name);
-		buffer->Push(srvFoldrItr->parentId);
-		buffer->Push(srvFoldrItr->timestampModified);
+		buffer->Push2<uint32_t>(srvFoldrItr->parentId);
+		buffer->Push2<uint32_t>(srvFoldrItr->timestampModified);
 
 		// Заполняем ключи серверных текстов и ссылки на них для быстрой сортировки по ключам
 
@@ -946,12 +946,12 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 				++intervalsDifferNum;
 			}
 		}
-		buffer->Push(intervalsDifferNum);
+		buffer->Push2<uint32_t>(intervalsDifferNum);
 		for (uint32_t i = 0; i < intervals.size(); ++i) {
 			if (intervals[i].textsNum != cltFoldrItr->intervals[i].textsInIntervalNum ||
 				intervals[i].hash != cltFoldrItr->intervals[i].hashOfKeys) {
-				buffer->Push(i);
-				buffer->Push(intervals[i].textsNum);
+				buffer->Push2<uint32_t>(i);
+				buffer->Push2<uint32_t>(intervals[i].textsNum);
 
 				for (uint32_t i2 = intervals[i].firstTextIdx; i2 < intervals[i].firstTextIdx + intervals[i].textsNum; ++i2) {
 					textsKeysRefs[i2]->textRef->SaveToBase(*buffer);

@@ -97,14 +97,14 @@ void DbSerializer::SaveDatabase()
 	SerializationBuffer buffer;
 	buffer.PushStringWithoutZero("TDBF0001");
 
-	buffer.Push(_pDataBase->_newAttributeId);
-	buffer.Push((uint32_t)_pDataBase->_attributeProps.size());
+	buffer.Push2<uint8_t>(_pDataBase->_newAttributeId);
+	buffer.Push2<uint32_t>(_pDataBase->_attributeProps.size());
 	for (const auto& atribProp : _pDataBase->_attributeProps) {
 		atribProp.SaveToBase(buffer);
 	}
 
-	buffer.Push(_pDataBase->_newFolderId);
-	buffer.Push((uint32_t)_pDataBase->_folders.size());
+	buffer.Push2<uint32_t>(_pDataBase->_newFolderId);
+	buffer.Push2<uint32_t>(_pDataBase->_folders.size());
 	for (const auto& folder : _pDataBase->_folders) {
 		folder.SaveToBase(buffer);
 	}

@@ -35,9 +35,9 @@ void SMessagesRepacker::RepackMessagesOutToPackets(std::shared_ptr<SConnectedCli
 			for (int i = 0; i < n; ++i) {
 				int curSize = (i == n - 1 ? v[0]->buffer.size() - (n - 1) * packetMaxSize : packetMaxSize);
 				SerializationBuffer sbuf;
-				sbuf.Push((uint8_t)PacketDataType::PartOfMessage);
-				sbuf.Push((uint32_t)v[0]->buffer.size()); // Длина полного сообщений
-				sbuf.Push((uint32_t)curSize);  // Длина текущего куска сообщения
+				sbuf.Push2<uint8_t>(PacketDataType::PartOfMessage);
+				sbuf.Push2<uint32_t>(v[0]->buffer.size()); // Длина полного сообщений
+				sbuf.Push2<uint32_t>(curSize);  // Длина текущего куска сообщения
 				sbuf.PushBytes(v[0]->buffer.data() + offs, curSize);
 				offs += curSize;
 				clLow->_packetsQueueOut.PushPacket(sbuf.buffer, HttpPacket::Status::WAITING_FOR_PACKING);
@@ -60,10 +60,10 @@ void SMessagesRepacker::RepackMessagesOutToPackets(std::shared_ptr<SConnectedCli
 			}
 			// Заносим n очередных сообщений в один пакет
 			SerializationBuffer sbuf;
-			sbuf.Push(PacketDataType::WholeMessages);
-			sbuf.Push((uint32_t)n); // Количество целых сообщений в пакете
+			sbuf.Push2<uint8_t>(PacketDataType::WholeMessages);
+			sbuf.Push2<uint32_t>(n); // Количество целых сообщений в пакете
 			for (int i = 0; i < n; ++i) {
-				sbuf.Push((uint32_t)v[0]->buffer.size());
+				sbuf.Push2<uint32_t>(v[0]->buffer.size());
 				sbuf.PushBytes(v[0]->buffer.data(), v[0]->buffer.size());
 				v.erase(v.begin());
 			}

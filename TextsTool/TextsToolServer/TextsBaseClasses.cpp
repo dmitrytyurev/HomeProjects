@@ -71,15 +71,15 @@ void AttributeProperty::CreateFromBase(DeserializationBuffer& buffer)
 
 void AttributeProperty::SaveToBase(SerializationBuffer& buffer) const
 {
-	buffer.Push(id);
-	buffer.Push(visiblePosition);
+	buffer.Push2<uint8_t>(id);
+	buffer.Push2<uint8_t>(visiblePosition);
 	uint8_t flag = isVisible;
-	buffer.Push(flag);
-	buffer.Push(timestampCreated);
+	buffer.Push2<uint8_t>(flag);
+	buffer.Push2<uint32_t>(timestampCreated);
 	buffer.PushStringWithoutZero<uint8_t>(name);
-	buffer.Push(type);
-	buffer.Push(param1);
-	buffer.Push(param2);
+	buffer.Push2<uint8_t>(type);
+	buffer.Push2<uint32_t>(param1);
+	buffer.Push2<uint32_t>(param2);
 }
 
 //===============================================================================
@@ -116,15 +116,15 @@ void AttributeProperty::SaveToHistory(TextsDatabasePtr db, const std::string& lo
 {
 	auto& buffer = db->GetHistoryBuffer();
 	buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
-	buffer.Push(timestampCreated);
-	buffer.Push(static_cast<uint8_t>(EventType::CreateAttribute));
-	buffer.Push(id);
-	buffer.Push(visiblePosition);
-	buffer.Push(static_cast<uint8_t>(isVisible));
+	buffer.Push2<uint32_t>(timestampCreated);
+	buffer.Push2<uint8_t>(EventType::CreateAttribute);
+	buffer.Push2<uint8_t>(id);
+	buffer.Push2<uint8_t>(visiblePosition);
+	buffer.Push2<uint8_t>(isVisible);
 	buffer.PushStringWithoutZero<uint8_t>(name);
-	buffer.Push(type);
-	buffer.Push(param1);
-	buffer.Push(param2);
+	buffer.Push2<uint8_t>(type);
+	buffer.Push2<uint32_t>(param1);
+	buffer.Push2<uint32_t>(param2);
 }
 
 //===============================================================================
@@ -134,14 +134,14 @@ SerializationBufferPtr AttributeProperty::SaveToPacket(const std::string& loginO
 	auto bufPtr = std::make_shared<SerializationBuffer>();
 
 	bufPtr->PushStringWithoutZero<uint8_t>(loginOfModifier);
-	bufPtr->Push(timestampCreated);
-	bufPtr->Push(static_cast<uint8_t>(EventType::CreateAttribute));
-	bufPtr->Push(id);
-	bufPtr->Push(visiblePosition);
-	bufPtr->Push(static_cast<uint8_t>(isVisible));
+	bufPtr->Push2<uint32_t>(timestampCreated);
+	bufPtr->Push2<uint8_t>(EventType::CreateAttribute);
+	bufPtr->Push2<uint8_t>(id);
+	bufPtr->Push2<uint8_t>(visiblePosition);
+	bufPtr->Push2<uint8_t>(isVisible);
 	bufPtr->PushStringWithoutZero<uint8_t>(name);
-	bufPtr->Push(type);
-	bufPtr->Push(param1);
+	bufPtr->Push2<uint8_t>(type);
+	bufPtr->Push2<uint32_t>(param1);
 	return bufPtr;
 }
 
@@ -187,12 +187,12 @@ void Folder::CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32
 
 void Folder::SaveToBase(SerializationBuffer& buffer) const
 {
-	buffer.Push(id);
-	buffer.Push(timestampCreated);
-	buffer.Push(timestampModified);
+	buffer.Push2<uint32_t>(id);
+	buffer.Push2<uint32_t>(timestampCreated);
+	buffer.Push2<uint32_t>(timestampModified);
 	buffer.PushStringWithoutZero<uint16_t>(name);
-	buffer.Push(parentId);
-	buffer.Push((uint32_t)texts.size());
+	buffer.Push2<uint32_t>(parentId);
+	buffer.Push2<uint32_t>(texts.size());
 	for (const auto& text : texts) {
 		text->SaveToBase(buffer);
 	}
@@ -204,10 +204,10 @@ void Folder::SaveToHistory(TextsDatabasePtr db, const std::string& loginOfLastMo
 {
 	auto& buffer = db->GetHistoryBuffer();
 	buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
-	buffer.Push(timestampCreated);
-	buffer.Push(static_cast<uint8_t>(EventType::CreateFolder));
-	buffer.Push(id);
-	buffer.Push(parentId);
+	buffer.Push2<uint32_t>(timestampCreated);
+	buffer.Push2<uint8_t>(EventType::CreateFolder);
+	buffer.Push2<uint32_t>(id);
+	buffer.Push2<uint32_t>(parentId);
 	buffer.PushStringWithoutZero<uint8_t>(name);
 }
 
@@ -218,10 +218,10 @@ SerializationBufferPtr Folder::SaveToPacket(const std::string& loginOfModifier) 
 	auto bufPtr = std::make_shared<SerializationBuffer>();
 
 	bufPtr->PushStringWithoutZero<uint8_t>(loginOfModifier);
-	bufPtr->Push(timestampCreated);
-	bufPtr->Push(static_cast<uint8_t>(EventType::CreateFolder));
-	bufPtr->Push(id);
-	bufPtr->Push(parentId);
+	bufPtr->Push2<uint32_t>(timestampCreated);
+	bufPtr->Push2<uint8_t>(EventType::CreateFolder);
+	bufPtr->Push2<uint32_t>(id);
+	bufPtr->Push2<uint32_t>(parentId);
 	bufPtr->PushStringWithoutZero<uint8_t>(name);
 	return bufPtr;
 }
@@ -248,13 +248,13 @@ void TextTranslated::CreateFromBase(DeserializationBuffer& buffer, const std::ve
 void TextTranslated::SaveToBase(SerializationBuffer& buffer) const
 {
 	buffer.PushStringWithoutZero<uint8_t>(id);
-	buffer.Push(timestampCreated);
-	buffer.Push(timestampModified);
+	buffer.Push2<uint32_t>(timestampCreated);
+	buffer.Push2<uint32_t>(timestampModified);
 	buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
-	buffer.Push(offsLastModified);
+	buffer.Push2<uint32_t>(offsLastModified);
 	buffer.PushStringWithoutZero<uint16_t>(baseText);
 	uint8_t attributesNum = static_cast<uint8_t>(attributes.size());
-	buffer.Push(attributesNum);
+	buffer.Push2<uint8_t>(attributesNum);
 	for (const auto& attrib : attributes) {
 		attrib.SaveToBase(buffer);
 	}
@@ -266,9 +266,9 @@ void TextTranslated::SaveToHistory(TextsDatabasePtr db, uint32_t folderId)
 {
 	auto& buffer = db->GetHistoryBuffer();
 	buffer.PushStringWithoutZero<uint8_t>(loginOfLastModifier);
-	buffer.Push(timestampCreated);
-	buffer.Push(static_cast<uint8_t>(EventType::CreateText));
-	buffer.Push(folderId);
+	buffer.Push2<uint32_t>(timestampCreated);
+	buffer.Push2<uint8_t>(EventType::CreateText);
+	buffer.Push2<uint32_t>(folderId);
 	buffer.PushStringWithoutZero<uint8_t>(id);
 }
 
@@ -279,8 +279,8 @@ SerializationBufferPtr TextTranslated::SaveToPacket(uint32_t folderId, const std
 	auto bufPtr = std::make_shared<SerializationBuffer>();
 
 	bufPtr->PushStringWithoutZero<uint8_t>(loginOfModifier);
-	bufPtr->Push(timestampCreated);
-	bufPtr->Push(static_cast<uint8_t>(EventType::CreateText));
+	bufPtr->Push2<uint32_t>(timestampCreated);
+	bufPtr->Push2<uint8_t>(EventType::CreateText);
 	bufPtr->PushStringWithoutZero<uint8_t>(loginOfLastModifier);
 	bufPtr->PushStringWithoutZero<uint8_t>(id);
 
@@ -316,7 +316,7 @@ void AttributeInText::CreateFromBase(DeserializationBuffer& buffer, const std::v
 
 void AttributeInText::SaveToBase(SerializationBuffer& buffer) const
 {
-	buffer.Push(id);
+	buffer.Push2<uint8_t>(id);
 	switch (type) {
 	case AttributeProperty::Translation_t:
 	case AttributeProperty::CommonText_t:
@@ -325,7 +325,7 @@ void AttributeInText::SaveToBase(SerializationBuffer& buffer) const
 	}
 	break;
 	case AttributeProperty::Checkbox_t:
-		buffer.Push(flagState);
+		buffer.Push2<uint8_t>(flagState);
 		break;
 
 	default:

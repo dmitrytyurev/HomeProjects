@@ -100,7 +100,7 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 
 	MTConnections::Account* pAccount = FindAccount(login, password);
 	if (!pAccount) {
-		response.Push((uint8_t)AnswersToClient::WrongLoginOrPassword);
+		response.Push2<uint8_t>(AnswersToClient::WrongLoginOrPassword);
 		return;
 	}
 
@@ -115,8 +115,8 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 			Utils::MutexLock lock(_connectQueue.mutex);
 			_connectQueue.queue.emplace_back(login, pAccount->sessionId);
 		}
-		response.Push((uint8_t)AnswersToClient::Connected);
-		response.Push(pAccount->sessionId);
+		response.Push2<uint8_t>(AnswersToClient::Connected);
+		response.Push2<uint32_t>(pAccount->sessionId);
 		return;
 	}
 	break;
@@ -126,12 +126,12 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 		uint32_t sessionId = request.GetUint<uint32_t>();
 		uint32_t requestedPacketN = request.GetUint<uint32_t>();
 		if (pAccount->sessionId != sessionId) {
-			response.Push((uint8_t)AnswersToClient::WrongSession);
+			response.Push2<uint8_t>(AnswersToClient::WrongSession);
 			return;
 		}
 		auto itClientLow = std::find_if(std::begin(_connections.clients), std::end(_connections.clients), [login](const SConnectedClientLow::Ptr& el) { return el->_login == login; });
 		if (itClientLow == std::end(_connections.clients)) {
-			response.Push((uint8_t)AnswersToClient::ClientNotConnected);
+			response.Push2<uint8_t>(AnswersToClient::ClientNotConnected);
 			//response.Push(pAccount->sessionId);     Сложилось впечатление, что эти параметры не нужны на клиенте. Получении такого ответа, клиент должен просто сделать reconnect
 			//response.Push(TIMEOUT_CLIENT_NOT_CONNECTED);
 			return;
@@ -150,16 +150,16 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 		// Расчитаем индекс в очереди пакета с запрашиваемым номером requestedPacketN
 		int requestedPacketIndex = requestedPacketN - (*itClientLow)->_packetsQueueOut.lastPushedPacketN + queue.size() - 1;
 		if (requestedPacketIndex < 0 || requestedPacketIndex >= (int)queue.size() || (NEED_PACK_PACKETS && queue[requestedPacketIndex]->_status != HttpPacket::Status::PACKED)) {
-			response.Push((uint8_t)AnswersToClient::NoSuchPacketYet);
-			response.Push(TIMEOUT_NO_SUCH_PACKET);
+			response.Push2<uint8_t>(AnswersToClient::NoSuchPacketYet);
+			response.Push2<uint32_t>(TIMEOUT_NO_SUCH_PACKET);
 			return;
 		}
 		// Проверим, готов ли на отсылку следующий по номеру пакет
 		int nextPacketIndex = (requestedPacketN + 1) - (*itClientLow)->_packetsQueueOut.lastPushedPacketN + queue.size() - 1;
 		bool isNextPacketReadyToSend = (nextPacketIndex >= 0 && nextPacketIndex < (int)queue.size() && (queue[nextPacketIndex]->_status == HttpPacket::Status::PACKED || !NEED_PACK_PACKETS));
 		uint32_t timeoutToSend = isNextPacketReadyToSend ? TIMEOUT_NEXT_PACKET_READY : TIMEOUT_NEXT_PACKET_NOT_READY;
-		response.Push((uint8_t)AnswersToClient::PacketSent);
-		response.Push(timeoutToSend);
+		response.Push2<uint8_t>(AnswersToClient::PacketSent);
+		response.Push2<uint32_t>(timeoutToSend);
 		response.PushBytes(queue[requestedPacketIndex]->_packetData.data(), queue[requestedPacketIndex]->_packetData.size());
 		return;
 	}
@@ -172,12 +172,12 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 		Log("  sessionId: " + std::to_string(sessionId) + " packetN: " + std::to_string(packetN));
 
 		if (pAccount->sessionId != sessionId) {
-			response.Push((uint8_t)AnswersToClient::WrongSession);
+			response.Push2<uint8_t>(AnswersToClient::WrongSession);
 			return;
 		}
 		auto itClientLow = std::find_if(std::begin(_connections.clients), std::end(_connections.clients), [login](const SConnectedClientLow::Ptr& el) { return el->_login == login; });
 		if (itClientLow == std::end(_connections.clients)) {
-			response.Push((uint8_t)AnswersToClient::ClientNotConnected);
+			response.Push2<uint8_t>(AnswersToClient::ClientNotConnected);
 			//response.Push(pAccount->sessionId);     Сложилось впечатление, что эти параметры не нужны на клиенте. Получении такого ответа, клиент должен просто сделать reconnect
 			//response.Push(TIMEOUT_CLIENT_NOT_CONNECTED);
 			return;
@@ -189,12 +189,12 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 			(*itClientLow)->_expectedClientPacketN++;
 			(*itClientLow)->_packetsQueueIn.emplace_back(std::make_shared<HttpPacket>(request, HttpPacket::Status::RECEIVED));
 		}
-		response.Push((uint8_t)AnswersToClient::PacketReceived);
+		response.Push2<uint8_t>(AnswersToClient::PacketReceived);
 	}
 	break;
 	default:
 		Log("SHttpManager::RequestProcessor: unknown requestType");
-		response.Push((uint8_t)AnswersToClient::UnknownRequest);
+		response.Push2<uint8_t>(AnswersToClient::UnknownRequest);
 		return;
 	}
 }
