@@ -44,7 +44,7 @@ void test()
 	folder.timestampCreated = 12345;
 	folder.timestampModified = 54321;
 
-	TextTranslated::Ptr textPtr = std::make_shared<TextTranslated>();
+	TextTranslatedPtr textPtr = std::make_shared<TextTranslated>();
 
 	textPtr->baseText = "Base Text";
 	textPtr->id = "Text ID";

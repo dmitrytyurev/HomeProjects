@@ -43,8 +43,6 @@ class STextsToolApp;
 class SConnectedClient
 {
 public:
-	using Ptr = std::shared_ptr<SConnectedClient>;
-
 	SConnectedClient(const std::string& login, uint32_t sessionId);
 
 	std::string _login;
@@ -52,8 +50,9 @@ public:
 	std::string _dbName;  // Имя база, с которой сейчас работает клиент
 	bool _syncFinished = false; // Ставится в true, когда в _msgsQueueOut записаны все сообщения стартовой синхронизации и значит можно добавлять сообщения синхронизации с других клиентов
 	std::vector<SerializationBufferPtr>   _msgsQueueOut; // Очередь сообщений, которые нужно отослать клиенту
-	std::vector<DeserializationBuffer::Ptr> _msgsQueueIn;  // Очередь пришедших от клиента сообщений
+	std::vector<DeserializationBufferPtr> _msgsQueueIn;  // Очередь пришедших от клиента сообщений
 };
+using SConnectedClientPtr = std::shared_ptr<SConnectedClient>;
 
 
 //===============================================================================
@@ -67,7 +66,7 @@ public:
 	void Update(double dt);
 
 	std::vector<TextsDatabasePtr> _dbs;
-	std::vector<SConnectedClient::Ptr> _clients;
+	std::vector<SConnectedClientPtr> _clients;
 
 	SClientMessagesMgr _messagesMgr;
 	SHttpManager       _httpMgr;

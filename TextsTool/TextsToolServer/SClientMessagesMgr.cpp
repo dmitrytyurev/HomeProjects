@@ -444,7 +444,7 @@ bool SClientMessagesMgr::ModifyDbDeleteText(DeserializationBuffer& buf, TextsDat
 	std::string textId;
 	buf.GetString<uint8_t>(textId);
 	for (auto& f : db._folders) {
-		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslated::Ptr& el) { return el->id == textId; });
+		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
 		if (result != std::end(f.texts)) {
 			prevTsModified = (*result)->timestampModified;
 			prevOffsModified = (*result)->offsLastModified;
@@ -472,9 +472,9 @@ bool SClientMessagesMgr::ModifyDbMoveTextToFolder(
 	uint32_t newFolderId = buf.GetUint32();
 
 	for (auto& f : db._folders) {
-		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslated::Ptr& el) { return el->id == textId; });
+		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
 		if (result != std::end(f.texts)) {
-			TextTranslated::Ptr tmpTextPtr = *result;
+			TextTranslatedPtr tmpTextPtr = *result;
 			f.texts.erase(result);
 			f.timestampModified = ts;
 			for (auto& f2 : db._folders) {
@@ -514,9 +514,9 @@ bool  SClientMessagesMgr::ModifyDbChangeBaseText(
 	buf.GetString<uint16_t>(newBaseText);
 
 	for (auto& f : db._folders) {
-		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslated::Ptr& el) { return el->id == textId; });
+		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
 		if (result != std::end(f.texts)) {
-			TextTranslated::Ptr tmpTextPtr = *result;
+			TextTranslatedPtr tmpTextPtr = *result;
 			f.timestampModified = ts;
 			tmpTextPtr->baseText = newBaseText;
 			tmpTextPtr->loginOfLastModifier = modifierLogin;
@@ -547,11 +547,11 @@ bool  SClientMessagesMgr::ModifyDbAddAttributeToText(
 	uint8_t attributeId = buf.GetUint8();
 	uint8_t attributeDataType = buf.GetUint8();
 
-	TextTranslated::Ptr tmpTextPtr;
+	TextTranslatedPtr tmpTextPtr;
 	for (auto& f : db._folders) {
-		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslated::Ptr& el) { return el->id == textId; });
+		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
 		if (result != std::end(f.texts)) {
-			TextTranslated::Ptr tmpTextPtr = *result;
+			TextTranslatedPtr tmpTextPtr = *result;
 			f.timestampModified = ts;
 			break;
 		}
@@ -613,11 +613,11 @@ bool  SClientMessagesMgr::ModifyDbDelAttributeFromText(
 	buf.GetString<uint8_t>(textId);
 	uint8_t attributeId = buf.GetUint8();
 
-	TextTranslated::Ptr tmpTextPtr;
+	TextTranslatedPtr tmpTextPtr;
 	for (auto& f : db._folders) {
-		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslated::Ptr& el) { return el->id == textId; });
+		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
 		if (result != std::end(f.texts)) {
-			TextTranslated::Ptr tmpTextPtr = *result;
+			TextTranslatedPtr tmpTextPtr = *result;
 			f.timestampModified = ts;
 			break;
 		}
@@ -659,11 +659,11 @@ bool  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 	uint8_t attributeId = buf.GetUint8();
 	uint8_t attributeDataType = buf.GetUint8();
 
-	TextTranslated::Ptr tmpTextPtr;
+	TextTranslatedPtr tmpTextPtr;
 	for (auto& f : db._folders) {
-		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslated::Ptr& el) { return el->id == textId; });
+		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
 		if (result != std::end(f.texts)) {
-			TextTranslated::Ptr tmpTextPtr = *result;
+			TextTranslatedPtr tmpTextPtr = *result;
 			f.timestampModified = ts;
 			break;
 		}
@@ -979,7 +979,7 @@ void SClientMessagesMgr::MakeKey(uint32_t tsModified, const std::string& textId,
 
 void SClientMessagesMgr::ConnectClient(const std::string& login, uint32_t sessionId)
 {
-	auto result = std::find_if(std::begin(_app->_clients), std::end(_app->_clients), [login](const SConnectedClient::Ptr& el) { return el->_login == login; });
+	auto result = std::find_if(std::begin(_app->_clients), std::end(_app->_clients), [login](const SConnectedClientPtr& el) { return el->_login == login; });
 	if (result != std::end(_app->_clients)) {
 		_app->_clients.erase(result);
 	}
@@ -1007,7 +1007,7 @@ void SClientMessagesMgr::ConnectClient(const std::string& login, uint32_t sessio
 
 void SClientMessagesMgr::DisconnectClient(const std::string& login, uint32_t sessionId)
 {
-	auto result = std::find_if(std::begin(_app->_clients), std::end(_app->_clients), [login](const SConnectedClient::Ptr& el) { return el->_login == login; });
+	auto result = std::find_if(std::begin(_app->_clients), std::end(_app->_clients), [login](const SConnectedClientPtr& el) { return el->_login == login; });
 	if (result != std::end(_app->_clients)) {
 		_app->_clients.erase(result);
 	}

@@ -73,8 +73,6 @@ public:
 class TextTranslated
 {
 public:
-	using Ptr = std::shared_ptr<TextTranslated>;
-
 	TextTranslated() {}
 	void CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);
 	void SaveToBase(SerializationBuffer& buffer) const;
@@ -93,6 +91,7 @@ public:
 	std::vector<AttributeInText> attributes; // Атрибуты текста с их данными
 };
 
+using TextTranslatedPtr = std::shared_ptr<TextTranslated>;
 
 //===============================================================================
 // Каталог с текстами и вложенными каталогами в базе текстов
@@ -116,7 +115,7 @@ public:
 	uint32_t timestampModified = 0;  // Время изменения данных папки или её текстов
 	std::string name;                // Имя папки
 	uint32_t parentId = 0;           // ID родительской папки
-	std::vector<TextTranslated::Ptr> texts;  // Тексты лежащие непосредственно в папке
+	std::vector<TextTranslatedPtr> texts;  // Тексты лежащие непосредственно в папке
 };
 
 //===============================================================================

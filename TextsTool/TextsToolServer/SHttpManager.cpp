@@ -129,7 +129,7 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 			response.PushUint8(AnswersToClient::WrongSession);
 			return;
 		}
-		auto itClientLow = std::find_if(std::begin(_connections.clients), std::end(_connections.clients), [login](const SConnectedClientLow::Ptr& el) { return el->_login == login; });
+		auto itClientLow = std::find_if(std::begin(_connections.clients), std::end(_connections.clients), [login](const SConnectedClientLowPtr& el) { return el->_login == login; });
 		if (itClientLow == std::end(_connections.clients)) {
 			response.PushUint8(AnswersToClient::ClientNotConnected);
 			//response.Push(pAccount->sessionId);     Сложилось впечатление, что эти параметры не нужны на клиенте. Получении такого ответа, клиент должен просто сделать reconnect
@@ -175,7 +175,7 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 			response.PushUint8(AnswersToClient::WrongSession);
 			return;
 		}
-		auto itClientLow = std::find_if(std::begin(_connections.clients), std::end(_connections.clients), [login](const SConnectedClientLow::Ptr& el) { return el->_login == login; });
+		auto itClientLow = std::find_if(std::begin(_connections.clients), std::end(_connections.clients), [login](const SConnectedClientLowPtr& el) { return el->_login == login; });
 		if (itClientLow == std::end(_connections.clients)) {
 			response.PushUint8(AnswersToClient::ClientNotConnected);
 			//response.Push(pAccount->sessionId);     Сложилось впечатление, что эти параметры не нужны на клиенте. Получении такого ответа, клиент должен просто сделать reconnect
@@ -215,7 +215,7 @@ MTConnections::Account* SHttpManager::FindAccount(const std::string& login, cons
 
 void SHttpManager::CreateClientLow(const std::string& login, uint32_t sessionId)
 {
-	auto result = std::find_if(std::begin(_connections.clients), std::end(_connections.clients), [login](const SConnectedClientLow::Ptr& el) { return el->_login == login; });
+	auto result = std::find_if(std::begin(_connections.clients), std::end(_connections.clients), [login](const SConnectedClientLowPtr& el) { return el->_login == login; });
 	if (result != std::end(_connections.clients)) {
 		(*result)->reinit(sessionId);
 	}

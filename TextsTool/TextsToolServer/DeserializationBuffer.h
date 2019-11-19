@@ -14,8 +14,6 @@ void ExitMsg(const std::string& message);
 class DeserializationBuffer
 {
 public:
-	using Ptr = std::unique_ptr<DeserializationBuffer>;
-
 	uint8_t GetUint8()
 	{
 		return GetUint<uint8_t>();
@@ -51,6 +49,9 @@ private:
 	template <typename T>
 	T GetUint();
 };
+
+using DeserializationBufferPtr = std::unique_ptr<DeserializationBuffer>;
+
 
 //===============================================================================
 //

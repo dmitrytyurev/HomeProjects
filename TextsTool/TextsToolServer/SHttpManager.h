@@ -16,8 +16,6 @@
 class HttpPacket
 {
 public:
-	using Ptr = std::shared_ptr<HttpPacket>;
-
 	enum class Status
 	{
 		// ---- Для пакетов с клиента
@@ -34,6 +32,8 @@ public:
 	std::vector<uint8_t> _packetData;
 	Status _status;
 };
+
+using HttpPacketPtr = std::shared_ptr<HttpPacket>;
 
 //===============================================================================
 //
@@ -56,7 +56,7 @@ public:
 class MTQueueOut
 {
 public:
-	std::vector<HttpPacket::Ptr> queue;
+	std::vector<HttpPacketPtr> queue;
 	uint32_t lastPushedPacketN = UINT32_MAX;     // Номер последнего добавленного в эту очередь пакета. По нему можем определить номера пакетов в очереди. А их используем для удаления из очереди пакетов, которые успешно дошли на клиент (им запрошен следущий пакет)
 												 // !!! Сделать логику для этого поля
 	void PushPacket(std::vector<uint8_t>& data, HttpPacket::Status status);
@@ -80,7 +80,6 @@ public:
 class SConnectedClientLow
 {
 public:
-	using Ptr = std::unique_ptr<SConnectedClientLow>;
 	SConnectedClientLow(const std::string& login, uint32_t sessionId);
 	void reinit(uint32_t sessionId);
 
@@ -88,12 +87,13 @@ public:
 	std::string _login;
 	uint32_t _sessionId = 0; // Копия поля MTConnections::Account::sessionId для быстрого доступа
 
-	std::vector<HttpPacket::Ptr> _packetsQueueIn;          // Очередь пакетов пришедших от клиента 
+	std::vector<HttpPacketPtr> _packetsQueueIn;          // Очередь пакетов пришедших от клиента 
 	uint32_t _expectedClientPacketN = 0;  // Номер пакета в рамках данной сессии, который мы ждём от клиента (защита от дублирования входящих пакетов)
 
 	MTQueueOut _packetsQueueOut;        // Очередь пакетов, которые нужно отослать клиенту
 	uint32_t _timestampLastRequest = 0; // Когда от этого клиента приходил последний запрос. Для разрыва соедиенения. !!! Сделать заполнение и использование
 };
+using SConnectedClientLowPtr = std::unique_ptr<SConnectedClientLow>;
 
 //===============================================================================
 //
@@ -110,7 +110,7 @@ public:
 		uint32_t sessionId = 0;  // ID текущей сессии, если в _connections есть клиент с таким login. А если нету, значит здесь ID последней завершившейся сессии
 	};
 
-	std::vector<SConnectedClientLow::Ptr> clients; // Низкоуровневая информация о подключенных клиентах
+	std::vector<SConnectedClientLowPtr> clients; // Низкоуровневая информация о подключенных клиентах
 	std::vector<Account> _accounts;  // Аккаунты, с которых могут подключаться клиенты
 	std::mutex mutex;
 };
