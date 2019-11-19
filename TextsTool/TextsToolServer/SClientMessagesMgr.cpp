@@ -79,7 +79,7 @@ void SClientMessagesMgr::Update(double dt)
 			uint8_t actionType = buf->GetUint<uint8_t>();
 			uint32_t ts = Utils::GetTime();
 			switch (actionType) {
-			case EventRequestSync:
+			case EventType::RequestSync:
 			{
 				buf->GetString<uint8_t>(client->_dbName);
 				TextsDatabasePtr db2 = GetDbPtrByDbName(client->_dbName);  // !!! Вероятно, тут надо проверить наличие базы и если нету, то запустить фоновую загрузку, а выполнение запроса отложить
@@ -88,13 +88,13 @@ void SClientMessagesMgr::Update(double dt)
 				client->_syncFinished = true;
 			}
 			break;
-			case EventRequestListOfDatabases:
+			case EventType::RequestListOfDatabases:
 			{
 				SerializationBufferPtr bufPtr = MakeDatabasesListMessage(); // Сформировать сообщение клиенту - со списком загруженных сервером баз с текстами
 				client->_msgsQueueOut.emplace_back(bufPtr);
 			}
 			break;
-			case EventCreateFolder:
+			case EventType::CreateFolder:
 			{
 				db->_folders.emplace_back();                            // Изменения в базе
 				Folder& folder = db->_folders.back();
@@ -104,7 +104,7 @@ void SClientMessagesMgr::Update(double dt)
 				AddPacketToClients(bufPtr, client->_dbName);
 			}
 			break;
-			case EventDeleteFolder:
+			case EventType::DeleteFolder:
 			{
 				bool isSucces = ModifyDbDeleteFolder(*buf, *db);
 				SaveToHistory(db, client->_login, ts, *buf);          // Запись в файл истории
@@ -113,7 +113,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case EventChangeFolderParent:
+			case EventType::ChangeFolderParent:
 			{
 				bool isSucces = ModifyDbChangeFolderParent(*buf, *db, ts);
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
@@ -122,7 +122,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case EventRenameFolder:
+			case EventType::RenameFolder:
 			{
 				bool isSucces = ModifyDbRenameFolder(*buf, *db, ts);              // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
@@ -131,7 +131,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case EventCreateAttribute:
+			case EventType::CreateAttribute:
 			{
 				db->_attributeProps.emplace_back();                 // Изменения в базе
 				AttributeProperty& ap = db->_attributeProps.back();
@@ -142,7 +142,7 @@ void SClientMessagesMgr::Update(double dt)
 				db->_newAttributeId = db->_attributeProps.back().id + 1;
 			}
 			break;
-			case EventDeleteAttribute:
+			case EventType::DeleteAttribute:
 			{
 				bool isSucces = ModifyDbDeleteAttribute(*buf, *db, ts);           // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
@@ -151,7 +151,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case EventRenameAttribute:
+			case EventType::RenameAttribute:
 			{
 				bool isSucces = ModifyDbRenameAttribute(*buf, *db);               // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
@@ -160,7 +160,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case EventChangeAttributeVis:
+			case EventType::ChangeAttributeVis:
 			{
 				bool isSucces = ModifyDbChangeAttributeVis(*buf, *db);            // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);      // Запись в файл истории
@@ -169,7 +169,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case EventCreateText:
+			case EventType::CreateText:
 			{
 				uint32_t folderId = buf->GetUint<uint32_t>();     // Изменения в базе
 				std::string textId;
@@ -193,7 +193,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case EventDeleteText:
+			case EventType::DeleteText:
 			{
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
@@ -206,7 +206,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case EventMoveTextToFolder:
+			case EventType::MoveTextToFolder:
 			{
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
@@ -219,7 +219,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case EventChangeBaseText:
+			case EventType::ChangeBaseText:
 			{
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
@@ -232,7 +232,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case EventAddAttributeToText:
+			case EventType::AddAttributeToText:
 			{
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
@@ -251,7 +251,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case EventDelAttributeFromText:
+			case EventType::DelAttributeFromText:
 			{
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
@@ -270,7 +270,7 @@ void SClientMessagesMgr::Update(double dt)
 				}
 			}
 			break;
-			case EventChangeAttributeInText:
+			case EventType::ChangeAttributeInText:
 			{
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
@@ -766,7 +766,7 @@ bool SClientMessagesMgr::IfKeyALess(const uint8_t* p1, int size1, const uint8_t*
 SerializationBufferPtr SClientMessagesMgr::MakeDatabasesListMessage()
 {
 	auto buffer = std::make_shared<SerializationBuffer>();
-	buffer->Push((uint8_t)EventReplyListOfDatabases);
+	buffer->Push((uint8_t)EventType::ReplyListOfDatabases);
 	buffer->Push((uint32_t)_app->_dbs.size());
 
 	for (const auto& db : _app->_dbs) {
@@ -795,7 +795,7 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 
 	auto buffer = std::make_shared<SerializationBuffer>();
 
-	buffer->Push((uint8_t)EventReplySync);
+	buffer->Push((uint8_t)EventType::ReplySync);
 
 	// Посылаем аттрибуты таблицы целиком
 	buffer->Push((uint32_t)db._attributeProps.size());

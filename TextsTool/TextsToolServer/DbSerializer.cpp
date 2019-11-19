@@ -262,35 +262,35 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 		uint8_t actionType = buf.GetUint<uint8_t>();
 		switch (actionType)
 		{
-		case EventCreateFolder:
+		case EventType::CreateFolder:
 			_pDataBase->_folders.emplace_back();
 			_pDataBase->_folders.back().CreateFromHistory(buf, ts);
 			_pDataBase->_newFolderId = _pDataBase->_folders.back().id + 1;
 			break;
-		case EventDeleteFolder:
+		case EventType::DeleteFolder:
 			SClientMessagesMgr::ModifyDbDeleteFolder(buf, *_pDataBase);
 		break;
-		case EventChangeFolderParent:
+		case EventType::ChangeFolderParent:
 			SClientMessagesMgr::ModifyDbChangeFolderParent(buf, *_pDataBase, ts);
 			break;
-		case EventRenameFolder:
+		case EventType::RenameFolder:
 			SClientMessagesMgr::ModifyDbRenameFolder(buf, *_pDataBase, ts);
 			break;
-		case EventCreateAttribute:
+		case EventType::CreateAttribute:
 			_pDataBase->_attributeProps.emplace_back();
 			_pDataBase->_attributeProps.back().CreateFromHistory(buf, ts);
 			_pDataBase->_newAttributeId = _pDataBase->_attributeProps.back().id + 1;
 			break;
-		case EventDeleteAttribute:
+		case EventType::DeleteAttribute:
 			SClientMessagesMgr::ModifyDbDeleteAttribute(buf, *_pDataBase, ts);
 			break;
-		case EventRenameAttribute:
+		case EventType::RenameAttribute:
 			SClientMessagesMgr::ModifyDbRenameAttribute(buf, *_pDataBase);
 			break;
-		case EventChangeAttributeVis:
+		case EventType::ChangeAttributeVis:
 			SClientMessagesMgr::ModifyDbChangeAttributeVis(buf, *_pDataBase);
 			break;
-		case EventCreateText:
+		case EventType::CreateText:
 		{
 			uint32_t folderId = buf.GetUint<uint32_t>();
 			std::string textId;
@@ -311,7 +311,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 			}
 		}
 		break;
-		case EventDeleteText:
+		case EventType::DeleteText:
 		{
 			uint32_t prevTsModified = 0;     // Модифицируем базу
 			uint32_t prevOffsModified = 0;
@@ -319,7 +319,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 			buf.offset += sizeof(uint32_t) + sizeof(uint32_t); // Пропускаем ts предыдущего изменения текста текста (для поиска файла истории с инфой о нём) и смещение в файле истории до него
 		}
 		break;
-		case EventMoveTextToFolder:
+		case EventType::MoveTextToFolder:
 		{
 			uint32_t prevTsModified = 0;    // Модифицируем базу
 			uint32_t prevOffsModified = 0;
@@ -327,7 +327,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 			buf.offset += sizeof(uint32_t) + sizeof(uint32_t); // Пропускаем ts предыдущего изменения текста текста (для поиска файла истории с инфой о нём) и смещение в файле истории до него
 		}
 		break;
-		case EventChangeBaseText:
+		case EventType::ChangeBaseText:
 		{
 			uint32_t prevTsModified = 0;   // Модифицируем базу
 			uint32_t prevOffsModified = 0;
@@ -335,7 +335,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 			buf.offset += sizeof(uint32_t) + sizeof(uint32_t); // Пропускаем ts предыдущего изменения текста текста (для поиска файла истории с инфой о нём) и смещение в файле истории до него
 		}
 		break;
-		case EventAddAttributeToText:
+		case EventType::AddAttributeToText:
 		{
 			buf.offset += sizeof(uint32_t) + sizeof(uint32_t); // Пропускаем ts предыдущего изменения текста текста (для поиска файла истории с инфой о нём) и смещение в файле истории до него
 			uint32_t prevTsModified = 0;  // Модифицируем базу
@@ -343,7 +343,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 			SClientMessagesMgr::ModifyDbAddAttributeToText(buf, *_pDataBase, modifierLogin, ts, offsToEventBegin, prevTsModified, prevOffsModified);
 		}
 		break;
-		case EventDelAttributeFromText:
+		case EventType::DelAttributeFromText:
 		{
 			buf.offset += sizeof(uint32_t) + sizeof(uint32_t); // Пропускаем ts предыдущего изменения текста текста (для поиска файла истории с инфой о нём) и смещение в файле истории до него
 			uint32_t prevTsModified = 0;  // Модифицируем базу
@@ -351,7 +351,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 			SClientMessagesMgr::ModifyDbDelAttributeFromText(buf, *_pDataBase, modifierLogin, ts, offsToEventBegin, prevTsModified, prevOffsModified);
 		}
 		break;
-		case EventChangeAttributeInText:
+		case EventType::ChangeAttributeInText:
 		{
 			buf.offset += sizeof(uint32_t) + sizeof(uint32_t); // Пропускаем ts предыдущего изменения текста текста (для поиска файла истории с инфой о нём) и смещение в файле истории до него
 			uint32_t prevTsModified = 0;  // Модифицируем базу

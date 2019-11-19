@@ -60,7 +60,7 @@ void SMessagesRepacker::RepackMessagesOutToPackets(std::shared_ptr<SConnectedCli
 			}
 			// «аносим n очередных сообщений в один пакет
 			SerializationBuffer sbuf;
-			sbuf.Push((uint8_t)PacketDataType::WholeMessages);
+			sbuf.Push(PacketDataType::WholeMessages);
 			sbuf.Push((uint32_t)n); //  оличество целых сообщений в пакете
 			for (int i = 0; i < n; ++i) {
 				sbuf.Push((uint32_t)v[0]->buffer.size());

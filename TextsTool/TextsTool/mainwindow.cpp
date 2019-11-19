@@ -365,7 +365,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    std::vector<uint8_t> packet = {0, 1, 0, 0, 0, 1, 0, 0, 0,     EventRequestListOfDatabases};   // Первые байты - это обёртка для парсинга сообщения из пакетов
+    std::vector<uint8_t> packet = {0, 1, 0, 0, 0, 1, 0, 0, 0,     EventType::RequestListOfDatabases};   // Первые байты - это обёртка для парсинга сообщения из пакетов
     httpManager.PutPacketToSendQueue(packet);
     httpManager.Connect("mylogin", "mypassword");
 }

@@ -7,57 +7,69 @@ const bool NEED_PACK_PACKETS = false;
 //
 //===============================================================================
 
-enum PacketDataType
+namespace PacketDataType
 {
-	WholeMessages = 0,  // В пакете одно или несколько целых сообщений
-	PartOfMessage = 1,  // В пакете одно незавершённое сообщение
-};
+	enum : uint8_t
+	{
+		WholeMessages = 0,  // В пакете одно или несколько целых сообщений
+		PartOfMessage = 1,  // В пакете одно незавершённое сообщение
+	};
+}
 
-enum class ClientRequestTypes // Типы запросов от клиента
-{
-    RequestConnect = 0,
-    RequestPacket = 1,
-    ProvidePacket = 2
-};
 
-enum class AnswersToClient // Коды ответов
+namespace ClientRequestTypes { // Типы запросов от клиента
+	enum : uint8_t  
+	{
+		RequestConnect = 0,
+		RequestPacket = 1,
+		ProvidePacket = 2
+	};
+}
+
+namespace AnswersToClient // Коды ответов
 {
-    UnknownRequest = 0,
-    WrongLoginOrPassword = 1,
-    WrongSession = 2,
-    ClientNotConnected = 3,
-    NoSuchPacketYet = 4,
-    Connected = 5,
-    PacketReceived = 6,
-    PacketSent = 7
-};
+	enum : uint8_t 
+	{
+		UnknownRequest = 0,
+		WrongLoginOrPassword = 1,
+		WrongSession = 2,
+		ClientNotConnected = 3,
+		NoSuchPacketYet = 4,
+		Connected = 5,
+		PacketReceived = 6,
+		PacketSent = 7
+	};
+}
 
 //===============================================================================
 //
 //===============================================================================
 
-enum EventType
+namespace EventType
 {
-	EventRequestSync = 0,               // Запрос синхронизации при подключении нового клиента
-	EventReplySync = 1,                 // Ответ на запрос EventRequestSync
-	EventRequestListOfDatabases = 2,    // Запрос списка баз с текстами
-	EventReplyListOfDatabases = 3,      // Ответ на запрос EventRequestListOfDatabases
+	enum : uint8_t
+	{
+		RequestSync = 0,               // Запрос синхронизации при подключении нового клиента
+		ReplySync = 1,                 // Ответ на запрос EventRequestSync
+		RequestListOfDatabases = 2,    // Запрос списка баз с текстами
+		ReplyListOfDatabases = 3,      // Ответ на запрос EventRequestListOfDatabases
 
-	// Блок событий, приходящих с клиента на сервер, а потом рассылаемых с сервера на остальные клиенты подключенные к данной базе
-	// Используются в файлах базы и истории, поэтому не могут быть изменены
-	EventCreateFolder = 100,            // Создание каталога для текстов
-	EventDeleteFolder = 101,            // Удаление каталога (должен не иметь текстов и вложенных каталогов)
-	EventChangeFolderParent = 102,      // Изменение родительского каталога
-	EventRenameFolder = 103,            // Переименование каталога
-	EventCreateAttribute = 104,         // Создание атрибута таблицы
-	EventDeleteAttribute = 105,         // Удаление атрибута таблицы
-	EventRenameAttribute = 106,         // Переименование атрибута таблицы
-	EventChangeAttributeVis = 107,      // Изменение отображаемого порядкового номера атрибута в таблице текстов или видимость атрибута
-	EventCreateText = 108,              // Создание текста
-	EventDeleteText = 109,              // Удаление текста
-	EventMoveTextToFolder = 110,        // Текст переместился в другую папку
-	EventChangeBaseText = 111,          // Изменился основной текст
-	EventAddAttributeToText = 112,      // В текст добавился атрибут
-	EventDelAttributeFromText = 113,    // Удалился атрибут из текста
-	EventChangeAttributeInText = 114,   // Изменилось значение атрибута в тексте
-};
+		// Блок событий, приходящих с клиента на сервер, а потом рассылаемых с сервера на остальные клиенты подключенные к данной базе
+		// Используются в файлах базы и истории, поэтому не могут быть изменены
+		CreateFolder = 100,            // Создание каталога для текстов
+		DeleteFolder = 101,            // Удаление каталога (должен не иметь текстов и вложенных каталогов)
+		ChangeFolderParent = 102,      // Изменение родительского каталога
+		RenameFolder = 103,            // Переименование каталога
+		CreateAttribute = 104,         // Создание атрибута таблицы
+		DeleteAttribute = 105,         // Удаление атрибута таблицы
+		RenameAttribute = 106,         // Переименование атрибута таблицы
+		ChangeAttributeVis = 107,      // Изменение отображаемого порядкового номера атрибута в таблице текстов или видимость атрибута
+		CreateText = 108,              // Создание текста
+		DeleteText = 109,              // Удаление текста
+		MoveTextToFolder = 110,        // Текст переместился в другую папку
+		ChangeBaseText = 111,          // Изменился основной текст
+		AddAttributeToText = 112,      // В текст добавился атрибут
+		DelAttributeFromText = 113,    // Удалился атрибут из текста
+		ChangeAttributeInText = 114,   // Изменилось значение атрибута в тексте
+	};
+}

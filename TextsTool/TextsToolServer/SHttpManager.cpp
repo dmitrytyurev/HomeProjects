@@ -106,7 +106,7 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 
 	switch (requestType)
 	{
-	case (uint8_t)ClientRequestTypes::RequestConnect:
+	case ClientRequestTypes::RequestConnect:
 	{
 		Log("Packet from client: RequestConnect");
 		++(pAccount->sessionId);
@@ -120,7 +120,7 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 		return;
 	}
 	break;
-	case (uint8_t)ClientRequestTypes::RequestPacket:
+	case ClientRequestTypes::RequestPacket:
 	{
 		Log("Packet from client: RequestPacket");
 		uint32_t sessionId = request.GetUint<uint32_t>();
@@ -164,7 +164,7 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 		return;
 	}
 	break;
-	case (uint8_t)ClientRequestTypes::ProvidePacket:
+	case ClientRequestTypes::ProvidePacket:
 	{
 		Log("Packet from client: ProvidePacket");
 		uint32_t sessionId = request.GetUint<uint32_t>();
