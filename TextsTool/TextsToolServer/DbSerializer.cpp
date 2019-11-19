@@ -204,8 +204,8 @@ void DbSerializer::LoadDatabaseInner(const std::string& fullFileName)
 	buf.offset = 8; // Пропускаем сигнатуру и номер версии
 	std::vector<uint8_t> attributesIdToType; // Для быстрой перекодировки id атрибута в его type
 
-	_pDataBase->_newAttributeId = buf.GetUint<uint8_t>();
-	uint32_t attributesNum = buf.GetUint<uint32_t>();
+	_pDataBase->_newAttributeId = buf.GetUint8();
+	uint32_t attributesNum = buf.GetUint32();
 	for (uint32_t i = 0; i < attributesNum; ++i) {
 		_pDataBase->_attributeProps.emplace_back();
 		_pDataBase->_attributeProps.back().CreateFromBase(buf);
@@ -216,8 +216,8 @@ void DbSerializer::LoadDatabaseInner(const std::string& fullFileName)
 		attributesIdToType[id] = _pDataBase->_attributeProps.back().type;
 	}
 
-	_pDataBase->_newFolderId = buf.GetUint<uint32_t>();
-	uint32_t foldersNum = buf.GetUint<uint32_t>();
+	_pDataBase->_newFolderId = buf.GetUint32();
+	uint32_t foldersNum = buf.GetUint32();
 	for (uint32_t i = 0; i < foldersNum; ++i) {
 		_pDataBase->_folders.emplace_back();
 		_pDataBase->_folders.back().CreateFromBase(buf, attributesIdToType);
@@ -258,8 +258,8 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 		uint32_t offsToEventBegin = buf.offset;
 		std::string modifierLogin;
 		buf.GetString<uint8_t>(modifierLogin);
-		uint32_t ts = buf.GetUint<uint32_t>();
-		uint8_t actionType = buf.GetUint<uint8_t>();
+		uint32_t ts = buf.GetUint32();
+		uint8_t actionType = buf.GetUint8();
 		switch (actionType)
 		{
 		case EventType::CreateFolder:
@@ -292,7 +292,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 			break;
 		case EventType::CreateText:
 		{
-			uint32_t folderId = buf.GetUint<uint32_t>();
+			uint32_t folderId = buf.GetUint32();
 			std::string textId;
 			buf.GetString<uint8_t>(textId);
 			auto& f = _pDataBase->_folders;

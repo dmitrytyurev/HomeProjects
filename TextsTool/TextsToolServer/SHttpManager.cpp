@@ -94,7 +94,7 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 	request.GetString<uint8_t>(login);
 	std::string password;
 	request.GetString<uint8_t>(password);
-	uint8_t requestType = request.GetUint<uint8_t>();
+	uint8_t requestType = request.GetUint8();
 
 	Utils::MutexLock lock(_connections.mutex);
 
@@ -123,8 +123,8 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 	case ClientRequestTypes::RequestPacket:
 	{
 		Log("Packet from client: RequestPacket");
-		uint32_t sessionId = request.GetUint<uint32_t>();
-		uint32_t requestedPacketN = request.GetUint<uint32_t>();
+		uint32_t sessionId = request.GetUint32();
+		uint32_t requestedPacketN = request.GetUint32();
 		if (pAccount->sessionId != sessionId) {
 			response.PushUint8(AnswersToClient::WrongSession);
 			return;
@@ -167,8 +167,8 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 	case ClientRequestTypes::ProvidePacket:
 	{
 		Log("Packet from client: ProvidePacket");
-		uint32_t sessionId = request.GetUint<uint32_t>();
-		uint32_t packetN = request.GetUint<uint32_t>();
+		uint32_t sessionId = request.GetUint32();
+		uint32_t packetN = request.GetUint32();
 		Log("  sessionId: " + std::to_string(sessionId) + " packetN: " + std::to_string(packetN));
 
 		if (pAccount->sessionId != sessionId) {

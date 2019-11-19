@@ -29,15 +29,15 @@ public:
 	ClientFolder() {}
 	ClientFolder(DeserializationBuffer& buf)
 	{
-		id = buf.GetUint<uint32_t>();
-		tsModified = buf.GetUint<uint32_t>();
-		uint32_t keysNum = buf.GetUint<uint32_t>();
+		id = buf.GetUint32();
+		tsModified = buf.GetUint32();
+		uint32_t keysNum = buf.GetUint32();
 		for (uint32_t keyIdx = 0; keyIdx < keysNum; ++keyIdx) {
 			keys.emplace_back(buf.GetVector<uint8_t>());
 		}
 		for (uint32_t intervalIdx = 0; intervalIdx < keysNum + 1; ++intervalIdx) {
-			uint32_t textsInIntervalNum = buf.GetUint<uint32_t>();    // Число текстов в интервале
-			uint64_t hashOfKeys = buf.GetUint<uint64_t>();            // CRC64 ключей входящих в группу текстов
+			uint32_t textsInIntervalNum = buf.GetUint32();    // Число текстов в интервале
+			uint64_t hashOfKeys = buf.GetUint64();            // CRC64 ключей входящих в группу текстов
 			intervals.emplace_back(textsInIntervalNum, hashOfKeys);
 		}
 	}
@@ -76,7 +76,7 @@ void SClientMessagesMgr::Update(double dt)
 	for (auto& client : _app->_clients) {
 		TextsDatabasePtr db = GetDbPtrByDbName(client->_dbName);
 		for (const auto& buf : client->_msgsQueueIn) {
-			uint8_t actionType = buf->GetUint<uint8_t>();
+			uint8_t actionType = buf->GetUint8();
 			uint32_t ts = Utils::GetTime();
 			switch (actionType) {
 			case EventType::RequestSync:
@@ -171,7 +171,7 @@ void SClientMessagesMgr::Update(double dt)
 			break;
 			case EventType::CreateText:
 			{
-				uint32_t folderId = buf->GetUint<uint32_t>();     // Изменения в базе
+				uint32_t folderId = buf->GetUint32();     // Изменения в базе
 				std::string textId;
 				buf->GetString<uint8_t>(textId);
 				auto& f = db->_folders;
@@ -310,7 +310,7 @@ void SClientMessagesMgr::Update(double dt)
 
 bool SClientMessagesMgr::ModifyDbDeleteFolder(DeserializationBuffer& buf, TextsDatabase& db)
 {
-	uint32_t folderId = buf.GetUint<uint32_t>();
+	uint32_t folderId = buf.GetUint32();
 	auto& f = db._folders;                                 // Изменения в базе
 	auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
 	if (result != std::end(f)) {
@@ -327,8 +327,8 @@ bool SClientMessagesMgr::ModifyDbDeleteFolder(DeserializationBuffer& buf, TextsD
 
 bool SClientMessagesMgr::ModifyDbChangeFolderParent(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts)
 {
-	uint32_t folderId = buf.GetUint<uint32_t>();
-	uint32_t newParentFolderId = buf.GetUint<uint32_t>();
+	uint32_t folderId = buf.GetUint32();
+	uint32_t newParentFolderId = buf.GetUint32();
 	auto& f = db._folders;                                  // Изменения в базе
 	auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
 	if (result != std::end(f)) {
@@ -347,7 +347,7 @@ bool SClientMessagesMgr::ModifyDbChangeFolderParent(DeserializationBuffer& buf, 
 
 bool SClientMessagesMgr::ModifyDbRenameFolder(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts)
 {
-	uint32_t folderId = buf.GetUint<uint32_t>();
+	uint32_t folderId = buf.GetUint32();
 	std::string newFolderName;
 	buf.GetString<uint8_t>(newFolderName);
 	auto& f = db._folders;
@@ -367,7 +367,7 @@ bool SClientMessagesMgr::ModifyDbRenameFolder(DeserializationBuffer& buf, TextsD
 
 bool SClientMessagesMgr::ModifyDbDeleteAttribute(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts)
 {
-	uint8_t attributeId = buf.GetUint<uint8_t>();
+	uint8_t attributeId = buf.GetUint8();
 	uint8_t visPosOfDeletedAttr = 0;                   // Изменения в базе
 	auto& ap = db._attributeProps;
 	auto result = std::find_if(std::begin(ap), std::end(ap), [attributeId](const AttributeProperty& el) { return el.id == attributeId; });
@@ -402,7 +402,7 @@ bool SClientMessagesMgr::ModifyDbDeleteAttribute(DeserializationBuffer& buf, Tex
 
 bool SClientMessagesMgr::ModifyDbRenameAttribute(DeserializationBuffer& buf, TextsDatabase& db)
 {
-	uint8_t attributeId = buf.GetUint<uint8_t>();
+	uint8_t attributeId = buf.GetUint8();
 	std::string newAttributeName;
 	buf.GetString<uint8_t>(newAttributeName);
 	auto& ap = db._attributeProps;
@@ -421,9 +421,9 @@ bool SClientMessagesMgr::ModifyDbRenameAttribute(DeserializationBuffer& buf, Tex
 
 bool SClientMessagesMgr::ModifyDbChangeAttributeVis(DeserializationBuffer& buf, TextsDatabase& db)
 {
-	uint8_t attributeId = buf.GetUint<uint8_t>();
-	uint8_t newVisiblePosition = buf.GetUint<uint8_t>();
-	uint8_t newVisibilityFlag = buf.GetUint<uint8_t>();
+	uint8_t attributeId = buf.GetUint8();
+	uint8_t newVisiblePosition = buf.GetUint8();
+	uint8_t newVisibilityFlag = buf.GetUint8();
 	auto& ap = db._attributeProps;
 	auto result = std::find_if(std::begin(ap), std::end(ap), [attributeId](const AttributeProperty& el) { return el.id == attributeId; });
 	if (result != std::end(ap)) {
@@ -469,7 +469,7 @@ bool SClientMessagesMgr::ModifyDbMoveTextToFolder(
 {
 	std::string textId;
 	buf.GetString<uint8_t>(textId);
-	uint32_t newFolderId = buf.GetUint<uint32_t>();
+	uint32_t newFolderId = buf.GetUint32();
 
 	for (auto& f : db._folders) {
 		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslated::Ptr& el) { return el->id == textId; });
@@ -544,8 +544,8 @@ bool  SClientMessagesMgr::ModifyDbAddAttributeToText(
 {
 	std::string textId;
 	buf.GetString<uint8_t>(textId);
-	uint8_t attributeId = buf.GetUint<uint8_t>();
-	uint8_t attributeDataType = buf.GetUint<uint8_t>();
+	uint8_t attributeId = buf.GetUint8();
+	uint8_t attributeDataType = buf.GetUint8();
 
 	TextTranslated::Ptr tmpTextPtr;
 	for (auto& f : db._folders) {
@@ -590,7 +590,7 @@ bool  SClientMessagesMgr::ModifyDbAddAttributeToText(
 		buf.GetString<uint16_t>(attributeInText.text);
 		break;
 	case AttributeProperty::Checkbox_t:
-		attributeInText.flagState = buf.GetUint<uint8_t>();
+		attributeInText.flagState = buf.GetUint8();
 		break;
 	default:
 		break;
@@ -611,7 +611,7 @@ bool  SClientMessagesMgr::ModifyDbDelAttributeFromText(
 {
 	std::string textId;
 	buf.GetString<uint8_t>(textId);
-	uint8_t attributeId = buf.GetUint<uint8_t>();
+	uint8_t attributeId = buf.GetUint8();
 
 	TextTranslated::Ptr tmpTextPtr;
 	for (auto& f : db._folders) {
@@ -656,8 +656,8 @@ bool  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 {
 	std::string textId;
 	buf.GetString<uint8_t>(textId);
-	uint8_t attributeId = buf.GetUint<uint8_t>();
-	uint8_t attributeDataType = buf.GetUint<uint8_t>();
+	uint8_t attributeId = buf.GetUint8();
+	uint8_t attributeDataType = buf.GetUint8();
 
 	TextTranslated::Ptr tmpTextPtr;
 	for (auto& f : db._folders) {
@@ -697,7 +697,7 @@ bool  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 		buf.GetString<uint16_t>(result->text);
 		break;
 	case AttributeProperty::Checkbox_t:
-		result->flagState = buf.GetUint<uint8_t>();
+		result->flagState = buf.GetUint8();
 		break;
 	default:
 		break;
@@ -805,7 +805,7 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 
 	// Считать из пакета в clientFolders информацию о папках на клиенте
 	std::vector<ClientFolder> clientFolders;
-	uint32_t CltFoldersNum = buf.GetUint<uint32_t>();  // Количество папок на клиенте
+	uint32_t CltFoldersNum = buf.GetUint32();  // Количество папок на клиенте
 	for (uint32_t folderIdx = 0; folderIdx < CltFoldersNum; ++folderIdx) {
 		clientFolders.emplace_back(buf);
 	}

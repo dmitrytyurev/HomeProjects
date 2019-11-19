@@ -57,14 +57,14 @@ uint32_t TextsDatabase::GetCurrentPosInHistoryFile()
 
 void AttributeProperty::CreateFromBase(DeserializationBuffer& buffer)
 {
-	id = buffer.GetUint<uint8_t>();
-	visiblePosition = buffer.GetUint<uint8_t>();
-	isVisible = static_cast<bool>(buffer.GetUint<uint8_t>());
-	timestampCreated = buffer.GetUint<uint32_t>();
+	id = buffer.GetUint8();
+	visiblePosition = buffer.GetUint8();
+	isVisible = static_cast<bool>(buffer.GetUint8());
+	timestampCreated = buffer.GetUint32();
 	buffer.GetString<uint8_t>(name);
-	type = buffer.GetUint<uint8_t>();
-	param1 = buffer.GetUint<uint32_t>();
-	param2 = buffer.GetUint<uint32_t>();
+	type = buffer.GetUint8();
+	param1 = buffer.GetUint32();
+	param2 = buffer.GetUint32();
 }
 
 //===============================================================================
@@ -86,14 +86,14 @@ void AttributeProperty::SaveToBase(SerializationBuffer& buffer) const
 
 void AttributeProperty::CreateFromHistory(DeserializationBuffer& buffer, uint32_t ts)
 {
-	id = buffer.GetUint<uint8_t>();
-	visiblePosition = buffer.GetUint<uint8_t>();
-	isVisible = static_cast<bool>(buffer.GetUint<uint8_t>());
+	id = buffer.GetUint8();
+	visiblePosition = buffer.GetUint8();
+	isVisible = static_cast<bool>(buffer.GetUint8());
 	timestampCreated = ts;
 	buffer.GetString<uint8_t>(name);
-	type = buffer.GetUint<uint8_t>();
-	param1 = buffer.GetUint<uint32_t>();
-	param2 = buffer.GetUint<uint32_t>();
+	type = buffer.GetUint8();
+	param1 = buffer.GetUint32();
+	param2 = buffer.GetUint32();
 }
 
 //===============================================================================
@@ -101,12 +101,12 @@ void AttributeProperty::CreateFromHistory(DeserializationBuffer& buffer, uint32_
 void AttributeProperty::CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32_t newId)
 {
 	id = newId;
-	visiblePosition = buffer.GetUint<uint8_t>();
-	isVisible = static_cast<bool>(buffer.GetUint<uint8_t>());
+	visiblePosition = buffer.GetUint8();
+	isVisible = static_cast<bool>(buffer.GetUint8());
 	timestampCreated = ts;
 	buffer.GetString<uint8_t>(name);
-	type = buffer.GetUint<uint8_t>();
-	param1 = buffer.GetUint<uint32_t>();
+	type = buffer.GetUint8();
+	param1 = buffer.GetUint32();
 	param2 = 0;
 }
 
@@ -149,12 +149,12 @@ SerializationBufferPtr AttributeProperty::SaveToPacket(const std::string& loginO
 
 void Folder::CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
 {
-	id = buffer.GetUint<uint32_t>();
-	timestampCreated = buffer.GetUint<uint32_t>();
-	timestampModified = buffer.GetUint<uint32_t>();
+	id = buffer.GetUint32();
+	timestampCreated = buffer.GetUint32();
+	timestampModified = buffer.GetUint32();
 	buffer.GetString<uint16_t>(name);
-	parentId = buffer.GetUint<uint32_t>();
-	uint32_t textsNum = buffer.GetUint<uint32_t>();
+	parentId = buffer.GetUint32();
+	uint32_t textsNum = buffer.GetUint32();
 	for (uint32_t i = 0; i < textsNum; ++i) {
 		texts.emplace_back(std::make_shared<TextTranslated>());
 		texts.back()->CreateFromBase(buffer, attributesIdToType);
@@ -167,8 +167,8 @@ void Folder::CreateFromHistory(DeserializationBuffer& buffer, uint32_t ts)
 {
 	timestampCreated = ts;
 	timestampModified = ts;
-	id = buffer.GetUint<uint32_t>();
-	parentId = buffer.GetUint<uint32_t>();
+	id = buffer.GetUint32();
+	parentId = buffer.GetUint32();
 	buffer.GetString<uint8_t>(name);
 }
 
@@ -179,7 +179,7 @@ void Folder::CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32
 	id = newId;
 	timestampCreated = ts;
 	timestampModified = ts;
-	parentId = buffer.GetUint<uint32_t>();
+	parentId = buffer.GetUint32();
 	buffer.GetString<uint8_t>(name);
 }
 
@@ -231,12 +231,12 @@ SerializationBufferPtr Folder::SaveToPacket(const std::string& loginOfModifier) 
 void TextTranslated::CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
 {
 	buffer.GetString<uint8_t>(id);
-	timestampCreated = buffer.GetUint<uint32_t>();
-	timestampModified = buffer.GetUint<uint32_t>();
+	timestampCreated = buffer.GetUint32();
+	timestampModified = buffer.GetUint32();
 	buffer.GetString<uint8_t>(loginOfLastModifier);
-	offsLastModified = buffer.GetUint<uint32_t>();
+	offsLastModified = buffer.GetUint32();
 	buffer.GetString<uint16_t>(baseText);
-	uint8_t attributesNum = buffer.GetUint<uint8_t>();
+	uint8_t attributesNum = buffer.GetUint8();
 	for (uint8_t i = 0; i < attributesNum; ++i) {
 		attributes.emplace_back();
 		attributes.back().CreateFromBase(buffer, attributesIdToType);
@@ -291,7 +291,7 @@ SerializationBufferPtr TextTranslated::SaveToPacket(uint32_t folderId, const std
 
 void AttributeInText::CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
 {
-	id = buffer.GetUint<uint8_t>();
+	id = buffer.GetUint8();
 	if (id >= attributesIdToType.size()) {
 		ExitMsg("id >= attributesIdToType.size()");
 	}
@@ -304,7 +304,7 @@ void AttributeInText::CreateFromBase(DeserializationBuffer& buffer, const std::v
 	}
 	break;
 	case AttributeProperty::Checkbox_t:
-		flagState = buffer.GetUint<uint8_t>();
+		flagState = buffer.GetUint8();
 		break;
 
 	default:
