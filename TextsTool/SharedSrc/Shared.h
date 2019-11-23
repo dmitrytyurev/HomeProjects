@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 const int HTTP_BUF_SIZE = 500000;
 const bool NEED_PACK_PACKETS = false;
@@ -52,7 +53,7 @@ namespace EventType
 		RequestSync = 0,               // Запрос синхронизации при подключении нового клиента
 		ReplySync = 1,                 // Ответ на запрос EventRequestSync
 		RequestListOfDatabases = 2,    // Запрос списка баз с текстами
-		ReplyListOfDatabases = 3,      // Ответ на запрос EventRequestListOfDatabases
+		ReplyListOfDatabases = 3,      // Ответ на запрос RequestListOfDatabases
 
 		// Блок событий, приходящих с клиента на сервер, а потом рассылаемых с сервера на остальные клиенты подключенные к данной базе
 		// Используются в файлах базы и истории, поэтому не могут быть изменены

@@ -7,35 +7,11 @@
 #include "DeserializationBuffer.h"
 #include "../SharedSrc/Shared.h"
 #include "CMessagesRepacker.h"
+#include "Utils.h"
 
 Ui::MainWindow* debugGlobalUi = nullptr;
 
-uint GetCurrentTimestamp()
-{
-    QDateTime current = QDateTime::currentDateTime();
-    return  current.toTime_t();
-}
 
-//---------------------------------------------------------------
-
-void Log(const std::string& str)
-{
-    FILE* fp = nullptr;
-    errno_t err = fopen_s(&fp, "d:\\ClientLog.txt", "at");
-    if (err != 0) {
-        return;
-    }
-    fprintf(fp, "%d: %s\n", GetCurrentTimestamp(), str.c_str());
-    fclose(fp);
-}
-
-//---------------------------------------------------------------
-
-void ExitMsg(const std::string& message)
-{
-    Log("Fatal: " + message);
-    throw std::exception("Exiting app exception");
-}
 
 //---------------------------------------------------------------
 
@@ -142,7 +118,7 @@ void CHttpManager::CallbackConnecting(QNetworkReply *reply)
         _sessionId = buf.GetUint<uint32_t>();
         _sendPacketN = 0;
         _rcvPacketN = 0;
-        _timeOfRequestPacket = GetCurrentTimestamp();
+		_timeOfRequestPacket = Utils::GetCurrentTimestamp();
         return;
     }
     Log("CallbackConnecting: unexpected response. code:" + std::to_string(code));
@@ -201,14 +177,14 @@ void CHttpManager::CallbackRequestPacket(QNetworkReply *reply)
     if (code == (uint8_t)AnswersToClient::NoSuchPacketYet)
     {
         uint32_t timeToNextRequest = buf.GetUint<uint32_t>();
-        _timeOfRequestPacket = GetCurrentTimestamp() + timeToNextRequest / 1000;
+		_timeOfRequestPacket = Utils::GetCurrentTimestamp() + timeToNextRequest / 1000;
         return;
     }
     if (code == (uint8_t)AnswersToClient::PacketSent) {
         _lastSuccesPostWas = LAST_POST_WAS::REQUEST_PACKET;
         ++_rcvPacketN;
         uint32_t timeToNextRequest = buf.GetUint<uint32_t>();
-        _timeOfRequestPacket = GetCurrentTimestamp() + timeToNextRequest;
+		_timeOfRequestPacket = Utils::GetCurrentTimestamp() + timeToNextRequest;
         _packetsIn.emplace_back(std::make_shared<CHttpPacket>(buf, CHttpPacket::Status::WAITING_FOR_UNPACKING));
         return;
     }
@@ -272,7 +248,7 @@ void CHttpManager::PutPacketToSendQueue(const std::vector<uint8_t>& packet)
 
 bool CHttpManager::IsTimeToRequestPacket()
 {
-    return _timeOfRequestPacket != 0 && GetCurrentTimestamp() >= _timeOfRequestPacket;
+	return _timeOfRequestPacket != 0 && Utils::GetCurrentTimestamp() >= _timeOfRequestPacket;
 }
 
 //---------------------------------------------------------------
@@ -365,8 +341,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    std::vector<uint8_t> packet = {0, 1, 0, 0, 0, 1, 0, 0, 0,     EventType::RequestListOfDatabases};   // Первые байты - это обёртка для парсинга сообщения из пакетов
-    httpManager.PutPacketToSendQueue(packet);
+	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
+
+	//    _msgsQueueOut.back()->Push(EventType::RequestListOfDatabases);
+
+	_msgsQueueOut.back()->Push(EventType::RequestSync);
+	_msgsQueueOut.back()->PushStringWithoutZero<uint8_t>("TestDB");
+	_msgsQueueOut.back()->Push((uint32_t)0);
+
     httpManager.Connect("mylogin", "mypassword");
 }
 
@@ -374,7 +356,13 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::update()
 {
-    httpManager.Update();
-    Repacker::RepackPacketsInToMessages(httpManager, _msgsQueueIn);
-    Repacker::RepackMessagesOutToPackets(_msgsQueueOut, httpManager);
+	httpManager.Update();
+	Repacker::RepackPacketsInToMessages(httpManager, _msgsQueueIn);
+	Repacker::RepackMessagesOutToPackets(_msgsQueueOut, httpManager);
+
+	for (auto& msg: _msgsQueueIn) {
+		Log("Message:  ");
+		Utils::LogBuf(msg->_buffer);
+	}
+	_msgsQueueIn.resize(0);
 }

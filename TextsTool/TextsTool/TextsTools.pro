@@ -29,6 +29,7 @@ SOURCES += \
         CMessagesRepacker.cpp \
         DeserializationBuffer.cpp \
         SerializationBuffer.cpp \
+        Utils.cpp \
         main.cpp \
         mainwindow.cpp
 
@@ -37,6 +38,7 @@ HEADERS += \
         CMessagesRepacker.h \
         DeserializationBuffer.h \
         SerializationBuffer.h \
+        Utils.h \
         mainwindow.h
 
 FORMS += \
