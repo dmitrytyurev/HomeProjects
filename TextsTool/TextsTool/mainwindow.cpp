@@ -107,7 +107,7 @@ void CHttpManager::CallbackConnecting(QNetworkReply *reply)
     int sizeReceived = (int)reply->read((char*)_httpBuf.data(), _httpBuf.size());
     DebugLogServerReply("Packet from server (Connecting)", sizeReceived);
     DeserializationBuffer buf(_httpBuf.data(), sizeReceived);
-    uint8_t code = buf.GetUint<uint8_t>();
+	uint8_t code = buf.GetUint8();
     if (code == (uint8_t)AnswersToClient::WrongLoginOrPassword) {
         _state = STATE::NOT_CONNECTED;
         _lastError = "wrong login or password";
@@ -115,7 +115,7 @@ void CHttpManager::CallbackConnecting(QNetworkReply *reply)
     }
     if (code == (uint8_t)AnswersToClient::Connected) {
         _state = STATE::CONNECTED;
-        _sessionId = buf.GetUint<uint32_t>();
+		_sessionId = buf.GetUint32();
         _sendPacketN = 0;
         _rcvPacketN = 0;
 		_timeOfRequestPacket = Utils::GetCurrentTimestamp();
@@ -135,7 +135,7 @@ void CHttpManager::CallbackSendPacket(QNetworkReply *reply)
     int sizeReceived = (int)reply->read((char*)_httpBuf.data(), _httpBuf.size());
     DebugLogServerReply("Packet from server (Send Packet)", sizeReceived);
     DeserializationBuffer buf(_httpBuf.data(), sizeReceived);
-    uint8_t code = buf.GetUint<uint8_t>();
+	uint8_t code = buf.GetUint8();
 
     if (code == (uint8_t)AnswersToClient::ClientNotConnected ||
         code == (uint8_t)AnswersToClient::WrongSession ) {
@@ -167,7 +167,7 @@ void CHttpManager::CallbackRequestPacket(QNetworkReply *reply)
     int sizeReceived = (int)reply->read((char*)_httpBuf.data(), _httpBuf.size());
     DebugLogServerReply("Packet from server (Request Packet)", sizeReceived);
     DeserializationBuffer buf(_httpBuf.data(), sizeReceived);
-    uint8_t code = buf.GetUint<uint8_t>();
+	uint8_t code = buf.GetUint8();
 
     if (code == (uint8_t)AnswersToClient::ClientNotConnected ||
         code == (uint8_t)AnswersToClient::WrongSession ) {
@@ -176,14 +176,14 @@ void CHttpManager::CallbackRequestPacket(QNetworkReply *reply)
     }
     if (code == (uint8_t)AnswersToClient::NoSuchPacketYet)
     {
-        uint32_t timeToNextRequest = buf.GetUint<uint32_t>();
+		uint32_t timeToNextRequest = buf.GetUint32();
 		_timeOfRequestPacket = Utils::GetCurrentTimestamp() + timeToNextRequest / 1000;
         return;
     }
     if (code == (uint8_t)AnswersToClient::PacketSent) {
         _lastSuccesPostWas = LAST_POST_WAS::REQUEST_PACKET;
         ++_rcvPacketN;
-        uint32_t timeToNextRequest = buf.GetUint<uint32_t>();
+		uint32_t timeToNextRequest = buf.GetUint32();
 		_timeOfRequestPacket = Utils::GetCurrentTimestamp() + timeToNextRequest;
         _packetsIn.emplace_back(std::make_shared<CHttpPacket>(buf, CHttpPacket::Status::WAITING_FOR_UNPACKING));
         return;
@@ -222,9 +222,9 @@ void CHttpManager::ConnectInner()
 {
     _state = STATE::CONNECTING;
     SerializationBuffer buf;
-    buf.PushStringWithoutZero<uint8_t>(_login);
-    buf.PushStringWithoutZero<uint8_t>(_password);
-    buf.Push((uint8_t)ClientRequestTypes::RequestConnect);
+	buf.PushString8(_login);
+	buf.PushString8(_password);
+	buf.PushUint8(ClientRequestTypes::RequestConnect);
     SendPacket(buf.buffer);
 }
 
@@ -258,11 +258,11 @@ void CHttpManager::RequestPacket()
     _lastTryPostWas = LAST_POST_WAS::REQUEST_PACKET;
 
     SerializationBuffer buf;
-    buf.PushStringWithoutZero<uint8_t>(_login);
-    buf.PushStringWithoutZero<uint8_t>(_password);
-    buf.Push((uint8_t)ClientRequestTypes::RequestPacket);
-    buf.Push(_sessionId);
-    buf.Push(_rcvPacketN);
+	buf.PushString8(_login);
+	buf.PushString8(_password);
+	buf.PushUint8(ClientRequestTypes::RequestPacket);
+	buf.PushUint32(_sessionId);
+	buf.PushUint32(_rcvPacketN);
     SendPacket(buf.buffer);
 }
 
@@ -277,11 +277,11 @@ void CHttpManager::SendPacket()
 
     _lastTryPostWas = LAST_POST_WAS::SEND_PACKET;
     SerializationBuffer buf;
-    buf.PushStringWithoutZero<uint8_t>(_login);
-    buf.PushStringWithoutZero<uint8_t>(_password);
-    buf.Push((uint8_t)ClientRequestTypes::ProvidePacket);
-    buf.Push(_sessionId);
-    buf.Push(_sendPacketN);
+	buf.PushString8(_login);
+	buf.PushString8(_password);
+	buf.PushUint8(ClientRequestTypes::ProvidePacket);
+	buf.PushUint32(_sessionId);
+	buf.PushUint32(_sendPacketN);
     buf.PushBytes(_packetsOut[0]->_packetData.data(), _packetsOut[0]->_packetData.size());
     SendPacket(buf.buffer);
 }
@@ -345,9 +345,9 @@ void MainWindow::on_pushButton_clicked()
 
 	//    _msgsQueueOut.back()->Push(EventType::RequestListOfDatabases);
 
-	_msgsQueueOut.back()->Push(EventType::RequestSync);
-	_msgsQueueOut.back()->PushStringWithoutZero<uint8_t>("TestDB");
-	_msgsQueueOut.back()->Push((uint32_t)0);
+	_msgsQueueOut.back()->PushUint8(EventType::RequestSync);
+	_msgsQueueOut.back()->PushString8("TestDB");
+	_msgsQueueOut.back()->PushUint32(0);
 
     httpManager.Connect("mylogin", "mypassword");
 }

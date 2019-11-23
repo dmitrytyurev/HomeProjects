@@ -1,7 +1,6 @@
+//#include "pch.h"
 #include "SerializationBuffer.h"
 
-//===============================================================================
-//
 //===============================================================================
 
 void SerializationBuffer::PushStringWithoutZero(const std::string& v)
@@ -13,43 +12,15 @@ void SerializationBuffer::PushStringWithoutZero(const std::string& v)
 }
 
 //===============================================================================
-//
-//===============================================================================
 
-void SerializationBuffer::Push(uint8_t v)
+void SerializationBuffer::Push(const DeserializationBuffer& buf, bool useAllBuffer)
 {
-	const uint8_t* beg = &v;
-	const uint8_t* end = beg + sizeof(v);
+	const uint8_t* beg = buf._buffer.data() + (useAllBuffer ? 0 : buf.offset);
+	const uint8_t* end = buf._buffer.data() + buf._buffer.size();
 
 	buffer.insert(buffer.end(), beg, end);
 }
 
-//===============================================================================
-//
-//===============================================================================
-
-void SerializationBuffer::Push(uint16_t v)
-{
-	const uint8_t* beg = reinterpret_cast<const uint8_t*>(&v);
-	const uint8_t* end = beg + sizeof(v);
-
-	buffer.insert(buffer.end(), beg, end);
-}
-
-//===============================================================================
-//
-//===============================================================================
-
-void SerializationBuffer::Push(uint32_t v)
-{
-	const uint8_t* beg = reinterpret_cast<const uint8_t*>(&v);
-	const uint8_t* end = beg + sizeof(v);
-
-	buffer.insert(buffer.end(), beg, end);
-}
-
-//===============================================================================
-//
 //===============================================================================
 
 void SerializationBuffer::PushBytes(const void* bytes, int size)
