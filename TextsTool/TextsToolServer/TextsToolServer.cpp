@@ -72,6 +72,8 @@ void test()
 
 	Folder folder2;
 	folder2.name = "FolderB";
+	folder2.id = 55443;
+	folder2.timestampModified = 54321;
 	db._folders.emplace_back(folder2);
 
 

@@ -35,10 +35,12 @@ public:
 		for (uint32_t keyIdx = 0; keyIdx < keysNum; ++keyIdx) {
 			keys.emplace_back(buf.GetVector<uint8_t>());
 		}
-		for (uint32_t intervalIdx = 0; intervalIdx < keysNum + 1; ++intervalIdx) {
-			uint32_t textsInIntervalNum = buf.GetUint32();    // Число текстов в интервале
-			uint64_t hashOfKeys = buf.GetUint64();            // CRC64 ключей входящих в группу текстов
-			intervals.emplace_back(textsInIntervalNum, hashOfKeys);
+		if (keysNum > 0) {
+			for (uint32_t intervalIdx = 0; intervalIdx < keysNum + 1; ++intervalIdx) {
+				uint32_t textsInIntervalNum = buf.GetUint32();    // Число текстов в интервале
+				uint64_t hashOfKeys = buf.GetUint64();            // CRC64 ключей входящих в группу текстов
+				intervals.emplace_back(textsInIntervalNum, hashOfKeys);
+			}
 		}
 	}
 

@@ -347,7 +347,18 @@ void MainWindow::on_pushButton_clicked()
 
 	_msgsQueueOut.back()->PushUint8(EventType::RequestSync);
 	_msgsQueueOut.back()->PushString8("TestDB");
-	_msgsQueueOut.back()->PushUint32(0);
+	_msgsQueueOut.back()->PushUint32(2); // Число папок
+
+
+	_msgsQueueOut.back()->PushUint32(55443); // id папки
+	_msgsQueueOut.back()->PushUint32(54321); // TS изменения папки на клиенте
+	_msgsQueueOut.back()->PushUint32(0); // Количество отобранных ключей
+
+
+	_msgsQueueOut.back()->PushUint32(11111); // id папки
+	_msgsQueueOut.back()->PushUint32(54321); // TS изменения папки на клиенте
+	_msgsQueueOut.back()->PushUint32(0); // Количество отобранных ключей
+
 
     httpManager.Connect("mylogin", "mypassword");
 }
