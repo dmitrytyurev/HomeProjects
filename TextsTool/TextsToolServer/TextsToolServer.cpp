@@ -25,7 +25,7 @@ void test()
 	ap.visiblePosition = 56;
 	ap.isVisible = true;
 	ap.timestampCreated = 99887766;
-	ap.name = "Dima";
+	ap.name = "Property1";
 	ap.type = 2;
 	ap.param1 = 11223344;
 	ap.param2 = 55667788;
@@ -34,12 +34,12 @@ void test()
 
 	ap.id = 100;
 	ap.type = 1;
-	ap.name = "Dima2";
+	ap.name = "Property2";
 	db._attributeProps.push_back(ap);
 
 	Folder folder;
 	folder.id = 55443322;
-	folder.name = "ggss";
+	folder.name = "FolderA";
 	folder.parentId = 567;
 	folder.timestampCreated = 12345;
 	folder.timestampModified = 54321;
@@ -69,6 +69,11 @@ void test()
 	folder.texts.emplace_back(textPtr);
 
 	db._folders.emplace_back(folder);
+
+	Folder folder2;
+	folder2.name = "FolderB";
+	db._folders.emplace_back(folder2);
+
 
 	db._dbSerializer->SaveDatabase();
 }
@@ -108,6 +113,9 @@ void Init()
 
 	app = std::make_unique<STextsToolApp>();
 	app->_httpMgr._connections._accounts.emplace_back("mylogin", "mypassword");
+
+	//test();
+	//exit(1);
 
 	std::set<std::string> basesNames;
 	MakeDatabasesNamesList(databasesPath, basesNames);  // Подготовить список баз по этому пути
