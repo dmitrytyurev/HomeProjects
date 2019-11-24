@@ -20,6 +20,9 @@ void test()
 	TextsDatabase db;
 	db.CreateDatabase("D:/Dimka/HomeProjects/", "TestDB");
 
+/*
+	// Атрибуты базы, один каталог с текстом (с атрибутами текста), один каталог без текстов
+
 	AttributeProperty ap;
 	ap.id = 99;
 	ap.visiblePosition = 56;
@@ -75,6 +78,41 @@ void test()
 	folder2.id = 55443;
 	folder2.timestampModified = 54321;
 	db._folders.emplace_back(folder2);
+*/
+
+	Folder folder;
+	folder.id = 55443322;
+	folder.name = "FolderA";
+	folder.parentId = 567;
+	folder.timestampCreated = 12345;
+	folder.timestampModified = 54321;
+
+
+	{
+		TextTranslatedPtr textPtr = std::make_shared<TextTranslated>();
+		textPtr->baseText = "BaseText1";
+		textPtr->id = "TextID1_";
+		textPtr->timestampModified = 101;
+		folder.texts.emplace_back(textPtr);
+	}
+
+	{
+		TextTranslatedPtr textPtr = std::make_shared<TextTranslated>();
+		textPtr->baseText = "BaseText2";
+		textPtr->id = "TextID2";
+		textPtr->timestampModified = 102;
+		folder.texts.emplace_back(textPtr);
+	}
+
+	{
+		TextTranslatedPtr textPtr = std::make_shared<TextTranslated>();
+		textPtr->baseText = "BaseText3";
+		textPtr->id = "TextID3";
+		textPtr->timestampModified = 103;
+		folder.texts.emplace_back(textPtr);
+	}
+
+	db._folders.emplace_back(folder);
 
 
 	db._dbSerializer->SaveDatabase();

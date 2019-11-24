@@ -11,7 +11,16 @@
 
 Ui::MainWindow* debugGlobalUi = nullptr;
 
+//---------------------------------------------------------------
 
+void MakeKey(uint32_t tsModified, const std::string& textId, std::vector<uint8_t>& result)
+{
+	result.resize(sizeof(uint32_t) + textId.size());
+	uint8_t* p = &result[0];
+
+	*(reinterpret_cast<uint32_t*>(p)) = tsModified;
+	memcpy(p + sizeof(uint32_t), textId.c_str(), textId.size());
+}
 
 //---------------------------------------------------------------
 
@@ -343,22 +352,59 @@ void MainWindow::on_pushButton_clicked()
 {
 	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
 
-	//    _msgsQueueOut.back()->Push(EventType::RequestListOfDatabases);
-
+/*
 	_msgsQueueOut.back()->PushUint8(EventType::RequestSync);
 	_msgsQueueOut.back()->PushString8("TestDB");
 	_msgsQueueOut.back()->PushUint32(2); // Число папок
 
 
 	_msgsQueueOut.back()->PushUint32(55443); // id папки
-	_msgsQueueOut.back()->PushUint32(54321); // TS изменения папки на клиенте
+	_msgsQueueOut.back()->PushUint32(50000); // TS изменения папки на клиенте
 	_msgsQueueOut.back()->PushUint32(0); // Количество отобранных ключей
 
 
 	_msgsQueueOut.back()->PushUint32(11111); // id папки
 	_msgsQueueOut.back()->PushUint32(54321); // TS изменения папки на клиенте
 	_msgsQueueOut.back()->PushUint32(0); // Количество отобранных ключей
+*/
 
+	_msgsQueueOut.back()->PushUint8(EventType::RequestSync);
+	_msgsQueueOut.back()->PushString8("TestDB");
+	_msgsQueueOut.back()->PushUint32(1); // Число папок
+
+
+	_msgsQueueOut.back()->PushUint32(55443322); // id папки
+	_msgsQueueOut.back()->PushUint32(50000); // TS изменения папки на клиенте
+	_msgsQueueOut.back()->PushUint32(1); // Количество отобранных ключей
+
+	struct Text
+	{
+		std::string id;
+		uint32_t ts;
+		std::vector<uint8_t> key;
+	};
+
+	std::vector<Text> texts = {{"TextID1", 101}, {"TextID2", 102}, {"TextID3", 103}};
+
+	for (auto& text: texts) {
+		MakeKey(text.ts, text.id, text.key);
+	}
+
+	// Ключи разбиения текстов
+	_msgsQueueOut.back()->PushUint8(texts[1].key.size());
+	_msgsQueueOut.back()->PushBytes(texts[1].key.data(), texts[1].key.size());
+Log("Key:");
+Utils::LogBuf(texts[1].key);
+	// Инфа об интервалах (на 1 больше числа ключей)
+	_msgsQueueOut.back()->PushUint32(1); // Число текстов в интервале
+	uint64_t hash = 0;
+	hash = Utils::AddHash(hash, texts[0].key, true);
+	_msgsQueueOut.back()->PushBytes(&hash, sizeof(uint64_t));
+
+	_msgsQueueOut.back()->PushUint32(2); // Число текстов в интервале
+	hash = Utils::AddHash(hash, texts[1].key, true);
+	hash = Utils::AddHash(hash, texts[2].key, false);
+	_msgsQueueOut.back()->PushBytes(&hash, sizeof(uint64_t));
 
     httpManager.Connect("mylogin", "mypassword");
 }
