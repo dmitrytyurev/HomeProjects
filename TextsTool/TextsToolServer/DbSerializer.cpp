@@ -30,7 +30,7 @@ void DbSerializer::HistoryFlush()
 		std::string timestamp = std::to_string(std::time(0));
 		_historyFile.name = "TextsHistory_" + _pDataBase->_dbName + "_" + timestamp + ".bin";
 		std::string fullFileName = _path + _historyFile.name;
-		file.open(fullFileName, std::ios::out | std::ios::app | std::ios::binary);
+		file.open(fullFileName, std::ios::out | std::ios::trunc | std::ios::binary);
 		if (file.rdstate()) {
 			ExitMsg("Error creating file " + fullFileName);
 		}
@@ -89,7 +89,7 @@ void DbSerializer::SaveDatabase()
 	std::string fileName = "TextsBase_" + _pDataBase->_dbName + "_" + timestamp + ".bin";
 	std::string fullFileName = _path + fileName;
 
-	std::ofstream file(fullFileName, std::ios::out | std::ios::app | std::ios::binary);
+	std::ofstream file(fullFileName, std::ios::out | std::ios::trunc | std::ios::binary);
 	if (file.rdstate()) {
 		ExitMsg("Error creating file " + fullFileName);
 	}
