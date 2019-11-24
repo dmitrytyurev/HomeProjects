@@ -16,42 +16,6 @@
 
 //===============================================================================
 
-class ClientFolder
-{
-public:
-	struct Interval
-	{
-		Interval(uint32_t textsNum, uint64_t keysHash) : textsInIntervalNum(textsNum), hashOfKeys(keysHash) {}
-		uint32_t textsInIntervalNum = 0;  // Количество текстов в интервале
-		uint64_t hashOfKeys = 0;          // Хэш ключей текстов интервала
-	};
-
-	ClientFolder() {}
-	ClientFolder(DeserializationBuffer& buf)
-	{
-		id = buf.GetUint32();
-		tsModified = buf.GetUint32();
-		uint32_t keysNum = buf.GetUint32();
-		for (uint32_t keyIdx = 0; keyIdx < keysNum; ++keyIdx) {
-			keys.emplace_back(buf.GetVector<uint8_t>());
-		}
-		if (keysNum > 0) {
-			for (uint32_t intervalIdx = 0; intervalIdx < keysNum + 1; ++intervalIdx) {
-				uint32_t textsInIntervalNum = buf.GetUint32();    // Число текстов в интервале
-				uint64_t hashOfKeys = buf.GetUint64();            // CRC64 ключей входящих в группу текстов
-				intervals.emplace_back(textsInIntervalNum, hashOfKeys);
-			}
-		}
-	}
-
-	uint32_t id = 0;   // Id папки
-	uint32_t tsModified = 0; // Ts изменения папки на клиенте
-	std::vector<std::vector<uint8_t>> keys;      // Ключи, разбивающие тексты на интервалы. Ключ - бинарная строка: 4 байта ts + текстовый id-текста 
-	std::vector<Interval> intervals;     // Параметры интервалов, задаваемых ключами (интервалов на один больше чем ключей)
-};
-
-//===============================================================================
-
 void SClientMessagesMgr::SaveToHistory(TextsDatabasePtr db, const std::string& login, uint32_t ts, const DeserializationBuffer& bufIn)
 {
 	auto& bufOut = db->GetHistoryBuffer();
@@ -780,21 +744,82 @@ SerializationBufferPtr SClientMessagesMgr::MakeDatabasesListMessage()
 
 //===============================================================================
 
+void SClientMessagesMgr::FillDiffFolderInfo(SerializationBuffer* buffer, Folder& srvFolder, ClientFolder& cltFolder)
+{
+	// Заполняем ключи серверных текстов и ссылки на них для быстрой сортировки по ключам
+
+	std::vector<TextKey> textsKeys;       // Ключи серверных текстов текущей папки (для сортировки и разбиения на интевалы)
+	std::vector<TextKey*> textsKeysRefs;  // Указатели на эти ключи для быстрой сортировки
+
+	textsKeys.reserve(srvFolder.texts.size());
+	textsKeysRefs.reserve(srvFolder.texts.size());
+
+	for (const auto& t : srvFolder.texts) {
+		textsKeys.emplace_back();
+		auto& textKey = textsKeys.back();
+		textKey.textRef = &*t;
+		textsKeysRefs.emplace_back(&textKey);
+		MakeKey(t->timestampModified, t->id, textKey.key); // Склеивает ts модификации текста и текстовый айдишник текста в "ключ"
+	}
+
+	// Сортируем ссылки на заполненные ключи серверных текстов
+	std::sort(textsKeysRefs.begin(), textsKeysRefs.end(), [](TextKey* el1, TextKey* el2) { return IfKeyALess(&el1->key[0], el1->key.size(), &el2->key[0], el2->key.size()); });
+
+	// Заполнение интервалов отсортированных серверных текстов текущей папки
+	std::vector<Interval> intervals;
+	intervals.resize(cltFolder.intervals.size());
+
+	int cltKeyIdx = 0;
+	int sum = 0;
+
+	for (int i = 0; i < (int)textsKeysRefs.size(); ++i) {
+		while (!IfKeyALess(&textsKeysRefs[i]->key[0], textsKeysRefs[i]->key.size(), &cltFolder.keys[cltKeyIdx][0], cltFolder.keys[cltKeyIdx].size())) {
+			sum += intervals[cltKeyIdx].textsNum;
+			++cltKeyIdx;
+			intervals[cltKeyIdx].firstTextIdx = sum;
+			if (cltKeyIdx == cltFolder.keys.size()) {
+				intervals[cltKeyIdx].textsNum = textsKeysRefs.size() - i;
+				goto out;
+			}
+		}
+		++(intervals[cltKeyIdx].textsNum);
+	}
+out:    // Заполняем значения хэшей в интервалах (хэш интервала считается, как хэш ключей всех текстов интервала)
+	for (auto& interval : intervals) {
+		uint64_t hash = 0;
+		for (uint32_t i = interval.firstTextIdx; i < (int)interval.firstTextIdx + interval.textsNum; ++i) {
+			hash = Utils::AddHash(hash, textsKeysRefs[i]->key, i == interval.firstTextIdx);
+		}
+		interval.hash = hash;
+	}
+
+	// Сравниваем интервалы текущего каталога у сервера и клиента. Если текущий интервал отличается, то для него будут посланы все тексты
+
+	uint32_t intervalsDifferNum = 0;  // Подсчитать количество отличающихся интервалов
+	for (int i = 0; i < (int)intervals.size(); ++i) {
+		if (intervals[i].textsNum != cltFolder.intervals[i].textsInIntervalNum ||
+			intervals[i].hash != cltFolder.intervals[i].hashOfKeys) {
+			++intervalsDifferNum;
+		}
+	}
+	buffer->PushUint32(intervalsDifferNum);
+	for (uint32_t i = 0; i < intervals.size(); ++i) {
+		if (intervals[i].textsNum != cltFolder.intervals[i].textsInIntervalNum ||
+			intervals[i].hash != cltFolder.intervals[i].hashOfKeys) {
+			buffer->PushUint32(i);
+			buffer->PushUint32(intervals[i].textsNum);
+
+			for (uint32_t i2 = intervals[i].firstTextIdx; i2 < intervals[i].firstTextIdx + intervals[i].textsNum; ++i2) {
+				textsKeysRefs[i2]->textRef->SaveToBase(*buffer);
+			}
+		}
+	}
+}
+
+//===============================================================================
+
 SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer& buf, TextsDatabase& db)
 {
-	struct TextKey
-	{
-		std::vector<uint8_t> key;   // Ключ - бинарная строка: 4 байта ts + текстовый id-текста 
-		TextTranslated* textRef = nullptr;    // Указатель на текст, для которого этот ключ
-	};
-
-	struct Interval
-	{
-		uint32_t firstTextIdx = 0; // Индекс первого текста интервала
-		uint32_t textsNum = 0; // Количество текстов в интервале
-		uint64_t hash = 0;  // Хэш ключей текстов интервала
-	};
-
 	auto buffer = std::make_shared<SerializationBuffer>();
 
 	buffer->PushUint8(EventType::ReplySync);
@@ -846,11 +871,11 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 	buffer->PushUint32(foldersToCreate.size());
 	for (auto folderId : foldersToCreate) {
 		auto& f = db._folders;
-		auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
-		if (result == std::end(f)) {
+		auto folder = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+		if (folder == std::end(f)) {
 			ExitMsg("result == std::end(f)");
 		}
-		result->SaveToBase(*buffer);
+		folder->SaveToBase(*buffer);
 	}
 
 	// Найдём каталоги сервера, которые есть и на сервер и на клиенте. Чтобы проверить какие из них совпадают, а где есть отличия
@@ -892,73 +917,16 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 		buffer->PushUint32(srvFoldrItr->parentId);
 		buffer->PushUint32(srvFoldrItr->timestampModified);
 
-		// Заполняем ключи серверных текстов и ссылки на них для быстрой сортировки по ключам
-
-		std::vector<TextKey> textsKeys;       // Ключи серверных текстов текущей папки (для сортировки и разбиения на интевалы)
-		std::vector<TextKey*> textsKeysRefs;  // Указатели на эти ключи для быстрой сортировки
-
-		textsKeys.reserve(srvFoldrItr->texts.size());
-		textsKeysRefs.reserve(srvFoldrItr->texts.size());
-
-		for (const auto& t : srvFoldrItr->texts) {
-			textsKeys.emplace_back();
-			auto& textKey = textsKeys.back();
-			textKey.textRef = &*t;
-			textsKeysRefs.emplace_back(&textKey);
-			MakeKey(t->timestampModified, t->id, textKey.key); // Склеивает ts модификации текста и текстовый айдишник текста в "ключ"
-		}
-
-		// Сортируем ссылки на заполненные ключи серверных текстов
-		std::sort(textsKeysRefs.begin(), textsKeysRefs.end(), [](TextKey* el1, TextKey* el2) { return IfKeyALess(&el1->key[0], el1->key.size(), &el2->key[0], el2->key.size()); });
-
-		// Заполнение интервалов отсортированных серверных текстов текущей папки
-		std::vector<Interval> intervals;
-		intervals.resize(cltFoldrItr->intervals.size());
-
-		int cltKeyIdx = 0;
-		int sum = 0;
-
-		for (int i = 0; i < (int)textsKeysRefs.size(); ++i) {
-			while (!IfKeyALess(&textsKeysRefs[i]->key[0], textsKeysRefs[i]->key.size(), &cltFoldrItr->keys[cltKeyIdx][0], cltFoldrItr->keys[cltKeyIdx].size())) {
-				sum += intervals[cltKeyIdx].textsNum;
-				++cltKeyIdx;
-				intervals[cltKeyIdx].firstTextIdx = sum;
-				if (cltKeyIdx == cltFoldrItr->keys.size()) {
-					intervals[cltKeyIdx].textsNum = textsKeysRefs.size() - i;
-					goto out;
-				}
-			}
-			++(intervals[cltKeyIdx].textsNum);
-		}
-	out:    // Заполняем значения хэшей в интервалах (хэш интервала считается, как хэш ключей всех текстов интервала)
-		for (auto& interval : intervals) {
-			uint64_t hash = 0;
-			for (uint32_t i = interval.firstTextIdx; i < (int)interval.firstTextIdx + interval.textsNum; ++i) {
-				hash = Utils::AddHash(hash, textsKeysRefs[i]->key, i == interval.firstTextIdx);
-			}
-			interval.hash = hash;
-		}
-
-		// Сравниваем интервалы текущего каталога у сервера и клиента. Если текущий интервал отличается, то для него будут посланы все тексты
-
-		uint32_t intervalsDifferNum = 0;  // Подсчитать количество отличающихся интервалов
-		for (int i = 0; i < (int)intervals.size(); ++i) {
-			if (intervals[i].textsNum != cltFoldrItr->intervals[i].textsInIntervalNum ||
-				intervals[i].hash != cltFoldrItr->intervals[i].hashOfKeys) {
-				++intervalsDifferNum;
+		if (cltFoldrItr->keys.empty()) { // Если на клиенте в этом каталоге так мало текстов, что для них не посчитать интервалы, то пошлём на клиент все тексты каталога
+			buffer->PushUint8(FolderDataTypeForSyncMsg::AllTexts);
+			buffer->PushUint32(srvFoldrItr->texts.size());
+			for (const auto& text : srvFoldrItr->texts) {
+				text->SaveToBase(*buffer);
 			}
 		}
-		buffer->PushUint32(intervalsDifferNum);
-		for (uint32_t i = 0; i < intervals.size(); ++i) {
-			if (intervals[i].textsNum != cltFoldrItr->intervals[i].textsInIntervalNum ||
-				intervals[i].hash != cltFoldrItr->intervals[i].hashOfKeys) {
-				buffer->PushUint32(i);
-				buffer->PushUint32(intervals[i].textsNum);
-
-				for (uint32_t i2 = intervals[i].firstTextIdx; i2 < intervals[i].firstTextIdx + intervals[i].textsNum; ++i2) {
-					textsKeysRefs[i2]->textRef->SaveToBase(*buffer);
-				}
-			}
+		else { // Пошлём на клиент дифф-текстов каталога (разбитый по интевалам)
+			buffer->PushUint8(FolderDataTypeForSyncMsg::DiffTexts);
+			FillDiffFolderInfo(buffer.get(), *srvFoldrItr, *cltFoldrItr);
 		}
 	}
 	return buffer;
