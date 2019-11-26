@@ -23,7 +23,6 @@ void DbSerializer::HistoryFlush()
 	const double HISTORY_FLUSH_INTERVAL = 1.f;
 
 	_historyFile.timeToFlush = HISTORY_FLUSH_INTERVAL;
-	bool isJustCreated = false;
 	std::ofstream file;
 
 	if (_historyFile.name.empty()) {
@@ -36,10 +35,9 @@ void DbSerializer::HistoryFlush()
 		}
 		const int HEADER_SIZE = 8;
 		file.write("TDHF0001", HEADER_SIZE);
-		isJustCreated = true;
 		_historyFile.savedFileSize = HEADER_SIZE;
 	}
-	if (!isJustCreated) {
+	else {
 		std::string fullFileName = _path + _historyFile.name;
 		file.open(fullFileName, std::ios::out | std::ios::app | std::ios::binary);
 		if (file.rdstate()) {
