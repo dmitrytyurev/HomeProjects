@@ -784,7 +784,8 @@ void SClientMessagesMgr::FillDiffFolderInfo(SerializationBuffer* buffer, Folder&
 		}
 		++(intervals[cltKeyIdx].textsNum);
 	}
-out:    // Заполняем значения хэшей в интервалах (хэш интервала считается, как хэш ключей всех текстов интервала)
+out:    // Заполняем значения хэшей в интервалах (хэш интервала считается, как хэш ключей всех текстов интервала
+		// каждый присланный ключ считается началом очередного интервала)
 	for (auto& interval : intervals) {
 		uint64_t hash = 0;
 		for (uint32_t i = interval.firstTextIdx; i < (int)interval.firstTextIdx + interval.textsNum; ++i) {

@@ -91,7 +91,7 @@ void test()
 	{
 		TextTranslatedPtr textPtr = std::make_shared<TextTranslated>();
 		textPtr->baseText = "BaseText1";
-		textPtr->id = "TextID1_";
+		textPtr->id = "TextID1";
 		textPtr->timestampModified = 101;
 		folder.texts.emplace_back(textPtr);
 	}
@@ -109,6 +109,62 @@ void test()
 		textPtr->baseText = "BaseText3";
 		textPtr->id = "TextID3";
 		textPtr->timestampModified = 103;
+		folder.texts.emplace_back(textPtr);
+	}
+
+	{
+		TextTranslatedPtr textPtr = std::make_shared<TextTranslated>();
+		textPtr->baseText = "BaseText4";
+		textPtr->id = "TextID4";
+		textPtr->timestampModified = 104;
+		folder.texts.emplace_back(textPtr);
+	}
+
+	{
+		TextTranslatedPtr textPtr = std::make_shared<TextTranslated>();
+		textPtr->baseText = "BaseText5";
+		textPtr->id = "TextID5";
+		textPtr->timestampModified = 105;
+		folder.texts.emplace_back(textPtr);
+	}
+
+	{
+		TextTranslatedPtr textPtr = std::make_shared<TextTranslated>();
+		textPtr->baseText = "BaseText6";
+		textPtr->id = "TextID6_";
+		textPtr->timestampModified = 106;
+		folder.texts.emplace_back(textPtr);
+	}
+
+	{
+		TextTranslatedPtr textPtr = std::make_shared<TextTranslated>();
+		textPtr->baseText = "BaseText7";
+		textPtr->id = "TextID7";
+		textPtr->timestampModified = 107;
+		folder.texts.emplace_back(textPtr);
+	}
+
+	{
+		TextTranslatedPtr textPtr = std::make_shared<TextTranslated>();
+		textPtr->baseText = "BaseText8";
+		textPtr->id = "TextID8";
+		textPtr->timestampModified = 108;
+		folder.texts.emplace_back(textPtr);
+	}
+
+	{
+		TextTranslatedPtr textPtr = std::make_shared<TextTranslated>();
+		textPtr->baseText = "BaseText9";
+		textPtr->id = "TextID9";
+		textPtr->timestampModified = 109;
+		folder.texts.emplace_back(textPtr);
+	}
+
+	{
+		TextTranslatedPtr textPtr = std::make_shared<TextTranslated>();
+		textPtr->baseText = "BaseText10";
+		textPtr->id = "TextID10";
+		textPtr->timestampModified = 110;
 		folder.texts.emplace_back(textPtr);
 	}
 
