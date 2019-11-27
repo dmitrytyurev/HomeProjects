@@ -55,7 +55,7 @@ uint32_t TextsDatabase::GetCurrentPosInHistoryFile()
 
 //===============================================================================
 
-void AttributeProperty::CreateFromBase(DeserializationBuffer& buffer)
+void AttributeProperty::LoadFullDump(DeserializationBuffer& buffer)
 {
 	id = buffer.GetUint8();
 	visiblePosition = buffer.GetUint8();
@@ -69,7 +69,7 @@ void AttributeProperty::CreateFromBase(DeserializationBuffer& buffer)
 
 //===============================================================================
 
-void AttributeProperty::SaveToBase(SerializationBuffer& buffer) const
+void AttributeProperty::SaveFullDump(SerializationBuffer& buffer) const
 {
 	buffer.PushUint8(id);
 	buffer.PushUint8(visiblePosition);
@@ -147,7 +147,7 @@ SerializationBufferPtr AttributeProperty::SaveToPacket(const std::string& loginO
 
 //===============================================================================
 
-void Folder::CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
+void Folder::LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
 {
 	id = buffer.GetUint32();
 	timestampCreated = buffer.GetUint32();
@@ -157,7 +157,7 @@ void Folder::CreateFromBase(DeserializationBuffer& buffer, const std::vector<uin
 	uint32_t textsNum = buffer.GetUint32();
 	for (uint32_t i = 0; i < textsNum; ++i) {
 		texts.emplace_back(std::make_shared<TextTranslated>());
-		texts.back()->CreateFromBase(buffer, attributesIdToType);
+		texts.back()->LoadFullDump(buffer, attributesIdToType);
 	}
 }
 
@@ -185,7 +185,7 @@ void Folder::CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32
 
 //===============================================================================
 
-void Folder::SaveToBase(SerializationBuffer& buffer) const
+void Folder::SaveFullDump(SerializationBuffer& buffer) const
 {
 	buffer.PushUint32(id);
 	buffer.PushUint32(timestampCreated);
@@ -194,7 +194,7 @@ void Folder::SaveToBase(SerializationBuffer& buffer) const
 	buffer.PushUint32(parentId);
 	buffer.PushUint32(texts.size());
 	for (const auto& text : texts) {
-		text->SaveToBase(buffer);
+		text->SaveFullDump(buffer);
 	}
 }
 
@@ -229,7 +229,7 @@ SerializationBufferPtr Folder::SaveToPacket(const std::string& loginOfModifier) 
 
 //===============================================================================
 
-void TextTranslated::CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
+void TextTranslated::LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
 {
 	buffer.GetString8(id);
 	timestampCreated = buffer.GetUint32();
@@ -240,13 +240,13 @@ void TextTranslated::CreateFromBase(DeserializationBuffer& buffer, const std::ve
 	uint8_t attributesNum = buffer.GetUint8();
 	for (uint8_t i = 0; i < attributesNum; ++i) {
 		attributes.emplace_back();
-		attributes.back().CreateFromBase(buffer, attributesIdToType);
+		attributes.back().LoadFullDump(buffer, attributesIdToType);
 	}
 }
 
 //===============================================================================
 
-void TextTranslated::SaveToBase(SerializationBuffer& buffer) const
+void TextTranslated::SaveFullDump(SerializationBuffer& buffer) const
 {
 	buffer.PushString8(id);
 	buffer.PushUint32(timestampCreated);
@@ -257,7 +257,7 @@ void TextTranslated::SaveToBase(SerializationBuffer& buffer) const
 	uint8_t attributesNum = static_cast<uint8_t>(attributes.size());
 	buffer.PushUint8(attributesNum);
 	for (const auto& attrib : attributes) {
-		attrib.SaveToBase(buffer);
+		attrib.SaveFullDump(buffer);
 	}
 }
 
@@ -291,7 +291,7 @@ SerializationBufferPtr TextTranslated::SaveToPacket(uint32_t folderId, const std
 
 //===============================================================================
 
-void AttributeInText::CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
+void AttributeInText::LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
 {
 	id = buffer.GetUint8();
 	if (id >= attributesIdToType.size()) {
@@ -316,7 +316,7 @@ void AttributeInText::CreateFromBase(DeserializationBuffer& buffer, const std::v
 
 //===============================================================================
 
-void AttributeInText::SaveToBase(SerializationBuffer& buffer) const
+void AttributeInText::SaveFullDump(SerializationBuffer& buffer) const
 {
 	buffer.PushUint8(id);
 	switch (type) {

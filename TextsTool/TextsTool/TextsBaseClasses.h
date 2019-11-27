@@ -29,8 +29,8 @@ public:
 	};
 
 	AttributeProperty() {}
-	void CreateFromBase(DeserializationBuffer& buffer);
-	void SaveToBase(SerializationBuffer& buffer) const;
+	void LoadFullDump(DeserializationBuffer& buffer);
+	void SaveFullDump(SerializationBuffer& buffer) const;
 
 	void CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32_t newId);   // Создание объекта из сообщения от клиента 
 
@@ -52,8 +52,8 @@ class AttributeInText
 {
 public:
 	AttributeInText() {}
-	void CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);
-	void SaveToBase(SerializationBuffer& buffer) const;
+	void LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);
+	void SaveFullDump(SerializationBuffer& buffer) const;
 
 	std::string text;       // Текстовые данные атрибута, если это текст
 	uint8_t flagState = 0;  // Состояние флажка, если это флажок;
@@ -70,8 +70,8 @@ class TextTranslated
 {
 public:
 	TextTranslated() {}
-	void CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);
-	void SaveToBase(SerializationBuffer& buffer) const;
+	void LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);
+	void SaveFullDump(SerializationBuffer& buffer) const;
 
 	std::string id;                   // ID текста
 	uint32_t timestampCreated = 0;    // Время создания
@@ -92,8 +92,8 @@ class Folder
 {
 public:
 	Folder() {}
-	void CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);  // Создание объекта из полного файла базы
-	void SaveToBase(SerializationBuffer& buffer) const;      // Запись объекта в полный файл базы
+	void LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);  // Создание объекта из полного файла базы
+	void SaveFullDump(SerializationBuffer& buffer) const;      // Запись объекта в полный файл базы
 
 	void CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32_t newId);   // Создание объекта из сообщения от клиента 
 

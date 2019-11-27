@@ -163,7 +163,7 @@ void MainWindow::ProcessSync(DeserializationBuffer& buf)
 	int attribsNum = buf.GetUint32();
 	for (int i=0; i<attribsNum; ++i) {
 		_dataBase->_attributeProps.emplace_back();
-		_dataBase->_attributeProps.back().CreateFromBase(buf);
+		_dataBase->_attributeProps.back().LoadFullDump(buf);
 	}
 
 	// Удаляем каталоги, которых уже нет на сервере
@@ -187,7 +187,7 @@ void MainWindow::ProcessSync(DeserializationBuffer& buf)
 	int foldersToCreate = buf.GetUint32();
 	for (int i=0; i<foldersToCreate; ++i) {
 		_dataBase->_folders.emplace_back();
-		_dataBase->_folders.back().CreateFromBase(buf, attributesIdToType);
+		_dataBase->_folders.back().LoadFullDump(buf, attributesIdToType);
 	}
 
 	// Патчим каталоги с текстами, которые есть на клиенте, но устаревшие
