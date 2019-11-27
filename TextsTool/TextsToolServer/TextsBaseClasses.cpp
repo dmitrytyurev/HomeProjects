@@ -217,6 +217,7 @@ SerializationBufferPtr Folder::SaveToPacket(const std::string& loginOfModifier) 
 {
 	auto bufPtr = std::make_shared<SerializationBuffer>();
 
+	bufPtr->PushUint8(EventType::ChangeDataBase);
 	bufPtr->PushString8(loginOfModifier);
 	bufPtr->PushUint32(timestampCreated);
 	bufPtr->PushUint8(EventType::CreateFolder);
@@ -278,6 +279,7 @@ SerializationBufferPtr TextTranslated::SaveToPacket(uint32_t folderId, const std
 {
 	auto bufPtr = std::make_shared<SerializationBuffer>();
 
+	bufPtr->PushUint8(EventType::ChangeDataBase);
 	bufPtr->PushString8(loginOfModifier);
 	bufPtr->PushUint32(timestampCreated);
 	bufPtr->PushUint8(EventType::CreateText);

@@ -189,8 +189,7 @@ void DbSerializer::LoadDatabaseInner(const std::string& fullFileName)
 	}
 
 	DeserializationBuffer buf;
-	buf._buffer.resize(fileSize + 1);  // +1 потому, что строки грузим путём временного добавления 0 в конце
-	buf._buffer[fileSize] = 0;
+	buf._buffer.resize(fileSize);
 
 	std::ifstream file(fullFileName, std::ios::in | std::ios::binary);
 	if (file.rdstate()) {
@@ -236,8 +235,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 	}
 
 	DeserializationBuffer buf;
-	buf._buffer.resize(fileSize + 1);  // +1 потому, что строки грузим путём временного добавления 0 в конце
-	buf._buffer[fileSize] = 0;
+	buf._buffer.resize(fileSize);
 
 	std::ifstream file(fullFileName, std::ios::in | std::ios::binary);
 	if (file.rdstate()) {
@@ -250,7 +248,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 
 	while (true)
 	{
-		if (buf.GetRestBytesNum() == 1) { // Потому, что выше добавили в конец один нулевой байт
+		if (buf.GetRestBytesNum() == 0) {
 			break;
 		}
 		uint32_t offsToEventBegin = buf.offset;

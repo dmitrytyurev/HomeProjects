@@ -1,6 +1,7 @@
 #include "pch.h"
 #include <iostream>
 #include <experimental/filesystem>
+#include <cassert>
 #include "Utils.h"
 
 //===============================================================================
@@ -23,6 +24,7 @@ void Log(const std::string& message)
 
 void ExitMsg(const std::string& message)
 {
+	assert(false);
 	Log("Fatal: " + message);
 	throw std::exception("Exiting app exception");
 }

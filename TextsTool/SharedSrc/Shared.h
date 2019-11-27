@@ -60,10 +60,11 @@ namespace EventType
 {
 	enum : uint8_t
 	{
-		RequestSync = 0,               // Запрос синхронизации при подключении нового клиента
-		ReplySync = 1,                 // Ответ на запрос EventRequestSync
-		RequestListOfDatabases = 2,    // Запрос списка баз с текстами
-		ReplyListOfDatabases = 3,      // Ответ на запрос RequestListOfDatabases
+		RequestSync = 0,               // Clt->Srv: Запрос синхронизации при подключении нового клиента
+		ReplySync = 1,                 // Srv->Clt: Ответ на запрос EventRequestSync
+		RequestListOfDatabases = 2,    // Clt->Srv: Запрос списка баз с текстами
+		ReplyListOfDatabases = 3,      // Srv->Clt: Ответ на запрос RequestListOfDatabases
+		ChangeDataBase = 4,            // Srv->Clt: Сообщение об изменении базы (другим польователем или наш loopback) (см. типы событий начиная с номера 100)
 
 		// Блок событий, приходящих с клиента на сервер, а потом рассылаемых с сервера на остальные клиенты подключенные к данной базе
 		// Используются в файлах базы и истории, поэтому не могут быть изменены

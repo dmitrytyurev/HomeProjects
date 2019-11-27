@@ -92,9 +92,9 @@ void SMessagesRepacker::RepackPacketsInToMessages(std::shared_ptr<SConnectedClie
 			for (int iMsg = 0; iMsg < (int)messagesNum; ++iMsg) {
 				uint32_t messageSize = buffer.GetUint32();
 				client->_msgsQueueIn.push_back(std::make_unique<DeserializationBuffer>(buffer.GetNextBytes(messageSize), messageSize));
-				if (!buffer.IsEmpty()) {
-					Log("!buffer.IsEmpty()");
-				}
+			}
+			if (!buffer.IsEmpty()) {
+				Log("!buffer.IsEmpty()");
 			}
 			clLow->_packetsQueueIn.erase(clLow->_packetsQueueIn.begin() + iPckt);
 			--iPckt;

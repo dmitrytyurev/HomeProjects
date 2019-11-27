@@ -68,14 +68,11 @@ void DeserializationBuffer::GetString(std::string& result)
 	T textLength = *(reinterpret_cast<T*>(_buffer.data() + offset));
 	offset += sizeof(T);
 #if CHECK_BUFFER
-	if (offset + textLength >= _buffer.size()) {
+	if (offset + textLength > _buffer.size()) {
 		ExitMsg("GetString _buffer overrun");
 	}
 #endif
-	uint8_t keep = _buffer[offset + textLength];
-	_buffer[offset + textLength] = 0;
-	result = reinterpret_cast<const char*>(_buffer.data() + offset);
-	_buffer[offset + textLength] = keep;
+	result.assign(reinterpret_cast<const char*>(_buffer.data() + offset), textLength);
 	offset += textLength;
 }
 

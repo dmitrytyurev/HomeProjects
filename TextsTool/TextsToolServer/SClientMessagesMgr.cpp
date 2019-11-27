@@ -29,6 +29,7 @@ void SClientMessagesMgr::SaveToHistory(TextsDatabasePtr db, const std::string& l
 void SClientMessagesMgr::SendToClients(const std::string& dbName, uint32_t ts, const DeserializationBuffer& buf, const std::string& loginOfLastModifier)
 {
 	auto bufPtr = std::make_shared<SerializationBuffer>();
+	bufPtr->PushUint8(EventType::ChangeDataBase);
 	bufPtr->PushString8(loginOfLastModifier);
 	bufPtr->PushUint32(ts);
 	bufPtr->Push(buf, true); // «аберЄм все данные из буфера, не важно сколько было из него уже прочитано
@@ -48,8 +49,8 @@ void SClientMessagesMgr::Update(double dt)
 			case EventType::RequestSync:
 			{
 				buf->GetString<uint8_t>(client->_dbName);
-				TextsDatabasePtr db2 = GetDbPtrByDbName(client->_dbName);  // !!! ¬еро€тно, тут надо проверить наличие базы и если нету, то запустить фоновую загрузку, а выполнение запроса отложить
-				SerializationBufferPtr bufPtr = MakeSyncMessage(*buf, *db2); // —формировать сообщение клиенту - дл€ синхронизации его базы (он подключилс€)
+				db = GetDbPtrByDbName(client->_dbName);  // !!! ¬еро€тно, тут надо проверить наличие базы и если нету, то запустить фоновую загрузку, а выполнение запроса отложить
+				SerializationBufferPtr bufPtr = MakeSyncMessage(*buf, *db); // —формировать сообщение клиенту - дл€ синхронизации его базы (он подключилс€)
 				client->_msgsQueueOut.emplace_back(bufPtr);
 				client->_syncFinished = true;
 			}
@@ -196,6 +197,7 @@ void SClientMessagesMgr::Update(double dt)
 				if (isSucces) {
 					SendToClients(client->_dbName, ts, *buf, client->_login);  // –азослать пакеты другим клиентам			
 				}
+//db->_dbSerializer->SaveDatabase();
 			}
 			break;
 			case EventType::AddAttributeToText:

@@ -86,7 +86,7 @@ void Repacker::RepackPacketsInToMessages(CHttpManager& httpManager, std::vector<
             for (iPckt2 = iPckt + 1; iPckt2 < (int)httpManager._packetsIn.size(); ++iPckt2) { // Просмотрим следующие пакеты, чтобы выяснить есть ли в них все фрагменты для сбора сообщения iPckt
                 auto& packetPtr2 = httpManager._packetsIn[iPckt2];
 				DeserializationBuffer buffer2(packetPtr2->_packetData); // !!! Неоптимально. Сделать возможность в DeserializationBuffer хранить указатель на вектор, а не копировать в него вектор целиком
-				uint8_t pType2 = buffer2.GetUint32();
+				uint8_t pType2 = buffer2.GetUint8();
 				if (pType2 != PacketDataType::PartOfMessage) {
 					Log("pType2 != PacketDataType::PartOfMessage"); // !!! Сделать корректный выход, если возможно
 				}

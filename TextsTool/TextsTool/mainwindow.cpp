@@ -426,8 +426,17 @@ void MainWindow::on_pushButton_clicked()
 	hash = Utils::AddHash(hash, texts[9].key, false);
 	_msgsQueueOut.back()->PushBytes(&hash, sizeof(uint64_t));
 
+	//-------------------
+
+	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
+	_msgsQueueOut.back()->PushUint8(111); // Изменить основной текст
+	_msgsQueueOut.back()->PushString8("TextID1");
+	_msgsQueueOut.back()->PushString16("NewBaseText1");
 
 
+
+
+	//-------------------
 
     httpManager.Connect("mylogin", "mypassword");
 }
