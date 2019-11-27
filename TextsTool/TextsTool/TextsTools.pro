@@ -26,6 +26,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        CHttpManager.cpp \
         CMessagesRepacker.cpp \
         DeserializationBuffer.cpp \
         SerializationBuffer.cpp \
@@ -35,6 +36,7 @@ SOURCES += \
 
 HEADERS += \
         ../SharedSrc/Shared.h \
+        CHttpManager.h \
         CMessagesRepacker.h \
         DeserializationBuffer.h \
         SerializationBuffer.h \
