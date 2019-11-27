@@ -28,8 +28,10 @@ CONFIG += c++11
 SOURCES += \
         CHttpManager.cpp \
         CMessagesRepacker.cpp \
+        DbSerializer.cpp \
         DeserializationBuffer.cpp \
         SerializationBuffer.cpp \
+        TextsBaseClasses.cpp \
         Utils.cpp \
         main.cpp \
         mainwindow.cpp
@@ -38,8 +40,10 @@ HEADERS += \
         ../SharedSrc/Shared.h \
         CHttpManager.h \
         CMessagesRepacker.h \
+        DbSerializer.h \
         DeserializationBuffer.h \
         SerializationBuffer.h \
+        TextsBaseClasses.h \
         Utils.h \
         mainwindow.h
 
