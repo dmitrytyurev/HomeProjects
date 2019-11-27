@@ -113,12 +113,10 @@ class TextsDatabase
 {
 public:
 	void CreateDatabase(const std::string path, const std::string dbName); // Создаёт базу в памяти, создаёт пустую базу на диске
-	void LoadDatabase(const std::string path, const std::string dbName); // Создаёт базу в памяти из файла базы и файла истории
+	void LoadDatabase(const std::string path, const std::string dbName); // Создаёт базу в памяти из файла базы
 
 	std::string _dbName;           // Имя базы данных текстов
-	uint8_t _newAttributeId = 0;   // Когда пользователь создаёт новый атрибут, берём этот номер. Поле инкрементим.
 	std::vector<AttributeProperty> _attributeProps; // Свойства атрибутов (колонок) таблицы
-	uint32_t _newFolderId = 0;     // Когда пользователь создаёт новую папку, берём этот номер. Поле инкрементим.
 	std::vector<Folder> _folders;  // Папки. Рекурсивная структура через ссылку на ID родителя
 
 	DbSerializerPtr _dbSerializer; // Чтение/запись базы текстов на диск

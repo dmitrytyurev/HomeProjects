@@ -91,9 +91,9 @@ void SHttpManager::Update(double dt)
 void SHttpManager::RequestProcessor(DeserializationBuffer& request, SerializationBuffer& response)
 {
 	std::string login;
-	request.GetString<uint8_t>(login);
+	request.GetString8(login);
 	std::string password;
-	request.GetString<uint8_t>(password);
+	request.GetString8(password);
 	uint8_t requestType = request.GetUint8();
 
 	Utils::MutexLock lock(_connections.mutex);

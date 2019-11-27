@@ -37,7 +37,7 @@ void AttributeProperty::CreateFromBase(DeserializationBuffer& buffer)
 	visiblePosition = buffer.GetUint8();
 	isVisible = static_cast<bool>(buffer.GetUint8());
 	timestampCreated = buffer.GetUint32();
-	buffer.GetString<uint8_t>(name);
+	buffer.GetString8(name);
 	type = buffer.GetUint8();
 	param1 = buffer.GetUint32();
 	param2 = buffer.GetUint32();
@@ -66,7 +66,7 @@ void AttributeProperty::CreateFromPacket(DeserializationBuffer& buffer, uint32_t
 	visiblePosition = buffer.GetUint8();
 	isVisible = static_cast<bool>(buffer.GetUint8());
 	timestampCreated = ts;
-	buffer.GetString<uint8_t>(name);
+	buffer.GetString8(name);
 	type = buffer.GetUint8();
 	param1 = buffer.GetUint32();
 	param2 = 0;
@@ -79,7 +79,7 @@ void Folder::CreateFromBase(DeserializationBuffer& buffer, const std::vector<uin
 	id = buffer.GetUint32();
 	timestampCreated = buffer.GetUint32();
 	timestampModified = buffer.GetUint32();
-	buffer.GetString<uint16_t>(name);
+	buffer.GetString16(name);
 	parentId = buffer.GetUint32();
 	uint32_t textsNum = buffer.GetUint32();
 	for (uint32_t i = 0; i < textsNum; ++i) {
@@ -96,7 +96,7 @@ void Folder::CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32
 	timestampCreated = ts;
 	timestampModified = ts;
 	parentId = buffer.GetUint32();
-	buffer.GetString<uint8_t>(name);
+	buffer.GetString8(name);
 }
 
 //===============================================================================
@@ -118,12 +118,12 @@ void Folder::SaveToBase(SerializationBuffer& buffer) const
 
 void TextTranslated::CreateFromBase(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
 {
-	buffer.GetString<uint8_t>(id);
+	buffer.GetString8(id);
 	timestampCreated = buffer.GetUint32();
 	timestampModified = buffer.GetUint32();
-	buffer.GetString<uint8_t>(loginOfLastModifier);
+	buffer.GetString8(loginOfLastModifier);
 	offsLastModified = buffer.GetUint32();
-	buffer.GetString<uint16_t>(baseText);
+	buffer.GetString16(baseText);
 	uint8_t attributesNum = buffer.GetUint8();
 	for (uint8_t i = 0; i < attributesNum; ++i) {
 		attributes.emplace_back();
@@ -161,7 +161,7 @@ void AttributeInText::CreateFromBase(DeserializationBuffer& buffer, const std::v
 	case AttributeProperty::Translation_t:
 	case AttributeProperty::CommonText_t:
 	{
-		buffer.GetString<uint16_t>(text);
+		buffer.GetString16(text);
 	}
 	break;
 	case AttributeProperty::Checkbox_t:

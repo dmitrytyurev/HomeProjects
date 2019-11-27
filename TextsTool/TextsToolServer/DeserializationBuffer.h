@@ -14,19 +14,24 @@ void ExitMsg(const std::string& message);
 class DeserializationBuffer
 {
 public:
-	uint8_t GetUint8()
-	{
+	uint8_t GetUint8() {
 		return GetUint<uint8_t>();
 	}
 
-	uint32_t GetUint32()
-	{
+	uint32_t GetUint32() {
 		return GetUint<uint32_t>();
 	}
 
-	uint64_t GetUint64()
-	{
+	uint64_t GetUint64() {
 		return GetUint<uint64_t>();
+	}
+
+	void GetString8(std::string& result) {
+		GetString<uint8_t>(result);
+	}
+
+	void GetString16(std::string& result) {
+		GetString<uint16_t>(result);
 	}
 
 	DeserializationBuffer() {}
@@ -34,8 +39,6 @@ public:
 	DeserializationBuffer(const uint8_t* buf, int bufSize);
 	void AddBytes(const uint8_t* buf, int bufSize);
 
-	template <typename T>
-	void GetString(std::string& result);
 	template <typename T>
 	std::vector<uint8_t> GetVector();
 	bool IsEmpty() { return _buffer.size() == offset; }
@@ -48,6 +51,8 @@ public:
 private:
 	template <typename T>
 	T GetUint();
+	template <typename T>
+	void GetString(std::string& result);
 };
 
 using DeserializationBufferPtr = std::unique_ptr<DeserializationBuffer>;

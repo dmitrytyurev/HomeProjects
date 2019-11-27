@@ -48,7 +48,7 @@ void SClientMessagesMgr::Update(double dt)
 			switch (actionType) {
 			case EventType::RequestSync:
 			{
-				buf->GetString<uint8_t>(client->_dbName);
+				buf->GetString8(client->_dbName);
 				db = GetDbPtrByDbName(client->_dbName);  // !!! ¬еро€тно, тут надо проверить наличие базы и если нету, то запустить фоновую загрузку, а выполнение запроса отложить
 				SerializationBufferPtr bufPtr = MakeSyncMessage(*buf, *db); // —формировать сообщение клиенту - дл€ синхронизации его базы (он подключилс€)
 				client->_msgsQueueOut.emplace_back(bufPtr);
@@ -140,7 +140,7 @@ void SClientMessagesMgr::Update(double dt)
 			{
 				uint32_t folderId = buf->GetUint32();     // »зменени€ в базе
 				std::string textId;
-				buf->GetString<uint8_t>(textId);
+				buf->GetString8(textId);
 				auto& f = db->_folders;
 				auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
 				if (result != std::end(f)) {
@@ -317,7 +317,7 @@ bool SClientMessagesMgr::ModifyDbRenameFolder(DeserializationBuffer& buf, TextsD
 {
 	uint32_t folderId = buf.GetUint32();
 	std::string newFolderName;
-	buf.GetString<uint8_t>(newFolderName);
+	buf.GetString8(newFolderName);
 	auto& f = db._folders;
 	auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
 	if (result != std::end(f)) {
@@ -372,7 +372,7 @@ bool SClientMessagesMgr::ModifyDbRenameAttribute(DeserializationBuffer& buf, Tex
 {
 	uint8_t attributeId = buf.GetUint8();
 	std::string newAttributeName;
-	buf.GetString<uint8_t>(newAttributeName);
+	buf.GetString8(newAttributeName);
 	auto& ap = db._attributeProps;
 	auto result = std::find_if(std::begin(ap), std::end(ap), [attributeId](const AttributeProperty& el) { return el.id == attributeId; });
 	if (result != std::end(ap)) {
@@ -410,7 +410,7 @@ bool SClientMessagesMgr::ModifyDbChangeAttributeVis(DeserializationBuffer& buf, 
 bool SClientMessagesMgr::ModifyDbDeleteText(DeserializationBuffer& buf, TextsDatabase& db, uint32_t& prevTsModified, uint32_t& prevOffsModified)
 {
 	std::string textId;
-	buf.GetString<uint8_t>(textId);
+	buf.GetString8(textId);
 	for (auto& f : db._folders) {
 		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
 		if (result != std::end(f.texts)) {
@@ -436,7 +436,7 @@ bool SClientMessagesMgr::ModifyDbMoveTextToFolder(
 	uint32_t& prevOffsModified)
 {
 	std::string textId;
-	buf.GetString<uint8_t>(textId);
+	buf.GetString8(textId);
 	uint32_t newFolderId = buf.GetUint32();
 
 	for (auto& f : db._folders) {
@@ -477,9 +477,9 @@ bool  SClientMessagesMgr::ModifyDbChangeBaseText(
 	uint32_t& prevOffsModified)
 {
 	std::string textId;
-	buf.GetString<uint8_t>(textId);
+	buf.GetString8(textId);
 	std::string newBaseText;
-	buf.GetString<uint16_t>(newBaseText);
+	buf.GetString16(newBaseText);
 
 	for (auto& f : db._folders) {
 		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
@@ -511,7 +511,7 @@ bool  SClientMessagesMgr::ModifyDbAddAttributeToText(
 	uint32_t& prevOffsModified)
 {
 	std::string textId;
-	buf.GetString<uint8_t>(textId);
+	buf.GetString8(textId);
 	uint8_t attributeId = buf.GetUint8();
 	uint8_t attributeDataType = buf.GetUint8();
 
@@ -555,7 +555,7 @@ bool  SClientMessagesMgr::ModifyDbAddAttributeToText(
 	{
 	case AttributeProperty::Translation_t:
 	case AttributeProperty::CommonText_t:
-		buf.GetString<uint16_t>(attributeInText.text);
+		buf.GetString16(attributeInText.text);
 		break;
 	case AttributeProperty::Checkbox_t:
 		attributeInText.flagState = buf.GetUint8();
@@ -578,7 +578,7 @@ bool  SClientMessagesMgr::ModifyDbDelAttributeFromText(
 	uint32_t& prevOffsModified)
 {
 	std::string textId;
-	buf.GetString<uint8_t>(textId);
+	buf.GetString8(textId);
 	uint8_t attributeId = buf.GetUint8();
 
 	TextTranslatedPtr tmpTextPtr;
@@ -623,7 +623,7 @@ bool  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 	uint32_t& prevOffsModified)
 {
 	std::string textId;
-	buf.GetString<uint8_t>(textId);
+	buf.GetString8(textId);
 	uint8_t attributeId = buf.GetUint8();
 	uint8_t attributeDataType = buf.GetUint8();
 
@@ -662,7 +662,7 @@ bool  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 	{
 	case AttributeProperty::Translation_t:
 	case AttributeProperty::CommonText_t:
-		buf.GetString<uint16_t>(result->text);
+		buf.GetString16(result->text);
 		break;
 	case AttributeProperty::Checkbox_t:
 		result->flagState = buf.GetUint8();

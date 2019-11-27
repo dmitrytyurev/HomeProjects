@@ -28,6 +28,7 @@ void DbSerializer::HistoryFlush()
 		return;
 	}
 
+
 	std::ofstream file;
 
 	if (_historyFile.name.empty()) {
@@ -258,7 +259,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 		}
 		uint32_t offsToEventBegin = buf.offset;
 		std::string modifierLogin;
-		buf.GetString<uint8_t>(modifierLogin);
+		buf.GetString8(modifierLogin);
 		uint32_t ts = buf.GetUint32();
 		uint8_t actionType = buf.GetUint8();
 		switch (actionType)
@@ -295,7 +296,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 		{
 			uint32_t folderId = buf.GetUint32();
 			std::string textId;
-			buf.GetString<uint8_t>(textId);
+			buf.GetString8(textId);
 			auto& f = _pDataBase->_folders;
 			auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
 			if (result != std::end(f)) {
