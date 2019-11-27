@@ -15,13 +15,6 @@ DbSerializer::DbSerializer(TextsDatabase* pDataBase) : _pDataBase(pDataBase)
 
 //===============================================================================
 
-void DbSerializer::Update(double dt)
-{
-}
-
-
-//===============================================================================
-
 void DbSerializer::SetPath(const std::string& path)
 {
 	_path = path;

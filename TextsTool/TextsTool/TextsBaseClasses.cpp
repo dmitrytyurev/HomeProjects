@@ -31,13 +31,6 @@ void TextsDatabase::LoadDatabase(const std::string path, const std::string dbNam
 
 //===============================================================================
 
-void TextsDatabase::Update(double dt)
-{
-	_dbSerializer->Update(dt);
-}
-
-//===============================================================================
-
 void AttributeProperty::CreateFromBase(DeserializationBuffer& buffer)
 {
 	id = buffer.GetUint8();

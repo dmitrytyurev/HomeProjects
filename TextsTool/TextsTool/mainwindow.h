@@ -12,6 +12,9 @@
 #include "SerializationBuffer.h"
 #include "CHttpManager.h"
 
+class TextsDatabase;
+using TextsDatabasePtr = std::shared_ptr<TextsDatabase>;
+
 namespace Ui {
 class MainWindow;
 }
@@ -31,7 +34,8 @@ private slots:
 private:
     Ui::MainWindow *ui = nullptr;
     QTimer *timer = nullptr;
-    CHttpManager httpManager;
+	TextsDatabasePtr _dataBase;
+	CHttpManager _httpManager;
     std::vector<SerializationBufferPtr>   _msgsQueueOut; // Очередь сообщений, которые нужно отослать на сервер
     std::vector<DeserializationBufferPtr> _msgsQueueIn;  // Очередь пришедших от сервера сообщений
 };

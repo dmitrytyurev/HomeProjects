@@ -826,6 +826,7 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 	auto buffer = std::make_shared<SerializationBuffer>();
 
 	buffer->PushUint8(EventType::ReplySync);
+	buffer->PushString8(db._dbName);
 
 	// Посылаем аттрибуты таблицы целиком
 	buffer->PushUint32(db._attributeProps.size());

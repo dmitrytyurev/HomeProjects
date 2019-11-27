@@ -4,7 +4,7 @@
 
 //===============================================================================
 
-DeserializationBuffer::DeserializationBuffer(std::vector<uint8_t>& buffer): _buffer(buffer)
+DeserializationBuffer::DeserializationBuffer(const std::vector<uint8_t>& buffer): _buffer(buffer)
 {
 }
 

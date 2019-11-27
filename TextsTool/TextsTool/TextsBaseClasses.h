@@ -114,7 +114,6 @@ class TextsDatabase
 public:
 	void CreateDatabase(const std::string path, const std::string dbName); // Создаёт базу в памяти, создаёт пустую базу на диске
 	void LoadDatabase(const std::string path, const std::string dbName); // Создаёт базу в памяти из файла базы и файла истории
-	void Update(double dt);
 
 	std::string _dbName;           // Имя базы данных текстов
 	uint8_t _newAttributeId = 0;   // Когда пользователь создаёт новый атрибут, берём этот номер. Поле инкрементим.

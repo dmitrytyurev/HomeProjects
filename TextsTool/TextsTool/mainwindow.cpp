@@ -138,20 +138,38 @@ void MainWindow::on_pushButton_clicked()
 
 	//-------------------
 
-    httpManager.Connect("mylogin", "mypassword");
+	_httpManager.Connect("mylogin", "mypassword");
+}
+
+//---------------------------------------------------------------
+
+void ProcessMessageFromServer(const std::vector<uint8_t>& buf)
+{
+	DeserializationBuffer dbuf(buf); // !!! Неоптимально, подумать о работе по указателю без копирования данных
+	uint8_t msgType = dbuf.GetUint8();
+	switch(msgType) {
+	case EventType::ReplySync:
+	{
+	}
+	break;
+
+
+	}
+
 }
 
 //---------------------------------------------------------------
 
 void MainWindow::update()
 {
-	httpManager.Update();
-	Repacker::RepackPacketsInToMessages(httpManager, _msgsQueueIn);
-	Repacker::RepackMessagesOutToPackets(_msgsQueueOut, httpManager);
+	_httpManager.Update();
+	Repacker::RepackPacketsInToMessages(_httpManager, _msgsQueueIn);
+	Repacker::RepackMessagesOutToPackets(_msgsQueueOut, _httpManager);
 
 	for (auto& msg: _msgsQueueIn) {
 		Log("Message:  ");
 		Utils::LogBuf(msg->_buffer);
+		ProcessMessageFromServer(msg->_buffer);
 	}
 	_msgsQueueIn.resize(0);
 }

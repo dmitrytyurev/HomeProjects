@@ -30,7 +30,7 @@ public:
 	}
 
 	DeserializationBuffer() {}
-	DeserializationBuffer(std::vector<uint8_t>& buffer);
+	DeserializationBuffer(const std::vector<uint8_t>& buffer);
 	DeserializationBuffer(const uint8_t* buf, int bufSize);
 	void AddBytes(const uint8_t* buf, int bufSize);
 
