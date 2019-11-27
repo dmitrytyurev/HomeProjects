@@ -23,6 +23,11 @@ void DbSerializer::HistoryFlush()
 	const double HISTORY_FLUSH_INTERVAL = 1.f;
 
 	_historyFile.timeToFlush = HISTORY_FLUSH_INTERVAL;
+
+	if (_historyFile.buffer.buffer.empty()) {
+		return;
+	}
+
 	std::ofstream file;
 
 	if (_historyFile.name.empty()) {

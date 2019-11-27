@@ -71,11 +71,11 @@ void Repacker::RepackPacketsInToMessages(CHttpManager& httpManager, std::vector<
 			for (int iMsg = 0; iMsg < (int)messagesNum; ++iMsg) {
 				uint32_t messageSize = buffer.GetUint32();
                 msgsQueueIn.push_back(std::make_unique<DeserializationBuffer>(buffer.GetNextBytes(messageSize), messageSize));
-				if (!buffer.IsEmpty()) {
-					Log("!buffer.IsEmpty()");
-				}
 			}
-            httpManager._packetsIn.erase(httpManager._packetsIn.begin() + iPckt);
+			if (!buffer.IsEmpty()) {
+				Log("!buffer.IsEmpty()");
+			}
+			httpManager._packetsIn.erase(httpManager._packetsIn.begin() + iPckt);
 			--iPckt;
 		}
 		else if (pType == PacketDataType::PartOfMessage) { // В данном пакете первый фрагмент неполного сообщения
