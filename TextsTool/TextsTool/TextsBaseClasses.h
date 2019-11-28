@@ -112,8 +112,7 @@ public:
 class TextsDatabase
 {
 public:
-	void CreateDatabase(const std::string path, const std::string dbName); // Создаёт базу в памяти, создаёт пустую базу на диске
-	void LoadDatabase(const std::string path, const std::string dbName); // Создаёт базу в памяти из файла базы
+	TextsDatabase(const std::string path, const std::string dbName);
 
 	std::string _dbName;           // Имя базы данных текстов
 	std::vector<AttributeProperty> _attributeProps; // Свойства атрибутов (колонок) таблицы

@@ -11,7 +11,7 @@
 #include "DbSerializer.h"
 
 Ui::MainWindow* debugGlobalUi = nullptr;
-const static std::string databasePath = "D:/Dimka/HomeProjects/";
+const static std::string databasePath = "D:/Dimka/HomeProjects/TextsTool/DatabaseClient/";
 const static int KeyPerTextsNum = 100;  // На такое количество текстов создаётся один ключ для запроса RequestSync
 
 //---------------------------------------------------------------
@@ -59,7 +59,7 @@ void MainWindow::on_pushButton_clicked()
 	_msgsQueueOut.back()->PushUint32(54321); // TS изменения папки на клиенте
 	_msgsQueueOut.back()->PushUint32(0); // Количество отобранных ключей
 */
-
+/*
 	_msgsQueueOut.back()->PushUint8(EventType::RequestSync);
 	_msgsQueueOut.back()->PushString8("TestDB");
 	_msgsQueueOut.back()->PushUint32(1); // Число папок
@@ -125,10 +125,11 @@ void MainWindow::on_pushButton_clicked()
 	_msgsQueueOut.back()->PushString8("TextID1");
 	_msgsQueueOut.back()->PushString16("NewBaseText1");
 
-
-
-
+*/
 	//-------------------
+
+
+	LoadBaseAndRequestSync("TextsBase"); // Загрузит базу если есть (если нет, создаст в памят пустую) и добавит запрос синхронизации в очередь сообщений на отсылку
 
 	_httpManager.Connect("mylogin", "mypassword");
 }
@@ -140,11 +141,11 @@ void MainWindow::ProcessSync(DeserializationBuffer& buf)
 	std::string dbName;
 	buf.GetString8(dbName);
 	if (_dataBase && _dataBase->_dbName != dbName) {
+		_dataBase->_dbSerializer->SaveDatabase();
 		_dataBase.reset();
 	}
 	if (!_dataBase) {
-		_dataBase = std::make_shared<TextsDatabase>();
-		_dataBase->CreateDatabase(databasePath, dbName);
+		_dataBase = std::make_shared<TextsDatabase>(databasePath, dbName);
 	}
 
 	// Загружаем атрибуты заново с сервера
@@ -232,11 +233,9 @@ void MainWindow::ProcessSync(DeserializationBuffer& buf)
 
 //---------------------------------------------------------------
 
-void MainWindow::SendRequestSyncMessage()
+void MainWindow::LoadBaseAndRequestSync(const std::string& dbName)
 {
-	if (!_dataBase) {
-		ExitMsg("SendRequestSyncMessage: !_dataBase)");
-	}
+	_dataBase = std::make_shared<TextsDatabase>(databasePath, dbName);
 
 	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
 	auto& buf = *_msgsQueueOut.back();

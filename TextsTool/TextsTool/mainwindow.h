@@ -33,7 +33,7 @@ private slots:
     void update();
 	void ProcessSync(DeserializationBuffer& buf);
 	void ProcessMessageFromServer(const std::vector<uint8_t>& buf);
-	void SendRequestSyncMessage();
+	void LoadBaseAndRequestSync(const std::string& dbName);
 
 
 private:

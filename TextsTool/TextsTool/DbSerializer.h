@@ -18,12 +18,10 @@ public:
 	DbSerializer(TextsDatabase* pDataBase);
 	void SetPath(const std::string& path);
 
-	void SaveDatabase();  //   Записывает всю базу в файл. Имя файла базы конструирует из имени базы
-	bool LoadDatabase();  // Читает базу из полного файла 
+	void SaveDatabase();
+	void LoadDatabase();
 
 private:
-	std::string FindFreshBaseFileName(uint32_t& resultTimestamp);
-	void LoadDatabaseInner(const std::string& fullFileName);
 
 	std::string _path;            // Путь, где хранятся файлы базы и файлы истории
 	TextsDatabase* _pDataBase = nullptr;

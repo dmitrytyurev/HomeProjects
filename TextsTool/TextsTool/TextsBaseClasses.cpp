@@ -11,23 +11,14 @@ void ExitMsg(const std::string& message);
 
 //===============================================================================
 
-void TextsDatabase::CreateDatabase(const std::string path, const std::string dbName)
-{
-	_dbName = dbName;
-	_dbSerializer = std::make_unique<DbSerializer>(this);
-	_dbSerializer->SetPath(path);
-	_dbSerializer->SaveDatabase();
-}
-
-//===============================================================================
-
-void TextsDatabase::LoadDatabase(const std::string path, const std::string dbName)
+TextsDatabase::TextsDatabase(const std::string path, const std::string dbName)
 {
 	_dbName = dbName;
 	_dbSerializer = std::make_unique<DbSerializer>(this);
 	_dbSerializer->SetPath(path);
 	_dbSerializer->LoadDatabase();
 }
+
 
 //===============================================================================
 

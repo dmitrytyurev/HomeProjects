@@ -11,7 +11,7 @@
 #include "DbSerializer.h"
 #include "Utils.h"
 
-const std::string databasesPath = "D:/Dimka/HomeProjects/";
+const std::string databasesPath = "D:/Dimka/HomeProjects/TextsTool/DatabaseServer/";
 
 //===============================================================================
 
