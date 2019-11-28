@@ -77,8 +77,6 @@ private:
 		TextTranslated* textRef = nullptr;    // Указатель на текст, для которого этот ключ
 	};
 
-	static bool IfKeyALess(const uint8_t* p1, int size1, const uint8_t* p2, int size2);
-	void MakeKey(uint32_t tsModified, const std::string& textId, std::vector<uint8_t>& result);
 	void SaveToHistory(TextsDatabasePtr db, const std::string& login, uint32_t ts, const DeserializationBuffer& buf);
 	// Разослать пакеты другим клиентам
 	void SendToClients(const std::string& dbName, uint32_t ts, const DeserializationBuffer& buf, const std::string& loginOfLastModifier);

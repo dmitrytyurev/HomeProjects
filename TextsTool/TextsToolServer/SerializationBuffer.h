@@ -22,6 +22,11 @@ public:
 		PushInner<uint32_t>(v);
 	}
 
+	void PushUint64(uint64_t v)
+	{
+		PushInner<uint64_t>(v);
+	}
+
 	void PushString8(const std::string& v)
 	{
 		PushStringWithoutZero<uint8_t>(v);
@@ -32,10 +37,15 @@ public:
 		PushStringWithoutZero<uint16_t>(v);
 	}
 
+	void PushVector8(std::vector<uint8_t>& v)
+	{
+		PushVector<uint8_t>(v);
+	}
+
 	void Push(const DeserializationBuffer& buf, bool useAllBuffer); // если useAllBuffer == true, то используем весь буффер, иначе только то, что ещё не прочитано из буфера
 	void PushStringWithoutZero(const std::string& v);
 	void PushBytes(const void* bytes, int size);
-	int GetSize() {	return buffer.size(); }
+	int GetSize() { return buffer.size(); }
 	uint8_t* GetData() { return buffer.data(); }
 
 	std::vector<uint8_t> buffer;
@@ -43,9 +53,10 @@ public:
 private:
 	template <typename T>
 	void PushInner(T v);
-
 	template <typename T>
 	void PushStringWithoutZero(const std::string& v);
+	template <typename T>
+	void PushVector(std::vector<uint8_t>& v);
 };
 
 using SerializationBufferPtr = std::shared_ptr<SerializationBuffer>;
@@ -78,3 +89,18 @@ void SerializationBuffer::PushStringWithoutZero(const std::string& v)
 	}
 }
 
+//===============================================================================
+
+template <typename T>
+void SerializationBuffer::PushVector(std::vector<uint8_t>& v)
+{
+	T vectorSize = static_cast<T>(v.size());
+	PushInner<T>(vectorSize);
+
+	if (vectorSize) {
+		const uint8_t* beg = reinterpret_cast<const uint8_t*>(v.data());
+		const uint8_t* end = beg + v.size();
+
+		buffer.insert(buffer.end(), beg, end);
+	}
+}

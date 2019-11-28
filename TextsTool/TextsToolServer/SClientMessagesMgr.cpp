@@ -693,44 +693,6 @@ void SClientMessagesMgr::AddPacketToClients(SerializationBufferPtr& bufPtr, cons
 
 //===============================================================================
 
-bool SClientMessagesMgr::IfKeyALess(const uint8_t* p1, int size1, const uint8_t* p2, int size2)
-{
-	if (*((uint32_t*)p1) < *((uint32_t*)p2)) {
-		return true;
-	}
-	if (*((uint32_t*)p1) > *((uint32_t*)p2)) {
-		return false;
-	}
-	p1 += sizeof(uint32_t);
-	p2 += sizeof(uint32_t);
-	while (true) {
-		if (*p1 < *p2) {
-			return true;
-		}
-		else {
-			if (*p1 > *p2) {
-				return false;
-			}
-		}
-		--size1;
-		--size2;
-		if (size1 == 0 && size2 == 0) {
-			return false;
-		}
-		if (size1 == 0) {
-			return true;
-		}
-		if (size2 == 0) {
-			return false;
-		}
-		++p1;
-		++p2;
-	}
-	return false;
-}
-
-//===============================================================================
-
 SerializationBufferPtr SClientMessagesMgr::MakeDatabasesListMessage()
 {
 	auto buffer = std::make_shared<SerializationBuffer>();
@@ -934,17 +896,6 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 		}
 	}
 	return buffer;
-}
-
-//===============================================================================
-
-void SClientMessagesMgr::MakeKey(uint32_t tsModified, const std::string& textId, std::vector<uint8_t>& result)
-{
-	result.resize(sizeof(uint32_t) + textId.size());
-	uint8_t* p = &result[0];
-
-	*(reinterpret_cast<uint32_t*>(p)) = tsModified;
-	memcpy(p + sizeof(uint32_t), textId.c_str(), textId.size());
 }
 
 //===============================================================================

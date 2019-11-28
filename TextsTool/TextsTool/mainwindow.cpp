@@ -12,17 +12,7 @@
 
 Ui::MainWindow* debugGlobalUi = nullptr;
 const static std::string databasePath = "D:/Dimka/HomeProjects/";
-
-//---------------------------------------------------------------
-
-void MakeKey(uint32_t tsModified, const std::string& textId, std::vector<uint8_t>& result)
-{
-	result.resize(sizeof(uint32_t) + textId.size());
-	uint8_t* p = &result[0];
-
-	*(reinterpret_cast<uint32_t*>(p)) = tsModified;
-	memcpy(p + sizeof(uint32_t), textId.c_str(), textId.size());
-}
+const static int KeyPerTextsNum = 100;  // На такое количество текстов создаётся один ключ для запроса RequestSync
 
 //---------------------------------------------------------------
 //---------------------------------------------------------------
@@ -240,6 +230,73 @@ void MainWindow::ProcessSync(DeserializationBuffer& buf)
 	_dataBase->_dbSerializer->SaveDatabase();
 }
 
+//---------------------------------------------------------------
+
+void MainWindow::SendRequestSyncMessage()
+{
+	if (!_dataBase) {
+		ExitMsg("SendRequestSyncMessage: !_dataBase)");
+	}
+
+	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
+	auto& buf = *_msgsQueueOut.back();
+	buf.PushUint8(EventType::RequestSync);
+	buf.PushString8(_dataBase->_dbName);
+	buf.PushUint32(_dataBase->_folders.size());
+	for (auto& folder: _dataBase->_folders) {
+		buf.PushUint32(folder.id);
+		buf.PushUint32(folder.timestampModified);
+
+		if (folder.texts.size() < KeyPerTextsNum) {
+			buf.PushUint32(0);
+			continue;
+		}
+
+		// Заполняем ключи текстов и ссылки на них для быстрой сортировки по ключам
+
+		std::vector<std::vector<uint8_t>> textsKeys;       // Ключи серверных текстов текущей папки (для сортировки и разбиения на интевалы)
+
+		textsKeys.resize(folder.texts.size());
+		_textsKeysRefs.resize(folder.texts.size());
+
+		for (int i=0; i<folder.texts.size(); ++i) {
+			_textsKeysRefs[i] = i;
+			MakeKey(folder.texts[i]->timestampModified, folder.texts[i]->id, textsKeys[i]); // Склеивает ts модификации текста и текстовый айдишник текста в "ключ"
+		}
+
+		// Сортируем ссылки на заполненные ключи текстов
+		std::sort(_textsKeysRefs.begin(), _textsKeysRefs.end(), [&textsKeys](int el1, int el2) {
+				auto& el1Ref = textsKeys[el1];
+				auto& el2Ref = textsKeys[el2];
+				return IfKeyALess(&el1Ref[0], el1Ref.size(), &el2Ref[0], el2Ref.size());
+			});
+
+		int selectedKeysNum = folder.texts.size() / KeyPerTextsNum;
+		buf.PushUint32(selectedKeysNum);
+		_intervals.resize(selectedKeysNum + 1);
+		int offs = (folder.texts.size() - (selectedKeysNum - 1) * KeyPerTextsNum) / 2;
+		// Добавляем в буфер ключи текстов и заполняем границы интервалов
+		int v = 0;
+		for (int i=0; i<selectedKeysNum; ++i) {
+			int index = i*KeyPerTextsNum + offs;
+			buf.PushVector8(textsKeys[_textsKeysRefs[index]]);
+			_intervals[i].firstTextIdx = v;
+			_intervals[i].textsNum = index - v;
+			v = index;
+		}
+		_intervals[selectedKeysNum].firstTextIdx = v;
+		_intervals[selectedKeysNum].textsNum = folder.texts.size() - v;
+
+		// Расчёт и добавляем в буфер CRC64 интервалов
+		for (auto& interval: _intervals) {
+			uint64_t crc = 0;
+			for (uint32_t i = interval.firstTextIdx; i < (int)interval.firstTextIdx + interval.textsNum; ++i) {
+				crc = Utils::AddHash(crc, textsKeys[_textsKeysRefs[i]], i == interval.firstTextIdx);
+			}
+			buf.PushUint64(crc);
+		}
+	}
+}
 
 //---------------------------------------------------------------
 
