@@ -24,8 +24,8 @@ void Log(const std::string& message)
 
 void ExitMsg(const std::string& message)
 {
-	assert(false);
 	Log("Fatal: " + message);
+	assert(false);
 	throw std::exception("Exiting app exception");
 }
 

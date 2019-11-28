@@ -42,7 +42,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
+//	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
 
 /*
 	_msgsQueueOut.back()->PushUint8(EventType::RequestSync);
@@ -129,7 +129,7 @@ void MainWindow::on_pushButton_clicked()
 	//-------------------
 
 
-	LoadBaseAndRequestSync("TextsBase"); // Загрузит базу если есть (если нет, создаст в памят пустую) и добавит запрос синхронизации в очередь сообщений на отсылку
+	LoadBaseAndRequestSync("TestDB"); // Загрузит базу если есть (если нет, создаст в памят пустую) и добавит запрос синхронизации в очередь сообщений на отсылку
 
 	_httpManager.Connect("mylogin", "mypassword");
 }
