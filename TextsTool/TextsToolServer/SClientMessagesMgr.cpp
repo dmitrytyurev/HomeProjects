@@ -768,7 +768,7 @@ void SClientMessagesMgr::FillDiffFolderInfo(SerializationBuffer* buffer, Folder&
 	std::sort(textsKeysRefs.begin(), textsKeysRefs.end(), [](TextKey* el1, TextKey* el2) { return IfKeyALess(&el1->key[0], el1->key.size(), &el2->key[0], el2->key.size()); });
 
 	// «аполнение интервалов отсортированных серверных текстов текущей папки
-	std::vector<Interval> intervals;
+	std::vector<TextsInterval> intervals;
 	intervals.resize(cltFolder.intervals.size());
 
 	int cltKeyIdx = 0;

@@ -5,7 +5,6 @@
 
 #include "SerializationBuffer.h"
 #include "DeserializationBuffer.h"
-#include "../SharedSrc/Shared.h"
 #include "CMessagesRepacker.h"
 #include "Utils.h"
 #include "TextsBaseClasses.h"
@@ -34,9 +33,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     Log("\n\n=== Start App ===========================================================");
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start(50);
+	_timer = new QTimer(this);
+	connect(_timer, SIGNAL(timeout()), this, SLOT(update()));
+	_timer->start(50);
 
     ui->setupUi(this);
     debugGlobalUi = ui;
@@ -191,7 +190,52 @@ void MainWindow::ProcessSync(DeserializationBuffer& buf)
 	}
 
 	// Патчим каталоги с текстами, которые есть на клиенте, но устаревшие
-
+	int foldersToPatch = buf.GetUint32();
+	for (int i=0; i<foldersToPatch; ++i) {
+		int folderId = buf.GetUint32();
+		auto& f = _dataBase->_folders;
+		auto folderIt = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+		if (folderIt == std::end(f)) {
+			ExitMsg("folderFound == std::end(f)");
+		}
+		buf.GetString16(folderIt->name);
+		folderIt->parentId = buf.GetUint32();
+		folderIt->timestampModified = buf.GetUint32();
+		uint8_t nextDataType = buf.GetUint8();
+		if (nextDataType == FolderDataTypeForSyncMsg::AllTexts) {
+			// Присланы все тексты каталога
+			folderIt->texts.clear();
+			int textsNum = buf.GetUint32();
+			for (int i2 = 0; i2 < textsNum; ++i2) {
+				folderIt->texts.emplace_back(std::make_shared<TextTranslated>());
+				folderIt->texts.back()->LoadFullDump(buf, attributesIdToType);
+			}
+		}
+		else {
+			// Прислана часть текстов каталога (только для изменившихся интервалов)
+			if (nextDataType != FolderDataTypeForSyncMsg::DiffTexts) {
+				ExitMsg("nextDataType != FolderDataTypeForSyncMsg::DiffTexts");
+			}
+			int changedIntervalsNum = buf.GetUint32();
+			for (int i2 = 0; i2 < changedIntervalsNum; ++i2) {
+				int changedIntervalId = buf.GetUint32();
+				// Обнулим указатели на тексты данного интервала (указатели из вектора удалим после обработки всех интервалов)
+				int textsInIntervalOldNum = _intervals[changedIntervalId].textsNum;
+				for (int i3 = 0; i3 < textsInIntervalOldNum; ++i3) {
+					int index = i3 + _intervals[changedIntervalId].firstTextIdx;
+					folderIt->texts[_textsKeysRefs[index]].reset();
+				}
+				// Добавим новые тексты интервала в папку
+				int textsInIntervalNewNum = buf.GetUint32();
+				for (int i3 = 0; i3 < textsInIntervalNewNum; ++i3) {
+					folderIt->texts.emplace_back(std::make_shared<TextTranslated>());
+					folderIt->texts.back()->LoadFullDump(buf, attributesIdToType);
+				}
+			}
+			// Удалим из вектора указатели на тексты, которые были обнулены выше
+			folderIt->texts.erase(std::remove_if(folderIt->texts.begin(), folderIt->texts.end(), [](const auto& el) { return el; }), folderIt->texts.end());
+		}
+	}
 
 	_dataBase->_dbSerializer->SaveDatabase();
 }

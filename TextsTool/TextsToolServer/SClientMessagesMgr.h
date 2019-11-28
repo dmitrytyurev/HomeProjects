@@ -77,13 +77,6 @@ private:
 		TextTranslated* textRef = nullptr;    // Указатель на текст, для которого этот ключ
 	};
 
-	struct Interval
-	{
-		uint32_t firstTextIdx = 0; // Индекс первого текста интервала
-		uint32_t textsNum = 0; // Количество текстов в интервале
-		uint64_t hash = 0;  // Хэш ключей текстов интервала
-	};
-
 	static bool IfKeyALess(const uint8_t* p1, int size1, const uint8_t* p2, int size2);
 	void MakeKey(uint32_t tsModified, const std::string& textId, std::vector<uint8_t>& result);
 	void SaveToHistory(TextsDatabasePtr db, const std::string& login, uint32_t ts, const DeserializationBuffer& buf);

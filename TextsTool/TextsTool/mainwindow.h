@@ -8,6 +8,7 @@
 #include <QUrl>
 #include <QTextCodec>
 
+#include "../SharedSrc/Shared.h"
 #include "DeserializationBuffer.h"
 #include "SerializationBuffer.h"
 #include "CHttpManager.h"
@@ -36,11 +37,14 @@ private slots:
 
 private:
     Ui::MainWindow *ui = nullptr;
-    QTimer *timer = nullptr;
+	QTimer *_timer = nullptr;
+
 	TextsDatabasePtr _dataBase;
 	CHttpManager _httpManager;
     std::vector<SerializationBufferPtr>   _msgsQueueOut; // Очередь сообщений, которые нужно отослать на сервер
     std::vector<DeserializationBufferPtr> _msgsQueueIn;  // Очередь пришедших от сервера сообщений
+	std::vector<int> _textsKeysRefs;  // Указатели на ключи текстов для быстрой сортировки
+	std::vector<TextsInterval> _intervals;
 };
 
 #endif // MAINWINDOW_H
