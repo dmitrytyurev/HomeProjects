@@ -26,23 +26,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        ../SharedSrc/DeserializationBuffer.cpp \
+        ../SharedSrc/SerializationBuffer.cpp \
         CHttpManager.cpp \
         CMessagesRepacker.cpp \
         DbSerializer.cpp \
-        DeserializationBuffer.cpp \
-        SerializationBuffer.cpp \
         TextsBaseClasses.cpp \
         Utils.cpp \
         main.cpp \
         mainwindow.cpp
 
 HEADERS += \
+        ../SharedSrc/DeserializationBuffer.h \
+        ../SharedSrc/SerializationBuffer.h \
         ../SharedSrc/Shared.h \
         CHttpManager.h \
         CMessagesRepacker.h \
         DbSerializer.h \
-        DeserializationBuffer.h \
-        SerializationBuffer.h \
         TextsBaseClasses.h \
         Utils.h \
         mainwindow.h

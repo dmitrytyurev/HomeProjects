@@ -1,8 +1,8 @@
 #pragma once
 
 #include "TextsBaseClasses.h"
-#include "SerializationBuffer.h"
-#include "DeserializationBuffer.h"
+#include "../SharedSrc/SerializationBuffer.h"
+#include "../SharedSrc/DeserializationBuffer.h"
 
 
 //===============================================================================

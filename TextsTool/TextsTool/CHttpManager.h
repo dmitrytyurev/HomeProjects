@@ -1,7 +1,9 @@
 #pragma once
 
-#include "DeserializationBuffer.h"
-#include "SerializationBuffer.h"
+#include <QObject>
+#include <QNetworkReply>
+#include "../SharedSrc/DeserializationBuffer.h"
+#include "../SharedSrc/SerializationBuffer.h"
 
 
 class CHttpPacket

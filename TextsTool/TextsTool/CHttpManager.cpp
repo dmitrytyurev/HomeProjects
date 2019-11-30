@@ -1,8 +1,8 @@
 #include <QTimer>
 #include <string>
 
-#include "SerializationBuffer.h"
-#include "DeserializationBuffer.h"
+#include "../SharedSrc/SerializationBuffer.h"
+#include "../SharedSrc/DeserializationBuffer.h"
 #include "../SharedSrc/Shared.h"
 #include "CMessagesRepacker.h"
 #include "Utils.h"

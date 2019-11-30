@@ -4,8 +4,8 @@
 #include <functional>
 #include <mutex>
 
-#include "DeserializationBuffer.h"
-#include "SerializationBuffer.h"
+#include "../SharedSrc/DeserializationBuffer.h"
+#include "../SharedSrc/SerializationBuffer.h"
 #include "SHttpManagerLow.h"
 
 

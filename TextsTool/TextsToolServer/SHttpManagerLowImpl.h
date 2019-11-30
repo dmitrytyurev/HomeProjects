@@ -6,8 +6,8 @@
 #include <mutex> 
 
 #include <WinSock2.h>
-#include "DeserializationBuffer.h"
-#include "SerializationBuffer.h"
+#include "../SharedSrc/DeserializationBuffer.h"
+#include "../SharedSrc/SerializationBuffer.h"
 
 
 //===============================================================================

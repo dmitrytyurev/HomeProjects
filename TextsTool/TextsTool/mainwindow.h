@@ -9,8 +9,8 @@
 #include <QTextCodec>
 
 #include "../SharedSrc/Shared.h"
-#include "DeserializationBuffer.h"
-#include "SerializationBuffer.h"
+#include "../SharedSrc/DeserializationBuffer.h"
+#include "../SharedSrc/SerializationBuffer.h"
 #include "CHttpManager.h"
 
 class TextsDatabase;

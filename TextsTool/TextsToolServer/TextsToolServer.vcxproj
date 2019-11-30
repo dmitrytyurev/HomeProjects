@@ -154,12 +154,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\SharedSrc\DeserializationBuffer.h" />
+    <ClInclude Include="..\SharedSrc\SerializationBuffer.h" />
     <ClInclude Include="..\SharedSrc\Shared.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="DbSerializer.h" />
-    <ClInclude Include="DeserializationBuffer.h" />
     <ClInclude Include="SClientMessagesMgr.h" />
-    <ClInclude Include="SerializationBuffer.h" />
     <ClInclude Include="SHttpManager.h" />
     <ClInclude Include="SHttpManagerLow.h" />
     <ClInclude Include="SHttpManagerLowImpl.h" />
@@ -168,11 +168,11 @@
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\SharedSrc\DeserializationBuffer.cpp" />
+    <ClCompile Include="..\SharedSrc\SerializationBuffer.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="DbSerializer.cpp" />
-    <ClCompile Include="DeserializationBuffer.cpp" />
     <ClCompile Include="SClientMessagesMgr.cpp" />
-    <ClCompile Include="SerializationBuffer.cpp" />
     <ClCompile Include="SHttpManager.cpp" />
     <ClCompile Include="SHttpManagerLow.cpp" />
     <ClCompile Include="SHttpManagerLowImpl.cpp" />
