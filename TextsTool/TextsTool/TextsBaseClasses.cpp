@@ -3,6 +3,7 @@
 #include <iostream>
 #include <experimental/filesystem>
 
+#include "Utils.h"
 #include "DbSerializer.h"
 #include "../SharedSrc/Shared.h"
 
@@ -22,6 +23,24 @@ TextsDatabase::TextsDatabase(const std::string path, const std::string dbName)
 
 //===============================================================================
 
+void TextsDatabase::LogDatabase()
+{
+	Log("--- Database log start -----------------------------------------");
+	Log(std::string("  Database: ") + _dbName);
+	Log("  AttributeProperty's list:");
+	for (auto& ap: _attributeProps) {
+		ap.Log("    ");
+		Log("-----");
+	}
+	Log("  Folders list:");
+	for (auto& folder : _folders) {
+		folder.Log("    ");
+		Log("  -----");
+	}
+	Log("--- Database log end -----------------------------------------");
+}
+
+//===============================================================================
 void AttributeProperty::LoadFullDump(DeserializationBuffer& buffer)
 {
 	id = buffer.GetUint8();
@@ -62,6 +81,20 @@ void AttributeProperty::CreateFromPacket(DeserializationBuffer& buffer, uint32_t
 	param1 = buffer.GetUint32();
 	param2 = 0;
 }
+
+//===============================================================================
+
+void AttributeProperty::Log(const std::string& prefix)
+{
+	::Log(prefix + "id: " + std::to_string(id));
+	::Log(prefix + "name: " + name);
+	::Log(prefix + "type: " + std::to_string(type));
+	::Log(prefix + "visiblePosition: " + std::to_string(visiblePosition));
+	::Log(prefix + "isVisible: " + std::to_string(isVisible));
+	::Log(prefix + "timestampCreated: " + std::to_string(timestampCreated));
+	::Log(prefix + "param1: " + std::to_string(param1));
+}
+
 
 //===============================================================================
 
@@ -107,6 +140,22 @@ void Folder::SaveFullDump(SerializationBuffer& buffer) const
 
 //===============================================================================
 
+void Folder::Log(const std::string& prefix)
+{
+	::Log(prefix + "id: " + std::to_string(id));
+	::Log(prefix + "name: " + name);
+	::Log(prefix + "parentId: " + std::to_string(parentId));
+	::Log(prefix + "timestampCreated: " + std::to_string(timestampCreated));
+	::Log(prefix + "timestampModified: " + std::to_string(timestampModified));
+	::Log(prefix + "Texts list:");
+	for (auto& text : texts) {
+		text->Log(prefix + "  ");
+		::Log(prefix + "-----");
+	}
+}
+
+//===============================================================================
+
 void TextTranslated::LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
 {
 	buffer.GetString8(id);
@@ -140,6 +189,25 @@ void TextTranslated::SaveFullDump(SerializationBuffer& buffer) const
 }
 
 //===============================================================================
+
+void TextTranslated::Log(const std::string& prefix)
+{
+	::Log(prefix + "id: " + id);
+	::Log(prefix + "timestampCreated: " + std::to_string(timestampCreated));
+	::Log(prefix + "timestampModified: " + std::to_string(timestampModified));
+	::Log(prefix + "loginOfLastModifier: " + loginOfLastModifier);
+	::Log(prefix + "offsLastModified: " + std::to_string(offsLastModified));
+	::Log(prefix + "baseText: " + baseText);
+	::Log(prefix + "AttributeInText list:");
+	for (auto& attr : attributes) {
+		attr.Log(prefix + "  ");
+		::Log(prefix + "-----");
+	}
+}
+
+
+//===============================================================================
+
 
 void AttributeInText::LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
 {
@@ -184,3 +252,14 @@ void AttributeInText::SaveFullDump(SerializationBuffer& buffer) const
 		ExitMsg("Wrong attribute type!");
 	}
 }
+
+//===============================================================================
+
+void AttributeInText::Log(const std::string& prefix)
+{
+	::Log(prefix + "id: " + std::to_string(id));
+	::Log(prefix + "type: " + std::to_string(type));
+	::Log(prefix + "flagState: " + std::to_string(flagState));
+	::Log(prefix + "text: " + text);
+}
+

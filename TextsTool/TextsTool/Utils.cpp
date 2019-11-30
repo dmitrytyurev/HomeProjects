@@ -31,7 +31,7 @@ namespace Utils
 
 //---------------------------------------------------------------
 
-    uint GetCurrentTimestamp()
+	uint32_t GetCurrentTimestamp()
     {
         QDateTime current = QDateTime::currentDateTime();
         return  current.toTime_t();

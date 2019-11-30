@@ -33,6 +33,7 @@ public:
 	void SaveFullDump(SerializationBuffer& buffer) const;
 
 	void CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32_t newId);   // Создание объекта из сообщения от клиента 
+	void Log(const std::string& prefix);
 
 	uint8_t id = 0;           // ID атрибута
 	std::string name;         // Имя атрибута
@@ -54,6 +55,7 @@ public:
 	AttributeInText() {}
 	void LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);
 	void SaveFullDump(SerializationBuffer& buffer) const;
+	void Log(const std::string& prefix);
 
 	std::string text;       // Текстовые данные атрибута, если это текст
 	uint8_t flagState = 0;  // Состояние флажка, если это флажок;
@@ -72,6 +74,7 @@ public:
 	TextTranslated() {}
 	void LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);
 	void SaveFullDump(SerializationBuffer& buffer) const;
+	void Log(const std::string& prefix);
 
 	std::string id;                   // ID текста
 	uint32_t timestampCreated = 0;    // Время создания
@@ -92,10 +95,11 @@ class Folder
 {
 public:
 	Folder() {}
-	void LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);  // Создание объекта из полного файла базы
-	void SaveFullDump(SerializationBuffer& buffer) const;      // Запись объекта в полный файл базы
+	void LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);  // Загрузка объекта с полного дампа
+	void SaveFullDump(SerializationBuffer& buffer) const;      // Запись полного дампа объекта
 
 	void CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32_t newId);   // Создание объекта из сообщения от клиента 
+	void Log(const std::string& prefix);
 
 	uint32_t id = 0;                 // ID папки
 	uint32_t timestampCreated = 0;   // Время создания
@@ -113,6 +117,7 @@ class TextsDatabase
 {
 public:
 	TextsDatabase(const std::string path, const std::string dbName);
+	void LogDatabase();
 
 	std::string _dbName;           // Имя базы данных текстов
 	std::vector<AttributeProperty> _attributeProps; // Свойства атрибутов (колонок) таблицы
