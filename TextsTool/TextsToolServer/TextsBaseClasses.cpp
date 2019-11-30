@@ -8,6 +8,7 @@
 #include "Common.h"
 #include "DbSerializer.h"
 #include "../SharedSrc/Shared.h"
+#include "Utils.h"
 
 void ExitMsg(const std::string& message);
 
@@ -30,6 +31,28 @@ void TextsDatabase::LoadDatabase(const std::string path, const std::string dbNam
 	_dbSerializer = std::make_unique<DbSerializer>(this);
 	_dbSerializer->SetPath(path);
 	_dbSerializer->LoadDatabaseAndHistory();
+	LogDatabase();
+}
+
+//===============================================================================
+
+void TextsDatabase::LogDatabase()
+{
+	Log("--- Database log start -----------------------------------------");
+	Log(std::string("  Database: ") + _dbName);
+	Log(std::string("  _newAttributeId: ") + std::to_string(_newAttributeId));
+	Log("  AttributeProperty's list:");
+	for (auto& ap: _attributeProps) {
+		ap.Log("    ");
+		Log("-----");
+	}
+	Log(std::string("  _newFolderId: ") + std::to_string(_newFolderId));
+	Log("  Folders list:");
+	for (auto& folder : _folders) {
+		folder.Log("    ");
+		Log("  -----");
+	}
+	Log("--- Database log end -----------------------------------------");
 }
 
 //===============================================================================
@@ -147,6 +170,20 @@ SerializationBufferPtr AttributeProperty::SaveToPacket(const std::string& loginO
 
 //===============================================================================
 
+void AttributeProperty::Log(const std::string& prefix)
+{
+	::Log(prefix + "id: " + std::to_string(id));
+	::Log(prefix + "name: " + name);
+	::Log(prefix + "type: " + std::to_string(type));
+	::Log(prefix + "visiblePosition: " + std::to_string(visiblePosition));
+	::Log(prefix + "isVisible: " + std::to_string(isVisible));
+	::Log(prefix + "timestampCreated: " + std::to_string(timestampCreated));
+	::Log(prefix + "param1: " + std::to_string(param1));
+}
+
+
+//===============================================================================
+
 void Folder::LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
 {
 	id = buffer.GetUint32();
@@ -229,6 +266,22 @@ SerializationBufferPtr Folder::SaveToPacket(const std::string& loginOfModifier) 
 
 //===============================================================================
 
+void Folder::Log(const std::string& prefix)
+{
+	::Log(prefix + "id: " + std::to_string(id));
+	::Log(prefix + "name: " + name);
+	::Log(prefix + "parentId: " + std::to_string(parentId));
+	::Log(prefix + "timestampCreated: " + std::to_string(timestampCreated));
+	::Log(prefix + "timestampModified: " + std::to_string(timestampModified));
+	::Log(prefix + "Texts list:");
+	for (auto& text : texts) {
+		text->Log(prefix + "  ");
+		::Log(prefix + "-----");
+	}
+}
+
+//===============================================================================
+
 void TextTranslated::LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
 {
 	buffer.GetString8(id);
@@ -291,6 +344,24 @@ SerializationBufferPtr TextTranslated::SaveToPacket(uint32_t folderId, const std
 
 //===============================================================================
 
+void TextTranslated::Log(const std::string& prefix)
+{
+	::Log(prefix + "id: " + id);
+	::Log(prefix + "timestampCreated: " + std::to_string(timestampCreated));
+	::Log(prefix + "timestampModified: " + std::to_string(timestampModified));
+	::Log(prefix + "loginOfLastModifier: " + loginOfLastModifier);
+	::Log(prefix + "offsLastModified: " + std::to_string(offsLastModified));
+	::Log(prefix + "baseText: " + baseText);
+	::Log(prefix + "AttributeInText list:");
+	for (auto& attr : attributes) {
+		attr.Log(prefix + "  ");
+		::Log(prefix + "-----");
+	}
+}
+
+
+//===============================================================================
+
 void AttributeInText::LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType)
 {
 	id = buffer.GetUint8();
@@ -334,3 +405,14 @@ void AttributeInText::SaveFullDump(SerializationBuffer& buffer) const
 		ExitMsg("Wrong attribute type!");
 	}
 }
+
+//===============================================================================
+
+void AttributeInText::Log(const std::string& prefix)
+{
+	::Log(prefix + "id: " + std::to_string(id));
+	::Log(prefix + "type: " + std::to_string(type));
+	::Log(prefix + "flagState: " + std::to_string(flagState));
+	::Log(prefix + "text: " + text);
+}
+
