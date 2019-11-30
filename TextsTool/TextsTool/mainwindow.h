@@ -31,7 +31,7 @@ public:
 private slots:
     void on_pushButton_clicked();
     void update();
-	void ProcessSync(DeserializationBuffer& buf);
+	void ApplyDiffForSync(DeserializationBuffer& buf);
 	void ProcessMessageFromServer(const std::vector<uint8_t>& buf);
 	void LoadBaseAndRequestSync(const std::string& dbName);
 

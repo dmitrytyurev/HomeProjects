@@ -136,7 +136,7 @@ void MainWindow::on_pushButton_clicked()
 
 //---------------------------------------------------------------
 
-void MainWindow::ProcessSync(DeserializationBuffer& buf)
+void MainWindow::ApplyDiffForSync(DeserializationBuffer& buf)
 {
 	std::string dbName;
 	buf.GetString8(dbName);
@@ -307,7 +307,8 @@ void MainWindow::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 	case EventType::ReplySync:
 	{
 		Log("Msg: ReplySync");
-		ProcessSync(dbuf);
+		ApplyDiffForSync(dbuf);
+		_dataBase->LogDatabase();
 	}
 	break;
 	default:
