@@ -1,6 +1,4 @@
-﻿
-#include "pch.h"
-#include <iostream>
+﻿#include <iostream>
 #include <chrono>
 #include <thread>
 #include <string>

@@ -1,4 +1,3 @@
-#include "pch.h"
 #include <iostream>
 #include <experimental/filesystem>
 #include <cassert>
