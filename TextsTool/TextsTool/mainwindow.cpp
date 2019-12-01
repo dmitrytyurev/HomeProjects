@@ -309,6 +309,11 @@ void MainWindow::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 		Log("Msg: ReplySync");
 		ApplyDiffForSync(dbuf);
 		_dataBase->LogDatabase();
+
+//_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
+//_msgsQueueOut.back()->PushUint8(EventType::ChangeBaseText);
+//_msgsQueueOut.back()->PushString8("TextID1");
+//_msgsQueueOut.back()->PushString16("NewBaseText2");
 	}
 	break;
 	default:
