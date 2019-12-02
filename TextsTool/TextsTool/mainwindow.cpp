@@ -2,6 +2,11 @@
 #include "ui_mainwindow.h"
 #include <QTimer>
 #include <string>
+#include <QObject>
+#include <QAbstractTableModel>
+#include <QList>
+#include <QString>
+#include <QDebug>
 
 #include "../SharedSrc/SerializationBuffer.h"
 #include "../SharedSrc/DeserializationBuffer.h"
@@ -14,6 +19,101 @@ Ui::MainWindow* debugGlobalUi = nullptr;
 const static std::string databasePath = "D:/Dimka/HomeProjects/TextsTool/DatabaseClient/";
 const static int KeyPerTextsNum = 100;  // На такое количество текстов создаётся один ключ для запроса RequestSync
 
+struct SimpleData
+{
+	QString m_one;
+	qint32 m_two;
+	qreal m_three;
+};
+
+class MyModel : public QAbstractTableModel
+{
+//	Q_OBJECT
+public:
+	explicit MyModel();//MyData *the_data);
+	int rowCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE;
+	int columnCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
+	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
+
+	QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
+signals:
+
+public slots:
+	void theDataChanged();
+
+private:
+   QList<SimpleData> m_the_data;
+
+};
+
+MyModel::MyModel() : QAbstractTableModel(0)
+{
+	m_the_data << SimpleData{"Alpha", 10, 100.0}
+			   << SimpleData{"Beta", 20, 200.0}
+			   << SimpleData{"Gamma", 30, 300.0}
+			   << SimpleData{"Delta", 40, 400.0};
+}
+
+int MyModel::rowCount(const QModelIndex &parent) const
+{
+	Q_UNUSED(parent)
+	return m_the_data.size();
+}
+
+int MyModel::columnCount(const QModelIndex &parent) const
+{
+	Q_UNUSED(parent)
+	return 3;
+}
+
+QVariant MyModel::data(const QModelIndex &index, int role) const
+{
+	// Check DisplayRole
+	if(role != Qt::DisplayRole)
+	{
+		return QVariant();
+	}
+
+	// Check boudaries
+	if(index.column() < 0 ||
+			columnCount() <= index.column() ||
+			index.row() < 0 ||
+			rowCount() <= index.row())
+	{
+		qDebug() << "Warning: " << index.row() << ", " << index.column();
+		return QVariant();
+	}
+
+	// Nominal case
+	 qDebug() << "MyModel::data: " << index.column() << "; " << index.row();
+	switch(index.column())
+	{
+		case 0:
+			return m_the_data[index.row()].m_one;
+		case 1:
+			return  m_the_data[index.row()].m_two;
+		case 2:
+			return  m_the_data[index.row()].m_three;
+		default:
+			qDebug() << "Not supposed to happen";
+			return QVariant();
+	}
+}
+
+QHash<int, QByteArray> MyModel::roleNames() const
+{
+	QHash<int, QByteArray> roles;
+	roles[0] = "one";
+	roles[1] = "two";
+	roles[2] = "three";
+	return roles;
+
+}
+
+void MyModel::theDataChanged()
+{
+	//TODO
+}
 //---------------------------------------------------------------
 //---------------------------------------------------------------
 //---------------------------------------------------------------
@@ -128,10 +228,15 @@ void MainWindow::on_pushButton_clicked()
 */
 	//-------------------
 
-
+/*
 	LoadBaseAndRequestSync("TestDB"); // Загрузит базу если есть (если нет, создаст в памят пустую) и добавит запрос синхронизации в очередь сообщений на отсылку
 
 	_httpManager.Connect("mylogin", "mypassword");
+*/
+
+	MyModel* model = new MyModel;
+	ui->tableView->setModel(model);
+
 }
 
 //---------------------------------------------------------------
