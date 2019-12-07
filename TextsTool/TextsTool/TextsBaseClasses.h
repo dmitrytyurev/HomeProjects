@@ -26,6 +26,8 @@ public:
 		Translation_t = 0,  // Текст одного из дополнительных языков
 		CommonText_t = 1,   // Текст общего назначения (не перевод)
 		Checkbox_t = 2,     // Чекбокс
+		BaseText_t = 3,     // Базовый текст
+		Id_t = 4,           // Id-текста (строка)
 	};
 
 	AttributeProperty() {}
