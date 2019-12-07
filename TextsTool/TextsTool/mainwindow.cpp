@@ -17,10 +17,13 @@ Ui::MainWindow* debugGlobalUi = nullptr;
 const static std::string databasePath = "D:/Dimka/HomeProjects/TextsTool/DatabaseClient/";
 const static int KeyPerTextsNum = 100;  // На такое количество текстов создаётся один ключ для запроса RequestSync
 
+//---------------------------------------------------------------
 
 MainTableModel::MainTableModel(TextsDatabasePtr& dataBase) : QAbstractTableModel(0), _dataBase(dataBase)
 {
 }
+
+//---------------------------------------------------------------
 
 int MainTableModel::rowCount(const QModelIndex &parent) const
 {
@@ -28,11 +31,15 @@ int MainTableModel::rowCount(const QModelIndex &parent) const
 	return _textsToShow.size();
 }
 
+//---------------------------------------------------------------
+
 int MainTableModel::columnCount(const QModelIndex &parent) const
 {
 	Q_UNUSED(parent)
 	return _columnsToShow.size();
 }
+
+//---------------------------------------------------------------
 
 QVariant MainTableModel::data(const QModelIndex &index, int role) const
 {
@@ -64,6 +71,8 @@ QVariant MainTableModel::data(const QModelIndex &index, int role) const
 	return QVariant();
 }
 
+//---------------------------------------------------------------
+
 QHash<int, QByteArray> MainTableModel::roleNames() const
 {
 	QHash<int, QByteArray> roles;
@@ -73,10 +82,41 @@ QHash<int, QByteArray> MainTableModel::roleNames() const
 	return roles;
 }
 
+//---------------------------------------------------------------
+
 void MainTableModel::theDataChanged()
 {
 	//TODO
 }
+
+//---------------------------------------------------------------
+
+void MainTableModel::fillTextsToShowIndices()
+{
+	_textsToShow.clear();
+	for (auto& folder: _dataBase->_folders) {
+		for (auto& text: folder.texts) {
+			_textsToShow.emplace_back(&text);
+		}
+	}
+}
+
+//---------------------------------------------------------------
+
+void MainTableModel::recalcColumnToShowData()
+{
+	_columnsToShow.clear();
+	for (int i=0; i<_dataBase->_attributeProps.size(); ++i) {
+		for (int i2=0; i2<_dataBase->_attributeProps.size(); ++i2) {
+			auto& attrib = _dataBase->_attributeProps[i2];
+			if (attrib.isVisible && attrib.visiblePosition == i) {
+				_columnsToShow.push_back(i2);
+			}
+		}
+	}
+}
+
+
 //---------------------------------------------------------------
 //---------------------------------------------------------------
 //---------------------------------------------------------------
@@ -378,6 +418,8 @@ void MainWindow::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 		Log("Msg: ReplySync");
 		ApplyDiffForSync(dbuf);
 		_dataBase->LogDatabase();
+		_mainTableModel->fillTextsToShowIndices();
+		_mainTableModel->recalcColumnToShowData();
 
 //_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
 //_msgsQueueOut.back()->PushUint8(EventType::ChangeBaseText);

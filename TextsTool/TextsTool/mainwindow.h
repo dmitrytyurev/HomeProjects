@@ -30,6 +30,9 @@ public:
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
 
 	QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
+
+	void fillTextsToShowIndices();
+	void recalcColumnToShowData();
 signals:
 
 public slots:
