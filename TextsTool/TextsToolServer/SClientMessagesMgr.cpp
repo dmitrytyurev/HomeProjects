@@ -551,11 +551,11 @@ bool  SClientMessagesMgr::ModifyDbAddAttributeToText(
 
 	switch (result->type)
 	{
-	case AttributeProperty::Translation_t:
-	case AttributeProperty::CommonText_t:
+	case AttributePropertyDataType::Translation_t:
+	case AttributePropertyDataType::CommonText_t:
 		buf.GetString16(attributeInText.text);
 		break;
-	case AttributeProperty::Checkbox_t:
+	case AttributePropertyDataType::Checkbox_t:
 		attributeInText.flagState = buf.GetUint8();
 		break;
 	default:
@@ -658,11 +658,11 @@ bool  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 
 	switch (result->type)
 	{
-	case AttributeProperty::Translation_t:
-	case AttributeProperty::CommonText_t:
+	case AttributePropertyDataType::Translation_t:
+	case AttributePropertyDataType::CommonText_t:
 		buf.GetString16(result->text);
 		break;
-	case AttributeProperty::Checkbox_t:
+	case AttributePropertyDataType::Checkbox_t:
 		result->flagState = buf.GetUint8();
 		break;
 	default:

@@ -21,15 +21,6 @@ using TextsDatabasePtr = std::shared_ptr<TextsDatabase>;
 class AttributeProperty
 {
 public:
-	enum DataType
-	{
-		Translation_t = 0,  // Текст одного из дополнительных языков
-		CommonText_t = 1,   // Текст общего назначения (не перевод)
-		Checkbox_t = 2,     // Чекбокс
-		BaseText_t = 3,     // Базовый текст
-		Id_t = 4,           // Id-текста (строка)
-	};
-
 	AttributeProperty() {}
 	void LoadFullDump(DeserializationBuffer& buffer);
 	void SaveFullDump(SerializationBuffer& buffer) const;
@@ -39,7 +30,7 @@ public:
 
 	uint8_t id = 0;           // ID атрибута
 	std::string name;         // Имя атрибута
-	uint8_t type = 0;         // Значение одного из типов DataType
+	uint8_t type = 0;         // Значение одного из типов AttributePropertyDataType
 	uint32_t param1 = 0;      // Параметр, зависящий от типа (для Translation_t - тут id языка)
 	uint32_t param2 = 0;      // Параметр, зависящий от типа (запас)
 	uint8_t visiblePosition = 0;    // Визуальная позиция атрибута в таблице (даже если скрыт)
@@ -121,6 +112,7 @@ public:
 	TextsDatabase(const std::string path, const std::string dbName);
 	void LogDatabase();
 
+	bool isSynced = false;         // Синхронизирована ли база с сервером
 	std::string _dbName;           // Имя базы данных текстов
 	std::vector<AttributeProperty> _attributeProps; // Свойства атрибутов (колонок) таблицы
 	std::vector<Folder> _folders;  // Папки. Рекурсивная структура через ссылку на ID родителя

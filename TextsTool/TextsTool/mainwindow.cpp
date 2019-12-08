@@ -19,7 +19,7 @@ const static int KeyPerTextsNum = 100;  // На такое количество 
 
 //---------------------------------------------------------------
 
-MainTableModel::MainTableModel(TextsDatabasePtr& dataBase) : QAbstractTableModel(0), _dataBase(dataBase)
+MainTableModel::MainTableModel(TextsDatabasePtr& dataBase) : QAbstractTableModel(nullptr), _dataBase(dataBase)
 {
 }
 
@@ -28,6 +28,10 @@ MainTableModel::MainTableModel(TextsDatabasePtr& dataBase) : QAbstractTableModel
 int MainTableModel::rowCount(const QModelIndex &parent) const
 {
 	Q_UNUSED(parent)
+	if (!_dataBase || !_dataBase->isSynced) {
+		return 0;
+	}
+
 	return _textsToShow.size();
 }
 
@@ -36,6 +40,10 @@ int MainTableModel::rowCount(const QModelIndex &parent) const
 int MainTableModel::columnCount(const QModelIndex &parent) const
 {
 	Q_UNUSED(parent)
+	if (!_dataBase || !_dataBase->isSynced) {
+		return 0;
+	}
+
 	return _columnsToShow.size();
 }
 
@@ -43,7 +51,7 @@ int MainTableModel::columnCount(const QModelIndex &parent) const
 
 QVariant MainTableModel::data(const QModelIndex &index, int role) const
 {
-	if(role != Qt::DisplayRole)	{
+	if (!_dataBase || !_dataBase->isSynced || role != Qt::DisplayRole)	{
 		return QVariant();
 	}
 
@@ -57,10 +65,10 @@ QVariant MainTableModel::data(const QModelIndex &index, int role) const
 
 	TextTranslated& text = *_textsToShow[index.row()];
 	AttributeProperty& prop = _dataBase->_attributeProps[_columnsToShow[index.column()]];
-	if (prop.type == AttributeProperty::Id_t) {
+	if (prop.type == AttributePropertyDataType::Id_t) {
 		return QString(text.id.c_str());
 	}
-	if (prop.type == AttributeProperty::BaseText_t) {
+	if (prop.type == AttributePropertyDataType::BaseText_t) {
 		return QString(text.baseText.c_str());
 	}
 	for (auto& attribInText: text.attributes) {
@@ -96,7 +104,7 @@ void MainTableModel::fillTextsToShowIndices()
 	_textsToShow.clear();
 	for (auto& folder: _dataBase->_folders) {
 		for (auto& text: folder.texts) {
-			_textsToShow.emplace_back(&text);
+			_textsToShow.emplace_back(text.get());
 		}
 	}
 }
@@ -234,13 +242,9 @@ void MainWindow::on_pushButton_clicked()
 */
 	//-------------------
 
-/*
 	LoadBaseAndRequestSync("TestDB"); // Загрузит базу если есть (если нет, создаст в памят пустую) и добавит запрос синхронизации в очередь сообщений на отсылку
 
 	_httpManager.Connect("mylogin", "mypassword");
-*/
-
-
 }
 
 //---------------------------------------------------------------
@@ -337,6 +341,7 @@ void MainWindow::ApplyDiffForSync(DeserializationBuffer& buf)
 		}
 	}
 
+	_dataBase->isSynced = true;
 	_dataBase->_dbSerializer->SaveDatabase();
 }
 
@@ -420,6 +425,9 @@ void MainWindow::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 		_dataBase->LogDatabase();
 		_mainTableModel->fillTextsToShowIndices();
 		_mainTableModel->recalcColumnToShowData();
+		ui->tableView->setModel(nullptr);
+		ui->tableView->setModel(_mainTableModel.get());
+		//ui->tableView->reset();
 
 //_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
 //_msgsQueueOut.back()->PushUint8(EventType::ChangeBaseText);

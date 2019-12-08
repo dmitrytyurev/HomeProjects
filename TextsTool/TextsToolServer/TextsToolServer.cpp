@@ -8,6 +8,7 @@
 #include "Common.h"
 #include "DbSerializer.h"
 #include "Utils.h"
+#include "../SharedSrc/Shared.h"
 
 const std::string databasesPath = "D:/Dimka/HomeProjects/TextsTool/DatabaseServer/";
 
@@ -16,7 +17,7 @@ const std::string databasesPath = "D:/Dimka/HomeProjects/TextsTool/DatabaseServe
 void test()
 {
 	TextsDatabase db;
-	db.CreateDatabase("D:/Dimka/HomeProjects/", "TestDB");
+	db.CreateDatabase(databasesPath, "TestDB");
 
 /*
 	// Атрибуты базы, один каталог с текстом (с атрибутами текста), один каталог без текстов
@@ -77,6 +78,21 @@ void test()
 	folder2.timestampModified = 54321;
 	db._folders.emplace_back(folder2);
 */
+
+	AttributeProperty atProp;
+	atProp.type = AttributePropertyDataType::Id_t;
+	atProp.id = 0;
+	atProp.isVisible = true;
+	atProp.visiblePosition = 0;
+	atProp.name = "TextId";
+	db._attributeProps.emplace_back(atProp);
+
+	atProp.type = AttributePropertyDataType::BaseText_t;
+	atProp.id = 1;
+	atProp.isVisible = true;
+	atProp.visiblePosition = 1;
+	atProp.name = "BaseText";
+	db._attributeProps.emplace_back(atProp);
 
 	Folder folder;
 	folder.id = 55443322;
