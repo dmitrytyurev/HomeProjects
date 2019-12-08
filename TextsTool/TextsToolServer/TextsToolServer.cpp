@@ -94,12 +94,19 @@ void test()
 	atProp.name = "BaseText";
 	db._attributeProps.emplace_back(atProp);
 
+	atProp.type = AttributePropertyDataType::CommonText_t;
+	atProp.id = 2;
+	atProp.isVisible = true;
+	atProp.visiblePosition = 2;
+	atProp.name = "CommonText";
+	db._attributeProps.emplace_back(atProp);
+
 	Folder folder;
 	folder.id = 55443322;
 	folder.name = "FolderA";
 	folder.parentId = 567;
 	folder.timestampCreated = 12345;
-	folder.timestampModified = 54321;
+	folder.timestampModified = 54322;
 
 
 	{
@@ -114,7 +121,12 @@ void test()
 		TextTranslatedPtr textPtr = std::make_shared<TextTranslated>();
 		textPtr->baseText = "BaseText2";
 		textPtr->id = "TextID2";
-		textPtr->timestampModified = 102;
+		textPtr->timestampModified = 1021;
+		AttributeInText attInText;
+		attInText.id = 2;
+		attInText.text = "Common text";
+		attInText.type = AttributePropertyDataType::CommonText_t;
+		textPtr->attributes.emplace_back(attInText);
 		folder.texts.emplace_back(textPtr);
 	}
 

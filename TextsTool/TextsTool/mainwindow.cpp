@@ -427,7 +427,6 @@ void MainWindow::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 		_mainTableModel->recalcColumnToShowData();
 		ui->tableView->setModel(nullptr);
 		ui->tableView->setModel(_mainTableModel.get());
-		//ui->tableView->reset();
 
 //_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
 //_msgsQueueOut.back()->PushUint8(EventType::ChangeBaseText);
