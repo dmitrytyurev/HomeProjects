@@ -49,9 +49,32 @@ int MainTableModel::columnCount(const QModelIndex &parent) const
 
 //---------------------------------------------------------------
 
+std::string& MainTableModel::getDataReference(const QModelIndex &index, bool& isFound)
+{
+	isFound = true;
+	TextTranslated& text = *_textsToShow[index.row()];
+	AttributeProperty& prop = _dataBase->_attributeProps[_columnsToShow[index.column()]];
+	if (prop.type == AttributePropertyDataType::Id_t) {
+		return text.id;
+	}
+	if (prop.type == AttributePropertyDataType::BaseText_t) {
+		return text.baseText;
+	}
+	for (auto& attribInText: text.attributes) {
+		if (attribInText.id == prop.id) {
+			return attribInText.text;
+		}
+	}
+	isFound = false;
+	static std::string emptyStr;
+	return emptyStr;
+}
+
+//---------------------------------------------------------------
+
 QVariant MainTableModel::data(const QModelIndex &index, int role) const
 {
-	if (!_dataBase || !_dataBase->isSynced || role != Qt::DisplayRole)	{
+	if (!index.isValid() || !_dataBase || !_dataBase->isSynced || (role != Qt::DisplayRole &&  role != Qt::EditRole))	{
 		return QVariant();
 	}
 
@@ -63,20 +86,59 @@ QVariant MainTableModel::data(const QModelIndex &index, int role) const
 		return QVariant();
 	}
 
-	TextTranslated& text = *_textsToShow[index.row()];
-	AttributeProperty& prop = _dataBase->_attributeProps[_columnsToShow[index.column()]];
-	if (prop.type == AttributePropertyDataType::Id_t) {
-		return QString(text.id.c_str());
+	bool isFound = false;
+	std::string& strRef = const_cast<MainTableModel*>(this)->getDataReference(index, isFound);
+	if (!isFound) {
+		return QVariant();
 	}
-	if (prop.type == AttributePropertyDataType::BaseText_t) {
-		return QString(text.baseText.c_str());
+	return QString(strRef.c_str());
+}
+
+//---------------------------------------------------------------
+
+bool MainTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+	if (!index.isValid() || !_dataBase || !_dataBase->isSynced || role != Qt::EditRole)	{
+		return false;
 	}
-	for (auto& attribInText: text.attributes) {
-		if (attribInText.id == prop.id) {
-			return QString(attribInText.text.c_str());
-		}
+
+	if(index.column() < 0 ||
+			index.column() >= _columnsToShow.size() ||
+			index.row() < 0 ||
+			index.row() >= _textsToShow.size())	{
+		qDebug() << "Warning: " << index.row() << ", " << index.column();
+		return false;
 	}
-	return QVariant();
+
+	bool isFound = false;
+	std::string& strRef = const_cast<MainTableModel*>(this)->getDataReference(index, isFound);
+	if (!isFound) {
+		return false;
+	}
+
+	strRef = value.toString().toUtf8().data();
+
+	emit(dataChanged(index, index));
+	return true;
+}
+
+//---------------------------------------------------------------
+
+Qt::ItemFlags MainTableModel::flags(const QModelIndex &index) const
+{
+	if (!index.isValid() || !_dataBase || !_dataBase->isSynced)	{
+		return Qt::ItemIsEnabled;
+	}
+
+	if(index.column() < 0 ||
+			index.column() >= _columnsToShow.size() ||
+			index.row() < 0 ||
+			index.row() >= _textsToShow.size())	{
+		qDebug() << "Warning: " << index.row() << ", " << index.column();
+		return Qt::ItemIsEnabled;
+	}
+
+	return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
 }
 
 //---------------------------------------------------------------
@@ -95,6 +157,17 @@ QHash<int, QByteArray> MainTableModel::roleNames() const
 void MainTableModel::theDataChanged()
 {
 	//TODO
+}
+
+//---------------------------------------------------------------
+
+QVariant MainTableModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+	if (role != Qt::DisplayRole || orientation != Qt::Horizontal || section < 0 || section >= _columnsToShow.size())
+		return QVariant();
+
+	AttributeProperty& prop = _dataBase->_attributeProps[_columnsToShow[section]];
+	return tr(prop.name.c_str());
 }
 
 //---------------------------------------------------------------

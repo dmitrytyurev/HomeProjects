@@ -28,6 +28,9 @@ public:
 	int rowCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE;
 	int columnCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
+	bool setData(const QModelIndex &index, const QVariant &value, int role=Qt::EditRole) Q_DECL_OVERRIDE;
+	Qt::ItemFlags flags(const QModelIndex &index) const Q_DECL_OVERRIDE;
+	QVariant headerData(int section, Qt::Orientation orientation, int role) const Q_DECL_OVERRIDE;
 
 	QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
 
@@ -37,6 +40,9 @@ signals:
 
 public slots:
 	void theDataChanged();
+
+private:
+	std::string& getDataReference(const QModelIndex &index, bool& isFound);
 
 private:
 	TextsDatabasePtr& _dataBase;
