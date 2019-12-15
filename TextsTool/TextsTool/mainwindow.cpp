@@ -19,7 +19,8 @@ const static int KeyPerTextsNum = 100;  // На такое количество 
 
 //---------------------------------------------------------------
 
-MainTableModel::MainTableModel(TextsDatabasePtr& dataBase) : QAbstractTableModel(nullptr), _dataBase(dataBase)
+MainTableModel::MainTableModel(TextsDatabasePtr& dataBase, MessagesManager& messagesManager) :
+	QAbstractTableModel(nullptr), _dataBase(dataBase), _messagesManager(messagesManager)
 {
 }
 
@@ -49,25 +50,37 @@ int MainTableModel::columnCount(const QModelIndex &parent) const
 
 //---------------------------------------------------------------
 
-std::string& MainTableModel::getDataReference(const QModelIndex &index, bool& isFound)
+bool MainTableModel::getTextReferences(const QModelIndex &index, bool needCreateAttrIfNotFound, FoundTextRefs& result)
 {
-	isFound = true;
-	TextTranslated& text = *_textsToShow[index.row()];
-	AttributeProperty& prop = _dataBase->_attributeProps[_columnsToShow[index.column()]];
-	if (prop.type == AttributePropertyDataType::Id_t) {
-		return text.id;
+	result.text = _textsToShow[index.row()];
+	result.attrInTable = &_dataBase->_attributeProps[_columnsToShow[index.column()]];
+	if (result.attrInTable->type == AttributePropertyDataType::Id_t) {
+		result.string = &result.text->id;
+		return true;
 	}
-	if (prop.type == AttributePropertyDataType::BaseText_t) {
-		return text.baseText;
+	if (result.attrInTable->type == AttributePropertyDataType::BaseText_t) {
+		result.string = &result.text->baseText;
+		return true;
 	}
-	for (auto& attribInText: text.attributes) {
-		if (attribInText.id == prop.id) {
-			return attribInText.text;
+	for (auto& attribInText: result.text->attributes) {
+		if (attribInText.id == result.attrInTable->id) {
+			result.string = &attribInText.text;
+			result.attrInText = &attribInText;
+			return true;
 		}
 	}
-	isFound = false;
-	static std::string emptyStr;
-	return emptyStr;
+	if (!needCreateAttrIfNotFound) {
+		return false;
+	}
+
+	result.text->attributes.emplace_back();
+	AttributeInText& attribInText = result.text->attributes.back();
+	result.attrInText = &attribInText;
+	attribInText.id = result.attrInTable->id;
+	attribInText.type = result.attrInTable->type;
+	result.string = &attribInText.text;
+
+	return true;
 }
 
 //---------------------------------------------------------------
@@ -86,12 +99,12 @@ QVariant MainTableModel::data(const QModelIndex &index, int role) const
 		return QVariant();
 	}
 
-	bool isFound = false;
-	std::string& strRef = const_cast<MainTableModel*>(this)->getDataReference(index, isFound);
+	FoundTextRefs textRefs;
+	bool isFound = const_cast<MainTableModel*>(this)->getTextReferences(index, false, textRefs);
 	if (!isFound) {
 		return QVariant();
 	}
-	return QString(strRef.c_str());
+	return QString(textRefs.string->c_str());
 }
 
 //---------------------------------------------------------------
@@ -110,13 +123,14 @@ bool MainTableModel::setData(const QModelIndex &index, const QVariant &value, in
 		return false;
 	}
 
-	bool isFound = false;
-	std::string& strRef = const_cast<MainTableModel*>(this)->getDataReference(index, isFound);
+	FoundTextRefs textRefs;
+	bool isFound = getTextReferences(index, true, textRefs);
 	if (!isFound) {
 		return false;
 	}
 
-	strRef = value.toString().toUtf8().data();
+	*textRefs.string = value.toString().toUtf8().data();
+	_messagesManager.SendMsgTextModified(textRefs);
 
 	emit(dataChanged(index, index));
 	return true;
@@ -204,7 +218,8 @@ void MainTableModel::recalcColumnToShowData()
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+	ui(new Ui::MainWindow),
+	_messagesManager(this)
 {
     Log("\n\n=== Start App ===========================================================");
 	_timer = new QTimer(this);
@@ -214,7 +229,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     debugGlobalUi = ui;
 
-	_mainTableModel = std::make_unique<MainTableModel>(_dataBase);
+	_mainTableModel = std::make_unique<MainTableModel>(_dataBase, _messagesManager);
 	ui->tableView->setModel(_mainTableModel.get());
 }
 
@@ -526,4 +541,17 @@ void MainWindow::update()
 		ProcessMessageFromServer(msg->_buffer);
 	}
 	_msgsQueueIn.resize(0);
+}
+
+//---------------------------------------------------------------
+
+void MessagesManager::SendMsgTextModified(const FoundTextRefs& textRefs)
+{
+	_mainWindow->_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
+	auto& buf = *_mainWindow->_msgsQueueOut.back();
+	buf.PushUint8(EventType::ChangeAttributeInText);
+	buf.PushString8(textRefs.text->id);
+	buf.PushUint8(textRefs.attrInText->id);
+	buf.PushUint8(textRefs.attrInText->type);
+	buf.PushString16(textRefs.attrInText->text);
 }

@@ -16,7 +16,29 @@
 #include "CHttpManager.h"
 
 class TextsDatabase;
+class MainWindow;
 using TextsDatabasePtr = std::shared_ptr<TextsDatabase>;
+
+
+//---------------------------------------------------------------
+struct FoundTextRefs
+{
+	TextTranslated* text = nullptr;
+	AttributeInText* attrInText = nullptr;
+	AttributeProperty* attrInTable = nullptr;
+	std::string* string = nullptr;
+};
+
+//---------------------------------------------------------------
+
+class MessagesManager
+{
+public:
+	MessagesManager (MainWindow* mainWindow): _mainWindow(mainWindow) {}
+	void SendMsgTextModified(const FoundTextRefs& textRefs);
+
+	MainWindow* _mainWindow = nullptr;
+};
 
 //---------------------------------------------------------------
 
@@ -24,7 +46,7 @@ class MainTableModel : public QAbstractTableModel
 {
 	Q_OBJECT
 public:
-	explicit MainTableModel(TextsDatabasePtr& dataBase);
+	explicit MainTableModel(TextsDatabasePtr& dataBase, MessagesManager& messagesManager);
 	int rowCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE;
 	int columnCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
@@ -42,10 +64,11 @@ public slots:
 	void theDataChanged();
 
 private:
-	std::string& getDataReference(const QModelIndex &index, bool& isFound);
+	bool getTextReferences(const QModelIndex &index, bool needCreateAttrIfNotFound, FoundTextRefs& result);
 
 private:
 	TextsDatabasePtr& _dataBase;
+	MessagesManager& _messagesManager;
 	std::vector<TextTranslated*> _textsToShow; // Выборка текстов, которую будем показывать
 	std::vector<int> _columnsToShow; // Индексы атрибутов в TextsDatabase::_attributeProps, которые показываем в качестве колонок
 };
@@ -67,21 +90,25 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+public:
+	std::vector<SerializationBufferPtr>   _msgsQueueOut; // Очередь сообщений, которые нужно отослать на сервер
+	TextsDatabasePtr _dataBase;
+
 private slots:
-    void on_pushButton_clicked();
-    void update();
+	void on_pushButton_clicked();
+	void update();
+
+private:
 	void ApplyDiffForSync(DeserializationBuffer& buf);
 	void ProcessMessageFromServer(const std::vector<uint8_t>& buf);
 	void LoadBaseAndRequestSync(const std::string& dbName);
-
 
 private:
     Ui::MainWindow *ui = nullptr;
 	QTimer *_timer = nullptr;
 
-	TextsDatabasePtr _dataBase;
+	MessagesManager _messagesManager;
 	CHttpManager _httpManager;
-    std::vector<SerializationBufferPtr>   _msgsQueueOut; // Очередь сообщений, которые нужно отослать на сервер
     std::vector<DeserializationBufferPtr> _msgsQueueIn;  // Очередь пришедших от сервера сообщений
 	std::vector<int> _textsKeysRefs;  // Указатели на ключи текстов для быстрой сортировки
 	std::vector<TextsInterval> _intervals;

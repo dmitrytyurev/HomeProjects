@@ -517,7 +517,7 @@ bool  SClientMessagesMgr::ModifyDbAddAttributeToText(
 	for (auto& f : db._folders) {
 		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
 		if (result != std::end(f.texts)) {
-			TextTranslatedPtr tmpTextPtr = *result;
+			tmpTextPtr = *result;
 			f.timestampModified = ts;
 			break;
 		}
@@ -583,7 +583,7 @@ bool  SClientMessagesMgr::ModifyDbDelAttributeFromText(
 	for (auto& f : db._folders) {
 		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
 		if (result != std::end(f.texts)) {
-			TextTranslatedPtr tmpTextPtr = *result;
+			tmpTextPtr = *result;
 			f.timestampModified = ts;
 			break;
 		}
@@ -629,7 +629,7 @@ bool  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 	for (auto& f : db._folders) {
 		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
 		if (result != std::end(f.texts)) {
-			TextTranslatedPtr tmpTextPtr = *result;
+			tmpTextPtr = *result;
 			f.timestampModified = ts;
 			break;
 		}
