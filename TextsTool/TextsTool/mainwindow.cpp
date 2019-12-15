@@ -73,6 +73,7 @@ bool MainTableModel::getTextReferences(const QModelIndex &index, bool needCreate
 		return false;
 	}
 
+	result.wasAttrInTextCreated = true;
 	result.text->attributes.emplace_back();
 	AttributeInText& attribInText = result.text->attributes.back();
 	result.attrInText = &attribInText;
@@ -549,7 +550,12 @@ void MessagesManager::SendMsgTextModified(const FoundTextRefs& textRefs)
 {
 	_mainWindow->_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
 	auto& buf = *_mainWindow->_msgsQueueOut.back();
-	buf.PushUint8(EventType::ChangeAttributeInText);
+	if (textRefs.wasAttrInTextCreated) {
+		buf.PushUint8(EventType::AddAttributeToText);
+	}
+	else {
+		buf.PushUint8(EventType::ChangeAttributeInText);
+	}
 	buf.PushString8(textRefs.text->id);
 	buf.PushUint8(textRefs.attrInText->id);
 	buf.PushUint8(textRefs.attrInText->type);

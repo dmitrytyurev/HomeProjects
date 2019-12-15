@@ -27,6 +27,7 @@ struct FoundTextRefs
 	AttributeInText* attrInText = nullptr;
 	AttributeProperty* attrInTable = nullptr;
 	std::string* string = nullptr;
+	bool wasAttrInTextCreated = false;
 };
 
 //---------------------------------------------------------------
