@@ -198,44 +198,6 @@ void SClientMessagesMgr::Update(double dt)
 //db->_dbSerializer->SaveDatabase();
 			}
 			break;
-			case EventType::AddAttributeToText:
-			{
-				uint32_t prevTsModified = 0;
-				uint32_t prevOffsModified = 0;
-				uint32_t keepOffset = buf->offset;
-				bool isSucces = ModifyDbAddAttributeToText(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
-				buf->offset = keepOffset; // Восстнавливаем буфер на состояние "прочитан только тип операции"
-				auto& historyBuf = db->GetHistoryBuffer();                     // Запись в файл истории
-				historyBuf.PushString8(client->_login);
-				historyBuf.PushUint32(ts);
-				historyBuf.PushUint8(actionType);
-				historyBuf.PushUint32(prevTsModified);
-				historyBuf.PushUint32(prevOffsModified);
-				historyBuf.Push(*buf, false); // Заберём только непрочитанные данные (всё кроме типа операции)
-				if (isSucces) {
-					SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
-				}
-			}
-			break;
-			case EventType::DelAttributeFromText:
-			{
-				uint32_t prevTsModified = 0;
-				uint32_t prevOffsModified = 0;
-				uint32_t keepOffset = buf->offset;
-				bool isSucces = ModifyDbDelAttributeFromText(*buf, *db, client->_login, ts, db->GetCurrentPosInHistoryFile(), prevTsModified, prevOffsModified); // Изменения в базе
-				buf->offset = keepOffset; // Восстнавливаем буфер на состояние "прочитан только тип операции"
-				auto& historyBuf = db->GetHistoryBuffer();                     // Запись в файл истории
-				historyBuf.PushString8(client->_login);
-				historyBuf.PushUint32(ts);
-				historyBuf.PushUint8(actionType);
-				historyBuf.PushUint32(prevTsModified);
-				historyBuf.PushUint32(prevOffsModified);
-				historyBuf.Push(*buf, false); // Заберём только непрочитанные данные (всё кроме типа операции)
-				if (isSucces) {
-					SendToClients(client->_dbName, ts, *buf, client->_login);  // Разослать пакеты другим клиентам			
-				}
-			}
-			break;
 			case EventType::ChangeAttributeInText:
 			{
 				uint32_t prevTsModified = 0;
@@ -499,118 +461,6 @@ bool  SClientMessagesMgr::ModifyDbChangeBaseText(
 
 //===============================================================================
 
-bool  SClientMessagesMgr::ModifyDbAddAttributeToText(
-	DeserializationBuffer& buf,
-	TextsDatabase& db,
-	const std::string& modifierLogin,
-	uint32_t ts,
-	uint32_t offsInHistoryFile,
-	uint32_t& prevTsModified,
-	uint32_t& prevOffsModified)
-{
-	std::string textId;
-	buf.GetString8(textId);
-	uint8_t attributeId = buf.GetUint8();
-	uint8_t attributeDataType = buf.GetUint8();
-
-	TextTranslatedPtr tmpTextPtr;
-	for (auto& f : db._folders) {
-		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
-		if (result != std::end(f.texts)) {
-			tmpTextPtr = *result;
-			f.timestampModified = ts;
-			break;
-		}
-	}
-	if (!tmpTextPtr) {
-		Log("ModifyDbAddAttributeToText: text not found by id");
-		return false;
-	}
-
-	tmpTextPtr->loginOfLastModifier = modifierLogin;
-	prevTsModified = tmpTextPtr->timestampModified;
-	tmpTextPtr->timestampModified = ts;
-	prevOffsModified = tmpTextPtr->offsLastModified;
-	tmpTextPtr->offsLastModified = offsInHistoryFile;
-
-	auto result = std::find_if(std::begin(db._attributeProps), std::end(db._attributeProps), [&attributeId](const AttributeProperty& el) { return el.id == attributeId; });
-	if (result == std::end(db._attributeProps)) {
-		Log("ModifyDbAddAttributeToText: attribute not found by id");
-		return false;
-	}
-
-	tmpTextPtr->attributes.emplace_back();
-	auto& attributeInText = tmpTextPtr->attributes.back();
-	attributeInText.id = attributeId;
-	attributeInText.type = result->type;
-
-	if (attributeDataType != result->type) {
-		Log("ModifyDbAddAttributeToText: attributeDataType != result->type");
-		return false;
-	}
-
-	switch (result->type)
-	{
-	case AttributePropertyDataType::Translation_t:
-	case AttributePropertyDataType::CommonText_t:
-		buf.GetString16(attributeInText.text);
-		break;
-	case AttributePropertyDataType::Checkbox_t:
-		attributeInText.flagState = buf.GetUint8();
-		break;
-	default:
-		break;
-	}
-	return true;
-}
-
-//===============================================================================
-
-bool  SClientMessagesMgr::ModifyDbDelAttributeFromText(
-	DeserializationBuffer& buf,
-	TextsDatabase& db,
-	const std::string& modifierLogin,
-	uint32_t ts,
-	uint32_t offsInHistoryFile,
-	uint32_t& prevTsModified,
-	uint32_t& prevOffsModified)
-{
-	std::string textId;
-	buf.GetString8(textId);
-	uint8_t attributeId = buf.GetUint8();
-
-	TextTranslatedPtr tmpTextPtr;
-	for (auto& f : db._folders) {
-		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
-		if (result != std::end(f.texts)) {
-			tmpTextPtr = *result;
-			f.timestampModified = ts;
-			break;
-		}
-	}
-	if (!tmpTextPtr) {
-		Log("ModifyDbDelAttributeFromText: text not found by id");
-		return false;
-	}
-
-	tmpTextPtr->loginOfLastModifier = modifierLogin;
-	prevTsModified = tmpTextPtr->timestampModified;
-	tmpTextPtr->timestampModified = ts;
-	prevOffsModified = tmpTextPtr->offsLastModified;
-	tmpTextPtr->offsLastModified = offsInHistoryFile;
-
-	auto result = std::find_if(std::begin(tmpTextPtr->attributes), std::end(tmpTextPtr->attributes), [&attributeId](const AttributeInText& el) { return el.id == attributeId; });
-	if (result == std::end(tmpTextPtr->attributes)) {
-		Log("ModifyDbDelAttributeFromText: attribute not found by id");
-		return false;
-	}
-
-	tmpTextPtr->attributes.erase(result);
-	return true;
-}
-
-//===============================================================================
-
 bool  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 	DeserializationBuffer& buf,
 	TextsDatabase& db,
@@ -645,28 +495,50 @@ bool  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 	prevOffsModified = tmpTextPtr->offsLastModified;
 	tmpTextPtr->offsLastModified = offsInHistoryFile;
 
+	AttributeInText* attributeInText = nullptr;
 	auto result = std::find_if(std::begin(tmpTextPtr->attributes), std::end(tmpTextPtr->attributes), [&attributeId](const AttributeInText& el) { return el.id == attributeId; });
 	if (result == std::end(tmpTextPtr->attributes)) {
-		Log("ModifyDbChangeAttributeInText: attribute not found by id");
+		auto prop = std::find_if(std::begin(db._attributeProps), std::end(db._attributeProps), [&attributeId](const AttributeProperty& el) { return el.id == attributeId; });
+		if (prop == std::end(db._attributeProps)) {
+			Log("ModifyDbChangeAttributeInText: attribute not found by id");
+			return false;
+		}
+		tmpTextPtr->attributes.emplace_back();
+		attributeInText = &tmpTextPtr->attributes.back();
+		attributeInText->id = attributeId;
+		attributeInText->type = prop->type;
+	}
+	else {
+		attributeInText = &*result;
+	}
+
+	if (attributeDataType != attributeInText->type) {
+		Log("ModifyDbChangeAttributeInText: attributeDataType != result->type");
 		return false;
 	}
 
-	if (attributeDataType != result->type) {
-		Log("ModifyDbAddAttributeToText: attributeDataType != result->type");
-		return false;
-	}
-
-	switch (result->type)
+	switch (attributeInText->type)
 	{
 	case AttributePropertyDataType::Translation_t:
 	case AttributePropertyDataType::CommonText_t:
-		buf.GetString16(result->text);
-		break;
+	{
+		buf.GetString16(attributeInText->text);
+		if (attributeInText->text.length() == 0) {
+			auto attribToDel = std::find_if(std::begin(tmpTextPtr->attributes), std::end(tmpTextPtr->attributes), [&attributeId](const AttributeInText& el) { return el.id == attributeId; });
+			if (attribToDel == std::end(tmpTextPtr->attributes)) {
+				ExitMsg("ModifyDbChangeAttributeInText: attribToDel == std::end(tmpTextPtr->attributes)");
+			}
+			tmpTextPtr->attributes.erase(result);
+		}
+	}
+	break;
 	case AttributePropertyDataType::Checkbox_t:
-		result->flagState = buf.GetUint8();
-		break;
+	{
+		attributeInText->flagState = buf.GetUint8();
+	}
+	break;
 	default:
-		break;
+	break;
 	}
 	return true;
 }

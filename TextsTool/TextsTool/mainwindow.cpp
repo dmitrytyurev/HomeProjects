@@ -550,12 +550,7 @@ void MessagesManager::SendMsgTextModified(const FoundTextRefs& textRefs)
 {
 	_mainWindow->_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
 	auto& buf = *_mainWindow->_msgsQueueOut.back();
-	if (textRefs.wasAttrInTextCreated) {
-		buf.PushUint8(EventType::AddAttributeToText);
-	}
-	else {
-		buf.PushUint8(EventType::ChangeAttributeInText);
-	}
+	buf.PushUint8(EventType::ChangeAttributeInText);
 	buf.PushString8(textRefs.text->id);
 	buf.PushUint8(textRefs.attrInText->id);
 	buf.PushUint8(textRefs.attrInText->type);
