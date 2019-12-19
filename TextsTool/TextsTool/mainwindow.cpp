@@ -243,6 +243,14 @@ MainWindow::~MainWindow()
 
 //---------------------------------------------------------------
 
+void MainWindow::closeEvent (QCloseEvent *event)
+{
+	_dataBase->_dbSerializer->SaveDatabase();
+}
+
+
+//---------------------------------------------------------------
+
 void MainWindow::on_pushButton_clicked()
 {
 //	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
