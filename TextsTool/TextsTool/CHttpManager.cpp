@@ -8,6 +8,11 @@
 #include "Utils.h"
 #include "CHttpManager.h"
 
+
+CHttpManager* CHttpManager::pthis = nullptr;
+
+//---------------------------------------------------------------
+
 CHttpPacket::CHttpPacket(const std::vector<uint8_t>& packetData, Status status) : _packetData(packetData), _status(status)
 {
 }
@@ -37,6 +42,37 @@ CHttpManager::CHttpManager()
 CHttpManager::~CHttpManager()
 {
     delete _manager;
+}
+
+
+//---------------------------------------------------------------
+
+void CHttpManager::Init()
+{
+	if (pthis) {
+		ExitMsg("CHttpManager::Init: already inited");
+	}
+	pthis = new CHttpManager;
+}
+
+//---------------------------------------------------------------
+
+void CHttpManager::Deinit()
+{
+	if (pthis) {
+		delete pthis;
+		pthis = nullptr;
+	}
+}
+
+//---------------------------------------------------------------
+
+CHttpManager& CHttpManager::Instance()
+{
+	if (!pthis) {
+		ExitMsg("CHttpManager::Instance: not inited");
+	}
+	return *pthis;
 }
 
 //---------------------------------------------------------------

@@ -17,10 +17,13 @@ Ui::MainWindow* debugGlobalUi = nullptr;
 const static std::string databasePath = "D:/Dimka/HomeProjects/TextsTool/DatabaseClient/";
 const static int KeyPerTextsNum = 100;  // На такое количество текстов создаётся один ключ для запроса RequestSync
 
+MainWindow* MainWindow::pthis = nullptr;
+DatabaseManager* DatabaseManager::pthis = nullptr;
+
 //---------------------------------------------------------------
 
-MainTableModel::MainTableModel(TextsDatabasePtr& dataBase, MessagesManager& messagesManager) :
-	QAbstractTableModel(nullptr), _dataBase(dataBase), _messagesManager(messagesManager)
+MainTableModel::MainTableModel(TextsDatabasePtr& dataBase) :
+	QAbstractTableModel(nullptr), _dataBase(dataBase)
 {
 }
 
@@ -131,7 +134,7 @@ bool MainTableModel::setData(const QModelIndex &index, const QVariant &value, in
 	}
 
 	*textRefs.string = value.toString().toUtf8().data();
-	_messagesManager.SendMsgTextModified(textRefs);
+	DatabaseManager::Instance().OnTextModifiedFromGUI(textRefs);
 
 	emit(dataChanged(index, index));
 	return true;
@@ -219,19 +222,18 @@ void MainTableModel::recalcColumnToShowData()
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-	ui(new Ui::MainWindow),
-	_messagesManager(this)
+	ui(new Ui::MainWindow)
 {
+	pthis = this;
     Log("\n\n=== Start App ===========================================================");
+	DatabaseManager::Init();
+	CHttpManager::Init();
 	_timer = new QTimer(this);
 	connect(_timer, SIGNAL(timeout()), this, SLOT(update()));
 	_timer->start(50);
 
     ui->setupUi(this);
     debugGlobalUi = ui;
-
-	_mainTableModel = std::make_unique<MainTableModel>(_dataBase, _messagesManager);
-	ui->tableView->setModel(_mainTableModel.get());
 }
 
 //---------------------------------------------------------------
@@ -243,9 +245,9 @@ MainWindow::~MainWindow()
 
 //---------------------------------------------------------------
 
-void MainWindow::closeEvent (QCloseEvent *event)
+void MainWindow::closeEvent (QCloseEvent *)
 {
-	_dataBase->_dbSerializer->SaveDatabase();
+	DatabaseManager::Instance().SaveDatabase();
 }
 
 
@@ -339,14 +341,148 @@ void MainWindow::on_pushButton_clicked()
 */
 	//-------------------
 
-	LoadBaseAndRequestSync("TestDB"); // Загрузит базу если есть (если нет, создаст в памят пустую) и добавит запрос синхронизации в очередь сообщений на отсылку
+	DatabaseManager::Instance().LoadBaseAndRequestSync("TestDB"); // Загрузит базу если есть (если нет, создаст в памят пустую) и добавит запрос синхронизации в очередь сообщений на отсылку
+	CHttpManager::Instance().Connect("mylogin", "mypassword");
+}
 
-	_httpManager.Connect("mylogin", "mypassword");
+//---------------------------------------------------------------
+void MainWindow::SetModelForMainTable(QAbstractTableModel* model)
+{
+	ui->tableView->setModel(nullptr);
+	ui->tableView->setModel(model);
 }
 
 //---------------------------------------------------------------
 
-void MainWindow::ApplyDiffForSync(DeserializationBuffer& buf)
+void MainWindow::update()
+{
+	CHttpManager::Instance().Update();
+	DatabaseManager::Instance().Update();
+}
+
+//---------------------------------------------------------------
+
+void MainWindow::OnMainTableDataModified()
+{
+	// !!!!!!!!!!! Перерисовать главную таблицу
+}
+
+
+//---------------------------------------------------------------
+
+void DatabaseManager::Init()
+{
+	if (pthis) {
+		ExitMsg("DatabaseManager::Init: already inited");
+	}
+	pthis = new DatabaseManager;
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::Deinit()
+{
+	if (pthis) {
+		delete pthis;
+		pthis = nullptr;
+	}
+}
+
+//---------------------------------------------------------------
+
+DatabaseManager& DatabaseManager::Instance()
+{
+	if (!pthis) {
+		ExitMsg("DatabaseManager::Instance: not inited");
+	}
+	return *pthis;
+}
+
+//---------------------------------------------------------------
+
+
+DatabaseManager::DatabaseManager()
+{
+	_mainTableModel = std::make_unique<MainTableModel>(_dataBase);
+	MainWindow::Instance().SetModelForMainTable(_mainTableModel.get());
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::SaveDatabase()
+{
+	_dataBase->_dbSerializer->SaveDatabase();
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::LoadBaseAndRequestSync(const std::string& dbName)
+{
+	_dataBase = std::make_shared<TextsDatabase>(databasePath, dbName);
+
+	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
+	auto& buf = *_msgsQueueOut.back();
+	buf.PushUint8(EventType::RequestSync);
+	buf.PushString8(_dataBase->_dbName);
+	buf.PushUint32(_dataBase->_folders.size());
+	for (auto& folder: _dataBase->_folders) {
+		buf.PushUint32(folder.id);
+		buf.PushUint32(folder.timestampModified);
+
+		if (folder.texts.size() < KeyPerTextsNum) {
+			buf.PushUint32(0);
+			continue;
+		}
+
+		// Заполняем ключи текстов и ссылки на них для быстрой сортировки по ключам
+
+		std::vector<std::vector<uint8_t>> textsKeys;       // Ключи серверных текстов текущей папки (для сортировки и разбиения на интевалы)
+
+		textsKeys.resize(folder.texts.size());
+		_textsKeysRefs.resize(folder.texts.size());
+
+		for (int i=0; i<folder.texts.size(); ++i) {
+			_textsKeysRefs[i] = i;
+			MakeKey(folder.texts[i]->timestampModified, folder.texts[i]->id, textsKeys[i]); // Склеивает ts модификации текста и текстовый айдишник текста в "ключ"
+		}
+
+		// Сортируем ссылки на заполненные ключи текстов
+		std::sort(_textsKeysRefs.begin(), _textsKeysRefs.end(), [&textsKeys](int el1, int el2) {
+				auto& el1Ref = textsKeys[el1];
+				auto& el2Ref = textsKeys[el2];
+				return IfKeyALess(&el1Ref[0], el1Ref.size(), &el2Ref[0], el2Ref.size());
+			});
+
+		int selectedKeysNum = folder.texts.size() / KeyPerTextsNum;
+		buf.PushUint32(selectedKeysNum);
+		_intervals.resize(selectedKeysNum + 1);
+		int offs = (folder.texts.size() - (selectedKeysNum - 1) * KeyPerTextsNum) / 2;
+		// Добавляем в буфер ключи текстов и заполняем границы интервалов
+		int v = 0;
+		for (int i=0; i<selectedKeysNum; ++i) {
+			int index = i*KeyPerTextsNum + offs;
+			buf.PushVector8(textsKeys[_textsKeysRefs[index]]);
+			_intervals[i].firstTextIdx = v;
+			_intervals[i].textsNum = index - v;
+			v = index;
+		}
+		_intervals[selectedKeysNum].firstTextIdx = v;
+		_intervals[selectedKeysNum].textsNum = folder.texts.size() - v;
+
+		// Расчёт и добавляем в буфер CRC64 интервалов
+		for (auto& interval: _intervals) {
+			uint64_t crc = 0;
+			for (uint32_t i = interval.firstTextIdx; i < (int)interval.firstTextIdx + interval.textsNum; ++i) {
+				crc = Utils::AddHash(crc, textsKeys[_textsKeysRefs[i]], i == interval.firstTextIdx);
+			}
+			buf.PushUint64(crc);
+		}
+	}
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::ApplyDiffForSync(DeserializationBuffer& buf)
 {
 	std::string dbName;
 	buf.GetString8(dbName);
@@ -444,105 +580,10 @@ void MainWindow::ApplyDiffForSync(DeserializationBuffer& buf)
 
 //---------------------------------------------------------------
 
-void MainWindow::LoadBaseAndRequestSync(const std::string& dbName)
+void DatabaseManager::Update()
 {
-	_dataBase = std::make_shared<TextsDatabase>(databasePath, dbName);
-
-	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
-	auto& buf = *_msgsQueueOut.back();
-	buf.PushUint8(EventType::RequestSync);
-	buf.PushString8(_dataBase->_dbName);
-	buf.PushUint32(_dataBase->_folders.size());
-	for (auto& folder: _dataBase->_folders) {
-		buf.PushUint32(folder.id);
-		buf.PushUint32(folder.timestampModified);
-
-		if (folder.texts.size() < KeyPerTextsNum) {
-			buf.PushUint32(0);
-			continue;
-		}
-
-		// Заполняем ключи текстов и ссылки на них для быстрой сортировки по ключам
-
-		std::vector<std::vector<uint8_t>> textsKeys;       // Ключи серверных текстов текущей папки (для сортировки и разбиения на интевалы)
-
-		textsKeys.resize(folder.texts.size());
-		_textsKeysRefs.resize(folder.texts.size());
-
-		for (int i=0; i<folder.texts.size(); ++i) {
-			_textsKeysRefs[i] = i;
-			MakeKey(folder.texts[i]->timestampModified, folder.texts[i]->id, textsKeys[i]); // Склеивает ts модификации текста и текстовый айдишник текста в "ключ"
-		}
-
-		// Сортируем ссылки на заполненные ключи текстов
-		std::sort(_textsKeysRefs.begin(), _textsKeysRefs.end(), [&textsKeys](int el1, int el2) {
-				auto& el1Ref = textsKeys[el1];
-				auto& el2Ref = textsKeys[el2];
-				return IfKeyALess(&el1Ref[0], el1Ref.size(), &el2Ref[0], el2Ref.size());
-			});
-
-		int selectedKeysNum = folder.texts.size() / KeyPerTextsNum;
-		buf.PushUint32(selectedKeysNum);
-		_intervals.resize(selectedKeysNum + 1);
-		int offs = (folder.texts.size() - (selectedKeysNum - 1) * KeyPerTextsNum) / 2;
-		// Добавляем в буфер ключи текстов и заполняем границы интервалов
-		int v = 0;
-		for (int i=0; i<selectedKeysNum; ++i) {
-			int index = i*KeyPerTextsNum + offs;
-			buf.PushVector8(textsKeys[_textsKeysRefs[index]]);
-			_intervals[i].firstTextIdx = v;
-			_intervals[i].textsNum = index - v;
-			v = index;
-		}
-		_intervals[selectedKeysNum].firstTextIdx = v;
-		_intervals[selectedKeysNum].textsNum = folder.texts.size() - v;
-
-		// Расчёт и добавляем в буфер CRC64 интервалов
-		for (auto& interval: _intervals) {
-			uint64_t crc = 0;
-			for (uint32_t i = interval.firstTextIdx; i < (int)interval.firstTextIdx + interval.textsNum; ++i) {
-				crc = Utils::AddHash(crc, textsKeys[_textsKeysRefs[i]], i == interval.firstTextIdx);
-			}
-			buf.PushUint64(crc);
-		}
-	}
-}
-
-//---------------------------------------------------------------
-
-void MainWindow::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
-{
-	DeserializationBuffer dbuf(buf); // !!! Неоптимально! Этот буфер может быть сотню Мб! Подумать о работе по указателю без копирования данных
-	uint8_t msgType = dbuf.GetUint8();
-	switch(msgType) {
-	case EventType::ReplySync:
-	{
-		Log("Msg: ReplySync");
-		ApplyDiffForSync(dbuf);
-		_dataBase->LogDatabase();
-		_mainTableModel->fillTextsToShowIndices();
-		_mainTableModel->recalcColumnToShowData();
-		ui->tableView->setModel(nullptr);
-		ui->tableView->setModel(_mainTableModel.get());
-
-//_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
-//_msgsQueueOut.back()->PushUint8(EventType::ChangeBaseText);
-//_msgsQueueOut.back()->PushString8("TextID1");
-//_msgsQueueOut.back()->PushString16("NewBaseText2");
-	}
-	break;
-	default:
-		Log("Unknown msgType");
-	}
-}
-
-//---------------------------------------------------------------
-
-void MainWindow::update()
-{
-	_httpManager.Update();
-	Repacker::RepackPacketsInToMessages(_httpManager, _msgsQueueIn);
-	Repacker::RepackMessagesOutToPackets(_msgsQueueOut, _httpManager);
+	Repacker::RepackPacketsInToMessages(CHttpManager::Instance(), _msgsQueueIn);
+	Repacker::RepackMessagesOutToPackets(_msgsQueueOut, CHttpManager::Instance());
 
 	for (auto& msg: _msgsQueueIn) {
 		Log("Message:  ");
@@ -554,13 +595,92 @@ void MainWindow::update()
 
 //---------------------------------------------------------------
 
-void MessagesManager::SendMsgTextModified(const FoundTextRefs& textRefs)
+void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 {
-	_mainWindow->_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
-	auto& buf = *_mainWindow->_msgsQueueOut.back();
+	DeserializationBuffer dbuf(buf); // !!! Неоптимально! Этот буфер может быть сотню Мб! Подумать о работе по указателю без копирования данных
+	uint8_t msgType = dbuf.GetUint8();
+
+	switch(msgType) {
+	case EventType::ReplySync:
+	{
+		Log("Msg: ReplySync");
+		ApplyDiffForSync(dbuf);
+		_dataBase->LogDatabase();
+		_mainTableModel->fillTextsToShowIndices();
+		_mainTableModel->recalcColumnToShowData();
+		MainWindow::Instance().SetModelForMainTable(_mainTableModel.get());
+
+//_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
+//_msgsQueueOut.back()->PushUint8(EventType::ChangeBaseText);
+//_msgsQueueOut.back()->PushString8("TextID1");
+//_msgsQueueOut.back()->PushString16("NewBaseText2");
+	}
+	break;
+	case EventType::ChangeDataBase:
+	{
+		Log("Msg: ChangeDataBase");
+
+		uint8_t actionType = dbuf.GetUint8();
+		switch (actionType) {
+		case EventType::ChangeBaseText:
+		{
+			Log("Msg: ChangeBaseText");
+			ModifyDbChangeBaseText(dbuf);
+			MainWindow::Instance().OnMainTableDataModified();
+		}
+		break;
+		case EventType::ChangeAttributeInText:
+		{
+			Log("Msg: ChangeAttributeInText");
+
+		}
+		break;
+		default:
+			Log("Unknown actionType: " + std::to_string(actionType));
+		}
+	}
+	break;
+	default:
+		Log("Unknown msgType:" + std::to_string(msgType));
+	}
+}
+
+//---------------------------------------------------------------
+
+// Важно: при любых изменениях текстов со стороны GUI надо записать -1 во timestamp’ы текста и непосредственный каталог
+
+void DatabaseManager::OnTextModifiedFromGUI(const FoundTextRefs& textRefs)
+{
+	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
+	auto& buf = *_msgsQueueOut.back();
 	buf.PushUint8(EventType::ChangeAttributeInText);
 	buf.PushString8(textRefs.text->id);
 	buf.PushUint8(textRefs.attrInText->id);
 	buf.PushUint8(textRefs.attrInText->type);
 	buf.PushString16(textRefs.attrInText->text);
 }
+
+//---------------------------------------------------------------
+
+void DatabaseManager::ModifyDbChangeBaseText(DeserializationBuffer& dbuf)
+{
+	std::string modifierLogin;
+	dbuf.GetString8(modifierLogin);
+	uint32_t ts = dbuf.GetUint32();
+	std::string textId;
+	dbuf.GetString8(textId);
+	std::string newBaseText;
+	dbuf.GetString16(newBaseText);
+
+	for (auto& f : _dataBase->_folders) {
+		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
+		if (result != std::end(f.texts)) {
+			TextTranslatedPtr tmpTextPtr = *result;
+			f.timestampModified = ts;
+			tmpTextPtr->baseText = newBaseText;
+			tmpTextPtr->loginOfLastModifier = modifierLogin;
+			tmpTextPtr->timestampModified = ts;
+		}
+	}
+}
+

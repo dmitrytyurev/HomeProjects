@@ -344,13 +344,11 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 		}
 		break;
 			
-
-
-		// !!!!!!!!!!!!!!!!
-		// После чтения любого изменения текста, у него нужно заполнить следующие поля:
+		// Важно: после чтения любого изменения текста, у него нужно заполнить следующие поля:
 		//   timestampModified = ts;
 		//   loginOfLastModifier = modifierLogin;
 		//   offsLastModified = offsToEventBegin;
+		// А у его каталога  (только непосредственно, без родителей) сделать timestampModified = ts
 
 		default:
 			ExitMsg("DbSerializer::LoadHistoryInner: Unknown action type");

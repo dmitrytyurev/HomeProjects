@@ -31,23 +31,12 @@ struct FoundTextRefs
 };
 
 //---------------------------------------------------------------
-
-class MessagesManager
-{
-public:
-	MessagesManager (MainWindow* mainWindow): _mainWindow(mainWindow) {}
-	void SendMsgTextModified(const FoundTextRefs& textRefs);
-
-	MainWindow* _mainWindow = nullptr;
-};
-
-//---------------------------------------------------------------
-
+class DatabaseManager;
 class MainTableModel : public QAbstractTableModel
 {
 	Q_OBJECT
 public:
-	explicit MainTableModel(TextsDatabasePtr& dataBase, MessagesManager& messagesManager);
+	explicit MainTableModel(TextsDatabasePtr& dataBase);
 	int rowCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE;
 	int columnCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
@@ -69,11 +58,38 @@ private:
 
 private:
 	TextsDatabasePtr& _dataBase;
-	MessagesManager& _messagesManager;
 	std::vector<TextTranslated*> _textsToShow; // Выборка текстов, которую будем показывать
 	std::vector<int> _columnsToShow; // Индексы атрибутов в TextsDatabase::_attributeProps, которые показываем в качестве колонок
 };
 using MainTableModelPtr = std::unique_ptr<MainTableModel>;
+
+//---------------------------------------------------------------
+
+class DatabaseManager
+{
+public:
+	DatabaseManager ();
+	static void Init();
+	static void Deinit();
+	static DatabaseManager& Instance();
+	void LoadBaseAndRequestSync(const std::string& dbName);
+	void OnTextModifiedFromGUI(const FoundTextRefs& textRefs);
+	void ProcessMessageFromServer(const std::vector<uint8_t>& buf);
+	void SaveDatabase();
+	void Update();
+
+private:
+	void ApplyDiffForSync(DeserializationBuffer& buf);
+	void ModifyDbChangeBaseText(DeserializationBuffer& dbuf);
+
+	static DatabaseManager* pthis;
+	std::vector<SerializationBufferPtr>   _msgsQueueOut; // Очередь сообщений, которые нужно отослать на сервер
+	std::vector<DeserializationBufferPtr> _msgsQueueIn;  // Очередь пришедших от сервера сообщений
+	TextsDatabasePtr _dataBase;
+	MainTableModelPtr _mainTableModel;  // Модель обеспечивающая доступ к данным главной таблицы текстов
+	std::vector<int> _textsKeysRefs;  // Указатели на ключи текстов для быстрой сортировки
+	std::vector<TextsInterval> _intervals;
+};
 
 //---------------------------------------------------------------
 
@@ -88,33 +104,22 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+	static MainWindow& Instance() { return *pthis; }
+	explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 	void closeEvent (QCloseEvent *event);
-
-public:
-	std::vector<SerializationBufferPtr>   _msgsQueueOut; // Очередь сообщений, которые нужно отослать на сервер
-	TextsDatabasePtr _dataBase;
+	void SetModelForMainTable(QAbstractTableModel* model);
+	void OnMainTableDataModified();
 
 private slots:
 	void on_pushButton_clicked();
 	void update();
 
 private:
-	void ApplyDiffForSync(DeserializationBuffer& buf);
-	void ProcessMessageFromServer(const std::vector<uint8_t>& buf);
-	void LoadBaseAndRequestSync(const std::string& dbName);
-
-private:
     Ui::MainWindow *ui = nullptr;
 	QTimer *_timer = nullptr;
 
-	MessagesManager _messagesManager;
-	CHttpManager _httpManager;
-    std::vector<DeserializationBufferPtr> _msgsQueueIn;  // Очередь пришедших от сервера сообщений
-	std::vector<int> _textsKeysRefs;  // Указатели на ключи текстов для быстрой сортировки
-	std::vector<TextsInterval> _intervals;
-	MainTableModelPtr _mainTableModel;  // Модель обеспечивающая доступ к данным главной таблицы текстов
+	static MainWindow* pthis;
 };
 
 #endif // MAINWINDOW_H

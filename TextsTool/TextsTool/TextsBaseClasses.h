@@ -73,7 +73,6 @@ public:
 	uint32_t timestampCreated = 0;    // Время создания
 	uint32_t timestampModified = 0;   // Время последнего изменения
 	std::string loginOfLastModifier;  // Логин того, кто менял последний раз
-	uint32_t offsLastModified = 0;    // смещение в файле истории до записи о последнем изменении
 	std::string baseText;             // Текст на базовом языке (русском)
 	std::vector<AttributeInText> attributes; // Атрибуты текста с их данными
 };

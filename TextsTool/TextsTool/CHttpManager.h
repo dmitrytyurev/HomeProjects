@@ -49,7 +49,10 @@ public:
 
     CHttpManager();
     ~CHttpManager();
-    void Update();
+	static void Init();
+	static void Deinit();
+	static CHttpManager& Instance();
+	void Update();
     void Connect(const std::string& login, const std::string& password);
     void TestSend();
     STATE GetStatus();
@@ -70,7 +73,8 @@ private:
     void RequestPacket();
     void SendPacket();
 
-    std::vector<CHttpPacket::Ptr> _packetsOut; // Пакеты для отсылки на сервер
+	static CHttpManager* pthis;
+	std::vector<CHttpPacket::Ptr> _packetsOut; // Пакеты для отсылки на сервер
     STATE _state = STATE::NOT_CONNECTED;
     QString _lastError;
     uint32_t _sendPacketN = 0; // Нумерация пакетов, которые клиент посылает на сервер
