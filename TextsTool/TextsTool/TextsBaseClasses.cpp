@@ -163,7 +163,6 @@ void TextTranslated::LoadFullDump(DeserializationBuffer& buffer, const std::vect
 	timestampCreated = buffer.GetUint32();
 	timestampModified = buffer.GetUint32();
 	buffer.GetString8(loginOfLastModifier);
-	offsLastModified = buffer.GetUint32();
 	buffer.GetString16(baseText);
 	uint8_t attributesNum = buffer.GetUint8();
 	for (uint8_t i = 0; i < attributesNum; ++i) {
@@ -180,7 +179,6 @@ void TextTranslated::SaveFullDump(SerializationBuffer& buffer) const
 	buffer.PushUint32(timestampCreated);
 	buffer.PushUint32(timestampModified);
 	buffer.PushString8(loginOfLastModifier);
-	buffer.PushUint32(offsLastModified);
 	buffer.PushString16(baseText);
 	uint8_t attributesNum = static_cast<uint8_t>(attributes.size());
 	buffer.PushUint8(attributesNum);
@@ -197,7 +195,6 @@ void TextTranslated::Log(const std::string& prefix)
 	::Log(prefix + "timestampCreated: " + std::to_string(timestampCreated));
 	::Log(prefix + "timestampModified: " + std::to_string(timestampModified));
 	::Log(prefix + "loginOfLastModifier: " + loginOfLastModifier);
-	::Log(prefix + "offsLastModified: " + std::to_string(offsLastModified));
 	::Log(prefix + "baseText: " + baseText);
 	::Log(prefix + "AttributeInText list:");
 	for (auto& attr : attributes) {

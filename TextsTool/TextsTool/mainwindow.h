@@ -46,7 +46,9 @@ public:
 
 	QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
 
-	void fillTextsToShowIndices();
+	// Заполнить ссылки на тексты, которые должны показывать (учитывая выбранную папку, начиная с которой показываем тексты и применённые фильтры).
+	// Если justOneTextContentChanged == true, то перезаполняем индексы только, если включены фильтры таблицы. Иначе сразу выход
+	void fillRefsToTextsToShow(bool justOneTextContentChanged);
 	void recalcColumnToShowData();
 signals:
 
@@ -81,6 +83,8 @@ public:
 private:
 	void ApplyDiffForSync(DeserializationBuffer& buf);
 	void ModifyDbChangeBaseText(DeserializationBuffer& dbuf);
+	void SendMsgToServer(const FoundTextRefs& textRefs);
+	void ResetTextAndFolderTimestamps(const FoundTextRefs& textRefs);
 
 	static DatabaseManager* pthis;
 	std::vector<SerializationBufferPtr>   _msgsQueueOut; // Очередь сообщений, которые нужно отослать на сервер

@@ -645,7 +645,7 @@ out:    // Заполняем значения хэшей в интервалах (хэш интервала считается, как х
 			buffer->PushUint32(intervals[i].textsNum);
 
 			for (uint32_t i2 = intervals[i].firstTextIdx; i2 < intervals[i].firstTextIdx + intervals[i].textsNum; ++i2) {
-				textsKeysRefs[i2]->textRef->SaveFullDump(*buffer);
+				textsKeysRefs[i2]->textRef->SaveFullDump(*buffer, true);
 			}
 		}
 	}
@@ -711,7 +711,7 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 		if (folder == std::end(f)) {
 			ExitMsg("result == std::end(f)");
 		}
-		folder->SaveFullDump(*buffer);
+		folder->SaveFullDump(*buffer, true);
 	}
 
 	// Найдём каталоги сервера, которые есть и на сервер и на клиенте. Чтобы проверить какие из них совпадают, а где есть отличия
@@ -757,7 +757,7 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 			buffer->PushUint8(FolderDataTypeForSyncMsg::AllTexts);
 			buffer->PushUint32(srvFoldrItr->texts.size());
 			for (const auto& text : srvFoldrItr->texts) {
-				text->SaveFullDump(*buffer);
+				text->SaveFullDump(*buffer, true);
 			}
 		}
 		else { // Пошлём на клиент дифф-текстов каталога (разбитый по интевалам)

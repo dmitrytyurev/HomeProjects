@@ -70,7 +70,7 @@ class TextTranslated
 public:
 	TextTranslated() {}
 	void LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);
-	void SaveFullDump(SerializationBuffer& buffer) const;
+	void SaveFullDump(SerializationBuffer& buffer, bool isForSyncMessage) const;
 
 	void SaveToHistory(TextsDatabasePtr db, uint32_t folderId);
 
@@ -98,7 +98,7 @@ class Folder
 public:
 	Folder() {}
 	void LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);  // Загрузка объекта с полного дампа
-	void SaveFullDump(SerializationBuffer& buffer) const;      // Запись полного дампа объекта
+	void SaveFullDump(SerializationBuffer& buffer, bool isForSyncMessage) const;      // Запись полного дампа объекта
 
 	void CreateFromHistory(DeserializationBuffer& buffer, uint32_t ts);  // Создание объекта из файла истории
 	void SaveToHistory(TextsDatabasePtr db, const std::string& loginOfLastModifier) const;

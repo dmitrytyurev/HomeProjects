@@ -190,7 +190,7 @@ QVariant MainTableModel::headerData(int section, Qt::Orientation orientation, in
 
 //---------------------------------------------------------------
 
-void MainTableModel::fillTextsToShowIndices()
+void MainTableModel::fillRefsToTextsToShow(bool justOneTextContentChanged)
 {
 	_textsToShow.clear();
 	for (auto& folder: _dataBase->_folders) {
@@ -226,14 +226,14 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 	pthis = this;
     Log("\n\n=== Start App ===========================================================");
+    ui->setupUi(this);
+    debugGlobalUi = ui;
+
 	DatabaseManager::Init();
 	CHttpManager::Init();
 	_timer = new QTimer(this);
 	connect(_timer, SIGNAL(timeout()), this, SLOT(update()));
 	_timer->start(50);
-
-    ui->setupUi(this);
-    debugGlobalUi = ui;
 }
 
 //---------------------------------------------------------------
@@ -606,7 +606,7 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 		Log("Msg: ReplySync");
 		ApplyDiffForSync(dbuf);
 		_dataBase->LogDatabase();
-		_mainTableModel->fillTextsToShowIndices();
+		_mainTableModel->fillRefsToTextsToShow(false);
 		_mainTableModel->recalcColumnToShowData();
 		MainWindow::Instance().SetModelForMainTable(_mainTableModel.get());
 
@@ -626,6 +626,7 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 		{
 			Log("Msg: ChangeBaseText");
 			ModifyDbChangeBaseText(dbuf);
+			_mainTableModel->fillRefsToTextsToShow(true);
 			MainWindow::Instance().OnMainTableDataModified();
 		}
 		break;
@@ -650,6 +651,31 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 // Важно: при любых изменениях текстов со стороны GUI надо записать -1 во timestamp’ы текста и непосредственный каталог
 
 void DatabaseManager::OnTextModifiedFromGUI(const FoundTextRefs& textRefs)
+{
+	SendMsgToServer(textRefs);
+	ResetTextAndFolderTimestamps(textRefs);
+	_mainTableModel->fillRefsToTextsToShow(true);
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::ResetTextAndFolderTimestamps(const FoundTextRefs& textRefs)
+{
+	textRefs.text->timestampModified = -1; // Это признак, что были изменения из GUI. Чтобы при стартовой синхронизации с сервером, точно была разница и эти данные пришли с сервера
+	for (auto& folder: _dataBase->_folders) {
+		for (auto& text: folder.texts) {
+			if (text->id == textRefs.text->id) {
+				folder.timestampModified = -1; 	// Это признак, что были изменения из GUI. Чтобы при стартовой синхронизации с сервером, точно была разница и эти данные пришли с сервера
+				return;
+			}
+		}
+	}
+	ExitMsg("ResetTextAndFolderTimestamps: text not found in folder");
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::SendMsgToServer(const FoundTextRefs& textRefs)
 {
 	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
 	auto& buf = *_msgsQueueOut.back();

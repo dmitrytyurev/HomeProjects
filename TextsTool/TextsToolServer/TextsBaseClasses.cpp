@@ -220,7 +220,7 @@ void Folder::CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32
 
 //===============================================================================
 
-void Folder::SaveFullDump(SerializationBuffer& buffer) const
+void Folder::SaveFullDump(SerializationBuffer& buffer, bool isForSyncMessage) const
 {
 	buffer.PushUint32(id);
 	buffer.PushUint32(timestampCreated);
@@ -229,7 +229,7 @@ void Folder::SaveFullDump(SerializationBuffer& buffer) const
 	buffer.PushUint32(parentId);
 	buffer.PushUint32(texts.size());
 	for (const auto& text : texts) {
-		text->SaveFullDump(buffer);
+		text->SaveFullDump(buffer, isForSyncMessage);
 	}
 }
 
@@ -297,13 +297,15 @@ void TextTranslated::LoadFullDump(DeserializationBuffer& buffer, const std::vect
 
 //===============================================================================
 
-void TextTranslated::SaveFullDump(SerializationBuffer& buffer) const
+void TextTranslated::SaveFullDump(SerializationBuffer& buffer, bool isForSyncMessage) const
 {
 	buffer.PushString8(id);
 	buffer.PushUint32(timestampCreated);
 	buffer.PushUint32(timestampModified);
 	buffer.PushString8(loginOfLastModifier);
-	buffer.PushUint32(offsLastModified);
+	if (!isForSyncMessage) {
+		buffer.PushUint32(offsLastModified);
+	}
 	buffer.PushString16(baseText);
 	uint8_t attributesNum = static_cast<uint8_t>(attributes.size());
 	buffer.PushUint8(attributesNum);

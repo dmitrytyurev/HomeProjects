@@ -108,7 +108,7 @@ void DbSerializer::SaveDatabase()
 	buffer.PushUint32(_pDataBase->_newFolderId);
 	buffer.PushUint32(_pDataBase->_folders.size());
 	for (const auto& folder : _pDataBase->_folders) {
-		folder.SaveFullDump(buffer);
+		folder.SaveFullDump(buffer, false);
 	}
 
 	file.write(reinterpret_cast<const char*>(buffer.GetData()), buffer.GetSize());
