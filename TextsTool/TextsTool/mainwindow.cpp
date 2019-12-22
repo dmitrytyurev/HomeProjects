@@ -620,12 +620,16 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 	{
 		Log("Msg: ChangeDataBase");
 
+		std::string loginOfModifier;
+		dbuf.GetString8(loginOfModifier);
+		uint32_t ts = dbuf.GetUint32();
+
 		uint8_t actionType = dbuf.GetUint8();
 		switch (actionType) {
 		case EventType::ChangeBaseText:
 		{
 			Log("Msg: ChangeBaseText");
-			ModifyDbChangeBaseText(dbuf);
+			ModifyDbChangeBaseText(dbuf, ts, loginOfModifier);
 			_mainTableModel->fillRefsToTextsToShow(true);
 			MainWindow::Instance().OnMainTableDataModified();
 		}
@@ -652,7 +656,12 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 
 void DatabaseManager::OnTextModifiedFromGUI(const FoundTextRefs& textRefs)
 {
-	SendMsgToServer(textRefs);
+	if (textRefs.attrInTable->type == AttributePropertyDataType::BaseText_t) {
+		SendMsgChangeBaseText(textRefs);
+	}
+	else {
+		SendMsgChangeTextAttrib(textRefs);
+	}
 	ResetTextAndFolderTimestamps(textRefs);
 	_mainTableModel->fillRefsToTextsToShow(true);
 }
@@ -675,7 +684,7 @@ void DatabaseManager::ResetTextAndFolderTimestamps(const FoundTextRefs& textRefs
 
 //---------------------------------------------------------------
 
-void DatabaseManager::SendMsgToServer(const FoundTextRefs& textRefs)
+void DatabaseManager::SendMsgChangeTextAttrib(const FoundTextRefs& textRefs)
 {
 	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
 	auto& buf = *_msgsQueueOut.back();
@@ -688,11 +697,19 @@ void DatabaseManager::SendMsgToServer(const FoundTextRefs& textRefs)
 
 //---------------------------------------------------------------
 
-void DatabaseManager::ModifyDbChangeBaseText(DeserializationBuffer& dbuf)
+void DatabaseManager::SendMsgChangeBaseText(const FoundTextRefs& textRefs)
 {
-	std::string modifierLogin;
-	dbuf.GetString8(modifierLogin);
-	uint32_t ts = dbuf.GetUint32();
+	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
+	auto& buf = *_msgsQueueOut.back();
+	buf.PushUint8(EventType::ChangeBaseText);
+	buf.PushString8(textRefs.text->id);
+	buf.PushString16(textRefs.text->baseText);
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::ModifyDbChangeBaseText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifier)
+{
 	std::string textId;
 	dbuf.GetString8(textId);
 	std::string newBaseText;
@@ -704,7 +721,10 @@ void DatabaseManager::ModifyDbChangeBaseText(DeserializationBuffer& dbuf)
 			TextTranslatedPtr tmpTextPtr = *result;
 			f.timestampModified = ts;
 			tmpTextPtr->baseText = newBaseText;
-			tmpTextPtr->loginOfLastModifier = modifierLogin;
+//tmpTextPtr->baseText = "TestVal!!!";
+//Log("Write TestVal");
+_mainTableModel->EmitDataChange();
+			tmpTextPtr->loginOfLastModifier = loginOfModifier;
 			tmpTextPtr->timestampModified = ts;
 		}
 	}

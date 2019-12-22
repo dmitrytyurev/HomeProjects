@@ -158,7 +158,7 @@ void CHttpManager::CallbackConnecting(QNetworkReply *reply)
 void CHttpManager::CallbackSendPacket(QNetworkReply *reply)
 {
     if (reply->error()) {
-        return;
+		return;
     }
 
     int sizeReceived = (int)reply->read((char*)_httpBuf.data(), _httpBuf.size());
@@ -213,7 +213,7 @@ void CHttpManager::CallbackRequestPacket(QNetworkReply *reply)
         _lastSuccesPostWas = LAST_POST_WAS::REQUEST_PACKET;
         ++_rcvPacketN;
 		uint32_t timeToNextRequest = buf.GetUint32();
-		_timeOfRequestPacket = Utils::GetCurrentTimestamp() + timeToNextRequest;
+		_timeOfRequestPacket = Utils::GetCurrentTimestamp() + timeToNextRequest / 1000;
         _packetsIn.emplace_back(std::make_shared<CHttpPacket>(buf, CHttpPacket::Status::WAITING_FOR_UNPACKING));
         return;
     }
@@ -330,7 +330,7 @@ void CHttpManager::Update()
     else {
         if (IsTimeToRequestPacket()) {
             if (_lastSuccesPostWas == LAST_POST_WAS::SEND_PACKET) {
-                RequestPacket();
+				RequestPacket();
             }
             else {
                 SendPacket();

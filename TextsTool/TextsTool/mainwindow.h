@@ -50,6 +50,7 @@ public:
 	// Если justOneTextContentChanged == true, то перезаполняем индексы только, если включены фильтры таблицы. Иначе сразу выход
 	void fillRefsToTextsToShow(bool justOneTextContentChanged);
 	void recalcColumnToShowData();
+	void EmitDataChange() {  emit dataChanged(index(0,0), index(9,1) ); }
 signals:
 
 public slots:
@@ -82,8 +83,9 @@ public:
 
 private:
 	void ApplyDiffForSync(DeserializationBuffer& buf);
-	void ModifyDbChangeBaseText(DeserializationBuffer& dbuf);
-	void SendMsgToServer(const FoundTextRefs& textRefs);
+	void ModifyDbChangeBaseText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
+	void SendMsgChangeBaseText(const FoundTextRefs& textRefs);
+	void SendMsgChangeTextAttrib(const FoundTextRefs& textRefs);
 	void ResetTextAndFolderTimestamps(const FoundTextRefs& textRefs);
 
 	static DatabaseManager* pthis;
