@@ -135,8 +135,8 @@ bool MainTableModel::setData(const QModelIndex &index, const QVariant &value, in
 
 	*textRefs.string = value.toString().toUtf8().data();
 	DatabaseManager::Instance().OnTextModifiedFromGUI(textRefs);
+	OnDataModif(true, false, index.row(), index.column());
 
-	emit(dataChanged(index, index));
 	return true;
 }
 
@@ -190,7 +190,7 @@ QVariant MainTableModel::headerData(int section, Qt::Orientation orientation, in
 
 //---------------------------------------------------------------
 
-void MainTableModel::fillRefsToTextsToShow(bool justOneTextContentChanged)
+void MainTableModel::fillRefsToTextsToShow()
 {
 	_textsToShow.clear();
 	for (auto& folder: _dataBase->_folders) {
@@ -212,6 +212,26 @@ void MainTableModel::recalcColumnToShowData()
 				_columnsToShow.push_back(i2);
 			}
 		}
+	}
+}
+
+//---------------------------------------------------------------
+
+void MainTableModel::OnDataModif(bool oneCellChanged, bool columnsCanChange, int line, int column)
+{
+	bool canChangeLines = !oneCellChanged || _isFiltersOn;
+	if (canChangeLines) {
+		fillRefsToTextsToShow();
+	}
+	if (columnsCanChange) {
+		recalcColumnToShowData();
+	}
+	if (canChangeLines) {
+		beginResetModel();
+		endResetModel();
+	}
+	else {
+		emit(dataChanged(index(line, column), index(line, column)));
 	}
 }
 
@@ -348,7 +368,7 @@ void MainWindow::on_pushButton_clicked()
 //---------------------------------------------------------------
 void MainWindow::SetModelForMainTable(QAbstractTableModel* model)
 {
-	ui->tableView->setModel(nullptr);
+//	ui->tableView->setModel(nullptr);
 	ui->tableView->setModel(model);
 }
 
@@ -359,14 +379,6 @@ void MainWindow::update()
 	CHttpManager::Instance().Update();
 	DatabaseManager::Instance().Update();
 }
-
-//---------------------------------------------------------------
-
-void MainWindow::OnMainTableDataModified()
-{
-	// !!!!!!!!!!! Перерисовать главную таблицу
-}
-
 
 //---------------------------------------------------------------
 
@@ -605,10 +617,8 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 	{
 		Log("Msg: ReplySync");
 		ApplyDiffForSync(dbuf);
-		_dataBase->LogDatabase();
-		_mainTableModel->fillRefsToTextsToShow(false);
-		_mainTableModel->recalcColumnToShowData();
-		MainWindow::Instance().SetModelForMainTable(_mainTableModel.get());
+_dataBase->LogDatabase();
+		_mainTableModel->OnDataModif(false, true, 0, 0);
 
 //_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
 //_msgsQueueOut.back()->PushUint8(EventType::ChangeBaseText);
@@ -623,15 +633,13 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 		std::string loginOfModifier;
 		dbuf.GetString8(loginOfModifier);
 		uint32_t ts = dbuf.GetUint32();
-
 		uint8_t actionType = dbuf.GetUint8();
 		switch (actionType) {
 		case EventType::ChangeBaseText:
 		{
 			Log("Msg: ChangeBaseText");
 			ModifyDbChangeBaseText(dbuf, ts, loginOfModifier);
-			_mainTableModel->fillRefsToTextsToShow(true);
-			MainWindow::Instance().OnMainTableDataModified();
+			_mainTableModel->OnDataModif(true, false, );
 		}
 		break;
 		case EventType::ChangeAttributeInText:
@@ -663,7 +671,6 @@ void DatabaseManager::OnTextModifiedFromGUI(const FoundTextRefs& textRefs)
 		SendMsgChangeTextAttrib(textRefs);
 	}
 	ResetTextAndFolderTimestamps(textRefs);
-	_mainTableModel->fillRefsToTextsToShow(true);
 }
 
 //---------------------------------------------------------------
@@ -723,7 +730,6 @@ void DatabaseManager::ModifyDbChangeBaseText(DeserializationBuffer& dbuf, uint32
 			tmpTextPtr->baseText = newBaseText;
 //tmpTextPtr->baseText = "TestVal!!!";
 //Log("Write TestVal");
-_mainTableModel->EmitDataChange();
 			tmpTextPtr->loginOfLastModifier = loginOfModifier;
 			tmpTextPtr->timestampModified = ts;
 		}

@@ -48,9 +48,9 @@ public:
 
 	// Заполнить ссылки на тексты, которые должны показывать (учитывая выбранную папку, начиная с которой показываем тексты и применённые фильтры).
 	// Если justOneTextContentChanged == true, то перезаполняем индексы только, если включены фильтры таблицы. Иначе сразу выход
-	void fillRefsToTextsToShow(bool justOneTextContentChanged);
+	void fillRefsToTextsToShow();
 	void recalcColumnToShowData();
-	void EmitDataChange() {  emit dataChanged(index(0,0), index(9,1) ); }
+	void OnDataModif(bool oneCellChanged, bool columnsCanChange, int line, int column);
 signals:
 
 public slots:
@@ -61,6 +61,7 @@ private:
 
 private:
 	TextsDatabasePtr& _dataBase;
+	bool _isFiltersOn = false;   // Включены ли фильтры главной таблицы
 	std::vector<TextTranslated*> _textsToShow; // Выборка текстов, которую будем показывать
 	std::vector<int> _columnsToShow; // Индексы атрибутов в TextsDatabase::_attributeProps, которые показываем в качестве колонок
 };
@@ -115,7 +116,6 @@ public:
     ~MainWindow();
 	void closeEvent (QCloseEvent *event);
 	void SetModelForMainTable(QAbstractTableModel* model);
-	void OnMainTableDataModified();
 
 private slots:
 	void on_pushButton_clicked();
