@@ -89,6 +89,30 @@ bool MainTableModel::getTextReferences(const QModelIndex &index, bool needCreate
 
 //---------------------------------------------------------------
 
+int MainTableModel::calcLineByTextId(const std::string& textId)
+{
+	for (int i=0; i<_textsToShow.size(); ++i) {
+		if (_textsToShow[i]->id == textId) {
+			return i;
+		}
+	}
+	return -1; // Это нормальная ситуация, если извне изменился текст, который отфильтрован в главной таблице
+}
+
+//---------------------------------------------------------------
+
+int MainTableModel::calcColumnOfBaseText()
+{
+	for (int i=0; i<_columnsToShow.size(); ++i) {
+		if (_dataBase->_attributeProps[_columnsToShow[i]].type == AttributePropertyDataType::BaseText_t) {
+			return i;
+		}
+	}
+	return -1; // Это возможно, если извне изменился текст, в колонке, которая не отображается в таблице
+}
+
+//---------------------------------------------------------------
+
 QVariant MainTableModel::data(const QModelIndex &index, int role) const
 {
 	if (!index.isValid() || !_dataBase || !_dataBase->isSynced || (role != Qt::DisplayRole &&  role != Qt::EditRole))	{
@@ -231,7 +255,9 @@ void MainTableModel::OnDataModif(bool oneCellChanged, bool columnsCanChange, int
 		endResetModel();
 	}
 	else {
-		emit(dataChanged(index(line, column), index(line, column)));
+		if (line != -1 && column != -1) {
+			emit(dataChanged(index(line, column), index(line, column)));
+		}
 	}
 }
 
@@ -638,8 +664,8 @@ _dataBase->LogDatabase();
 		case EventType::ChangeBaseText:
 		{
 			Log("Msg: ChangeBaseText");
-			ModifyDbChangeBaseText(dbuf, ts, loginOfModifier);
-			_mainTableModel->OnDataModif(true, false, );
+			std::string textId = ModifyDbChangeBaseText(dbuf, ts, loginOfModifier);
+			_mainTableModel->OnDataModif(true, false, _mainTableModel->calcLineByTextId(textId), _mainTableModel->calcColumnOfBaseText());
 		}
 		break;
 		case EventType::ChangeAttributeInText:
@@ -715,7 +741,7 @@ void DatabaseManager::SendMsgChangeBaseText(const FoundTextRefs& textRefs)
 
 //---------------------------------------------------------------
 
-void DatabaseManager::ModifyDbChangeBaseText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifier)
+std::string DatabaseManager::ModifyDbChangeBaseText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifier)
 {
 	std::string textId;
 	dbuf.GetString8(textId);
@@ -732,7 +758,9 @@ void DatabaseManager::ModifyDbChangeBaseText(DeserializationBuffer& dbuf, uint32
 //Log("Write TestVal");
 			tmpTextPtr->loginOfLastModifier = loginOfModifier;
 			tmpTextPtr->timestampModified = ts;
+			return textId;
 		}
 	}
+	return "";
 }
 

@@ -51,6 +51,8 @@ public:
 	void fillRefsToTextsToShow();
 	void recalcColumnToShowData();
 	void OnDataModif(bool oneCellChanged, bool columnsCanChange, int line, int column);
+	int calcLineByTextId(const std::string& textId);
+	int calcColumnOfBaseText();
 signals:
 
 public slots:
@@ -84,7 +86,7 @@ public:
 
 private:
 	void ApplyDiffForSync(DeserializationBuffer& buf);
-	void ModifyDbChangeBaseText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
+	std::string ModifyDbChangeBaseText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
 	void SendMsgChangeBaseText(const FoundTextRefs& textRefs);
 	void SendMsgChangeTextAttrib(const FoundTextRefs& textRefs);
 	void ResetTextAndFolderTimestamps(const FoundTextRefs& textRefs);
