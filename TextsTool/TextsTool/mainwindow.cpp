@@ -113,6 +113,18 @@ int MainTableModel::calcColumnOfBaseText()
 
 //---------------------------------------------------------------
 
+int MainTableModel::calcColumnOfAttributInText(int attributId)
+{
+	for (int i=0; i<_columnsToShow.size(); ++i) {
+		if (_dataBase->_attributeProps[_columnsToShow[i]].id == attributId) {
+			return i;
+		}
+	}
+	return -1; // Это возможно, если извне изменился текст, в колонке, которая не отображается в таблице
+}
+
+//---------------------------------------------------------------
+
 QVariant MainTableModel::data(const QModelIndex &index, int role) const
 {
 	if (!index.isValid() || !_dataBase || !_dataBase->isSynced || (role != Qt::DisplayRole &&  role != Qt::EditRole))	{
@@ -671,7 +683,8 @@ _dataBase->LogDatabase();
 		case EventType::ChangeAttributeInText:
 		{
 			Log("Msg: ChangeAttributeInText");
-
+			auto[textId, attribId] = ModifyDbChangeAttributeInText(dbuf, ts, loginOfModifier);
+			_mainTableModel->OnDataModif(true, false, _mainTableModel->calcLineByTextId(textId), _mainTableModel->calcColumnOfAttributInText(attribId));
 		}
 		break;
 		default:
@@ -763,4 +776,67 @@ std::string DatabaseManager::ModifyDbChangeBaseText(DeserializationBuffer& dbuf,
 	}
 	return "";
 }
+
+//---------------------------------------------------------------
+
+std::pair<std::string, int> DatabaseManager::ModifyDbChangeAttributeInText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifier)
+{
+	std::string textId;
+	dbuf.GetString8(textId);
+	uint8_t attribId = dbuf.GetUint8();
+	uint8_t attribDataType = dbuf.GetUint8();
+	std::string text;
+	uint8_t flagState = 0;
+	switch(attribDataType) {
+	case AttributePropertyDataType::Translation_t:
+	case AttributePropertyDataType::CommonText_t:
+		dbuf.GetString16(text);
+	break;
+	case AttributePropertyDataType::Checkbox_t:
+		flagState = dbuf.GetUint8();
+	break;
+	default:
+		ExitMsg("DatabaseManager::ModifyDbChangeAttributeInText: unknown dataType");
+	break;
+	}
+
+	for (auto& f : _dataBase->_folders) {
+		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
+		if (result != std::end(f.texts)) {
+			TextTranslatedPtr tmpTextPtr = *result;
+			f.timestampModified = ts;
+			tmpTextPtr->loginOfLastModifier = loginOfModifier;
+			tmpTextPtr->timestampModified = ts;
+
+			AttributeInText* attribInTextToModify = nullptr;
+			for (auto& attribInText: tmpTextPtr->attributes) {
+				if (attribInText.id	== attribId) {
+					attribInTextToModify = &attribInText;
+				}
+			}
+			if (!attribInTextToModify) {
+				tmpTextPtr->attributes.emplace_back();
+				attribInTextToModify = &tmpTextPtr->attributes.back();
+			}
+
+			switch(attribDataType) {
+			case AttributePropertyDataType::Translation_t:
+			case AttributePropertyDataType::CommonText_t:
+				attribInTextToModify->text = text;
+				if (text.empty()) {
+					int indexElement = attribInTextToModify - &tmpTextPtr->attributes[0];
+					tmpTextPtr->attributes.erase(tmpTextPtr->attributes.begin() + indexElement);
+				}
+			break;
+			case AttributePropertyDataType::Checkbox_t:
+				attribInTextToModify->flagState = flagState;
+			break;
+			}
+			return  std::pair<std::string, int>(textId, attribId);
+		}
+	}
+	Log("DatabaseManager::ModifyDbChangeAttributeInText: textId not found");
+	return std::pair<std::string, int>("", -1);
+}
+
 
