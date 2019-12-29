@@ -52,7 +52,7 @@ public:
 	static void Init();
 	static void Deinit();
 	static CHttpManager& Instance();
-	void Update();
+	void Update(int dtMs);
     void Connect(const std::string& login, const std::string& password);
     void TestSend();
     STATE GetStatus();
@@ -82,7 +82,8 @@ private:
     uint32_t _sessionId = 0;
     LAST_POST_WAS _lastTryPostWas = LAST_POST_WAS::NONE;
     LAST_POST_WAS _lastSuccesPostWas = LAST_POST_WAS::NONE;
-    uint _timeOfRequestPacket = 0;  // Время следующего запроса пакета с сервера
+	int _timeToRequestPacket = 0;  // Время в миллисекундах через сколько нужно послать запрос следующего пакета с сервера
+	int _requestTimout = 0; // Таймаут между запросами пакетов с сервера. Может уменьшаться и увеличиваться в зависимости от активности отсылаемых и получаемых пакетов
     QNetworkAccessManager* _manager = nullptr;
     QNetworkRequest _request;
     std::vector<uint8_t> _httpBuf;

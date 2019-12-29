@@ -16,6 +16,8 @@
 Ui::MainWindow* debugGlobalUi = nullptr;
 const static std::string databasePath = "D:/Dimka/HomeProjects/TextsTool/DatabaseClient/";
 const static int KeyPerTextsNum = 100;  // На такое количество текстов создаётся один ключ для запроса RequestSync
+const static int UpdateCallTimoutMs = 50; // Через сколько миллисекунд вызывается Update
+
 
 MainWindow* MainWindow::pthis = nullptr;
 DatabaseManager* DatabaseManager::pthis = nullptr;
@@ -277,7 +279,6 @@ void MainTableModel::OnDataModif(bool oneCellChanged, bool columnsCanChange, int
 //---------------------------------------------------------------
 //---------------------------------------------------------------
 //---------------------------------------------------------------
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
 	ui(new Ui::MainWindow)
@@ -291,7 +292,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	CHttpManager::Init();
 	_timer = new QTimer(this);
 	connect(_timer, SIGNAL(timeout()), this, SLOT(update()));
-	_timer->start(50);
+	_timer->start(UpdateCallTimoutMs);
 }
 
 //---------------------------------------------------------------
@@ -414,7 +415,7 @@ void MainWindow::SetModelForMainTable(QAbstractTableModel* model)
 
 void MainWindow::update()
 {
-	CHttpManager::Instance().Update();
+	CHttpManager::Instance().Update(UpdateCallTimoutMs);
 	DatabaseManager::Instance().Update();
 }
 
@@ -823,6 +824,8 @@ std::pair<std::string, int> DatabaseManager::ModifyDbChangeAttributeInText(Deser
 			case AttributePropertyDataType::Translation_t:
 			case AttributePropertyDataType::CommonText_t:
 				attribInTextToModify->text = text;
+attribInTextToModify->text = "TestVal2 !!!";
+
 				if (text.empty()) {
 					int indexElement = attribInTextToModify - &tmpTextPtr->attributes[0];
 					tmpTextPtr->attributes.erase(tmpTextPtr->attributes.begin() + indexElement);

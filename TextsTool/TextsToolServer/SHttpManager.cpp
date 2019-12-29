@@ -10,11 +10,6 @@
 #include "Utils.h"
 #include "../SharedSrc/Shared.h"
 
-
-//const static uint32_t TIMEOUT_CLIENT_NOT_CONNECTED = 300;   // “аймаут в миллисекундах, в ответе когда приходит пакет с клиента, которым уже разорвано соединение
-const static uint32_t TIMEOUT_NO_SUCH_PACKET = 3000;        // “аймаут в миллисекундах, в ответе когда клиент запрашивает пакет на сервере, которого ещЄ нет
-const static uint32_t TIMEOUT_NEXT_PACKET_READY = 0;        // “аймаут в миллисекундах, в ответе когда клиент запрашивает пакет на сервере, а уже готов следующий пакет
-const static uint32_t TIMEOUT_NEXT_PACKET_NOT_READY = 3000; // “аймаут в миллисекундах, в ответе когда клиент запрашивает пакет на сервере, а ещЄ не готов следующий пакет
 const static uint32_t TIMEOUT_DISCONNECT_CLIENT = 30;       // “аймаут через сколько секунд неприхода запросов от клиента дисконнектим его
 
 //===============================================================================
@@ -149,15 +144,13 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 		int requestedPacketIndex = requestedPacketN - (*itClientLow)->_packetsQueueOut.lastPushedPacketN + queue.size() - 1;
 		if (requestedPacketIndex < 0 || requestedPacketIndex >= (int)queue.size() || (NEED_PACK_PACKETS && queue[requestedPacketIndex]->_status != HttpPacket::Status::PACKED)) {
 			response.PushUint8(AnswersToClient::NoSuchPacketYet);
-			response.PushUint32(TIMEOUT_NO_SUCH_PACKET);
 			return;
 		}
 		// ѕроверим, готов ли на отсылку следующий по номеру пакет
 		int nextPacketIndex = (requestedPacketN + 1) - (*itClientLow)->_packetsQueueOut.lastPushedPacketN + queue.size() - 1;
 		bool isNextPacketReadyToSend = (nextPacketIndex >= 0 && nextPacketIndex < (int)queue.size() && (queue[nextPacketIndex]->_status == HttpPacket::Status::PACKED || !NEED_PACK_PACKETS));
-		uint32_t timeoutToSend = isNextPacketReadyToSend ? TIMEOUT_NEXT_PACKET_READY : TIMEOUT_NEXT_PACKET_NOT_READY;
 		response.PushUint8(AnswersToClient::PacketSent);
-		response.PushUint32(timeoutToSend);
+		response.PushUint8(isNextPacketReadyToSend);
 		response.PushBytes(queue[requestedPacketIndex]->_packetData.data(), queue[requestedPacketIndex]->_packetData.size());
 		return;
 	}

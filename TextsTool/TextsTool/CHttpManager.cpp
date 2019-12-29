@@ -1,5 +1,6 @@
 #include <QTimer>
 #include <string>
+#include <algorithm>
 
 #include "../SharedSrc/SerializationBuffer.h"
 #include "../SharedSrc/DeserializationBuffer.h"
@@ -8,6 +9,9 @@
 #include "Utils.h"
 #include "CHttpManager.h"
 
+const static int MinTimeoutRequestPacketFromServer = 150;  // На сколько миллисикунд сбрасывается таймаут запроса пакетов на сервере при активности (посылка данных на сервер или получение данных с сервера)
+const static int MaxTimeoutRequestPacketFromServer = 3000; // Максимальный таймаут запроса пакетов на сервере (он плавно поднимается до этого значения при отсутствии активности)
+const static float IncreaseTimeoutRequestPacketFromServer = 1.05f; // Множитель для плавного увеличения таймаута запроса пакетов на сервере (при отсутствии активности)
 
 CHttpManager* CHttpManager::pthis = nullptr;
 
@@ -147,8 +151,8 @@ void CHttpManager::CallbackConnecting(QNetworkReply *reply)
 		_sessionId = buf.GetUint32();
         _sendPacketN = 0;
         _rcvPacketN = 0;
-		_timeOfRequestPacket = Utils::GetCurrentTimestamp();
-        return;
+		_requestTimout = MinTimeoutRequestPacketFromServer;
+		return;
     }
     Log("CallbackConnecting: unexpected response. code:" + std::to_string(code));
 }
@@ -205,16 +209,17 @@ void CHttpManager::CallbackRequestPacket(QNetworkReply *reply)
     }
     if (code == (uint8_t)AnswersToClient::NoSuchPacketYet)
     {
-		uint32_t timeToNextRequest = buf.GetUint32();
-		_timeOfRequestPacket = Utils::GetCurrentTimestamp() + timeToNextRequest / 1000;
         return;
     }
     if (code == (uint8_t)AnswersToClient::PacketSent) {
+		_requestTimout = MinTimeoutRequestPacketFromServer;
         _lastSuccesPostWas = LAST_POST_WAS::REQUEST_PACKET;
         ++_rcvPacketN;
-		uint32_t timeToNextRequest = buf.GetUint32();
-		_timeOfRequestPacket = Utils::GetCurrentTimestamp() + timeToNextRequest / 1000;
-        _packetsIn.emplace_back(std::make_shared<CHttpPacket>(buf, CHttpPacket::Status::WAITING_FOR_UNPACKING));
+		bool isNextPacketReady = static_cast<bool>(buf.GetUint8());
+		if (isNextPacketReady) {
+			_timeToRequestPacket = 0;
+		}
+		_packetsIn.emplace_back(std::make_shared<CHttpPacket>(buf, CHttpPacket::Status::WAITING_FOR_UNPACKING));
         return;
     }
     Log("CallbackRequestPacket unexpected response. code:" + std::to_string(code));
@@ -277,13 +282,16 @@ void CHttpManager::PutPacketToSendQueue(const std::vector<uint8_t>& packet)
 
 bool CHttpManager::IsTimeToRequestPacket()
 {
-	return _timeOfRequestPacket != 0 && Utils::GetCurrentTimestamp() >= _timeOfRequestPacket;
+	return _timeToRequestPacket == 0;
 }
 
 //---------------------------------------------------------------
 
 void CHttpManager::RequestPacket()
 {
+	_timeToRequestPacket = _requestTimout;
+	_requestTimout = std::min(static_cast<int>(_requestTimout * IncreaseTimeoutRequestPacketFromServer), MaxTimeoutRequestPacketFromServer);
+Log("RequestPacket, _requestTimout: " + std::to_string(_requestTimout));
     _lastTryPostWas = LAST_POST_WAS::REQUEST_PACKET;
 
     SerializationBuffer buf;
@@ -304,6 +312,7 @@ void CHttpManager::SendPacket()
         return;
     }
 
+	_requestTimout = MinTimeoutRequestPacketFromServer;
     _lastTryPostWas = LAST_POST_WAS::SEND_PACKET;
     SerializationBuffer buf;
 	buf.PushString8(_login);
@@ -317,8 +326,10 @@ void CHttpManager::SendPacket()
 
 //---------------------------------------------------------------
 
-void CHttpManager::Update()
+void CHttpManager::Update(int dtMs)
 {
+	_timeToRequestPacket = std::max(_timeToRequestPacket - dtMs, 0);
+
     if (_state != STATE::CONNECTED || _lastTryPostWas != LAST_POST_WAS::NONE) {
         return;
     }
