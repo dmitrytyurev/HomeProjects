@@ -63,12 +63,10 @@ DatabaseManager::DatabaseManager()
 
 void DatabaseManager::SaveDatabase()
 {
-Log("DatabaseManager::SaveDatabase Cp1");
-	if (!_dataBase) {
+	if (!_dataBase || !_dataBase->isSynced) {
 		return;
 	}
 	_dataBase->_dbSerializer->SaveDatabase();
-Log("DatabaseManager::SaveDatabase Cp2");
 }
 
 //---------------------------------------------------------------

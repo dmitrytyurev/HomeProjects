@@ -151,7 +151,7 @@ bool MainTableModel::setData(const QModelIndex &index, const QVariant &value, in
 		return false;
 	}
 
-	if(index.column() < 0 ||
+	if(index.column() <= 0 ||
 			index.column() >= _columnsToShow.size() ||
 			index.row() < 0 ||
 			index.row() >= _textsToShow.size())	{
