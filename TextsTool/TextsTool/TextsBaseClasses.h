@@ -15,7 +15,7 @@ using TextsDatabasePtr = std::shared_ptr<TextsDatabase>;
 
 
 //===============================================================================
-// Свойства атрибута (колонка в базе текстов)
+// РЎРІРѕР№СЃС‚РІР° Р°С‚СЂРёР±СѓС‚Р° (РєРѕР»РѕРЅРєР° РІ Р±Р°Р·Рµ С‚РµРєСЃС‚РѕРІ)
 //===============================================================================
 
 class AttributeProperty
@@ -25,21 +25,21 @@ public:
 	void LoadFullDump(DeserializationBuffer& buffer);
 	void SaveFullDump(SerializationBuffer& buffer) const;
 
-	void CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32_t newId);   // Создание объекта из сообщения от клиента 
+	void CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32_t newId);   // РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° РёР· СЃРѕРѕР±С‰РµРЅРёСЏ РѕС‚ РєР»РёРµРЅС‚Р° 
 	void Log(const std::string& prefix);
 
-	uint8_t id = 0;           // ID атрибута
-	std::string name;         // Имя атрибута
-	uint8_t type = 0;         // Значение одного из типов AttributePropertyDataType
-	uint32_t param1 = 0;      // Параметр, зависящий от типа (для Translation_t - тут id языка)
-	uint32_t param2 = 0;      // Параметр, зависящий от типа (запас)
-	uint8_t visiblePosition = 0;    // Визуальная позиция атрибута в таблице (даже если скрыт)
-	bool isVisible = false;         // Видимость атрибута
-	uint32_t timestampCreated = 0;  // Время создания
+	uint8_t id = 0;           // ID Р°С‚СЂРёР±СѓС‚Р°
+	std::string name;         // РРјСЏ Р°С‚СЂРёР±СѓС‚Р°
+	uint8_t type = 0;         // Р—РЅР°С‡РµРЅРёРµ РѕРґРЅРѕРіРѕ РёР· С‚РёРїРѕРІ AttributePropertyDataType
+	uint32_t param1 = 0;      // РџР°СЂР°РјРµС‚СЂ, Р·Р°РІРёСЃСЏС‰РёР№ РѕС‚ С‚РёРїР° (РґР»СЏ Translation_t - С‚СѓС‚ id СЏР·С‹РєР°)
+	uint32_t param2 = 0;      // РџР°СЂР°РјРµС‚СЂ, Р·Р°РІРёСЃСЏС‰РёР№ РѕС‚ С‚РёРїР° (Р·Р°РїР°СЃ)
+	uint8_t visiblePosition = 0;    // Р’РёР·СѓР°Р»СЊРЅР°СЏ РїРѕР·РёС†РёСЏ Р°С‚СЂРёР±СѓС‚Р° РІ С‚Р°Р±Р»РёС†Рµ (РґР°Р¶Рµ РµСЃР»Рё СЃРєСЂС‹С‚)
+	bool isVisible = false;         // Р’РёРґРёРјРѕСЃС‚СЊ Р°С‚СЂРёР±СѓС‚Р°
+	uint32_t timestampCreated = 0;  // Р’СЂРµРјСЏ СЃРѕР·РґР°РЅРёСЏ
 };
 
 //===============================================================================
-// Данные атрибута в тексте
+// Р”Р°РЅРЅС‹Рµ Р°С‚СЂРёР±СѓС‚Р° РІ С‚РµРєСЃС‚Рµ
 //===============================================================================
 
 class AttributeInText
@@ -50,15 +50,15 @@ public:
 	void SaveFullDump(SerializationBuffer& buffer) const;
 	void Log(const std::string& prefix);
 
-	std::string text;       // Текстовые данные атрибута, если это текст
-	uint8_t flagState = 0;  // Состояние флажка, если это флажок;
-	uint8_t id = 0;         // ID атрибута, по которому можно узнать его тип
-	uint8_t type = 0;       // Значение одного из типов AttributeProperty::DataType. !!!Здесь копия для быстрого доступа! В файле не нужно, поскольку тип можно определить по ID атрибута
+	std::string text;       // РўРµРєСЃС‚РѕРІС‹Рµ РґР°РЅРЅС‹Рµ Р°С‚СЂРёР±СѓС‚Р°, РµСЃР»Рё СЌС‚Рѕ С‚РµРєСЃС‚
+	uint8_t flagState = 0;  // РЎРѕСЃС‚РѕСЏРЅРёРµ С„Р»Р°Р¶РєР°, РµСЃР»Рё СЌС‚Рѕ С„Р»Р°Р¶РѕРє;
+	uint8_t id = 0;         // ID Р°С‚СЂРёР±СѓС‚Р°, РїРѕ РєРѕС‚РѕСЂРѕРјСѓ РјРѕР¶РЅРѕ СѓР·РЅР°С‚СЊ РµРіРѕ С‚РёРї
+	uint8_t type = 0;       // Р—РЅР°С‡РµРЅРёРµ РѕРґРЅРѕРіРѕ РёР· С‚РёРїРѕРІ AttributeProperty::DataType. !!!Р—РґРµСЃСЊ РєРѕРїРёСЏ РґР»СЏ Р±С‹СЃС‚СЂРѕРіРѕ РґРѕСЃС‚СѓРїР°! Р’ С„Р°Р№Р»Рµ РЅРµ РЅСѓР¶РЅРѕ, РїРѕСЃРєРѕР»СЊРєСѓ С‚РёРї РјРѕР¶РЅРѕ РѕРїСЂРµРґРµР»РёС‚СЊ РїРѕ ID Р°С‚СЂРёР±СѓС‚Р°
 };
 
 
 //===============================================================================
-// Текст со всеми переводами и прочими свойствами (строчка в таблице)
+// РўРµРєСЃС‚ СЃРѕ РІСЃРµРјРё РїРµСЂРµРІРѕРґР°РјРё Рё РїСЂРѕС‡РёРјРё СЃРІРѕР№СЃС‚РІР°РјРё (СЃС‚СЂРѕС‡РєР° РІ С‚Р°Р±Р»РёС†Рµ)
 //===============================================================================
 
 class TextTranslated
@@ -69,40 +69,40 @@ public:
 	void SaveFullDump(SerializationBuffer& buffer) const;
 	void Log(const std::string& prefix);
 
-	std::string id;                   // ID текста
-	uint32_t timestampCreated = 0;    // Время создания
-	uint32_t timestampModified = 0;   // Время последнего изменения
-	std::string loginOfLastModifier;  // Логин того, кто менял последний раз
-	std::string baseText;             // Текст на базовом языке (русском)
-	std::vector<AttributeInText> attributes; // Атрибуты текста с их данными
+	std::string id;                   // ID С‚РµРєСЃС‚Р°
+	uint32_t timestampCreated = 0;    // Р’СЂРµРјСЏ СЃРѕР·РґР°РЅРёСЏ
+	uint32_t timestampModified = 0;   // Р’СЂРµРјСЏ РїРѕСЃР»РµРґРЅРµРіРѕ РёР·РјРµРЅРµРЅРёСЏ
+	std::string loginOfLastModifier;  // Р›РѕРіРёРЅ С‚РѕРіРѕ, РєС‚Рѕ РјРµРЅСЏР» РїРѕСЃР»РµРґРЅРёР№ СЂР°Р·
+	std::string baseText;             // РўРµРєСЃС‚ РЅР° Р±Р°Р·РѕРІРѕРј СЏР·С‹РєРµ (СЂСѓСЃСЃРєРѕРј)
+	std::vector<AttributeInText> attributes; // РђС‚СЂРёР±СѓС‚С‹ С‚РµРєСЃС‚Р° СЃ РёС… РґР°РЅРЅС‹РјРё
 };
 
 using TextTranslatedPtr = std::shared_ptr<TextTranslated>;
 
 //===============================================================================
-// Каталог с текстами и вложенными каталогами в базе текстов
+// РљР°С‚Р°Р»РѕРі СЃ С‚РµРєСЃС‚Р°РјРё Рё РІР»РѕР¶РµРЅРЅС‹РјРё РєР°С‚Р°Р»РѕРіР°РјРё РІ Р±Р°Р·Рµ С‚РµРєСЃС‚РѕРІ
 //===============================================================================
 
 class Folder
 {
 public:
 	Folder() {}
-	void LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);  // Загрузка объекта с полного дампа
-	void SaveFullDump(SerializationBuffer& buffer) const;      // Запись полного дампа объекта
+	void LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);  // Р—Р°РіСЂСѓР·РєР° РѕР±СЉРµРєС‚Р° СЃ РїРѕР»РЅРѕРіРѕ РґР°РјРїР°
+	void SaveFullDump(SerializationBuffer& buffer) const;      // Р—Р°РїРёСЃСЊ РїРѕР»РЅРѕРіРѕ РґР°РјРїР° РѕР±СЉРµРєС‚Р°
 
-	void CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32_t newId);   // Создание объекта из сообщения от клиента 
+	void CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32_t newId);   // РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° РёР· СЃРѕРѕР±С‰РµРЅРёСЏ РѕС‚ РєР»РёРµРЅС‚Р° 
 	void Log(const std::string& prefix);
 
-	uint32_t id = 0;                 // ID папки
-	uint32_t timestampCreated = 0;   // Время создания
-	uint32_t timestampModified = 0;  // Время изменения данных папки или её текстов
-	std::string name;                // Имя папки
-	uint32_t parentId = 0;           // ID родительской папки
-	std::vector<TextTranslatedPtr> texts;  // Тексты лежащие непосредственно в папке
+	uint32_t id = 0;                 // ID РїР°РїРєРё
+	uint32_t timestampCreated = 0;   // Р’СЂРµРјСЏ СЃРѕР·РґР°РЅРёСЏ
+	uint32_t timestampModified = 0;  // Р’СЂРµРјСЏ РёР·РјРµРЅРµРЅРёСЏ РґР°РЅРЅС‹С… РїР°РїРєРё РёР»Рё РµС‘ С‚РµРєСЃС‚РѕРІ
+	std::string name;                // РРјСЏ РїР°РїРєРё
+	uint32_t parentId = 0;           // ID СЂРѕРґРёС‚РµР»СЊСЃРєРѕР№ РїР°РїРєРё
+	std::vector<TextTranslatedPtr> texts;  // РўРµРєСЃС‚С‹ Р»РµР¶Р°С‰РёРµ РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕ РІ РїР°РїРєРµ
 };
 
 //===============================================================================
-// База текстов
+// Р‘Р°Р·Р° С‚РµРєСЃС‚РѕРІ
 //===============================================================================
 
 class TextsDatabase
@@ -111,11 +111,11 @@ public:
 	TextsDatabase(const std::string path, const std::string dbName);
 	void LogDatabase();
 
-	bool isSynced = false;         // Синхронизирована ли база с сервером
-	std::string _dbName;           // Имя базы данных текстов
-	std::vector<AttributeProperty> _attributeProps; // Свойства атрибутов (колонок) таблицы
-	std::vector<Folder> _folders;  // Папки. Рекурсивная структура через ссылку на ID родителя
+	bool isSynced = false;         // РЎРёРЅС…СЂРѕРЅРёР·РёСЂРѕРІР°РЅР° Р»Рё Р±Р°Р·Р° СЃ СЃРµСЂРІРµСЂРѕРј
+	std::string _dbName;           // РРјСЏ Р±Р°Р·С‹ РґР°РЅРЅС‹С… С‚РµРєСЃС‚РѕРІ
+	std::vector<AttributeProperty> _attributeProps; // РЎРІРѕР№СЃС‚РІР° Р°С‚СЂРёР±СѓС‚РѕРІ (РєРѕР»РѕРЅРѕРє) С‚Р°Р±Р»РёС†С‹
+	std::vector<Folder> _folders;  // РџР°РїРєРё. Р РµРєСѓСЂСЃРёРІРЅР°СЏ СЃС‚СЂСѓРєС‚СѓСЂР° С‡РµСЂРµР· СЃСЃС‹Р»РєСѓ РЅР° ID СЂРѕРґРёС‚РµР»СЏ
 
-	DbSerializerPtr _dbSerializer; // Чтение/запись базы текстов на диск
+	DbSerializerPtr _dbSerializer; // Р§С‚РµРЅРёРµ/Р·Р°РїРёСЃСЊ Р±Р°Р·С‹ С‚РµРєСЃС‚РѕРІ РЅР° РґРёСЃРє
 };
 

@@ -75,8 +75,8 @@ void DbSerializer::LoadDatabase()
 	file.read(reinterpret_cast<char*>(buf._buffer.data()), fileSize);
 	file.close();
 
-	buf.offset = 8; // Пропускаем сигнатуру и номер версии
-	std::vector<uint8_t> attributesIdToType; // Для быстрой перекодировки id атрибута в его type
+	buf.offset = 8; // РџСЂРѕРїСѓСЃРєР°РµРј СЃРёРіРЅР°С‚СѓСЂСѓ Рё РЅРѕРјРµСЂ РІРµСЂСЃРёРё
+	std::vector<uint8_t> attributesIdToType; // Р”Р»СЏ Р±С‹СЃС‚СЂРѕР№ РїРµСЂРµРєРѕРґРёСЂРѕРІРєРё id Р°С‚СЂРёР±СѓС‚Р° РІ РµРіРѕ type
 
 //	_pDataBase->_newAttributeId = buf.GetUint8();
 	uint32_t attributesNum = buf.GetUint32();

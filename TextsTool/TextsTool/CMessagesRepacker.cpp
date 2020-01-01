@@ -9,21 +9,21 @@ void Log(const std::string& str);
 
 void Repacker::RepackMessagesOutToPackets(std::vector<SerializationBufferPtr>& msgsQueueOut, CHttpManager& httpManager)
 {
-	const int packetMaxSize = HTTP_BUF_SIZE - 200; // Максимальный размер данных сообщения в пакете. Берётся меньше размера буфера получения HTTP-запроса, потому, что к данным сообщения ещё добавляются данные репакера и данные HTTP-менеджера
+	const int packetMaxSize = HTTP_BUF_SIZE - 200; // РњР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ РґР°РЅРЅС‹С… СЃРѕРѕР±С‰РµРЅРёСЏ РІ РїР°РєРµС‚Рµ. Р‘РµСЂС‘С‚СЃСЏ РјРµРЅСЊС€Рµ СЂР°Р·РјРµСЂР° Р±СѓС„РµСЂР° РїРѕР»СѓС‡РµРЅРёСЏ HTTP-Р·Р°РїСЂРѕСЃР°, РїРѕС‚РѕРјСѓ, С‡С‚Рѕ Рє РґР°РЅРЅС‹Рј СЃРѕРѕР±С‰РµРЅРёСЏ РµС‰С‘ РґРѕР±Р°РІР»СЏСЋС‚СЃСЏ РґР°РЅРЅС‹Рµ СЂРµРїР°РєРµСЂР° Рё РґР°РЅРЅС‹Рµ HTTP-РјРµРЅРµРґР¶РµСЂР°
 
     auto& v = msgsQueueOut;
 
 	while (v.size()) {
 		if (v[0]->buffer.size() > packetMaxSize) {
-			// Сообщение превышает максимальный размер пакета. Разбиваем его на несколько пакетов
-			int n = (v[0]->buffer.size() + packetMaxSize - 1) / packetMaxSize; // Число пакетов, на которое разобьём сообщение
+			// РЎРѕРѕР±С‰РµРЅРёРµ РїСЂРµРІС‹С€Р°РµС‚ РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ РїР°РєРµС‚Р°. Р Р°Р·Р±РёРІР°РµРј РµРіРѕ РЅР° РЅРµСЃРєРѕР»СЊРєРѕ РїР°РєРµС‚РѕРІ
+			int n = (v[0]->buffer.size() + packetMaxSize - 1) / packetMaxSize; // Р§РёСЃР»Рѕ РїР°РєРµС‚РѕРІ, РЅР° РєРѕС‚РѕСЂРѕРµ СЂР°Р·РѕР±СЊС‘Рј СЃРѕРѕР±С‰РµРЅРёРµ
 			int offs = 0;
 			for (int i = 0; i < n; ++i) {
                 int curSize =(i == n - 1 ? (int)v[0]->buffer.size() - (n - 1) * packetMaxSize : packetMaxSize);
 				SerializationBuffer sbuf;
 				sbuf.PushUint8(PacketDataType::PartOfMessage);
-				sbuf.PushUint32(v[0]->buffer.size()); // Длина полного сообщений
-				sbuf.PushUint32(curSize);  // Длина текущего куска сообщения
+				sbuf.PushUint32(v[0]->buffer.size()); // Р”Р»РёРЅР° РїРѕР»РЅРѕРіРѕ СЃРѕРѕР±С‰РµРЅРёР№
+				sbuf.PushUint32(curSize);  // Р”Р»РёРЅР° С‚РµРєСѓС‰РµРіРѕ РєСѓСЃРєР° СЃРѕРѕР±С‰РµРЅРёСЏ
 				sbuf.PushBytes(v[0]->buffer.data() + offs, curSize);
 				offs += curSize;
                 httpManager.PutPacketToSendQueue(sbuf.buffer);
@@ -31,23 +31,23 @@ void Repacker::RepackMessagesOutToPackets(std::vector<SerializationBufferPtr>& m
 			v.erase(v.begin());
 		}
 		else {
-			// Объединяем по несколько сообщений в пакет (от 1 до N сообщений)
+			// РћР±СЉРµРґРёРЅСЏРµРј РїРѕ РЅРµСЃРєРѕР»СЊРєРѕ СЃРѕРѕР±С‰РµРЅРёР№ РІ РїР°РєРµС‚ (РѕС‚ 1 РґРѕ N СЃРѕРѕР±С‰РµРЅРёР№)
 			int n = 0;
 			int sum = 0;
-			// Считаем число сообщений n, который поместятся в один пакет
-            while (sum + v[n]->buffer.size() + sizeof(uint32_t) <= packetMaxSize) {  // Добавляется sizeof(uint32_t) потому, что к каждому сообщению
-                sum += (int)v[n]->buffer.size() + (int)sizeof(uint32_t);                       // в пакете допишется его длина - это добавочные расходы длины пакета
+			// РЎС‡РёС‚Р°РµРј С‡РёСЃР»Рѕ СЃРѕРѕР±С‰РµРЅРёР№ n, РєРѕС‚РѕСЂС‹Р№ РїРѕРјРµСЃС‚СЏС‚СЃСЏ РІ РѕРґРёРЅ РїР°РєРµС‚
+            while (sum + v[n]->buffer.size() + sizeof(uint32_t) <= packetMaxSize) {  // Р”РѕР±Р°РІР»СЏРµС‚СЃСЏ sizeof(uint32_t) РїРѕС‚РѕРјСѓ, С‡С‚Рѕ Рє РєР°Р¶РґРѕРјСѓ СЃРѕРѕР±С‰РµРЅРёСЋ
+                sum += (int)v[n]->buffer.size() + (int)sizeof(uint32_t);                       // РІ РїР°РєРµС‚Рµ РґРѕРїРёС€РµС‚СЃСЏ РµРіРѕ РґР»РёРЅР° - СЌС‚Рѕ РґРѕР±Р°РІРѕС‡РЅС‹Рµ СЂР°СЃС…РѕРґС‹ РґР»РёРЅС‹ РїР°РєРµС‚Р°
                 if (++n == (int)v.size()) {
 					break;
 				}
 			};
 			if (n == 0) {
-				n = 1; // Если длина данных пакета в интервале [packetMaxSize-sizeof(uint32_t)..packetMaxSize], то получим n == 0
+				n = 1; // Р•СЃР»Рё РґР»РёРЅР° РґР°РЅРЅС‹С… РїР°РєРµС‚Р° РІ РёРЅС‚РµСЂРІР°Р»Рµ [packetMaxSize-sizeof(uint32_t)..packetMaxSize], С‚Рѕ РїРѕР»СѓС‡РёРј n == 0
 			}
-			// Заносим n очередных сообщений в один пакет
+			// Р—Р°РЅРѕСЃРёРј n РѕС‡РµСЂРµРґРЅС‹С… СЃРѕРѕР±С‰РµРЅРёР№ РІ РѕРґРёРЅ РїР°РєРµС‚
 			SerializationBuffer sbuf;
 			sbuf.PushUint8(PacketDataType::WholeMessages);
-			sbuf.PushUint32(n); // Количество целых сообщений в пакете
+			sbuf.PushUint32(n); // РљРѕР»РёС‡РµСЃС‚РІРѕ С†РµР»С‹С… СЃРѕРѕР±С‰РµРЅРёР№ РІ РїР°РєРµС‚Рµ
 			for (int i = 0; i < n; ++i) {
 				sbuf.PushUint32(v[0]->buffer.size());
                 sbuf.PushBytes(v[0]->buffer.data(), (int)v[0]->buffer.size());
@@ -64,9 +64,9 @@ void Repacker::RepackPacketsInToMessages(CHttpManager& httpManager, std::vector<
 {
     for (int iPckt = 0; iPckt < (int)httpManager._packetsIn.size(); ++iPckt) {
         auto& packetPtr = httpManager._packetsIn[iPckt];
-		DeserializationBuffer buffer(packetPtr->_packetData); // !!! Неоптимально. Сделать возможность в DeserializationBuffer хранить указатель на вектор, а не копировать в него вектор целиком
+		DeserializationBuffer buffer(packetPtr->_packetData); // !!! РќРµРѕРїС‚РёРјР°Р»СЊРЅРѕ. РЎРґРµР»Р°С‚СЊ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РІ DeserializationBuffer С…СЂР°РЅРёС‚СЊ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РІРµРєС‚РѕСЂ, Р° РЅРµ РєРѕРїРёСЂРѕРІР°С‚СЊ РІ РЅРµРіРѕ РІРµРєС‚РѕСЂ С†РµР»РёРєРѕРј
 		uint8_t pType = buffer.GetUint8();
-		if (pType == PacketDataType::WholeMessages) { // В данном пакете один или несколько целых сообщений
+		if (pType == PacketDataType::WholeMessages) { // Р’ РґР°РЅРЅРѕРј РїР°РєРµС‚Рµ РѕРґРёРЅ РёР»Рё РЅРµСЃРєРѕР»СЊРєРѕ С†РµР»С‹С… СЃРѕРѕР±С‰РµРЅРёР№
 			uint32_t messagesNum = buffer.GetUint32();
 			for (int iMsg = 0; iMsg < (int)messagesNum; ++iMsg) {
 				uint32_t messageSize = buffer.GetUint32();
@@ -78,17 +78,17 @@ void Repacker::RepackPacketsInToMessages(CHttpManager& httpManager, std::vector<
 			httpManager._packetsIn.erase(httpManager._packetsIn.begin() + iPckt);
 			--iPckt;
 		}
-		else if (pType == PacketDataType::PartOfMessage) { // В данном пакете первый фрагмент неполного сообщения
+		else if (pType == PacketDataType::PartOfMessage) { // Р’ РґР°РЅРЅРѕРј РїР°РєРµС‚Рµ РїРµСЂРІС‹Р№ С„СЂР°РіРјРµРЅС‚ РЅРµРїРѕР»РЅРѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ
 			uint32_t messageSize = buffer.GetUint32();
 			uint32_t partMessageSize = buffer.GetUint32();
 			uint32_t sum = partMessageSize;
 			int iPckt2 = 0;
-            for (iPckt2 = iPckt + 1; iPckt2 < (int)httpManager._packetsIn.size(); ++iPckt2) { // Просмотрим следующие пакеты, чтобы выяснить есть ли в них все фрагменты для сбора сообщения iPckt
+            for (iPckt2 = iPckt + 1; iPckt2 < (int)httpManager._packetsIn.size(); ++iPckt2) { // РџСЂРѕСЃРјРѕС‚СЂРёРј СЃР»РµРґСѓСЋС‰РёРµ РїР°РєРµС‚С‹, С‡С‚РѕР±С‹ РІС‹СЏСЃРЅРёС‚СЊ РµСЃС‚СЊ Р»Рё РІ РЅРёС… РІСЃРµ С„СЂР°РіРјРµРЅС‚С‹ РґР»СЏ СЃР±РѕСЂР° СЃРѕРѕР±С‰РµРЅРёСЏ iPckt
                 auto& packetPtr2 = httpManager._packetsIn[iPckt2];
-				DeserializationBuffer buffer2(packetPtr2->_packetData); // !!! Неоптимально. Сделать возможность в DeserializationBuffer хранить указатель на вектор, а не копировать в него вектор целиком
+				DeserializationBuffer buffer2(packetPtr2->_packetData); // !!! РќРµРѕРїС‚РёРјР°Р»СЊРЅРѕ. РЎРґРµР»Р°С‚СЊ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РІ DeserializationBuffer С…СЂР°РЅРёС‚СЊ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РІРµРєС‚РѕСЂ, Р° РЅРµ РєРѕРїРёСЂРѕРІР°С‚СЊ РІ РЅРµРіРѕ РІРµРєС‚РѕСЂ С†РµР»РёРєРѕРј
 				uint8_t pType2 = buffer2.GetUint8();
 				if (pType2 != PacketDataType::PartOfMessage) {
-					Log("pType2 != PacketDataType::PartOfMessage"); // !!! Сделать корректный выход, если возможно
+					Log("pType2 != PacketDataType::PartOfMessage"); // !!! РЎРґРµР»Р°С‚СЊ РєРѕСЂСЂРµРєС‚РЅС‹Р№ РІС‹С…РѕРґ, РµСЃР»Рё РІРѕР·РјРѕР¶РЅРѕ
 				}
 				uint32_t messageSize2 = buffer2.GetUint32();
 				if (messageSize != messageSize2) {
@@ -100,16 +100,16 @@ void Repacker::RepackPacketsInToMessages(CHttpManager& httpManager, std::vector<
 					ExitMsg("sum > messageSize");
 				}
 				if (sum == messageSize) {
-					break; // Нашли последний пакет, содержащий данное сообщение. Выходим досрочно.
+					break; // РќР°С€Р»Рё РїРѕСЃР»РµРґРЅРёР№ РїР°РєРµС‚, СЃРѕРґРµСЂР¶Р°С‰РёР№ РґР°РЅРЅРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ. Р’С‹С…РѕРґРёРј РґРѕСЃСЂРѕС‡РЅРѕ.
 				}
 			}
-            if (iPckt2 < (int)httpManager._packetsIn.size()) { // Вышли досрочно, значит найдены все пакеты с данным сообщением. Склеем его и удалим содержащие его пакеты
-				int lastMsgPckt = iPckt2; // Последний пакет, содержащий данные текущего пакета
-                msgsQueueIn.emplace_back(std::make_unique<DeserializationBuffer>(buffer.GetNextBytes(partMessageSize), partMessageSize)); // Начнём склейку взяв данные сообщения из первого пакета
+            if (iPckt2 < (int)httpManager._packetsIn.size()) { // Р’С‹С€Р»Рё РґРѕСЃСЂРѕС‡РЅРѕ, Р·РЅР°С‡РёС‚ РЅР°Р№РґРµРЅС‹ РІСЃРµ РїР°РєРµС‚С‹ СЃ РґР°РЅРЅС‹Рј СЃРѕРѕР±С‰РµРЅРёРµРј. РЎРєР»РµРµРј РµРіРѕ Рё СѓРґР°Р»РёРј СЃРѕРґРµСЂР¶Р°С‰РёРµ РµРіРѕ РїР°РєРµС‚С‹
+				int lastMsgPckt = iPckt2; // РџРѕСЃР»РµРґРЅРёР№ РїР°РєРµС‚, СЃРѕРґРµСЂР¶Р°С‰РёР№ РґР°РЅРЅС‹Рµ С‚РµРєСѓС‰РµРіРѕ РїР°РєРµС‚Р°
+                msgsQueueIn.emplace_back(std::make_unique<DeserializationBuffer>(buffer.GetNextBytes(partMessageSize), partMessageSize)); // РќР°С‡РЅС‘Рј СЃРєР»РµР№РєСѓ РІР·СЏРІ РґР°РЅРЅС‹Рµ СЃРѕРѕР±С‰РµРЅРёСЏ РёР· РїРµСЂРІРѕРіРѕ РїР°РєРµС‚Р°
                 DeserializationBuffer* pBuf = msgsQueueIn.back().get();
-				for (iPckt2 = iPckt + 1; iPckt2 <= lastMsgPckt; ++iPckt2) { // Добавим данные из остальных пакетов (сразу будем удалять их)
+				for (iPckt2 = iPckt + 1; iPckt2 <= lastMsgPckt; ++iPckt2) { // Р”РѕР±Р°РІРёРј РґР°РЅРЅС‹Рµ РёР· РѕСЃС‚Р°Р»СЊРЅС‹С… РїР°РєРµС‚РѕРІ (СЃСЂР°Р·Сѓ Р±СѓРґРµРј СѓРґР°Р»СЏС‚СЊ РёС…)
                     auto& packetPtr2 = httpManager._packetsIn[iPckt2];
-					DeserializationBuffer buffer2(packetPtr2->_packetData); // !!! Неоптимально. Сделать возможность в DeserializationBuffer хранить указатель на вектор, а не копировать в него вектор целиком
+					DeserializationBuffer buffer2(packetPtr2->_packetData); // !!! РќРµРѕРїС‚РёРјР°Р»СЊРЅРѕ. РЎРґРµР»Р°С‚СЊ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РІ DeserializationBuffer С…СЂР°РЅРёС‚СЊ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РІРµРєС‚РѕСЂ, Р° РЅРµ РєРѕРїРёСЂРѕРІР°С‚СЊ РІ РЅРµРіРѕ РІРµРєС‚РѕСЂ С†РµР»РёРєРѕРј
 					uint8_t pType2 = buffer2.GetUint8();
 					uint32_t messageSize2 = buffer2.GetUint32();
 					uint32_t partMessageSize2 = buffer2.GetUint32();
@@ -121,7 +121,7 @@ void Repacker::RepackPacketsInToMessages(CHttpManager& httpManager, std::vector<
                 httpManager._packetsIn.erase(httpManager._packetsIn.begin() + iPckt);
 				--iPckt;
 			}
-			else { // Перебрали все оставшиеся пакеты, но всё сообщение склеить пока не получится. Выходим из разбора пакетов текущего клиента. 
+			else { // РџРµСЂРµР±СЂР°Р»Рё РІСЃРµ РѕСЃС‚Р°РІС€РёРµСЃСЏ РїР°РєРµС‚С‹, РЅРѕ РІСЃС‘ СЃРѕРѕР±С‰РµРЅРёРµ СЃРєР»РµРёС‚СЊ РїРѕРєР° РЅРµ РїРѕР»СѓС‡РёС‚СЃСЏ. Р’С‹С…РѕРґРёРј РёР· СЂР°Р·Р±РѕСЂР° РїР°РєРµС‚РѕРІ С‚РµРєСѓС‰РµРіРѕ РєР»РёРµРЅС‚Р°. 
 				break;
 			}
 		}
