@@ -30,7 +30,9 @@ SOURCES += \
         ../SharedSrc/SerializationBuffer.cpp \
         CHttpManager.cpp \
         CMessagesRepacker.cpp \
+        DatabaseManager.cpp \
         DbSerializer.cpp \
+        MainTableModel.cpp \
         TextsBaseClasses.cpp \
         Utils.cpp \
         main.cpp \
@@ -42,7 +44,9 @@ HEADERS += \
         ../SharedSrc/Shared.h \
         CHttpManager.h \
         CMessagesRepacker.h \
+        DatabaseManager.h \
         DbSerializer.h \
+        MainTableModel.h \
         TextsBaseClasses.h \
         Utils.h \
         mainwindow.h
