@@ -167,7 +167,7 @@ bool MainTableModel::setData(const QModelIndex &index, const QVariant &value, in
 
 	*textRefs.string = value.toString().toUtf8().data();
 	DatabaseManager::Instance().OnTextModifiedFromGUI(textRefs);
-	OnDataModif(true, false, index.row(), index.column());
+	OnDataModif(false, true, false, index.row(), index.column());
 
 	return true;
 }
@@ -226,8 +226,10 @@ void MainTableModel::fillRefsToTextsToShow()
 {
 	_textsToShow.clear();
 	for (auto& folder: _dataBase->_folders) {
-		for (auto& text: folder.texts) {
-			_textsToShow.emplace_back(text.get());
+		if (folder.uiTreeItem->isSelected()) {
+			for (auto& text: folder.texts) {
+				_textsToShow.emplace_back(text.get());
+			}
 		}
 	}
 }
@@ -249,9 +251,9 @@ void MainTableModel::recalcColumnToShowData()
 
 //---------------------------------------------------------------
 
-void MainTableModel::OnDataModif(bool oneCellChanged, bool columnsCanChange, int line, int column)
+void MainTableModel::OnDataModif(bool selectedFolderChanged, bool oneCellChanged, bool columnsCanChange, int line, int column)
 {
-	bool canChangeLines = !oneCellChanged || _isFiltersOn;
+	bool canChangeLines = selectedFolderChanged || !oneCellChanged || _isFiltersOn;
 	if (canChangeLines) {
 		fillRefsToTextsToShow();
 	}

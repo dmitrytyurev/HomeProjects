@@ -45,6 +45,7 @@ public:
 	void ProcessMessageFromServer(const std::vector<uint8_t>& buf);
 	void SaveDatabase();
 	void Update();
+	void TreeSelectionChanged();
 
 private:
 	void ApplyDiffForSync(DeserializationBuffer& buf);

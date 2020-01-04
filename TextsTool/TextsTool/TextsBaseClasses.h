@@ -8,6 +8,7 @@ class DeserializationBuffer;
 class SerializationBuffer;
 class DbSerializer;
 class TextsDatabase;
+class QTreeWidgetItem;
 
 using DbSerializerPtr = std::unique_ptr<DbSerializer>;
 using SerializationBufferPtr = std::shared_ptr<SerializationBuffer>;
@@ -99,6 +100,7 @@ public:
 	std::string name;                // Имя папки
 	uint32_t parentId = 0;           // ID родительской папки, для корневой папки здесь UINT32_MAX
 	std::vector<TextTranslatedPtr> texts;  // Тексты лежащие непосредственно в папке
+	QTreeWidgetItem* uiTreeItem = nullptr; // Указатель на айтем в UI
 };
 
 //===============================================================================

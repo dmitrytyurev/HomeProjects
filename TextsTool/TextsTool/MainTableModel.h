@@ -37,7 +37,7 @@ public:
 	// Если justOneTextContentChanged == true, то перезаполняем индексы только, если включены фильтры таблицы. Иначе сразу выход
 	void fillRefsToTextsToShow();
 	void recalcColumnToShowData();
-	void OnDataModif(bool oneCellChanged, bool columnsCanChange, int line, int column);
+	void OnDataModif(bool selectedFolderChanged, bool oneCellChanged, bool columnsCanChange, int line, int column);
 	int calcLineByTextId(const std::string& textId);
 	int calcColumnOfBaseText();
 	int calcColumnOfAttributInText(int attributId);

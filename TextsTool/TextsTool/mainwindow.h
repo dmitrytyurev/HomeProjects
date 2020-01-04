@@ -40,6 +40,7 @@ public:
 private slots:
 	void on_pushButton_clicked();
 	void update();
+	void treeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
 private:
     Ui::MainWindow *ui = nullptr;

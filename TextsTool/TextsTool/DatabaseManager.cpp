@@ -249,6 +249,13 @@ void DatabaseManager::Update()
 
 //---------------------------------------------------------------
 
+void DatabaseManager::TreeSelectionChanged()
+{
+	_mainTableModel->OnDataModif(true, false, false, 0, 0);
+}
+
+//---------------------------------------------------------------
+
 void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 {
 	DeserializationBuffer dbuf(buf); // !!! Неоптимально! Этот буфер может быть сотню Мб! Подумать о работе по указателю без копирования данных
@@ -261,8 +268,8 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 		ApplyDiffForSync(dbuf);
 		_dataBase->_dbSerializer->SaveDatabase();
 _dataBase->LogDatabase();
-		_mainTableModel->OnDataModif(false, true, 0, 0);
 		AdjustFolderView(UINT32_MAX, nullptr);
+		_mainTableModel->OnDataModif(false, false, true, 0, 0);
 
 //_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
 //_msgsQueueOut.back()->PushUint8(EventType::ChangeBaseText);
@@ -283,14 +290,14 @@ _dataBase->LogDatabase();
 		{
 			Log("Msg: ChangeBaseText");
 			std::string textId = ModifyDbChangeBaseText(dbuf, ts, loginOfModifier);
-			_mainTableModel->OnDataModif(true, false, _mainTableModel->calcLineByTextId(textId), _mainTableModel->calcColumnOfBaseText());
+			_mainTableModel->OnDataModif(false, true, false, _mainTableModel->calcLineByTextId(textId), _mainTableModel->calcColumnOfBaseText());
 		}
 		break;
 		case EventType::ChangeAttributeInText:
 		{
 			Log("Msg: ChangeAttributeInText");
 			auto[textId, attribId] = ModifyDbChangeAttributeInText(dbuf, ts, loginOfModifier);
-			_mainTableModel->OnDataModif(true, false, _mainTableModel->calcLineByTextId(textId), _mainTableModel->calcColumnOfAttributInText(attribId));
+			_mainTableModel->OnDataModif(false, true, false, _mainTableModel->calcLineByTextId(textId), _mainTableModel->calcColumnOfAttributInText(attribId));
 		}
 		break;
 		default:
@@ -454,12 +461,14 @@ void DatabaseManager::AdjustFolderView(uint32_t parentId, QTreeWidgetItem *paren
 	for (auto& folder: _dataBase->_folders) {
 		if (folder.parentId == parentId) {
 			if (parentId == UINT32_MAX) {  // Корневая папка
-				QTreeWidgetItem *treeItem = new QTreeWidgetItem(MainWindow::Instance().getTreeWidget());
+				QTreeWidgetItem* treeItem = new QTreeWidgetItem(MainWindow::Instance().getTreeWidget());
+				folder.uiTreeItem = treeItem;
 				treeItem->setText(0, QString::fromStdString(folder.name));
 				AdjustFolderView(folder.id, treeItem);
 			}
 			else { // Некорневая папка
 				QTreeWidgetItem *treeItem = new QTreeWidgetItem();
+				folder.uiTreeItem = treeItem;
 				treeItem->setText(0, QString::fromStdString(folder.name));
 				parentTreeItem->addChild(treeItem);
 			}

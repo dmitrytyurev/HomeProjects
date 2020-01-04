@@ -37,6 +37,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	ui->treeWidget->setColumnCount(1);
 	ui->treeWidget->setHeaderLabels(QStringList() << "Папки с текстами");
+
+	connect(ui->treeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(treeSelectionChanged(const QItemSelection&,const QItemSelection&)));
 }
 
 //---------------------------------------------------------------
@@ -46,6 +48,12 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+//---------------------------------------------------------------
+
+void MainWindow::treeSelectionChanged(const QItemSelection&, const QItemSelection&)
+{
+	DatabaseManager::Instance().TreeSelectionChanged();
+}
 //---------------------------------------------------------------
 
 void MainWindow::closeEvent (QCloseEvent *)
