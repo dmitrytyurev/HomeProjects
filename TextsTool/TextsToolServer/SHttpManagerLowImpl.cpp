@@ -162,9 +162,9 @@ void SHttpManagerLowImpl::ThreadListenSocketFunc()
 				return;
 			}
 			else if (readBytesNum == SOCKET_ERROR) {
-					ThreadExitMsg("recv failed: " + std::to_string(WSAGetLastError()));
-					return;
-				}
+					Log("recv failed: " + std::to_string(WSAGetLastError()));
+					break;
+			}
 				else if (readBytesNum == 0) {
 					// соединение закрыто клиентом
 					break;
