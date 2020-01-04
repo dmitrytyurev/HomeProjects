@@ -2,7 +2,10 @@
 
 #include "CMessagesRepacker.h"
 #include "../SharedSrc/Shared.h"
+#include <QElapsedTimer>
 
+
+extern QElapsedTimer gTimer;
 void Log(const std::string& str);
 
 //===============================================================================
@@ -53,7 +56,7 @@ void Repacker::RepackMessagesOutToPackets(std::vector<SerializationBufferPtr>& m
                 sbuf.PushBytes(v[0]->buffer.data(), (int)v[0]->buffer.size());
 				v.erase(v.begin());
 			}
-            httpManager.PutPacketToSendQueue(sbuf.buffer);
+			httpManager.PutPacketToSendQueue(sbuf.buffer);
 		}
 	}
 }

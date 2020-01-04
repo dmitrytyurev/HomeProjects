@@ -13,10 +13,13 @@
 #include "Utils.h"
 #include "DbSerializer.h"
 #include "DatabaseManager.h"
+#include <QElapsedTimer>
+
 
 const static std::string databasePath = "D:/Dimka/HomeProjects/TextsTool/DatabaseClient/";
 const static int KeyPerTextsNum = 100;  // На такое количество текстов создаётся один ключ для запроса RequestSync
 
+extern QElapsedTimer gTimer;
 DatabaseManager* DatabaseManager::pthis = nullptr;
 
 
@@ -267,7 +270,7 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 		Log("Msg: ReplySync");
 		ApplyDiffForSync(dbuf);
 		_dataBase->_dbSerializer->SaveDatabase();
-_dataBase->LogDatabase();
+//_dataBase->LogDatabase();
 		AdjustFolderView(UINT32_MAX, nullptr);
 		_mainTableModel->OnDataModif(false, false, true, 0, 0);
 

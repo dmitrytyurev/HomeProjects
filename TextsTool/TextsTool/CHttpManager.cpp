@@ -8,11 +8,14 @@
 #include "CMessagesRepacker.h"
 #include "Utils.h"
 #include "CHttpManager.h"
+#include <QElapsedTimer>
+
 
 const static int MinTimeoutRequestPacketFromServer = 150;  // На сколько миллисикунд сбрасывается таймаут запроса пакетов на сервере при активности (посылка данных на сервер или получение данных с сервера)
 const static int MaxTimeoutRequestPacketFromServer = 3000; // Максимальный таймаут запроса пакетов на сервере (он плавно поднимается до этого значения при отсутствии активности)
 const static float IncreaseTimeoutRequestPacketFromServer = 1.05f; // Множитель для плавного увеличения таймаута запроса пакетов на сервере (при отсутствии активности)
 
+extern QElapsedTimer gTimer;
 CHttpManager* CHttpManager::pthis = nullptr;
 
 //---------------------------------------------------------------
@@ -92,7 +95,7 @@ void CHttpManager::HttpRequestFinishedCallback(QNetworkReply *reply)
     else {
         if (_state == STATE::CONNECTED) {
             if (lastTryPostWasCopy == LAST_POST_WAS::SEND_PACKET) {
-                CallbackSendPacket(reply);
+				CallbackSendPacket(reply);
             }
             else {
                 if (lastTryPostWasCopy == LAST_POST_WAS::REQUEST_PACKET) {

@@ -46,6 +46,7 @@ void SClientMessagesMgr::Update(double dt)
 			switch (actionType) {
 			case EventType::RequestSync:
 			{
+printf("EventType::RequestSync\n");
 				buf->GetString8(client->_dbName);
 				db = GetDbPtrByDbName(client->_dbName);  // !!! ¬еро€тно, тут надо проверить наличие базы и если нету, то запустить фоновую загрузку, а выполнение запроса отложить
 				SerializationBufferPtr bufPtr = MakeSyncMessage(*buf, *db); // —формировать сообщение клиенту - дл€ синхронизации его базы (он подключилс€)
@@ -659,6 +660,7 @@ SerializationBufferPtr SClientMessagesMgr::MakeSyncMessage(DeserializationBuffer
 
 	buffer->PushUint8(EventType::ReplySync);
 	buffer->PushString8(db._dbName);
+printf("PushUint8(EventType::ReplySync)\n");
 
 	// ѕосылаем аттрибуты таблицы целиком
 	buffer->PushUint32(db._attributeProps.size());

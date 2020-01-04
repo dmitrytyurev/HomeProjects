@@ -18,7 +18,7 @@ TextsDatabase::TextsDatabase(const std::string path, const std::string dbName)
 	_dbSerializer = std::make_unique<DbSerializer>(this);
 	_dbSerializer->SetPath(path);
 	_dbSerializer->LoadDatabase();
-	LogDatabase();
+//	LogDatabase();
 }
 
 

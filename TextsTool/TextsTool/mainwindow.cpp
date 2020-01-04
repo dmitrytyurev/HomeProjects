@@ -13,9 +13,12 @@
 #include "Utils.h"
 #include "DbSerializer.h"
 #include "DatabaseManager.h"
+#include <QElapsedTimer>
 
 const static int UpdateCallTimoutMs = 50; // Через сколько миллисекунд вызывается Update
 
+
+QElapsedTimer gTimer;
 Ui::MainWindow* debugGlobalUi = nullptr;
 MainWindow* MainWindow::pthis = nullptr;
 
@@ -39,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->treeWidget->setHeaderLabels(QStringList() << "Папки с текстами");
 
 	connect(ui->treeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(treeSelectionChanged(const QItemSelection&,const QItemSelection&)));
+	gTimer.start();
 }
 
 //---------------------------------------------------------------
@@ -151,9 +155,11 @@ void MainWindow::on_pushButton_clicked()
 
 */
 	//-------------------
-
+qDebug() << gTimer.elapsed() << " on_pushButton_clicked cp1";
 	DatabaseManager::Instance().LoadBaseAndRequestSync("TestDB"); // Загрузит базу если есть (если нет, создаст в памят пустую) и добавит запрос синхронизации в очередь сообщений на отсылку
+qDebug() << gTimer.elapsed() << " on_pushButton_clicked cp2";
 	CHttpManager::Instance().Connect("mylogin", "mypassword");
+qDebug() << gTimer.elapsed() << " on_pushButton_clicked cp3";
 }
 
 //---------------------------------------------------------------
