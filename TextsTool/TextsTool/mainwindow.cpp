@@ -34,6 +34,9 @@ MainWindow::MainWindow(QWidget *parent) :
 	_timer = new QTimer(this);
 	connect(_timer, SIGNAL(timeout()), this, SLOT(update()));
 	_timer->start(UpdateCallTimoutMs);
+
+	ui->treeWidget->setColumnCount(1);
+	ui->treeWidget->setHeaderLabels(QStringList() << "Папки с текстами");
 }
 
 //---------------------------------------------------------------
@@ -158,5 +161,12 @@ void MainWindow::update()
 {
 	CHttpManager::Instance().Update(UpdateCallTimoutMs);
 	DatabaseManager::Instance().Update();
+}
+
+//---------------------------------------------------------------
+
+QTreeWidget* MainWindow::getTreeWidget()
+{
+	return ui->treeWidget;
 }
 

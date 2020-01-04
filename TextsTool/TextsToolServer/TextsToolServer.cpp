@@ -102,9 +102,9 @@ void test()
 	db._attributeProps.emplace_back(atProp);
 
 	Folder folder;
-	folder.id = 55443322;
+	folder.id = 123;
 	folder.name = "FolderA";
-	folder.parentId = 567;
+	folder.parentId = UINT32_MAX;
 	folder.timestampCreated = 12345;
 	folder.timestampModified = 54322;
 
@@ -190,6 +190,23 @@ void test()
 		TextTranslatedPtr textPtr = std::make_shared<TextTranslated>();
 		textPtr->baseText = "BaseText10";
 		textPtr->id = "TextID10";
+		textPtr->timestampModified = 110;
+		folder.texts.emplace_back(textPtr);
+	}
+
+	db._folders.emplace_back(folder);
+
+	// Второй каталог
+
+	folder.id = 124;
+	folder.parentId = 123;
+	folder.name = "FolderB";
+	folder.texts.clear();
+
+	{
+		TextTranslatedPtr textPtr = std::make_shared<TextTranslated>();
+		textPtr->baseText = "BaseText11";
+		textPtr->id = "TextID11";
 		textPtr->timestampModified = 110;
 		folder.texts.emplace_back(textPtr);
 	}

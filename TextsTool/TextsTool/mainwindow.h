@@ -8,6 +8,7 @@
 #include <QUrl>
 #include <QTextCodec>
 #include <QAbstractTableModel>
+#include <QTreeWidget>
 
 #include "../SharedSrc/Shared.h"
 #include "../SharedSrc/DeserializationBuffer.h"
@@ -34,6 +35,7 @@ public:
     ~MainWindow();
 	void closeEvent (QCloseEvent *event);
 	void SetModelForMainTable(QAbstractTableModel* model);
+	QTreeWidget* getTreeWidget();
 
 private slots:
 	void on_pushButton_clicked();

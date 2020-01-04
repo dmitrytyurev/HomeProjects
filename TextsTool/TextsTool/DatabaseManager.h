@@ -7,6 +7,7 @@
 #include <QUrl>
 #include <QTextCodec>
 #include <QAbstractTableModel>
+#include <QTreeWidget>
 
 #include "../SharedSrc/Shared.h"
 #include "../SharedSrc/DeserializationBuffer.h"
@@ -52,6 +53,7 @@ private:
 	void SendMsgChangeBaseText(const FoundTextRefs& textRefs);
 	void SendMsgChangeTextAttrib(const FoundTextRefs& textRefs);
 	void ResetTextAndFolderTimestamps(const FoundTextRefs& textRefs);
+	void AdjustFolderView(uint32_t parentId, QTreeWidgetItem *parentTreeItem);
 
 	static DatabaseManager* pthis;
 	std::vector<SerializationBufferPtr>   _msgsQueueOut; // Очередь сообщений, которые нужно отослать на сервер

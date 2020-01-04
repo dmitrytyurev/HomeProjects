@@ -111,7 +111,7 @@ public:
 	uint32_t timestampCreated = 0;   // Время создания
 	uint32_t timestampModified = 0;  // Время изменения данных папки или её текстов
 	std::string name;                // Имя папки
-	uint32_t parentId = 0;           // ID родительской папки
+	uint32_t parentId = 0;           // ID родительской папки, для корневой папки здесь UINT32_MAX
 	std::vector<TextTranslatedPtr> texts;  // Тексты лежащие непосредственно в папке
 };
 

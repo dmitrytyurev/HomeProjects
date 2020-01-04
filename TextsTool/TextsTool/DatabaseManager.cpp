@@ -230,7 +230,6 @@ void DatabaseManager::ApplyDiffForSync(DeserializationBuffer& buf)
 	}
 
 	_dataBase->isSynced = true;
-	_dataBase->_dbSerializer->SaveDatabase();
 }
 
 //---------------------------------------------------------------
@@ -260,8 +259,10 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 	{
 		Log("Msg: ReplySync");
 		ApplyDiffForSync(dbuf);
+		_dataBase->_dbSerializer->SaveDatabase();
 _dataBase->LogDatabase();
 		_mainTableModel->OnDataModif(false, true, 0, 0);
+		AdjustFolderView(UINT32_MAX, nullptr);
 
 //_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
 //_msgsQueueOut.back()->PushUint8(EventType::ChangeBaseText);
@@ -446,4 +447,23 @@ attribInTextToModify->text = "TestVal2 !!!";
 	return std::pair<std::string, int>("", -1);
 }
 
+//---------------------------------------------------------------
+
+void DatabaseManager::AdjustFolderView(uint32_t parentId, QTreeWidgetItem *parentTreeItem)
+{
+	for (auto& folder: _dataBase->_folders) {
+		if (folder.parentId == parentId) {
+			if (parentId == UINT32_MAX) {  // Корневая папка
+				QTreeWidgetItem *treeItem = new QTreeWidgetItem(MainWindow::Instance().getTreeWidget());
+				treeItem->setText(0, QString::fromStdString(folder.name));
+				AdjustFolderView(folder.id, treeItem);
+			}
+			else { // Некорневая папка
+				QTreeWidgetItem *treeItem = new QTreeWidgetItem();
+				treeItem->setText(0, QString::fromStdString(folder.name));
+				parentTreeItem->addChild(treeItem);
+			}
+		}
+	}
+}
 
