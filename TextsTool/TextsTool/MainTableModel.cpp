@@ -222,14 +222,19 @@ QVariant MainTableModel::headerData(int section, Qt::Orientation orientation, in
 
 //---------------------------------------------------------------
 
-void MainTableModel::fillRefsToTextsToShow()
+void MainTableModel::addFolderTextsToShowReq(uint32_t folderId)
 {
-	_textsToShow.clear();
 	for (auto& folder: _dataBase->_folders) {
-		if (folder.uiTreeItem->isSelected()) {
+		if (folder.id == folderId) {
 			for (auto& text: folder.texts) {
 				_textsToShow.emplace_back(text.get());
 			}
+			break;
+		}
+	}
+	for (auto& folder: _dataBase->_folders) {
+		if (folder.parentId == folderId) {
+			addFolderTextsToShowReq(folder.id);
 		}
 	}
 }
@@ -255,7 +260,13 @@ void MainTableModel::OnDataModif(bool selectedFolderChanged, bool oneCellChanged
 {
 	bool canChangeLines = selectedFolderChanged || !oneCellChanged || _isFiltersOn;
 	if (canChangeLines) {
-		fillRefsToTextsToShow();
+		_textsToShow.clear();
+		for (auto& folder: _dataBase->_folders) {
+			if (folder.uiTreeItem->isSelected()) {
+				addFolderTextsToShowReq(folder.id);
+				break;
+			}
+		}
 	}
 	if (columnsCanChange) {
 		recalcColumnToShowData();

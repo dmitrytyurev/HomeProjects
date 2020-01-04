@@ -35,7 +35,7 @@ public:
 
 	// Заполнить ссылки на тексты, которые должны показывать (учитывая выбранную папку, начиная с которой показываем тексты и применённые фильтры).
 	// Если justOneTextContentChanged == true, то перезаполняем индексы только, если включены фильтры таблицы. Иначе сразу выход
-	void fillRefsToTextsToShow();
+	void addFolderTextsToShowReq(uint32_t parentId);
 	void recalcColumnToShowData();
 	void OnDataModif(bool selectedFolderChanged, bool oneCellChanged, bool columnsCanChange, int line, int column);
 	int calcLineByTextId(const std::string& textId);
