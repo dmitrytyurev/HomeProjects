@@ -138,7 +138,7 @@ void CHttpManager::CallbackConnecting(QNetworkReply *reply)
     }
 
     int sizeReceived = (int)reply->read((char*)_httpBuf.data(), _httpBuf.size());
-    DebugLogServerReply("Packet from server (Connecting)", sizeReceived);
+	//DebugLogServerReply("Packet from server (Connecting)", sizeReceived);
     DeserializationBuffer buf(_httpBuf.data(), sizeReceived);
 	uint8_t code = buf.GetUint8();
     if (code == (uint8_t)AnswersToClient::WrongLoginOrPassword) {
@@ -166,7 +166,7 @@ void CHttpManager::CallbackSendPacket(QNetworkReply *reply)
     }
 
     int sizeReceived = (int)reply->read((char*)_httpBuf.data(), _httpBuf.size());
-    DebugLogServerReply("Packet from server (Send Packet)", sizeReceived);
+	//DebugLogServerReply("Packet from server (Send Packet)", sizeReceived);
     DeserializationBuffer buf(_httpBuf.data(), sizeReceived);
 	uint8_t code = buf.GetUint8();
 
@@ -198,7 +198,7 @@ void CHttpManager::CallbackRequestPacket(QNetworkReply *reply)
     }
 
     int sizeReceived = (int)reply->read((char*)_httpBuf.data(), _httpBuf.size());
-    DebugLogServerReply("Packet from server (Request Packet)", sizeReceived);
+	//DebugLogServerReply("Packet from server (Request Packet)", sizeReceived);
     DeserializationBuffer buf(_httpBuf.data(), sizeReceived);
 	uint8_t code = buf.GetUint8();
 
@@ -239,7 +239,7 @@ void CHttpManager::SendPacket(const std::vector<uint8_t>& packet)
     QByteArray postDataSize = QByteArray::number(packet.size());
     _request.setRawHeader("Content-Length", postDataSize);
     _manager->post(_request, postData);
-    Log("SendPacket");
+	//Log("SendPacket");
 }
 
 //---------------------------------------------------------------
@@ -291,7 +291,7 @@ void CHttpManager::RequestPacket()
 {
 	_timeToRequestPacket = _requestTimout;
 	_requestTimout = std::min(static_cast<int>(_requestTimout * IncreaseTimeoutRequestPacketFromServer), MaxTimeoutRequestPacketFromServer);
-Log("RequestPacket, _requestTimout: " + std::to_string(_requestTimout));
+//Log("RequestPacket, _requestTimout: " + std::to_string(_requestTimout));
     _lastTryPostWas = LAST_POST_WAS::REQUEST_PACKET;
 
     SerializationBuffer buf;
