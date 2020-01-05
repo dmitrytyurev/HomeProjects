@@ -31,23 +31,23 @@ namespace Utils
 
 //---------------------------------------------------------------
 
-	uint32_t GetCurrentTimestamp()
-    {
-        QDateTime current = QDateTime::currentDateTime();
-        return  current.toTime_t();
-    }
+uint32_t GetCurrentTimestamp()
+{
+	QDateTime current = QDateTime::currentDateTime();
+	return  current.toTime_t();
+}
 
 //---------------------------------------------------------------
 
-	void LogBuf(std::vector<uint8_t>& buffer)
-	{
-		std::string sstr;
-		for (auto val : buffer) {
-			sstr = sstr + std::to_string(val);
-			sstr = sstr + " ";
-		}
-		Log(sstr);
+void LogBuf(std::vector<uint8_t>& buffer)
+{
+	std::string sstr;
+	for (auto val : buffer) {
+		sstr = sstr + std::to_string(val);
+		sstr = sstr + " ";
 	}
+	Log(sstr);
+}
 
 //---------------------------------------------------------------
 // FNV-1a algorithm https://softwareengineering.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed
@@ -65,5 +65,16 @@ namespace Utils
 		}
 		return curHash;
 	}
+
+
+//---------------------------------------------------------------
+
+std::string ConvertTimestampToDate(uint32_t timestamp)
+{
+	QDateTime qDateTime;
+	qDateTime.setTime_t(timestamp);
+	return qDateTime.toString(Qt::SystemLocaleShortDate).toLocal8Bit().constData();
+}
+
 
 }; // namespace Utils

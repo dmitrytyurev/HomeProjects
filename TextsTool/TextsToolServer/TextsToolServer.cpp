@@ -19,65 +19,9 @@ void test()
 	TextsDatabase db;
 	db.CreateDatabase(databasesPath, "TestDB");
 
-/*
-	// Атрибуты базы, один каталог с текстом (с атрибутами текста), один каталог без текстов
-
-	AttributeProperty ap;
-	ap.id = 99;
-	ap.visiblePosition = 56;
-	ap.isVisible = true;
-	ap.timestampCreated = 99887766;
-	ap.name = "Property1";
-	ap.type = 2;
-	ap.param1 = 11223344;
-	ap.param2 = 55667788;
-
-	db._attributeProps.push_back(ap);
-
-	ap.id = 100;
-	ap.type = 1;
-	ap.name = "Property2";
-	db._attributeProps.push_back(ap);
-
-	Folder folder;
-	folder.id = 55443322;
-	folder.name = "FolderA";
-	folder.parentId = 567;
-	folder.timestampCreated = 12345;
-	folder.timestampModified = 54321;
-
-	TextTranslatedPtr textPtr = std::make_shared<TextTranslated>();
-
-	textPtr->baseText = "Base Text";
-	textPtr->id = "Text ID";
-	textPtr->loginOfLastModifier = "Login123";
-	textPtr->offsLastModified = 11111;
-	textPtr->timestampCreated = 12;
-	textPtr->timestampModified = 23;
-	
-	AttributeInText attr;
-	attr.flagState = 1;
-	attr.id = 99;
-	attr.text = "Attrib text";
-	attr.type = 2;
-	textPtr->attributes.emplace_back(attr);
-
-	attr.flagState = 0;
-	attr.id = 100;
-	attr.text = "Attrib text 2";
-	attr.type = 1;
-	textPtr->attributes.emplace_back(attr);
-
-	folder.texts.emplace_back(textPtr);
-
-	db._folders.emplace_back(folder);
-
-	Folder folder2;
-	folder2.name = "FolderB";
-	folder2.id = 55443;
-	folder2.timestampModified = 54321;
-	db._folders.emplace_back(folder2);
-*/
+	// ---------------------------------------------------   
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! При изменении базы, удалять базу на сервере, поскольку без именения таймстэмпов база не обновится !!!!!!!
+	// ---------------------------------------------------   
 
 	AttributeProperty atProp;
 	atProp.type = AttributePropertyDataType::Id_t;
@@ -87,19 +31,37 @@ void test()
 	atProp.name = "TextId";
 	db._attributeProps.emplace_back(atProp);
 
-	atProp.type = AttributePropertyDataType::BaseText_t;
+	atProp.type = AttributePropertyDataType::CreationTimestamp_t;
 	atProp.id = 1;
 	atProp.isVisible = true;
 	atProp.visiblePosition = 1;
+	atProp.name = "Created";
+	db._attributeProps.emplace_back(atProp);
+
+	atProp.type = AttributePropertyDataType::ModificationTimestamp_t;
+	atProp.id = 2;
+	atProp.isVisible = true;
+	atProp.visiblePosition = 2;
+	atProp.name = "Modified";
+	db._attributeProps.emplace_back(atProp);
+
+	atProp.type = AttributePropertyDataType::BaseText_t;
+	atProp.id = 3;
+	atProp.isVisible = true;
+	atProp.visiblePosition = 3;
 	atProp.name = "BaseText";
 	db._attributeProps.emplace_back(atProp);
 
 	atProp.type = AttributePropertyDataType::CommonText_t;
-	atProp.id = 2;
+	atProp.id = 4;
 	atProp.isVisible = true;
-	atProp.visiblePosition = 2;
+	atProp.visiblePosition = 4;
 	atProp.name = "CommonText";
 	db._attributeProps.emplace_back(atProp);
+
+	// ---------------------------------------------------   
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! При изменении базы, удалять базу на сервере, поскольку без именения таймстэмпов база не обновится !!!!!!!
+	// ---------------------------------------------------   
 
 	Folder folder;
 	folder.id = 123;
@@ -123,7 +85,7 @@ void test()
 		textPtr->id = "TextID2";
 		textPtr->timestampModified = 1021;
 		AttributeInText attInText;
-		attInText.id = 2;
+		attInText.id = 4;
 		attInText.text = "Common text";
 		attInText.type = AttributePropertyDataType::CommonText_t;
 		textPtr->attributes.emplace_back(attInText);
@@ -197,6 +159,9 @@ void test()
 	db._folders.emplace_back(folder);
 
 	// Второй каталог
+	// ---------------------------------------------------   
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! При изменении базы, удалять базу на сервере, поскольку без именения таймстэмпов база не обновится !!!!!!!
+	// ---------------------------------------------------   
 
 	folder.id = 124;
 	folder.parentId = 123;

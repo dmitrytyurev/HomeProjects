@@ -52,6 +52,7 @@ int MainTableModel::columnCount(const QModelIndex &parent) const
 bool MainTableModel::getTextReferences(const QModelIndex &index, bool needCreateAttrIfNotFound, FoundTextRefs& result)
 {
 	result.text = _textsToShow[index.row()];
+
 	result.attrInTable = &_dataBase->_attributeProps[_columnsToShow[index.column()]];
 	if (result.attrInTable->type == AttributePropertyDataType::Id_t) {
 		result.string = &result.text->id;
@@ -61,6 +62,17 @@ bool MainTableModel::getTextReferences(const QModelIndex &index, bool needCreate
 		result.string = &result.text->baseText;
 		return true;
 	}
+	if (result.attrInTable->type == AttributePropertyDataType::CreationTimestamp_t) {
+		result.localString = Utils::ConvertTimestampToDate(result.text->timestampCreated);
+		result.string = &result.localString;
+		return true;
+	}
+	if (result.attrInTable->type == AttributePropertyDataType::ModificationTimestamp_t) {
+		result.localString = Utils::ConvertTimestampToDate(result.text->timestampModified);
+		result.string = &result.localString;
+		return true;
+	}
+
 	for (auto& attribInText: result.text->attributes) {
 		if (attribInText.id == result.attrInTable->id) {
 			result.string = &attribInText.text;
@@ -151,11 +163,18 @@ bool MainTableModel::setData(const QModelIndex &index, const QVariant &value, in
 		return false;
 	}
 
-	if(index.column() <= 0 ||
+	if(index.column() < 0 ||
 			index.column() >= _columnsToShow.size() ||
 			index.row() < 0 ||
 			index.row() >= _textsToShow.size())	{
 		qDebug() << "Warning: " << index.row() << ", " << index.column();
+		return false;
+	}
+
+	AttributeProperty* attrProp = &_dataBase->_attributeProps[_columnsToShow[index.column()]];
+	if (attrProp->type == AttributePropertyDataType::Id_t ||
+		attrProp->type == AttributePropertyDataType::CreationTimestamp_t ||
+		attrProp->type == AttributePropertyDataType::ModificationTimestamp_t) {
 		return false;
 	}
 
@@ -244,7 +263,7 @@ void MainTableModel::addFolderTextsToShowReq(uint32_t folderId)
 void MainTableModel::SortTextsById()
 {
 	std::sort(_textsToShow.begin(), _textsToShow.end(), [](TextTranslated* el1, TextTranslated* el2) {
-		return el2->id < el1->id;
+		return el1->id < el2->id;
 	});
 }
 

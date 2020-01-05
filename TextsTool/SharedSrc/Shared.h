@@ -16,6 +16,8 @@ namespace AttributePropertyDataType // Тип данных атрибута таблицы
 		Checkbox_t = 2,     // Чекбокс
 		BaseText_t = 3,     // Базовый текст
 		Id_t = 4,           // Id-текста (строка)
+		CreationTimestamp_t = 5,  // Таймстэмп создания текста
+		ModificationTimestamp_t = 6, // Таймстэмп последнего текста
 	};
 }
 
