@@ -280,7 +280,7 @@ void MainTableModel::SortTextsByIdBack()
 
 void MainTableModel::SortTextsByCreateTime()
 {
-	std::stable_sort(_textsToShow.begin(), _textsToShow.end(), [](TextTranslated* el1, TextTranslated* el2) {
+	std::sort(_textsToShow.begin(), _textsToShow.end(), [](TextTranslated* el1, TextTranslated* el2) {
 		return el1->timestampCreated < el2->timestampCreated;
 	});
 }
@@ -289,7 +289,7 @@ void MainTableModel::SortTextsByCreateTime()
 
 void MainTableModel::SortTextsByCreateTimeBack()
 {
-	std::stable_sort(_textsToShow.begin(), _textsToShow.end(), [](TextTranslated* el1, TextTranslated* el2) {
+	std::sort(_textsToShow.begin(), _textsToShow.end(), [](TextTranslated* el1, TextTranslated* el2) {
 		return el2->timestampCreated < el1->timestampCreated;
 	});
 }
