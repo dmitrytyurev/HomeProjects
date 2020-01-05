@@ -72,7 +72,7 @@ public:
 
 	std::string id;                   // ID текста
 	uint32_t timestampCreated = 0;    // Время создания
-	uint32_t timestampModified = 0;   // Время последнего изменения
+	uint32_t timestampModified = 0;   // Время последнего изменения. UINT32_MAX - признак, что были изменения из GUI. Чтобы при стартовой синхронизации с сервером, точно была разница и эти данные пришли с сервера
 	std::string loginOfLastModifier;  // Логин того, кто менял последний раз
 	std::string baseText;             // Текст на базовом языке (русском)
 	std::vector<AttributeInText> attributes; // Атрибуты текста с их данными
@@ -96,7 +96,7 @@ public:
 
 	uint32_t id = 0;                 // ID папки
 	uint32_t timestampCreated = 0;   // Время создания
-	uint32_t timestampModified = 0;  // Время изменения данных папки или её текстов
+	uint32_t timestampModified = 0;  // Время изменения данных папки или её текстов. UINT32_MAX - признак, что были изменения из GUI. Чтобы при стартовой синхронизации с сервером, точно была разница и эти данные пришли с сервера
 	std::string name;                // Имя папки
 	uint32_t parentId = 0;           // ID родительской папки, для корневой папки здесь UINT32_MAX
 	std::vector<TextTranslatedPtr> texts;  // Тексты лежащие непосредственно в папке

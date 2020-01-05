@@ -7,7 +7,7 @@ const bool NEED_PACK_PACKETS = false;
 //-------------------------------------------------------------------------------
 
 
-namespace AttributePropertyDataType // Тип данных атрибута таблицы
+namespace AttributePropertyDataType // Тип данных атрибута таблицы. Часть типов используется для сериализации/десериализации, часть типов для отображения данных в таблице
 {
 	enum : uint8_t
 	{
@@ -18,6 +18,7 @@ namespace AttributePropertyDataType // Тип данных атрибута таблицы
 		Id_t = 4,           // Id-текста (строка)
 		CreationTimestamp_t = 5,  // Таймстэмп создания текста
 		ModificationTimestamp_t = 6, // Таймстэмп последнего текста
+		LoginOfLastModifier_t = 7, // Логин того, кто последний модифицировал данный текст
 	};
 }
 

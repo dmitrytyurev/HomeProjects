@@ -339,11 +339,11 @@ void DatabaseManager::OnTextModifiedFromGUI(const FoundTextRefs& textRefs)
 
 void DatabaseManager::ResetTextAndFolderTimestamps(const FoundTextRefs& textRefs)
 {
-	textRefs.text->timestampModified = -1; // Это признак, что были изменения из GUI. Чтобы при стартовой синхронизации с сервером, точно была разница и эти данные пришли с сервера
+	textRefs.text->timestampModified = UINT32_MAX; // Это признак, что были изменения из GUI. Чтобы при стартовой синхронизации с сервером, точно была разница и эти данные пришли с сервера
 	for (auto& folder: _dataBase->_folders) {
 		for (auto& text: folder.texts) {
 			if (text->id == textRefs.text->id) {
-				folder.timestampModified = -1; 	// Это признак, что были изменения из GUI. Чтобы при стартовой синхронизации с сервером, точно была разница и эти данные пришли с сервера
+				folder.timestampModified = UINT32_MAX; 	// Это признак, что были изменения из GUI. Чтобы при стартовой синхронизации с сервером, точно была разница и эти данные пришли с сервера
 				return;
 			}
 		}
@@ -446,7 +446,7 @@ std::pair<std::string, int> DatabaseManager::ModifyDbChangeAttributeInText(Deser
 			case AttributePropertyDataType::Translation_t:
 			case AttributePropertyDataType::CommonText_t:
 				attribInTextToModify->text = text;
-attribInTextToModify->text = "TestVal2 !!!";
+//attribInTextToModify->text = "TestVal2 !!!";
 
 				if (text.empty()) {
 					int indexElement = attribInTextToModify - &tmpTextPtr->attributes[0];

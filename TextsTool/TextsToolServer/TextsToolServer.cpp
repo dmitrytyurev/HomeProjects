@@ -45,19 +45,28 @@ void test()
 	atProp.name = "Modified";
 	db._attributeProps.emplace_back(atProp);
 
-	atProp.type = AttributePropertyDataType::BaseText_t;
+	atProp.type = AttributePropertyDataType::LoginOfLastModifier_t;
 	atProp.id = 3;
 	atProp.isVisible = true;
 	atProp.visiblePosition = 3;
+	atProp.name = "Modifier";
+	db._attributeProps.emplace_back(atProp);
+	   	  
+	atProp.type = AttributePropertyDataType::BaseText_t;
+	atProp.id = 4;
+	atProp.isVisible = true;
+	atProp.visiblePosition = 4;
 	atProp.name = "BaseText";
 	db._attributeProps.emplace_back(atProp);
 
 	atProp.type = AttributePropertyDataType::CommonText_t;
-	atProp.id = 4;
+	atProp.id = 5;
 	atProp.isVisible = true;
-	atProp.visiblePosition = 4;
+	atProp.visiblePosition = 5;
 	atProp.name = "CommonText";
 	db._attributeProps.emplace_back(atProp);
+
+	
 
 	// ---------------------------------------------------   
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! При изменении базы, удалять базу на сервере, поскольку без именения таймстэмпов база не обновится !!!!!!!
@@ -85,7 +94,7 @@ void test()
 		textPtr->id = "TextID2";
 		textPtr->timestampModified = 1021;
 		AttributeInText attInText;
-		attInText.id = 4;
+		attInText.id = 5;
 		attInText.text = "Common text";
 		attInText.type = AttributePropertyDataType::CommonText_t;
 		textPtr->attributes.emplace_back(attInText);

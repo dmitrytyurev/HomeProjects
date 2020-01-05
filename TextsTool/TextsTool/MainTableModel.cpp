@@ -68,8 +68,12 @@ bool MainTableModel::getTextReferences(const QModelIndex &index, bool needCreate
 		return true;
 	}
 	if (result.attrInTable->type == AttributePropertyDataType::ModificationTimestamp_t) {
-		result.localString = Utils::ConvertTimestampToDate(result.text->timestampModified);
+		result.localString = result.text->timestampModified == UINT32_MAX ? "Syncing..." : Utils::ConvertTimestampToDate(result.text->timestampModified);
 		result.string = &result.localString;
+		return true;
+	}
+	if (result.attrInTable->type == AttributePropertyDataType::LoginOfLastModifier_t) {
+		result.string = &result.text->loginOfLastModifier;
 		return true;
 	}
 
@@ -354,7 +358,7 @@ void MainTableModel::OnDataModif(bool sortTypeChanged, bool selectedFolderChange
 	}
 	else {
 		if (line != -1 && column != -1) {
-			emit(dataChanged(index(line, column), index(line, column)));
+			emit(dataChanged(index(line, 0), index(line, _columnsToShow.size()-1)));
 		}
 	}
 }
