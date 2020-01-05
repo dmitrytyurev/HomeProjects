@@ -47,6 +47,7 @@ public:
 	void SaveDatabase();
 	void Update();
 	void TreeSelectionChanged();
+	void SortSelectionChanged(int index);
 
 private:
 	void ApplyDiffForSync(DeserializationBuffer& buf);

@@ -186,7 +186,7 @@ bool MainTableModel::setData(const QModelIndex &index, const QVariant &value, in
 
 	*textRefs.string = value.toString().toUtf8().data();
 	DatabaseManager::Instance().OnTextModifiedFromGUI(textRefs);
-	OnDataModif(false, true, false, index.row(), index.column());
+	OnDataModif(false, false, true, false, index.row(), index.column());
 
 	return true;
 }
@@ -269,6 +269,51 @@ void MainTableModel::SortTextsById()
 
 //---------------------------------------------------------------
 
+void MainTableModel::SortTextsByIdBack()
+{
+	std::sort(_textsToShow.begin(), _textsToShow.end(), [](TextTranslated* el1, TextTranslated* el2) {
+		return el2->id < el1->id;
+	});
+}
+
+//---------------------------------------------------------------
+
+void MainTableModel::SortTextsByCreateTime()
+{
+	std::stable_sort(_textsToShow.begin(), _textsToShow.end(), [](TextTranslated* el1, TextTranslated* el2) {
+		return el1->timestampCreated < el2->timestampCreated;
+	});
+}
+
+//---------------------------------------------------------------
+
+void MainTableModel::SortTextsByCreateTimeBack()
+{
+	std::stable_sort(_textsToShow.begin(), _textsToShow.end(), [](TextTranslated* el1, TextTranslated* el2) {
+		return el2->timestampCreated < el1->timestampCreated;
+	});
+}
+
+//---------------------------------------------------------------
+
+void MainTableModel::SortTextsByModifyTime()
+{
+	std::sort(_textsToShow.begin(), _textsToShow.end(), [](TextTranslated* el1, TextTranslated* el2) {
+		return el1->timestampModified < el2->timestampModified;
+	});
+}
+
+//---------------------------------------------------------------
+
+void MainTableModel::SortTextsByModifyTimeBack()
+{
+	std::sort(_textsToShow.begin(), _textsToShow.end(), [](TextTranslated* el1, TextTranslated* el2) {
+		return el2->timestampModified < el1->timestampModified;
+	});
+}
+
+//---------------------------------------------------------------
+
 void MainTableModel::recalcColumnToShowData()
 {
 	_columnsToShow.clear();
@@ -284,10 +329,11 @@ void MainTableModel::recalcColumnToShowData()
 
 //---------------------------------------------------------------
 
-void MainTableModel::OnDataModif(bool selectedFolderChanged, bool oneCellChanged, bool columnsCanChange, int line, int column)
+void MainTableModel::OnDataModif(bool sortTypeChanged, bool selectedFolderChanged, bool oneCellChanged, bool columnsCanChange, int line, int column)
 {
-	bool canChangeLines = selectedFolderChanged || !oneCellChanged || _isFiltersOn;
-	if (canChangeLines) {
+	bool canChangeLinesNumber = selectedFolderChanged || !oneCellChanged || _isFiltersOn;
+
+	if (canChangeLinesNumber) {
 		_textsToShow.clear();
 		for (auto& folder: _dataBase->_folders) {
 			if (folder.uiTreeItem->isSelected()) {
@@ -295,12 +341,14 @@ void MainTableModel::OnDataModif(bool selectedFolderChanged, bool oneCellChanged
 				break;
 			}
 		}
-		SortTextsById();
+	}
+	if (canChangeLinesNumber || sortTypeChanged) {
+		SortTextsByCurrentSortType();
 	}
 	if (columnsCanChange) {
 		recalcColumnToShowData();
 	}
-	if (canChangeLines) {
+	if (canChangeLinesNumber || sortTypeChanged) {
 		beginResetModel();
 		endResetModel();
 	}
@@ -310,4 +358,34 @@ void MainTableModel::OnDataModif(bool selectedFolderChanged, bool oneCellChanged
 		}
 	}
 }
+
+void MainTableModel::SortTextsByCurrentSortType()
+{
+	int sortTypeIndex = MainWindow::Instance().GetSortTypeIndex();
+	switch (sortTypeIndex) {
+	case 0:
+	break;
+	case 1:
+		SortTextsById();
+	break;
+	case 2:
+		SortTextsByIdBack();
+	break;
+	case 3:
+		SortTextsByCreateTime();
+	break;
+	case 4:
+		SortTextsByCreateTimeBack();
+	break;
+	case 5:
+		SortTextsByModifyTime();
+	break;
+	case 6:
+		SortTextsByModifyTimeBack();
+	break;
+
+	}
+}
+
+
 

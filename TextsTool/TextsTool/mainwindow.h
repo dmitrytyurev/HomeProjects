@@ -36,11 +36,13 @@ public:
 	void closeEvent (QCloseEvent *event);
 	void SetModelForMainTable(QAbstractTableModel* model);
 	QTreeWidget* getTreeWidget();
+	int GetSortTypeIndex();
 
 private slots:
 	void on_pushButton_clicked();
 	void update();
 	void treeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+	void sortTypeComboboxIndexChanged(int index);
 
 private:
     Ui::MainWindow *ui = nullptr;

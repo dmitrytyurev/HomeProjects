@@ -43,6 +43,19 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	connect(ui->treeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(treeSelectionChanged(const QItemSelection&,const QItemSelection&)));
 	gTimer.start();
+
+	ui->comboBox->addItem(QString("Без сортировки"));
+	ui->comboBox->addItem(QString("Id"));
+	ui->comboBox->addItem(QString("Id (обратная)"));
+	ui->comboBox->addItem(QString("Время создания"));
+	ui->comboBox->addItem(QString("Время создания (обратная)"));
+	ui->comboBox->addItem(QString("Время изменения"));
+	ui->comboBox->addItem(QString("Время изменения (обратная)"));
+	ui->comboBox->addItem(QString("Кто менял"));
+	ui->comboBox->addItem(QString("Кто менял (обратная)"));
+
+	connect(ui->comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(sortTypeComboboxIndexChanged(int)));
+
 }
 
 //---------------------------------------------------------------
@@ -58,6 +71,14 @@ void MainWindow::treeSelectionChanged(const QItemSelection&, const QItemSelectio
 {
 	DatabaseManager::Instance().TreeSelectionChanged();
 }
+
+//---------------------------------------------------------------
+
+void MainWindow::sortTypeComboboxIndexChanged(int index)
+{
+	DatabaseManager::Instance().SortSelectionChanged(index);
+}
+
 //---------------------------------------------------------------
 
 void MainWindow::closeEvent (QCloseEvent *)
@@ -70,96 +91,11 @@ void MainWindow::closeEvent (QCloseEvent *)
 
 void MainWindow::on_pushButton_clicked()
 {
-//	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
-
-/*
-	_msgsQueueOut.back()->PushUint8(EventType::RequestSync);
-	_msgsQueueOut.back()->PushString8("TestDB");
-	_msgsQueueOut.back()->PushUint32(2); // Число папок
-
-
-	_msgsQueueOut.back()->PushUint32(55443); // id папки
-	_msgsQueueOut.back()->PushUint32(50000); // TS изменения папки на клиенте
-	_msgsQueueOut.back()->PushUint32(0); // Количество отобранных ключей
-
-
-	_msgsQueueOut.back()->PushUint32(11111); // id папки
-	_msgsQueueOut.back()->PushUint32(54321); // TS изменения папки на клиенте
-	_msgsQueueOut.back()->PushUint32(0); // Количество отобранных ключей
-*/
-/*
-	_msgsQueueOut.back()->PushUint8(EventType::RequestSync);
-	_msgsQueueOut.back()->PushString8("TestDB");
-	_msgsQueueOut.back()->PushUint32(1); // Число папок
-
-
-	_msgsQueueOut.back()->PushUint32(55443322); // id папки
-	_msgsQueueOut.back()->PushUint32(50000); // TS изменения папки на клиенте
-	_msgsQueueOut.back()->PushUint32(3); // Количество отобранных ключей
-
-	struct Text
-	{
-		std::string id;
-		uint32_t ts;
-		std::vector<uint8_t> key;
-	};
-
-	std::vector<Text> texts = {{"TextID1", 101}, {"TextID2", 102}, {"TextID3", 103}, {"TextID4", 104}, {"TextID5", 105}, {"TextID6", 106}, {"TextID7", 107}, {"TextID8", 108}, {"TextID9", 109}, {"TextID10", 110}};
-
-	for (auto& text: texts) {
-		MakeKey(text.ts, text.id, text.key);
-	}
-
-	// Ключи разбиения текстов
-	_msgsQueueOut.back()->PushUint8(texts[2].key.size());
-	_msgsQueueOut.back()->PushBytes(texts[2].key.data(), texts[2].key.size());
-
-	_msgsQueueOut.back()->PushUint8(texts[4].key.size());
-	_msgsQueueOut.back()->PushBytes(texts[4].key.data(), texts[4].key.size());
-
-	_msgsQueueOut.back()->PushUint8(texts[7].key.size());
-	_msgsQueueOut.back()->PushBytes(texts[7].key.data(), texts[7].key.size());
-
-//Log("Key:");
-//Utils::LogBuf(texts[1].key);
-	// Инфа об интервалах (на 1 больше числа ключей)
-	_msgsQueueOut.back()->PushUint32(2); // Число текстов в интервале
-	uint64_t hash = 0;
-	hash = Utils::AddHash(hash, texts[0].key, true);
-	hash = Utils::AddHash(hash, texts[1].key, false);
-	_msgsQueueOut.back()->PushBytes(&hash, sizeof(uint64_t));
-
-	_msgsQueueOut.back()->PushUint32(2); // Число текстов в интервале
-	hash = Utils::AddHash(hash, texts[2].key, true);
-	hash = Utils::AddHash(hash, texts[3].key, false);
-	_msgsQueueOut.back()->PushBytes(&hash, sizeof(uint64_t));
-
-	_msgsQueueOut.back()->PushUint32(3); // Число текстов в интервале
-	hash = Utils::AddHash(hash, texts[4].key, true);
-	hash = Utils::AddHash(hash, texts[5].key, false);
-	hash = Utils::AddHash(hash, texts[6].key, false);
-	_msgsQueueOut.back()->PushBytes(&hash, sizeof(uint64_t));
-
-	_msgsQueueOut.back()->PushUint32(3); // Число текстов в интервале
-	hash = Utils::AddHash(hash, texts[7].key, true);
-	hash = Utils::AddHash(hash, texts[8].key, false);
-	hash = Utils::AddHash(hash, texts[9].key, false);
-	_msgsQueueOut.back()->PushBytes(&hash, sizeof(uint64_t));
-
-	//-------------------
-
-	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
-	_msgsQueueOut.back()->PushUint8(111); // Изменить основной текст
-	_msgsQueueOut.back()->PushString8("TextID1");
-	_msgsQueueOut.back()->PushString16("NewBaseText1");
-
-*/
-	//-------------------
-qDebug() << gTimer.elapsed() << " on_pushButton_clicked cp1";
+//qDebug() << gTimer.elapsed() << " on_pushButton_clicked cp1";
 	DatabaseManager::Instance().LoadBaseAndRequestSync("TestDB"); // Загрузит базу если есть (если нет, создаст в памят пустую) и добавит запрос синхронизации в очередь сообщений на отсылку
-qDebug() << gTimer.elapsed() << " on_pushButton_clicked cp2";
+//qDebug() << gTimer.elapsed() << " on_pushButton_clicked cp2";
 	CHttpManager::Instance().Connect("mylogin", "mypassword");
-qDebug() << gTimer.elapsed() << " on_pushButton_clicked cp3";
+//qDebug() << gTimer.elapsed() << " on_pushButton_clicked cp3";
 }
 
 //---------------------------------------------------------------
@@ -183,4 +119,13 @@ QTreeWidget* MainWindow::getTreeWidget()
 {
 	return ui->treeWidget;
 }
+
+//---------------------------------------------------------------
+
+int MainWindow::GetSortTypeIndex()
+{
+	return ui->comboBox->currentIndex();
+
+}
+
 

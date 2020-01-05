@@ -254,7 +254,14 @@ void DatabaseManager::Update()
 
 void DatabaseManager::TreeSelectionChanged()
 {
-	_mainTableModel->OnDataModif(true, false, false, 0, 0);
+	_mainTableModel->OnDataModif(false, true, false, false, 0, 0);
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::SortSelectionChanged(int index)
+{
+	_mainTableModel->OnDataModif(true, false, false, false, 0, 0);
 }
 
 //---------------------------------------------------------------
@@ -272,7 +279,7 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 		_dataBase->_dbSerializer->SaveDatabase();
 //_dataBase->LogDatabase();
 		AdjustFolderView(UINT32_MAX, nullptr);
-		_mainTableModel->OnDataModif(false, false, true, 0, 0);
+		_mainTableModel->OnDataModif(false, false, false, true, 0, 0);
 
 //_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
 //_msgsQueueOut.back()->PushUint8(EventType::ChangeBaseText);
@@ -293,14 +300,14 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 		{
 			Log("Msg: ChangeBaseText");
 			std::string textId = ModifyDbChangeBaseText(dbuf, ts, loginOfModifier);
-			_mainTableModel->OnDataModif(false, true, false, _mainTableModel->calcLineByTextId(textId), _mainTableModel->calcColumnOfBaseText());
+			_mainTableModel->OnDataModif(false, false, true, false, _mainTableModel->calcLineByTextId(textId), _mainTableModel->calcColumnOfBaseText());
 		}
 		break;
 		case EventType::ChangeAttributeInText:
 		{
 			Log("Msg: ChangeAttributeInText");
 			auto[textId, attribId] = ModifyDbChangeAttributeInText(dbuf, ts, loginOfModifier);
-			_mainTableModel->OnDataModif(false, true, false, _mainTableModel->calcLineByTextId(textId), _mainTableModel->calcColumnOfAttributInText(attribId));
+			_mainTableModel->OnDataModif(false, false, true, false, _mainTableModel->calcLineByTextId(textId), _mainTableModel->calcColumnOfAttributInText(attribId));
 		}
 		break;
 		default:
