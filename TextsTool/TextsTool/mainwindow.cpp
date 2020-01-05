@@ -92,10 +92,16 @@ void MainWindow::closeEvent (QCloseEvent *)
 void MainWindow::on_pushButton_clicked()
 {
 //qDebug() << gTimer.elapsed() << " on_pushButton_clicked cp1";
-	DatabaseManager::Instance().LoadBaseAndRequestSync("TestDB"); // Загрузит базу если есть (если нет, создаст в памят пустую) и добавит запрос синхронизации в очередь сообщений на отсылку
-//qDebug() << gTimer.elapsed() << " on_pushButton_clicked cp2";
-	CHttpManager::Instance().Connect("mylogin", "mypassword");
-//qDebug() << gTimer.elapsed() << " on_pushButton_clicked cp3";
+
+	CHttpManager::Instance().Connect("mylogin", "mypassword", [](bool isSuccess){
+		if (isSuccess) {
+			Log("Connect succeded");
+			DatabaseManager::Instance().LoadBaseAndRequestSync("TestDB"); // Загрузит базу если есть (если нет, создаст в памят пустую) и добавит запрос синхронизации в очередь сообщений на отсылку
+		}
+		else {
+			Log("Connect failed");
+		}
+	});
 }
 
 //---------------------------------------------------------------

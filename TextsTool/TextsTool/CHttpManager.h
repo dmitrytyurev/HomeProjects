@@ -53,7 +53,7 @@ public:
 	static void Deinit();
 	static CHttpManager& Instance();
 	void Update(int dtMs);
-    void Connect(const std::string& login, const std::string& password);
+	void Connect(const std::string& login, const std::string& password, std::function<void (bool isSuccess)> callback);
     void TestSend();
     STATE GetStatus();
     void PutPacketToSendQueue(const std::vector<uint8_t>& packet);
@@ -89,4 +89,5 @@ private:
     std::vector<uint8_t> _httpBuf;
     std::string _login;
     std::string _password;
+	std::function<void (bool isSuccess)> _connectCallback;
 };

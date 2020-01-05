@@ -137,6 +137,7 @@ void CHttpManager::CallbackConnecting(QNetworkReply *reply)
         QString errorString = "network error: " + reply->errorString();
         _lastError = errorString;
         qDebug() << errorString;
+		_connectCallback(false);
         return;
     }
 
@@ -147,7 +148,8 @@ void CHttpManager::CallbackConnecting(QNetworkReply *reply)
     if (code == (uint8_t)AnswersToClient::WrongLoginOrPassword) {
         _state = STATE::NOT_CONNECTED;
         _lastError = "wrong login or password";
-        return;
+		_connectCallback(false);
+		return;
     }
     if (code == (uint8_t)AnswersToClient::Connected) {
         _state = STATE::CONNECTED;
@@ -155,6 +157,7 @@ void CHttpManager::CallbackConnecting(QNetworkReply *reply)
         _sendPacketN = 0;
         _rcvPacketN = 0;
 		_requestTimout = MinTimeoutRequestPacketFromServer;
+		_connectCallback(true);
 		return;
     }
     Log("CallbackConnecting: unexpected response. code:" + std::to_string(code));
@@ -267,10 +270,11 @@ void CHttpManager::ConnectInner()
 
 //---------------------------------------------------------------
 
-void CHttpManager::Connect(const std::string& login, const std::string& password)
+void CHttpManager::Connect(const std::string& login, const std::string& password, std::function<void (bool isSuccess)> callback)
 {
     _login = login;
     _password = password;
+	_connectCallback = callback;
     ConnectInner();
 }
 
