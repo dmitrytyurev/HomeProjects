@@ -241,6 +241,15 @@ void MainTableModel::addFolderTextsToShowReq(uint32_t folderId)
 
 //---------------------------------------------------------------
 
+void MainTableModel::SortTextsById()
+{
+	std::sort(_textsToShow.begin(), _textsToShow.end(), [](TextTranslated* el1, TextTranslated* el2) {
+		return el2->id < el1->id;
+	});
+}
+
+//---------------------------------------------------------------
+
 void MainTableModel::recalcColumnToShowData()
 {
 	_columnsToShow.clear();
@@ -267,6 +276,7 @@ void MainTableModel::OnDataModif(bool selectedFolderChanged, bool oneCellChanged
 				break;
 			}
 		}
+		SortTextsById();
 	}
 	if (columnsCanChange) {
 		recalcColumnToShowData();
