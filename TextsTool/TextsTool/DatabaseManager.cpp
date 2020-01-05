@@ -279,6 +279,7 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 		_dataBase->_dbSerializer->SaveDatabase();
 //_dataBase->LogDatabase();
 		AdjustFolderView(UINT32_MAX, nullptr);
+		MainWindow::Instance().getTreeWidget()->expandAll();
 		_mainTableModel->OnDataModif(false, false, false, true, 0, 0);
 
 //_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
