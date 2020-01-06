@@ -37,6 +37,7 @@ public:
 	void SetModelForMainTable(QAbstractTableModel* model);
 	QTreeWidget* getTreeWidget();
 	int GetSortTypeIndex();
+	std::vector<std::pair<QString, uint8_t>>& GetSortSelectors();
 
 private slots:
 	void on_pushButton_clicked();
@@ -47,6 +48,7 @@ private slots:
 private:
     Ui::MainWindow *ui = nullptr;
 	QTimer *_timer = nullptr;
+	std::vector<std::pair<QString, uint8_t>> _sortSelectorItems;
 
 	static MainWindow* pthis;
 };

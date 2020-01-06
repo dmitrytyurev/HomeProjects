@@ -44,18 +44,21 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->treeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(treeSelectionChanged(const QItemSelection&,const QItemSelection&)));
 	gTimer.start();
 
-	ui->comboBox->addItem(QString("Без сортировки"));
-	ui->comboBox->addItem(QString("Id"));
-	ui->comboBox->addItem(QString("Id (обратная)"));
-	ui->comboBox->addItem(QString("Время создания"));
-	ui->comboBox->addItem(QString("Время создания (обратная)"));
-	ui->comboBox->addItem(QString("Время изменения"));
-	ui->comboBox->addItem(QString("Время изменения (обратная)"));
-	ui->comboBox->addItem(QString("Кто менял"));
-	ui->comboBox->addItem(QString("Кто менял (обратная)"));
-
+	std::vector<std::pair<QString, uint8_t>> sortSelectorItems = { {"Без сортировки", 255},
+																   {"Id", AttributePropertyDataType::Id_t},
+																   {"Id (обратная)", AttributePropertyDataType::Id_t},
+																   {"Время создания", AttributePropertyDataType::CreationTimestamp_t},
+																   {"Время создания (обратная)", AttributePropertyDataType::CreationTimestamp_t},
+																   {"Время изменения", AttributePropertyDataType::ModificationTimestamp_t},
+																   {"Время изменения (обратная)", AttributePropertyDataType::ModificationTimestamp_t},
+																   {"Кто менял", AttributePropertyDataType::LoginOfLastModifier_t},
+																   {"Кто менял (обратная)", AttributePropertyDataType::LoginOfLastModifier_t}
+																 };
+	_sortSelectorItems = sortSelectorItems;
+	for (auto& selector: _sortSelectorItems) {
+		ui->comboBox->addItem(selector.first);
+	}
 	connect(ui->comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(sortTypeComboboxIndexChanged(int)));
-
 }
 
 //---------------------------------------------------------------
@@ -64,6 +67,14 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+//---------------------------------------------------------------
+
+std::vector<std::pair<QString, uint8_t>>& MainWindow::GetSortSelectors()
+{
+	return _sortSelectorItems;
+}
+
 
 //---------------------------------------------------------------
 

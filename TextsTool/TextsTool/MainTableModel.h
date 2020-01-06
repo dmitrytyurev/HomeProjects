@@ -19,6 +19,16 @@ struct FoundTextRefs;
 class DatabaseManager;
 
 //---------------------------------------------------------------
+
+enum class TEXTS_RECOLLECT_TYPE
+{
+	YES,
+	NO,
+	IF_COLUMNS_AFFECTED
+};
+
+
+//---------------------------------------------------------------
 class MainTableModel : public QAbstractTableModel
 {
 	Q_OBJECT
@@ -46,10 +56,10 @@ public:
 	void SortTextsByLoginOfModifier();
 	void SortTextsByLoginOfModifierBack();
 	void recalcColumnToShowData();
-	void OnDataModif(bool sortTypeChanged, bool selectedFolderChanged, bool oneCellChanged, bool columnsCanChange, int line, int column);
+	void OnDataModif(bool columnsChanged, TEXTS_RECOLLECT_TYPE textsRecollectType,  std::vector<AttributeProperty*>* affectedAttributes, bool sortTypeChanged, int line);
 	int calcLineByTextId(const std::string& textId);
-	int calcColumnOfBaseText();
-	int calcColumnOfAttributInText(int attributId);
+	AttributeProperty* getAttributeByType(uint8_t attribType);
+	AttributeProperty* getAttributeById(int attributId);
 signals:
 
 public slots:

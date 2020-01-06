@@ -28,6 +28,8 @@ public:
 
 	void CreateFromPacket(DeserializationBuffer& buffer, uint32_t ts, uint32_t newId);   // Создание объекта из сообщения от клиента 
 	void Log(const std::string& prefix);
+	bool IsFilteredByThisAttribute();
+	bool IsSortedByThisAttribute();
 
 	uint8_t id = 0;           // ID атрибута
 	std::string name;         // Имя атрибута

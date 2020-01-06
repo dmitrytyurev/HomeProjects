@@ -113,26 +113,26 @@ int MainTableModel::calcLineByTextId(const std::string& textId)
 
 //---------------------------------------------------------------
 
-int MainTableModel::calcColumnOfBaseText()
+AttributeProperty* MainTableModel::getAttributeByType(uint8_t attribType)
 {
-	for (int i=0; i<_columnsToShow.size(); ++i) {
-		if (_dataBase->_attributeProps[_columnsToShow[i]].type == AttributePropertyDataType::BaseText_t) {
-			return i;
+	for (auto& attrib: _dataBase->_attributeProps) {
+		if (attrib.type == attribType)  {
+			return &attrib;
 		}
 	}
-	return -1; // Это возможно, если извне изменился текст, в колонке, которая не отображается в таблице
+	return nullptr;
 }
 
 //---------------------------------------------------------------
 
-int MainTableModel::calcColumnOfAttributInText(int attributId)
+AttributeProperty* MainTableModel::getAttributeById(int attributId)
 {
-	for (int i=0; i<_columnsToShow.size(); ++i) {
-		if (_dataBase->_attributeProps[_columnsToShow[i]].id == attributId) {
-			return i;
+	for (auto& attrib: _dataBase->_attributeProps) {
+		if (attrib.id == attributId)  {
+			return &attrib;
 		}
 	}
-	return -1; // Это возможно, если извне изменился текст, в колонке, которая не отображается в таблице
+	return nullptr;
 }
 
 //---------------------------------------------------------------
@@ -190,8 +190,8 @@ bool MainTableModel::setData(const QModelIndex &index, const QVariant &value, in
 
 	*textRefs.string = value.toString().toUtf8().data();
 	DatabaseManager::Instance().OnTextModifiedFromGUI(textRefs);
-	OnDataModif(false, false, true, false, index.row(), index.column());
-
+	std::vector<AttributeProperty*> affectedAttributes;
+	OnDataModif(false, TEXTS_RECOLLECT_TYPE::NO, nullptr, false, index.row()); // Не передаём заафеченную колонку, чтобы пересбор текстов и сортировка не происходили до возврата наших изменений с сервера
 	return true;
 }
 
@@ -352,33 +352,68 @@ void MainTableModel::recalcColumnToShowData()
 
 //---------------------------------------------------------------
 
-void MainTableModel::OnDataModif(bool sortTypeChanged, bool selectedFolderChanged, bool oneCellChanged, bool columnsCanChange, int line, int column)
+void MainTableModel::OnDataModif(bool columnsChanged, TEXTS_RECOLLECT_TYPE textsRecollectType,  std::vector<AttributeProperty*>* affectedAttributes, bool sortTypeChanged, int line)
 {
-	bool canChangeLinesNumber = selectedFolderChanged || !oneCellChanged || _isFiltersOn;
+	if (columnsChanged) {
+		recalcColumnToShowData();
+	}
 
-	if (canChangeLinesNumber) {
+	// Определим нужно ли пересобирать тексты из каталогов
+	bool ifNeedRecollectTexts = false;
+	if (textsRecollectType != TEXTS_RECOLLECT_TYPE::NO) {
+		if (textsRecollectType == TEXTS_RECOLLECT_TYPE::YES) {
+			ifNeedRecollectTexts = true;
+		}
+		else {
+			if (affectedAttributes) {
+				for (auto attrib: *affectedAttributes) {
+					if (attrib->IsFilteredByThisAttribute()) {
+						ifNeedRecollectTexts = true;
+						break;
+					}
+				}
+			}
+		}
+	}
+	// Если нужно, то пересоберём тексты из каталогов
+	if (ifNeedRecollectTexts) {
 		_textsToShow.clear();
 		for (auto& folder: _dataBase->_folders) {
-			if (folder.uiTreeItem->isSelected()) {
+			if (folder.uiTreeItem->isSelected()) { // Среди всех папок найдём выделенную и запустим от неё рекурсивный обход
 				addFolderTextsToShowReq(folder.id);
 				break;
 			}
 		}
 	}
-	if (canChangeLinesNumber || sortTypeChanged) {
+
+	// Определим нужно ли отсортировать тексты
+	bool ifNeedSortTexts = false;
+	bool isSortOn = MainWindow::Instance().GetSortTypeIndex() != 0;
+	if (isSortOn && (sortTypeChanged || ifNeedRecollectTexts)) {
+		ifNeedSortTexts = true;
+	}
+	else {
+		if (affectedAttributes) {
+			for (auto attrib: *affectedAttributes) {
+				if (attrib->IsSortedByThisAttribute()) {
+					ifNeedSortTexts = true;
+					break;
+				}
+			}
+		}
+	}
+	// Если нужно, то отсортируем тексты
+	if (ifNeedSortTexts) {
 		SortTextsByCurrentSortType();
 	}
-	if (columnsCanChange) {
-		recalcColumnToShowData();
-	}
-	if (canChangeLinesNumber || sortTypeChanged) {
+
+	// Обновим в GUI или все строки или одну заафеченную строку
+	if (line == -1 || ifNeedRecollectTexts || ifNeedSortTexts) {
 		beginResetModel();
 		endResetModel();
 	}
 	else {
-		if (line != -1 && column != -1) {
-			emit(dataChanged(index(line, 0), index(line, _columnsToShow.size()-1)));
-		}
+		emit(dataChanged(index(line, 0), index(line, _columnsToShow.size()-1)));
 	}
 }
 

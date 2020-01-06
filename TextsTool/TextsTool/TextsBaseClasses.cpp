@@ -6,6 +6,7 @@
 #include "Utils.h"
 #include "DbSerializer.h"
 #include "../SharedSrc/Shared.h"
+#include "mainwindow.h"
 
 void ExitMsg(const std::string& message);
 
@@ -96,6 +97,24 @@ void AttributeProperty::Log(const std::string& prefix)
 	::Log(prefix + "param1: " + std::to_string(param1));
 }
 
+//===============================================================================
+
+bool AttributeProperty::IsFilteredByThisAttribute()
+{
+	return false; // !!! Когда будут фильтры, реализовать этот метод
+}
+
+//===============================================================================
+bool AttributeProperty::IsSortedByThisAttribute()
+{
+	auto& selectors = MainWindow::Instance().GetSortSelectors();
+	for (auto& selector: selectors) {
+		if (selector.second != 255 && type == selector.second) {
+			return true;
+		}
+	}
+	return false;
+}
 
 //===============================================================================
 

@@ -254,14 +254,14 @@ void DatabaseManager::Update()
 
 void DatabaseManager::TreeSelectionChanged()
 {
-	_mainTableModel->OnDataModif(false, true, false, false, 0, 0);
+	_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
 }
 
 //---------------------------------------------------------------
 
 void DatabaseManager::SortSelectionChanged(int index)
 {
-	_mainTableModel->OnDataModif(true, false, false, false, 0, 0);
+	_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::NO, nullptr, true, -1);
 }
 
 //---------------------------------------------------------------
@@ -280,12 +280,7 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 //_dataBase->LogDatabase();
 		AdjustFolderView(UINT32_MAX, nullptr);
 		MainWindow::Instance().getTreeWidget()->expandAll();
-		_mainTableModel->OnDataModif(false, false, false, true, 0, 0);
-
-//_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
-//_msgsQueueOut.back()->PushUint8(EventType::ChangeBaseText);
-//_msgsQueueOut.back()->PushString8("TextID1");
-//_msgsQueueOut.back()->PushString16("NewBaseText2");
+		_mainTableModel->OnDataModif(true, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
 	}
 	break;
 	case EventType::ChangeDataBase:
@@ -300,15 +295,17 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 		case EventType::ChangeBaseText:
 		{
 			Log("Msg: ChangeBaseText");
-			std::string textId = ModifyDbChangeBaseText(dbuf, ts, loginOfModifier);
-			_mainTableModel->OnDataModif(false, false, true, false, _mainTableModel->calcLineByTextId(textId), _mainTableModel->calcColumnOfBaseText());
+			std::vector<AttributeProperty*> affectedAttributes;
+			std::string textId = ModifyDbChangeBaseText(dbuf, ts, loginOfModifier, &affectedAttributes);
+			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::IF_COLUMNS_AFFECTED, &affectedAttributes, false, _mainTableModel->calcLineByTextId(textId));
 		}
 		break;
 		case EventType::ChangeAttributeInText:
 		{
 			Log("Msg: ChangeAttributeInText");
-			auto[textId, attribId] = ModifyDbChangeAttributeInText(dbuf, ts, loginOfModifier);
-			_mainTableModel->OnDataModif(false, false, true, false, _mainTableModel->calcLineByTextId(textId), _mainTableModel->calcColumnOfAttributInText(attribId));
+			std::vector<AttributeProperty*> affectedAttributes;
+			std::string textId = ModifyDbChangeAttributeInText(dbuf, ts, loginOfModifier, &affectedAttributes);
+			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::IF_COLUMNS_AFFECTED, &affectedAttributes, false, _mainTableModel->calcLineByTextId(textId));
 		}
 		break;
 		default:
@@ -378,32 +375,52 @@ void DatabaseManager::SendMsgChangeBaseText(const FoundTextRefs& textRefs)
 
 //---------------------------------------------------------------
 
-std::string DatabaseManager::ModifyDbChangeBaseText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifier)
+std::string DatabaseManager::ModifyDbChangeBaseText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifier, std::vector<AttributeProperty*>* affectedAttributes)
 {
 	std::string textId;
 	dbuf.GetString8(textId);
 	std::string newBaseText;
 	dbuf.GetString16(newBaseText);
 
+	TextTranslatedPtr tmpTextPtr;
 	for (auto& f : _dataBase->_folders) {
 		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
 		if (result != std::end(f.texts)) {
-			TextTranslatedPtr tmpTextPtr = *result;
+			tmpTextPtr = *result;
 			f.timestampModified = ts;
-			tmpTextPtr->baseText = newBaseText;
-//tmpTextPtr->baseText = "TestVal!!!";
-//Log("Write TestVal");
-			tmpTextPtr->loginOfLastModifier = loginOfModifier;
-			tmpTextPtr->timestampModified = ts;
-			return textId;
+			break;
 		}
 	}
-	return "";
+
+	if (!tmpTextPtr) {
+		return "";
+	}
+
+	// Нашли текст, модифицируем его
+	tmpTextPtr->baseText = newBaseText;
+	tmpTextPtr->loginOfLastModifier = loginOfModifier;
+	tmpTextPtr->timestampModified = ts;
+
+	// Заполняем атрибуты таблицы (колонки), которые у данного текста мы модифицировали
+	AttributeProperty* affectedAttrib = _mainTableModel->getAttributeByType(AttributePropertyDataType::BaseText_t);
+	if (affectedAttrib) {
+		affectedAttributes->emplace_back(affectedAttrib);
+	}
+	affectedAttrib = _mainTableModel->getAttributeByType(AttributePropertyDataType::ModificationTimestamp_t);
+	if (affectedAttrib) {
+		affectedAttributes->emplace_back(affectedAttrib);
+	}
+	affectedAttrib = _mainTableModel->getAttributeByType(AttributePropertyDataType::LoginOfLastModifier_t);
+	if (affectedAttrib) {
+		affectedAttributes->emplace_back(affectedAttrib);
+	}
+
+	return textId;
 }
 
 //---------------------------------------------------------------
 
-std::pair<std::string, int> DatabaseManager::ModifyDbChangeAttributeInText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifier)
+std::string DatabaseManager::ModifyDbChangeAttributeInText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifier, std::vector<AttributeProperty*>* affectedAttributes)
 {
 	std::string textId;
 	dbuf.GetString8(textId);
@@ -424,45 +441,65 @@ std::pair<std::string, int> DatabaseManager::ModifyDbChangeAttributeInText(Deser
 	break;
 	}
 
+	TextTranslatedPtr tmpTextPtr;
 	for (auto& f : _dataBase->_folders) {
 		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
 		if (result != std::end(f.texts)) {
-			TextTranslatedPtr tmpTextPtr = *result;
+			tmpTextPtr = *result;
 			f.timestampModified = ts;
-			tmpTextPtr->loginOfLastModifier = loginOfModifier;
-			tmpTextPtr->timestampModified = ts;
-
-			AttributeInText* attribInTextToModify = nullptr;
-			for (auto& attribInText: tmpTextPtr->attributes) {
-				if (attribInText.id	== attribId) {
-					attribInTextToModify = &attribInText;
-				}
-			}
-			if (!attribInTextToModify) {
-				tmpTextPtr->attributes.emplace_back();
-				attribInTextToModify = &tmpTextPtr->attributes.back();
-			}
-
-			switch(attribDataType) {
-			case AttributePropertyDataType::Translation_t:
-			case AttributePropertyDataType::CommonText_t:
-				attribInTextToModify->text = text;
-//attribInTextToModify->text = "TestVal2 !!!";
-
-				if (text.empty()) {
-					int indexElement = attribInTextToModify - &tmpTextPtr->attributes[0];
-					tmpTextPtr->attributes.erase(tmpTextPtr->attributes.begin() + indexElement);
-				}
 			break;
-			case AttributePropertyDataType::Checkbox_t:
-				attribInTextToModify->flagState = flagState;
-			break;
-			}
-			return  std::pair<std::string, int>(textId, attribId);
 		}
 	}
-	Log("DatabaseManager::ModifyDbChangeAttributeInText: textId not found");
-	return std::pair<std::string, int>("", -1);
+
+	if (!tmpTextPtr) {
+		Log("DatabaseManager::ModifyDbChangeAttributeInText: textId not found");
+		return "";
+	}
+
+	// Нашли текст, ищем атрибут в нём и модифицируем его
+	tmpTextPtr->loginOfLastModifier = loginOfModifier;
+	tmpTextPtr->timestampModified = ts;
+
+	AttributeInText* attribInTextToModify = nullptr;
+	for (auto& attribInText: tmpTextPtr->attributes) {
+		if (attribInText.id	== attribId) {
+			attribInTextToModify = &attribInText;
+		}
+	}
+	if (!attribInTextToModify) {
+		tmpTextPtr->attributes.emplace_back();
+		attribInTextToModify = &tmpTextPtr->attributes.back();
+	}
+
+	switch(attribDataType) {
+	case AttributePropertyDataType::Translation_t:
+	case AttributePropertyDataType::CommonText_t:
+		attribInTextToModify->text = text;
+		if (text.empty()) {
+			int indexElement = attribInTextToModify - &tmpTextPtr->attributes[0];
+			tmpTextPtr->attributes.erase(tmpTextPtr->attributes.begin() + indexElement);
+		}
+	break;
+	case AttributePropertyDataType::Checkbox_t:
+		attribInTextToModify->flagState = flagState;
+	break;
+	}
+
+	// Заполняем атрибуты таблицы (колонки), которые у данного текста мы модифицировали
+	AttributeProperty* affectedAttrib = _mainTableModel->getAttributeById(attribId);
+	if (affectedAttrib) {
+		affectedAttributes->emplace_back(affectedAttrib);
+	}
+	affectedAttrib = _mainTableModel->getAttributeByType(AttributePropertyDataType::ModificationTimestamp_t);
+	if (affectedAttrib) {
+		affectedAttributes->emplace_back(affectedAttrib);
+	}
+	affectedAttrib = _mainTableModel->getAttributeByType(AttributePropertyDataType::LoginOfLastModifier_t);
+	if (affectedAttrib) {
+		affectedAttributes->emplace_back(affectedAttrib);
+	}
+
+	return textId;
 }
 
 //---------------------------------------------------------------
