@@ -324,7 +324,7 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 
 void DatabaseManager::OnTextModifiedFromGUI(const FoundTextRefs& textRefs)
 {
-	if (textRefs.attrInTable->type == AttributePropertyDataType::BaseText_t) {
+	if (textRefs.attrInTable->type == AttributePropertyType::BaseText_t) {
 		SendMsgChangeBaseText(textRefs);
 	}
 	else {
@@ -402,15 +402,15 @@ std::string DatabaseManager::ModifyDbChangeBaseText(DeserializationBuffer& dbuf,
 	tmpTextPtr->timestampModified = ts;
 
 	// Заполняем атрибуты таблицы (колонки), которые у данного текста мы модифицировали
-	AttributeProperty* affectedAttrib = _mainTableModel->getAttributeByType(AttributePropertyDataType::BaseText_t);
+	AttributeProperty* affectedAttrib = _mainTableModel->getAttributeByType(AttributePropertyType::BaseText_t);
 	if (affectedAttrib) {
 		affectedAttributes->emplace_back(affectedAttrib);
 	}
-	affectedAttrib = _mainTableModel->getAttributeByType(AttributePropertyDataType::ModificationTimestamp_t);
+	affectedAttrib = _mainTableModel->getAttributeByType(AttributePropertyType::ModificationTimestamp_t);
 	if (affectedAttrib) {
 		affectedAttributes->emplace_back(affectedAttrib);
 	}
-	affectedAttrib = _mainTableModel->getAttributeByType(AttributePropertyDataType::LoginOfLastModifier_t);
+	affectedAttrib = _mainTableModel->getAttributeByType(AttributePropertyType::LoginOfLastModifier_t);
 	if (affectedAttrib) {
 		affectedAttributes->emplace_back(affectedAttrib);
 	}
@@ -429,11 +429,11 @@ std::string DatabaseManager::ModifyDbChangeAttributeInText(DeserializationBuffer
 	std::string text;
 	uint8_t flagState = 0;
 	switch(attribDataType) {
-	case AttributePropertyDataType::Translation_t:
-	case AttributePropertyDataType::CommonText_t:
+	case AttributePropertyType::Translation_t:
+	case AttributePropertyType::CommonText_t:
 		dbuf.GetString16(text);
 	break;
-	case AttributePropertyDataType::Checkbox_t:
+	case AttributePropertyType::Checkbox_t:
 		flagState = dbuf.GetUint8();
 	break;
 	default:
@@ -472,15 +472,15 @@ std::string DatabaseManager::ModifyDbChangeAttributeInText(DeserializationBuffer
 	}
 
 	switch(attribDataType) {
-	case AttributePropertyDataType::Translation_t:
-	case AttributePropertyDataType::CommonText_t:
+	case AttributePropertyType::Translation_t:
+	case AttributePropertyType::CommonText_t:
 		attribInTextToModify->text = text;
 		if (text.empty()) {
 			int indexElement = attribInTextToModify - &tmpTextPtr->attributes[0];
 			tmpTextPtr->attributes.erase(tmpTextPtr->attributes.begin() + indexElement);
 		}
 	break;
-	case AttributePropertyDataType::Checkbox_t:
+	case AttributePropertyType::Checkbox_t:
 		attribInTextToModify->flagState = flagState;
 	break;
 	}
@@ -490,11 +490,11 @@ std::string DatabaseManager::ModifyDbChangeAttributeInText(DeserializationBuffer
 	if (affectedAttrib) {
 		affectedAttributes->emplace_back(affectedAttrib);
 	}
-	affectedAttrib = _mainTableModel->getAttributeByType(AttributePropertyDataType::ModificationTimestamp_t);
+	affectedAttrib = _mainTableModel->getAttributeByType(AttributePropertyType::ModificationTimestamp_t);
 	if (affectedAttrib) {
 		affectedAttributes->emplace_back(affectedAttrib);
 	}
-	affectedAttrib = _mainTableModel->getAttributeByType(AttributePropertyDataType::LoginOfLastModifier_t);
+	affectedAttrib = _mainTableModel->getAttributeByType(AttributePropertyType::LoginOfLastModifier_t);
 	if (affectedAttrib) {
 		affectedAttributes->emplace_back(affectedAttrib);
 	}

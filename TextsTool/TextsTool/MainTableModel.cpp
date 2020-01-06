@@ -54,25 +54,25 @@ bool MainTableModel::getTextReferences(const QModelIndex &index, bool needCreate
 	result.text = _textsToShow[index.row()];
 
 	result.attrInTable = &_dataBase->_attributeProps[_columnsToShow[index.column()]];
-	if (result.attrInTable->type == AttributePropertyDataType::Id_t) {
+	if (result.attrInTable->type == AttributePropertyType::Id_t) {
 		result.string = &result.text->id;
 		return true;
 	}
-	if (result.attrInTable->type == AttributePropertyDataType::BaseText_t) {
+	if (result.attrInTable->type == AttributePropertyType::BaseText_t) {
 		result.string = &result.text->baseText;
 		return true;
 	}
-	if (result.attrInTable->type == AttributePropertyDataType::CreationTimestamp_t) {
+	if (result.attrInTable->type == AttributePropertyType::CreationTimestamp_t) {
 		result.localString = Utils::ConvertTimestampToDate(result.text->timestampCreated);
 		result.string = &result.localString;
 		return true;
 	}
-	if (result.attrInTable->type == AttributePropertyDataType::ModificationTimestamp_t) {
+	if (result.attrInTable->type == AttributePropertyType::ModificationTimestamp_t) {
 		result.localString = result.text->timestampModified == UINT32_MAX ? "Syncing..." : Utils::ConvertTimestampToDate(result.text->timestampModified);
 		result.string = &result.localString;
 		return true;
 	}
-	if (result.attrInTable->type == AttributePropertyDataType::LoginOfLastModifier_t) {
+	if (result.attrInTable->type == AttributePropertyType::LoginOfLastModifier_t) {
 		result.string = &result.text->loginOfLastModifier;
 		return true;
 	}
@@ -176,9 +176,9 @@ bool MainTableModel::setData(const QModelIndex &index, const QVariant &value, in
 	}
 
 	AttributeProperty* attrProp = &_dataBase->_attributeProps[_columnsToShow[index.column()]];
-	if (attrProp->type == AttributePropertyDataType::Id_t ||
-		attrProp->type == AttributePropertyDataType::CreationTimestamp_t ||
-		attrProp->type == AttributePropertyDataType::ModificationTimestamp_t) {
+	if (attrProp->type == AttributePropertyType::Id_t ||
+		attrProp->type == AttributePropertyType::CreationTimestamp_t ||
+		attrProp->type == AttributePropertyType::ModificationTimestamp_t) {
 		return false;
 	}
 
@@ -416,6 +416,8 @@ void MainTableModel::OnDataModif(bool columnsChanged, TEXTS_RECOLLECT_TYPE texts
 		emit(dataChanged(index(line, 0), index(line, _columnsToShow.size()-1)));
 	}
 }
+
+//---------------------------------------------------------------
 
 void MainTableModel::SortTextsByCurrentSortType()
 {

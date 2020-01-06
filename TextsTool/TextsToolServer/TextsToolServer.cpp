@@ -24,42 +24,42 @@ void test()
 	// ---------------------------------------------------   
 
 	AttributeProperty atProp;
-	atProp.type = AttributePropertyDataType::Id_t;
+	atProp.type = AttributePropertyType::Id_t;
 	atProp.id = 0;
 	atProp.isVisible = true;
 	atProp.visiblePosition = 0;
 	atProp.name = "TextId";
 	db._attributeProps.emplace_back(atProp);
 
-	atProp.type = AttributePropertyDataType::CreationTimestamp_t;
+	atProp.type = AttributePropertyType::CreationTimestamp_t;
 	atProp.id = 1;
 	atProp.isVisible = true;
 	atProp.visiblePosition = 1;
 	atProp.name = "Created";
 	db._attributeProps.emplace_back(atProp);
 
-	atProp.type = AttributePropertyDataType::ModificationTimestamp_t;
+	atProp.type = AttributePropertyType::ModificationTimestamp_t;
 	atProp.id = 2;
 	atProp.isVisible = true;
 	atProp.visiblePosition = 2;
 	atProp.name = "Modified";
 	db._attributeProps.emplace_back(atProp);
 
-	atProp.type = AttributePropertyDataType::LoginOfLastModifier_t;
+	atProp.type = AttributePropertyType::LoginOfLastModifier_t;
 	atProp.id = 3;
 	atProp.isVisible = true;
 	atProp.visiblePosition = 3;
 	atProp.name = "Modifier";
 	db._attributeProps.emplace_back(atProp);
 	   	  
-	atProp.type = AttributePropertyDataType::BaseText_t;
+	atProp.type = AttributePropertyType::BaseText_t;
 	atProp.id = 4;
 	atProp.isVisible = true;
 	atProp.visiblePosition = 4;
 	atProp.name = "BaseText";
 	db._attributeProps.emplace_back(atProp);
 
-	atProp.type = AttributePropertyDataType::CommonText_t;
+	atProp.type = AttributePropertyType::CommonText_t;
 	atProp.id = 5;
 	atProp.isVisible = true;
 	atProp.visiblePosition = 5;
@@ -96,7 +96,7 @@ void test()
 		AttributeInText attInText;
 		attInText.id = 5;
 		attInText.text = "Common text";
-		attInText.type = AttributePropertyDataType::CommonText_t;
+		attInText.type = AttributePropertyType::CommonText_t;
 		textPtr->attributes.emplace_back(attInText);
 		folder.texts.emplace_back(textPtr);
 	}

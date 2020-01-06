@@ -370,13 +370,13 @@ void AttributeInText::LoadFullDump(DeserializationBuffer& buffer, const std::vec
 	}
 	type = attributesIdToType[id];
 	switch (type) {
-	case AttributePropertyDataType::Translation_t:
-	case AttributePropertyDataType::CommonText_t:
+	case AttributePropertyType::Translation_t:
+	case AttributePropertyType::CommonText_t:
 	{
 		buffer.GetString16(text);
 	}
 	break;
-	case AttributePropertyDataType::Checkbox_t:
+	case AttributePropertyType::Checkbox_t:
 		flagState = buffer.GetUint8();
 		break;
 
@@ -391,13 +391,13 @@ void AttributeInText::SaveFullDump(SerializationBuffer& buffer) const
 {
 	buffer.PushUint8(id);
 	switch (type) {
-	case AttributePropertyDataType::Translation_t:
-	case AttributePropertyDataType::CommonText_t:
+	case AttributePropertyType::Translation_t:
+	case AttributePropertyType::CommonText_t:
 	{
 		buffer.PushString16(text);
 	}
 	break;
-	case AttributePropertyDataType::Checkbox_t:
+	case AttributePropertyType::Checkbox_t:
 		buffer.PushUint8(flagState);
 		break;
 

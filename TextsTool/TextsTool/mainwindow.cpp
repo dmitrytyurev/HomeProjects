@@ -45,14 +45,14 @@ MainWindow::MainWindow(QWidget *parent) :
 	gTimer.start();
 
 	std::vector<std::pair<QString, uint8_t>> sortSelectorItems = { {"Без сортировки", 255},
-																   {"Id", AttributePropertyDataType::Id_t},
-																   {"Id (обратная)", AttributePropertyDataType::Id_t},
-																   {"Время создания", AttributePropertyDataType::CreationTimestamp_t},
-																   {"Время создания (обратная)", AttributePropertyDataType::CreationTimestamp_t},
-																   {"Время изменения", AttributePropertyDataType::ModificationTimestamp_t},
-																   {"Время изменения (обратная)", AttributePropertyDataType::ModificationTimestamp_t},
-																   {"Кто менял", AttributePropertyDataType::LoginOfLastModifier_t},
-																   {"Кто менял (обратная)", AttributePropertyDataType::LoginOfLastModifier_t}
+																   {"Id", AttributePropertyType::Id_t},
+																   {"Id (обратная)", AttributePropertyType::Id_t},
+																   {"Время создания", AttributePropertyType::CreationTimestamp_t},
+																   {"Время создания (обратная)", AttributePropertyType::CreationTimestamp_t},
+																   {"Время изменения", AttributePropertyType::ModificationTimestamp_t},
+																   {"Время изменения (обратная)", AttributePropertyType::ModificationTimestamp_t},
+																   {"Кто менял", AttributePropertyType::LoginOfLastModifier_t},
+																   {"Кто менял (обратная)", AttributePropertyType::LoginOfLastModifier_t}
 																 };
 	_sortSelectorItems = sortSelectorItems;
 	for (auto& selector: _sortSelectorItems) {

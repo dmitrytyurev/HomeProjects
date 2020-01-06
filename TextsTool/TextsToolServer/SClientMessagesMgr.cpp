@@ -520,8 +520,8 @@ bool  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 
 	switch (attributeInText->type)
 	{
-	case AttributePropertyDataType::Translation_t:
-	case AttributePropertyDataType::CommonText_t:
+	case AttributePropertyType::Translation_t:
+	case AttributePropertyType::CommonText_t:
 	{
 		buf.GetString16(attributeInText->text);
 		if (attributeInText->text.length() == 0) {
@@ -533,7 +533,7 @@ bool  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 		}
 	}
 	break;
-	case AttributePropertyDataType::Checkbox_t:
+	case AttributePropertyType::Checkbox_t:
 	{
 		attributeInText->flagState = buf.GetUint8();
 	}
