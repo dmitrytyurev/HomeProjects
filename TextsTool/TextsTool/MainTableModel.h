@@ -43,6 +43,8 @@ public:
 	void SortTextsByCreateTimeBack();
 	void SortTextsByModifyTime();
 	void SortTextsByModifyTimeBack();
+	void SortTextsByLoginOfModifier();
+	void SortTextsByLoginOfModifierBack();
 	void recalcColumnToShowData();
 	void OnDataModif(bool sortTypeChanged, bool selectedFolderChanged, bool oneCellChanged, bool columnsCanChange, int line, int column);
 	int calcLineByTextId(const std::string& textId);

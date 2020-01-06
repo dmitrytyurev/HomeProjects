@@ -318,6 +318,25 @@ void MainTableModel::SortTextsByModifyTimeBack()
 
 //---------------------------------------------------------------
 
+void MainTableModel::SortTextsByLoginOfModifier()
+{
+	std::sort(_textsToShow.begin(), _textsToShow.end(), [](TextTranslated* el1, TextTranslated* el2) {
+		return el1->loginOfLastModifier < el2->loginOfLastModifier;
+	});
+}
+
+//---------------------------------------------------------------
+
+void MainTableModel::SortTextsByLoginOfModifierBack()
+{
+	std::sort(_textsToShow.begin(), _textsToShow.end(), [](TextTranslated* el1, TextTranslated* el2) {
+		return el2->loginOfLastModifier < el1->loginOfLastModifier;
+	});
+}
+
+
+//---------------------------------------------------------------
+
 void MainTableModel::recalcColumnToShowData()
 {
 	_columnsToShow.clear();
@@ -387,9 +406,15 @@ void MainTableModel::SortTextsByCurrentSortType()
 	case 6:
 		SortTextsByModifyTimeBack();
 	break;
-
+	case 7:
+		SortTextsByLoginOfModifier();
+	break;
+	case 8:
+		SortTextsByLoginOfModifierBack();
+	break;
+	default:
+		Log("SortTextsByCurrentSortTyp: unknown sort type");
 	}
 }
-
 
 
