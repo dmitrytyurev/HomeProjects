@@ -249,22 +249,47 @@ bool MainTableModel::ifTextPassesFilters(TextTranslatedPtr& text, std::vector<At
 {
 	for (auto attrib: attribsFilter) {
 		switch (attrib->type) {
-		case AttributePropertyType::LoginOfLastModifier_t:
-			if (text->loginOfLastModifier.find(attrib->filterOem) == std::string::npos) {
-				return false;
+			case AttributePropertyType::LoginOfLastModifier_t:
+			{
+				if (text->loginOfLastModifier.find(attrib->filterOem) == std::string::npos) {
+					return false;
+				}
 			}
-		break;
-		case AttributePropertyType::Id_t:
-			if (text->id.find(attrib->filterOem) == std::string::npos) {
-				return false;
+			break;
+			case AttributePropertyType::Id_t:
+			{
+				if (text->id.find(attrib->filterOem) == std::string::npos) {
+					return false;
+				}
 			}
-		break;
-		case AttributePropertyType::BaseText_t:
-			QString qstr = QString::fromStdString(text->baseText);
-			if (!qstr.contains(attrib->filterUtf8)) {
-				return false;
+			break;
+			case AttributePropertyType::BaseText_t:
+			{
+//				QString qstr = QString::fromStdString(text->baseText);
+//				if (!qstr.contains(attrib->filterUtf8)) {
+//					return false;
+//				}
 			}
-		break;
+			break;
+			case AttributePropertyType::Translation_t:
+			case AttributePropertyType::CommonText_t:
+			{
+				bool found = false;
+				for (auto& attribInText: text->attributes) {
+					if (attribInText.id != attrib->id) {
+						continue;
+					}
+					found = true;
+					QString qstr = QString::fromStdString(attribInText.text);
+					if (!qstr.contains(attrib->filterUtf8)) {
+						return false;
+					}
+				}
+				if (!found) {
+					return false;
+				}
+			}
+			break;
 		}
 	}
 	return true;
@@ -386,7 +411,7 @@ void MainTableModel::recollectTextsFromSelectedFolder()
 	std::vector<AttributeProperty*> attribsFilter;
 	// Выберем колонки, по которым задан фильтр
 	for (auto& attrib: _dataBase->_attributeProps) {
-		if (attrib.filterUtf8.length() > 0 || attrib.filterOem.length() > 0 ) {
+		if (attrib.IsFilteredByThisAttribute()) {
 			attribsFilter.emplace_back(&attrib);
 		}
 	}

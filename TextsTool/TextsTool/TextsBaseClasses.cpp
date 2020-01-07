@@ -101,7 +101,7 @@ void AttributeProperty::Log(const std::string& prefix)
 
 bool AttributeProperty::IsFilteredByThisAttribute()
 {
-	return false; // !!! Когда будут фильтры, реализовать этот метод
+	return filterUtf8.length() > 0 || filterOem.length() > 0;
 }
 
 //===============================================================================
