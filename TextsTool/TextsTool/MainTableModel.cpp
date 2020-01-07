@@ -245,19 +245,48 @@ QVariant MainTableModel::headerData(int section, Qt::Orientation orientation, in
 
 //---------------------------------------------------------------
 
-void MainTableModel::addFolderTextsToShowReq(uint32_t folderId)
+bool MainTableModel::ifTextPassesFilters(TextTranslatedPtr& text, std::vector<AttributeProperty*>& attribsFilter)
+{
+	for (auto attrib: attribsFilter) {
+		switch (attrib->type) {
+		case AttributePropertyType::LoginOfLastModifier_t:
+			if (text->loginOfLastModifier.find(attrib->filterOem) == std::string::npos) {
+				return false;
+			}
+		break;
+		case AttributePropertyType::Id_t:
+			if (text->id.find(attrib->filterOem) == std::string::npos) {
+				return false;
+			}
+		break;
+		case AttributePropertyType::BaseText_t:
+			QString qstr = QString::fromStdString(text->baseText);
+			if (!qstr.contains(attrib->filterUtf8)) {
+				return false;
+			}
+		break;
+		}
+	}
+	return true;
+}
+
+//---------------------------------------------------------------
+
+void MainTableModel::addFolderTextsToShowReq(uint32_t folderId, std::vector<AttributeProperty*>& attribsFilter)
 {
 	for (auto& folder: _dataBase->_folders) {
 		if (folder.id == folderId) {
 			for (auto& text: folder.texts) {
-				_textsToShow.emplace_back(text.get());
+				if (ifTextPassesFilters(text, attribsFilter)) {
+					_textsToShow.emplace_back(text.get());
+				}
 			}
 			break;
 		}
 	}
 	for (auto& folder: _dataBase->_folders) {
 		if (folder.parentId == folderId) {
-			addFolderTextsToShowReq(folder.id);
+			addFolderTextsToShowReq(folder.id, attribsFilter);
 		}
 	}
 }
@@ -352,6 +381,28 @@ void MainTableModel::recalcColumnToShowData()
 
 //---------------------------------------------------------------
 
+void MainTableModel::recollectTextsFromSelectedFolder()
+{
+	std::vector<AttributeProperty*> attribsFilter;
+	// Выберем колонки, по которым задан фильтр
+	for (auto& attrib: _dataBase->_attributeProps) {
+		if (attrib.filterUtf8.length() > 0 || attrib.filterOem.length() > 0 ) {
+			attribsFilter.emplace_back(&attrib);
+		}
+	}
+
+	// Заполним _textsToShow текстами, начиная с выбранного в дереве каталога рекурсивно (с учётом фильтра)
+	_textsToShow.clear();
+	for (auto& folder: _dataBase->_folders) {
+		if (folder.uiTreeItem->isSelected()) { // Среди всех папок найдём выделенную и запустим от неё рекурсивный обход
+			addFolderTextsToShowReq(folder.id, attribsFilter);
+			break;
+		}
+	}
+}
+
+//---------------------------------------------------------------
+
 void MainTableModel::OnDataModif(bool columnsChanged, TEXTS_RECOLLECT_TYPE textsRecollectType,  std::vector<AttributeProperty*>* affectedAttributes, bool sortTypeChanged, int line)
 {
 	if (columnsChanged) {
@@ -377,13 +428,7 @@ void MainTableModel::OnDataModif(bool columnsChanged, TEXTS_RECOLLECT_TYPE texts
 	}
 	// Если нужно, то пересоберём тексты из каталогов
 	if (ifNeedRecollectTexts) {
-		_textsToShow.clear();
-		for (auto& folder: _dataBase->_folders) {
-			if (folder.uiTreeItem->isSelected()) { // Среди всех папок найдём выделенную и запустим от неё рекурсивный обход
-				addFolderTextsToShowReq(folder.id);
-				break;
-			}
-		}
+		recollectTextsFromSelectedFolder();
 	}
 
 	// Определим нужно ли отсортировать тексты

@@ -42,10 +42,22 @@ public:
 	QVariant headerData(int section, Qt::Orientation orientation, int role) const Q_DECL_OVERRIDE;
 
 	QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
+	void OnDataModif(bool columnsChanged, TEXTS_RECOLLECT_TYPE textsRecollectType,  std::vector<AttributeProperty*>* affectedAttributes, bool sortTypeChanged, int line);
+	int calcLineByTextId(const std::string& textId);
+	AttributeProperty* getAttributeByType(uint8_t attribType);
+	AttributeProperty* getAttributeById(int attributId);
 
+signals:
+
+public slots:
+	void theDataChanged();
+
+private:
+	bool getTextReferences(const QModelIndex &index, bool needCreateAttrIfNotFound, FoundTextRefs& result);
+	void recollectTextsFromSelectedFolder();
 	// Заполнить ссылки на тексты, которые должны показывать (учитывая выбранную папку, начиная с которой показываем тексты и применённые фильтры).
-	// Если justOneTextContentChanged == true, то перезаполняем индексы только, если включены фильтры таблицы. Иначе сразу выход
-	void addFolderTextsToShowReq(uint32_t parentId);
+	void addFolderTextsToShowReq(uint32_t parentId, std::vector<AttributeProperty*>& attribsFilter);
+	bool ifTextPassesFilters(TextTranslatedPtr& text, std::vector<AttributeProperty*>& attribsFilter);
 	void SortTextsByCurrentSortType();
 	void SortTextsById();
 	void SortTextsByIdBack();
@@ -56,17 +68,6 @@ public:
 	void SortTextsByLoginOfModifier();
 	void SortTextsByLoginOfModifierBack();
 	void recalcColumnToShowData();
-	void OnDataModif(bool columnsChanged, TEXTS_RECOLLECT_TYPE textsRecollectType,  std::vector<AttributeProperty*>* affectedAttributes, bool sortTypeChanged, int line);
-	int calcLineByTextId(const std::string& textId);
-	AttributeProperty* getAttributeByType(uint8_t attribType);
-	AttributeProperty* getAttributeById(int attributId);
-signals:
-
-public slots:
-	void theDataChanged();
-
-private:
-	bool getTextReferences(const QModelIndex &index, bool needCreateAttrIfNotFound, FoundTextRefs& result);
 
 private:
 	TextsDatabasePtr& _dataBase;

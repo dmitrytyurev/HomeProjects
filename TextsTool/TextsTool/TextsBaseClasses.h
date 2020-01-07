@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <mutex>
+#include <QString>
 
 class DeserializationBuffer;
 class SerializationBuffer;
@@ -39,6 +40,8 @@ public:
 	uint8_t visiblePosition = 0;    // Визуальная позиция атрибута в таблице (даже если скрыт)
 	bool isVisible = false;         // Видимость атрибута
 	uint32_t timestampCreated = 0;  // Время создания
+	QString filterUtf8;       // (Для игровых текстов) Строка по которой фильтруется данное поле. Если пустая строка, то фильтра нет.
+	std::string filterOem;    // (Для полей Id, Login) Строка по которой фильтруется данное поле. Если пустая строка, то фильтра нет.
 };
 
 //===============================================================================
