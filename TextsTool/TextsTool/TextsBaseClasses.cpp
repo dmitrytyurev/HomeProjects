@@ -53,6 +53,12 @@ void AttributeProperty::LoadFullDump(DeserializationBuffer& buffer)
 	type = buffer.GetUint8();
 	param1 = buffer.GetUint32();
 	param2 = buffer.GetUint32();
+
+//if (type == AttributePropertyType::ModificationTimestamp_t) {
+//	filterModifyTsMode = LOWER_THAN_TS;  // Режим фильтра по времени модификации текста
+//	filterModifyTs = 157830000;            // Относительно какого времени фильтруем
+//}
+
 }
 
 //===============================================================================
@@ -101,7 +107,10 @@ void AttributeProperty::Log(const std::string& prefix)
 
 bool AttributeProperty::IsFilteredByThisAttribute()
 {
-	return filterUtf8.length() > 0 || filterOem.length() > 0;
+	return filterUtf8.length() > 0 ||
+		   filterOem.length() > 0 ||
+		   filterCreateTsMode != NO_FILTER ||
+		   filterModifyTsMode != NO_FILTER;
 }
 
 //===============================================================================

@@ -263,12 +263,40 @@ bool MainTableModel::ifTextPassesFilters(TextTranslatedPtr& text, std::vector<At
 				}
 			}
 			break;
+			case AttributePropertyType::CreationTimestamp_t:
+			{
+				if (attrib->filterCreateTsMode == AttributeProperty::GREATER_THAN_TS) {
+					if (text->timestampCreated < attrib->filterCreateTs) {
+						return false;
+					}
+				}
+				else {
+					if (text->timestampCreated > attrib->filterCreateTs) {
+						return false;
+					}
+				}
+			}
+			break;
+			case AttributePropertyType::ModificationTimestamp_t:
+			{
+				if (attrib->filterModifyTsMode == AttributeProperty::GREATER_THAN_TS) {
+					if (text->timestampModified < attrib->filterModifyTs) {
+						return false;
+					}
+				}
+				else {
+					if (text->timestampModified > attrib->filterModifyTs) {
+						return false;
+					}
+				}
+			}
+			break;
 			case AttributePropertyType::BaseText_t:
 			{
-//				QString qstr = QString::fromStdString(text->baseText);
-//				if (!qstr.contains(attrib->filterUtf8)) {
-//					return false;
-//				}
+				QString qstr = QString::fromStdString(text->baseText);
+				if (!qstr.contains(attrib->filterUtf8)) {
+					return false;
+				}
 			}
 			break;
 			case AttributePropertyType::Translation_t:

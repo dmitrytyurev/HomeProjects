@@ -23,6 +23,12 @@ using TextsDatabasePtr = std::shared_ptr<TextsDatabase>;
 class AttributeProperty
 {
 public:
+	enum TS_FILTER_MODE {  // Режимы фильтра по Timestamp (время создания текста или время модификации текста)
+		NO_FILTER,         // Фильтр не испольуется
+		GREATER_THAN_TS,   // Фильтр проходят тексты с временем больше заданного
+		LOWER_THAN_TS,     // Фильтр проходят тексты с временем меньше заданного
+	};
+
 	AttributeProperty() {}
 	void LoadFullDump(DeserializationBuffer& buffer);
 	void SaveFullDump(SerializationBuffer& buffer) const;
@@ -40,8 +46,13 @@ public:
 	uint8_t visiblePosition = 0;    // Визуальная позиция атрибута в таблице (даже если скрыт)
 	bool isVisible = false;         // Видимость атрибута
 	uint32_t timestampCreated = 0;  // Время создания
-	QString filterUtf8="21";       // (Для игровых текстов) Строка по которой фильтруется данное поле. Если пустая строка, то фильтра нет.
+	// Параметры фильтрации
+	QString filterUtf8;       // (Для игровых текстов) Строка по которой фильтруется данное поле. Если пустая строка, то фильтра нет.
 	std::string filterOem;    // (Для полей Id, Login) Строка по которой фильтруется данное поле. Если пустая строка, то фильтра нет.
+	TS_FILTER_MODE filterCreateTsMode = NO_FILTER;  // Режим фильтра по времени создания текста
+	uint32_t filterCreateTs;                        // Относительно какого времени фильтруем
+	TS_FILTER_MODE filterModifyTsMode = NO_FILTER;  // Режим фильтра по времени модификации текста
+	uint32_t filterModifyTs;				        // Относительно какого времени фильтруем
 };
 
 //===============================================================================
