@@ -430,12 +430,44 @@ void MainTableModel::recalcColumnToShowData()
 				COLUMN_INFO ci;
 				ci.attribIndex = i2;
 				ci.lineEdit = std::make_unique<QLineEdit>(&MainWindow::Instance());
+				connect(ci.lineEdit.get(), SIGNAL(editingFinished()), this, SLOT(filterEditFinished()) );
 				ci.lineEdit->show();
 				_columnsToShow.push_back(std::move(ci));
 			}
 		}
 	}
 }
+
+//---------------------------------------------------------------
+
+void MainTableModel::filterEditFinished()
+{
+	int attributIndex = -1;
+	QObject* obj = QObject::sender();
+	for (auto& column : _columnsToShow) {
+		if (column.lineEdit.get() == obj) {
+			attributIndex = column.attribIndex;
+			break;
+		}
+	}
+
+	for (auto& attrib: _dataBase->_attributeProps) {
+		if (attrib.id == attributIndex) {
+			if (attrib.type == AttributePropertyType::Id_t || attrib.type == AttributePropertyType::LoginOfLastModifier_t) {
+				attrib.filterOem = static_cast<QLineEdit*>(obj)->text().toLocal8Bit().constData();
+			}
+			else if (attrib.type == AttributePropertyType::BaseText_t ||
+					 attrib.type == AttributePropertyType::CommonText_t ||
+					 attrib.type == AttributePropertyType::Translation_t)
+			{
+				attrib.filterUtf8 = static_cast<QLineEdit*>(obj)->text();
+			}
+			OnDataModif(false, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
+			break;
+		}
+	}
+}
+
 
 //---------------------------------------------------------------
 

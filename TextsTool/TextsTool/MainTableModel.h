@@ -56,6 +56,7 @@ signals:
 
 public slots:
 	void theDataChanged();
+	void filterEditFinished();
 
 private:
 	bool getTextReferences(const QModelIndex &index, bool needCreateAttrIfNotFound, FoundTextRefs& result);
