@@ -237,8 +237,9 @@ void DatabaseManager::ApplyDiffForSync(DeserializationBuffer& buf)
 
 //---------------------------------------------------------------
 
-void DatabaseManager::Update()
+void DatabaseManager::Update(Ui::MainWindow* ui)
 {
+	_mainTableModel->Update(ui);
 	Repacker::RepackPacketsInToMessages(CHttpManager::Instance(), _msgsQueueIn);
 	Repacker::RepackMessagesOutToPackets(_msgsQueueOut, CHttpManager::Instance());
 

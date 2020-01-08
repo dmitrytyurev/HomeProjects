@@ -6,6 +6,7 @@
 #include <QList>
 #include <QString>
 #include <QDebug>
+#include <QLineEdit>
 
 #include "../SharedSrc/SerializationBuffer.h"
 #include "../SharedSrc/DeserializationBuffer.h"
@@ -53,7 +54,7 @@ bool MainTableModel::getTextReferences(const QModelIndex &index, bool needCreate
 {
 	result.text = _textsToShow[index.row()];
 
-	result.attrInTable = &_dataBase->_attributeProps[_columnsToShow[index.column()]];
+	result.attrInTable = &_dataBase->_attributeProps[_columnsToShow[index.column()].attribIndex];
 	if (result.attrInTable->type == AttributePropertyType::Id_t) {
 		result.string = &result.text->id;
 		return true;
@@ -175,7 +176,7 @@ bool MainTableModel::setData(const QModelIndex &index, const QVariant &value, in
 		return false;
 	}
 
-	AttributeProperty* attrProp = &_dataBase->_attributeProps[_columnsToShow[index.column()]];
+	AttributeProperty* attrProp = &_dataBase->_attributeProps[_columnsToShow[index.column()].attribIndex];
 	if (attrProp->type == AttributePropertyType::Id_t ||
 		attrProp->type == AttributePropertyType::CreationTimestamp_t ||
 		attrProp->type == AttributePropertyType::ModificationTimestamp_t) {
@@ -239,7 +240,7 @@ QVariant MainTableModel::headerData(int section, Qt::Orientation orientation, in
 	if (role != Qt::DisplayRole || orientation != Qt::Horizontal || section < 0 || section >= _columnsToShow.size())
 		return QVariant();
 
-	AttributeProperty& prop = _dataBase->_attributeProps[_columnsToShow[section]];
+	AttributeProperty& prop = _dataBase->_attributeProps[_columnsToShow[section].attribIndex];
 	return tr(prop.name.c_str());
 }
 
@@ -426,7 +427,11 @@ void MainTableModel::recalcColumnToShowData()
 		for (int i2=0; i2<_dataBase->_attributeProps.size(); ++i2) {
 			auto& attrib = _dataBase->_attributeProps[i2];
 			if (attrib.isVisible && attrib.visiblePosition == i) {
-				_columnsToShow.push_back(i2);
+				COLUMN_INFO ci;
+				ci.attribIndex = i2;
+				ci.lineEdit = std::make_unique<QLineEdit>(&MainWindow::Instance());
+				ci.lineEdit->show();
+				_columnsToShow.push_back(std::move(ci));
 			}
 		}
 	}
@@ -552,4 +557,35 @@ void MainTableModel::SortTextsByCurrentSortType()
 	}
 }
 
+//---------------------------------------------------------------
 
+void MainTableModel::Update(Ui::MainWindow* ui)
+{
+	// Обновить границы QLineEdit'ов хранящих фильтры. Спрятать невидимые, показать видимые
+	int i = 0;
+	for (auto& ci: _columnsToShow) {
+		int localX1 = ui->tableView->columnViewportPosition(i);
+		int localX2 = ui->tableView->columnViewportPosition(i) + ui->tableView->columnWidth(i);
+		if (localX2 < 0 || localX1 >= ui->tableView->size().width()) {
+			ci.lineEdit->hide();
+		}
+		else {
+			ci.lineEdit->show();
+		}
+		if (localX1 < 0) {
+			localX1 = 0;
+		}
+		if (localX2 > ui->tableView->size().width()) {
+			localX2 = ui->tableView->size().width();
+		}
+
+		int posx1 = ui->tableView->pos().x() + localX1;
+		int posx2 = ui->tableView->pos().x() + localX2;
+		int posy = ui->tableView->pos().y();
+		int sizeY = 20;
+
+		int mainToolBarHeight = ui->mainToolBar->size().height();
+		ci.lineEdit->setGeometry(posx1, posy - sizeY + mainToolBarHeight, posx2-posx1, sizeY);
+		++i;
+	}
+}

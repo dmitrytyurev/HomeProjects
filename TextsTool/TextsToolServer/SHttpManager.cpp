@@ -115,7 +115,7 @@ void SHttpManager::RequestProcessor(DeserializationBuffer& request, Serializatio
 	break;
 	case ClientRequestTypes::RequestPacket:
 	{
-		Log("Packet from client: RequestPacket");
+//		Log("Packet from client: RequestPacket");
 		uint32_t sessionId = request.GetUint32();
 		uint32_t requestedPacketN = request.GetUint32();
 		if (pAccount->sessionId != sessionId) {

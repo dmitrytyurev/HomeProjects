@@ -127,7 +127,7 @@ void MainWindow::SetModelForMainTable(QAbstractTableModel* model)
 void MainWindow::update()
 {
 	CHttpManager::Instance().Update(UpdateCallTimoutMs);
-	DatabaseManager::Instance().Update();
+	DatabaseManager::Instance().Update(ui);
 }
 
 //---------------------------------------------------------------

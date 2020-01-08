@@ -13,10 +13,14 @@
 #include "TextsBaseClasses.h"
 #include "CHttpManager.h"
 
+namespace Ui {
+	class MainWindow;
+}
 class TextsDatabase;
 using TextsDatabasePtr = std::shared_ptr<TextsDatabase>;
 struct FoundTextRefs;
 class DatabaseManager;
+class QLineEdit;
 
 //---------------------------------------------------------------
 
@@ -46,6 +50,7 @@ public:
 	int calcLineByTextId(const std::string& textId);
 	AttributeProperty* getAttributeByType(uint8_t attribType);
 	AttributeProperty* getAttributeById(int attributId);
+	void Update(Ui::MainWindow* ui);
 
 signals:
 
@@ -70,9 +75,15 @@ private:
 	void recalcColumnToShowData();
 
 private:
+	struct COLUMN_INFO
+	{
+		int attribIndex;  // Индекс атрибута в TextsDatabase::_attributeProps, который показываем в качестве текущей колонки
+		std::unique_ptr<QLineEdit> lineEdit;  // Созданный контрол LineEdit, отображающийся над данной колонкой таблицы и служащий для ввода фильтра по данной колонке
+	};
+
 	TextsDatabasePtr& _dataBase;
 	bool _isFiltersOn = false;   // Включены ли фильтры главной таблицы
 	std::vector<TextTranslated*> _textsToShow; // Выборка текстов, которую будем показывать
-	std::vector<int> _columnsToShow; // Индексы атрибутов в TextsDatabase::_attributeProps, которые показываем в качестве колонок
+	std::vector<COLUMN_INFO> _columnsToShow; // См. описание полей COLUMN_INFO
 };
 using MainTableModelPtr = std::unique_ptr<MainTableModel>;

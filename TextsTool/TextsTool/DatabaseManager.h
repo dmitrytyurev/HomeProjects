@@ -16,6 +16,9 @@
 #include "CHttpManager.h"
 #include "MainTableModel.h"
 
+namespace Ui {
+	class MainWindow;
+}
 class TextsDatabase;
 class MainWindow;
 using TextsDatabasePtr = std::shared_ptr<TextsDatabase>;
@@ -45,7 +48,7 @@ public:
 	void OnTextModifiedFromGUI(const FoundTextRefs& textRefs);
 	void ProcessMessageFromServer(const std::vector<uint8_t>& buf);
 	void SaveDatabase();
-	void Update();
+	void Update(Ui::MainWindow* ui);
 	void TreeSelectionChanged();
 	void SortSelectionChanged(int index);
 
