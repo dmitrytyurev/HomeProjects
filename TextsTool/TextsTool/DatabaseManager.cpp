@@ -314,11 +314,13 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 			Log("Msg: ChangeCreateText");
 			std::string textId = ModifyDbCreateText(dbuf, ts, loginOfModifier);
 			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
-			int line = _mainTableModel->calcLineByTextId(textId);
-			int column = _mainTableModel->calcColumnByType(AttributePropertyType::BaseText_t);
-			if (line != -1 && column != -1) {
-				MainWindow::Instance().SetFocusToTableCellAndStartEdit(_mainTableModel->index(line, column));
-			}
+//			if (loginOfModifier == ) {
+				int line = _mainTableModel->calcLineByTextId(textId);
+				int column = _mainTableModel->calcColumnByType(AttributePropertyType::BaseText_t);
+				if (line != -1 && column != -1) {
+					MainWindow::Instance().SetFocusToTableCellAndStartEdit(_mainTableModel->index(line, column));
+				}
+//			}
 		}
 		break;
 		default:
@@ -567,7 +569,6 @@ void DatabaseManager::SendMsgCreateNewText(const std::string& textId)
 	for (auto& folder: _dataBase->_folders) {
 		if (folder.uiTreeItem->isSelected()) {
 			folderId = folder.id;
-			folder.timestampModified = UINT32_MAX;  // Признак, что каталог был изменён. Чтобы при синхронизации с сервером, он обновился.
 			break;
 		}
 	}

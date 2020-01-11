@@ -143,6 +143,7 @@ printf("EventType::RequestSync\n");
 				auto& f = db->_folders;
 				auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
 				if (result != std::end(f)) {
+					result->timestampModified = ts;
 					result->texts.emplace_back(new TextTranslated);
 					TextTranslated& tt = *(result->texts.back());
 					tt.id = textId;
