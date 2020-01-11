@@ -7,6 +7,7 @@
 #include <QString>
 #include <QDebug>
 
+#include "createtextdialog.h"
 #include "../SharedSrc/SerializationBuffer.h"
 #include "../SharedSrc/DeserializationBuffer.h"
 #include "CMessagesRepacker.h"
@@ -123,6 +124,8 @@ void MainWindow::treeViewPrepareContextMenu(const QPoint& pos)
 void MainWindow::treeViewContextMenuCreateText()
 {
 	qDebug() << "Create text is called";
+	CreateTextDialog* createTextDialog = new CreateTextDialog(this);
+	createTextDialog->show();
 }
 
 //---------------------------------------------------------------

@@ -35,6 +35,7 @@ SOURCES += \
         MainTableModel.cpp \
         TextsBaseClasses.cpp \
         Utils.cpp \
+        createtextdialog.cpp \
         main.cpp \
         mainwindow.cpp
 
@@ -49,9 +50,11 @@ HEADERS += \
         MainTableModel.h \
         TextsBaseClasses.h \
         Utils.h \
+        createtextdialog.h \
         mainwindow.h
 
 FORMS += \
+        createtextdialog.ui \
         mainwindow.ui
 
 # Default rules for deployment.
