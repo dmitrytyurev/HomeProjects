@@ -57,6 +57,7 @@ public:
     void TestSend();
     STATE GetStatus();
     void PutPacketToSendQueue(const std::vector<uint8_t>& packet);
+	const std::string& GetLogin();
 
 public:
     std::vector<CHttpPacket::Ptr> _packetsIn; // Пакеты, полученные с сервера. Их обработает Repacker, перепакует и положит в очередь входящих сообщений

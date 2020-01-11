@@ -314,13 +314,13 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 			Log("Msg: ChangeCreateText");
 			std::string textId = ModifyDbCreateText(dbuf, ts, loginOfModifier);
 			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
-//			if (loginOfModifier == ) {
+			if (loginOfModifier == CHttpManager::Instance().GetLogin()) {  // Если с сервера вернулось наше сообщение о создании текста, то перемотаем таблицу на него и включим редактирование BaseText
 				int line = _mainTableModel->calcLineByTextId(textId);
 				int column = _mainTableModel->calcColumnByType(AttributePropertyType::BaseText_t);
 				if (line != -1 && column != -1) {
 					MainWindow::Instance().SetFocusToTableCellAndStartEdit(_mainTableModel->index(line, column));
 				}
-//			}
+			}
 		}
 		break;
 		default:

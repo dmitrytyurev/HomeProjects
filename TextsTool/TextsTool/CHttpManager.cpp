@@ -359,3 +359,10 @@ void CHttpManager::Update(int dtMs)
         }
     }
 }
+
+//---------------------------------------------------------------
+
+const std::string& CHttpManager::GetLogin()
+{
+	return _login;
+}
