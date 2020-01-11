@@ -1,6 +1,7 @@
 #include <QDebug>
 #include "createtextdialog.h"
 #include "ui_createtextdialog.h"
+#include "DatabaseManager.h"
 
 //---------------------------------------------------------------
 
@@ -25,5 +26,7 @@ CreateTextDialog::~CreateTextDialog()
 
 void CreateTextDialog::okPressed()
 {
-	qDebug() << ui->lineEdit->text();
+	std::string textIdToCreate = ui->lineEdit->text().toLocal8Bit().constData();
+	DatabaseManager::Instance().SendMsgCreateNewText(textIdToCreate);
+
 }

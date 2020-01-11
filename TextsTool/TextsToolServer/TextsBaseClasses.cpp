@@ -336,7 +336,7 @@ SerializationBufferPtr TextTranslated::SaveToPacket(uint32_t folderId, const std
 	bufPtr->PushString8(loginOfModifier);
 	bufPtr->PushUint32(timestampCreated);
 	bufPtr->PushUint8(EventType::CreateText);
-	bufPtr->PushString8(loginOfLastModifier);
+	bufPtr->PushUint32(folderId);
 	bufPtr->PushString8(id);
 
 	return bufPtr;

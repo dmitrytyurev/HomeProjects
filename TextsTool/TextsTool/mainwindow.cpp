@@ -35,16 +35,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	DatabaseManager::Init();
 	CHttpManager::Init();
-	_timer = new QTimer(this);
-	connect(_timer, SIGNAL(timeout()), this, SLOT(update()));
-	_timer->start(UpdateCallTimoutMs);
 
+	// --- Настройка treeWidget ---
 	ui->treeWidget->setColumnCount(1);
 	ui->treeWidget->setHeaderLabels(QStringList() << "Папки с текстами");
-
 	connect(ui->treeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(treeSelectionChanged(const QItemSelection&,const QItemSelection&)));
-	gTimer.start();
+	ui->treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(ui->treeWidget, &QTreeWidget::customContextMenuRequested, this, &MainWindow::treeViewPrepareContextMenu);
 
+	// --- Настройка comboBox ---
 	std::vector<std::pair<QString, uint8_t>> sortSelectorItems = { {"Без сортировки", 255},
 																   {"Id", AttributePropertyType::Id_t},
 																   {"Id (обратная)", AttributePropertyType::Id_t},
@@ -60,8 +59,12 @@ MainWindow::MainWindow(QWidget *parent) :
 		ui->comboBox->addItem(selector.first);
 	}
 	connect(ui->comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(sortTypeComboboxIndexChanged(int)));
-	ui->treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-	connect(ui->treeWidget, &QTreeWidget::customContextMenuRequested, this, &MainWindow::treeViewPrepareContextMenu);
+
+	// --- Настройка таймера ---
+	_timer = new QTimer(this);
+	connect(_timer, SIGNAL(timeout()), this, SLOT(update()));
+	_timer->start(UpdateCallTimoutMs);
+	gTimer.start();
 }
 
 //---------------------------------------------------------------
@@ -123,7 +126,6 @@ void MainWindow::treeViewPrepareContextMenu(const QPoint& pos)
 
 void MainWindow::treeViewContextMenuCreateText()
 {
-	qDebug() << "Create text is called";
 	CreateTextDialog* createTextDialog = new CreateTextDialog(this);
 	createTextDialog->show();
 }

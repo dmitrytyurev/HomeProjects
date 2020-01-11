@@ -298,7 +298,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 			auto& f = _pDataBase->_folders;
 			auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
 			if (result != std::end(f)) {
-				result->texts.emplace_back();
+				result->texts.emplace_back(new TextTranslated);
 				TextTranslated& tt = *(result->texts.back());
 				tt.id = textId;
 				tt.timestampCreated = ts;

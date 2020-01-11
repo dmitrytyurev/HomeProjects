@@ -309,6 +309,13 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::IF_COLUMNS_AFFECTED, &affectedAttributes, false, _mainTableModel->calcLineByTextId(textId));
 		}
 		break;
+		case EventType::CreateText:
+		{
+			Log("Msg: ChangeCreateText");
+			std::string textId = ModifyDbCreateText(dbuf, ts, loginOfModifier);
+			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
+		}
+		break;
 		default:
 			Log("Unknown actionType: " + std::to_string(actionType));
 		}
@@ -505,6 +512,27 @@ std::string DatabaseManager::ModifyDbChangeAttributeInText(DeserializationBuffer
 
 //---------------------------------------------------------------
 
+std::string DatabaseManager::ModifyDbCreateText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie)
+{
+	uint32_t folderId = dbuf.GetUint32();
+	std::string textId;
+	dbuf.GetString8(textId);
+
+	auto& f = _dataBase->_folders;
+	auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+	if (result != std::end(f)) {
+		result->texts.emplace_back(new TextTranslated);
+		TextTranslated* text = result->texts.back().get();
+		text->id = textId;
+		text->timestampCreated = ts;
+		text->timestampModified = ts;
+		text->loginOfLastModifier = loginOfModifie;
+	}
+	return textId;
+}
+
+//---------------------------------------------------------------
+
 void DatabaseManager::AdjustFolderView(uint32_t parentId, QTreeWidgetItem *parentTreeItem)
 {
 	for (auto& folder: _dataBase->_folders) {
@@ -525,3 +553,26 @@ void DatabaseManager::AdjustFolderView(uint32_t parentId, QTreeWidgetItem *paren
 	}
 }
 
+//---------------------------------------------------------------
+
+void DatabaseManager::SendMsgCreateNewText(const std::string& textId)
+{
+	// Найти выделенный каталог (в него будем добавлять текст)
+	uint32_t folderId = UINT32_MAX;
+	for (auto& folder: _dataBase->_folders) {
+		if (folder.uiTreeItem->isSelected()) {
+			folderId = folder.id;
+			folder.timestampModified = UINT32_MAX;  // Признак, что каталог был изменён. Чтобы при синхронизации с сервером, он обновился.
+			break;
+		}
+	}
+	if (folderId == UINT32_MAX) {
+		return;
+	}
+	// Послать сообщение о создании текста
+	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
+	auto& buf = *_msgsQueueOut.back();
+	buf.PushUint8(EventType::CreateText);
+	buf.PushUint32(folderId);
+	buf.PushString8(textId);
+}
