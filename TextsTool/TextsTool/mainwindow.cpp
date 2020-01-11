@@ -59,6 +59,8 @@ MainWindow::MainWindow(QWidget *parent) :
 		ui->comboBox->addItem(selector.first);
 	}
 	connect(ui->comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(sortTypeComboboxIndexChanged(int)));
+	ui->treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(ui->treeWidget, &QTreeWidget::customContextMenuRequested, this, &MainWindow::treeViewPrepareContextMenu);
 }
 
 //---------------------------------------------------------------
@@ -88,6 +90,46 @@ void MainWindow::treeSelectionChanged(const QItemSelection&, const QItemSelectio
 void MainWindow::sortTypeComboboxIndexChanged(int index)
 {
 	DatabaseManager::Instance().SortSelectionChanged(index);
+}
+
+//---------------------------------------------------------------
+
+void MainWindow::treeViewPrepareContextMenu(const QPoint& pos)
+{
+	QTreeWidget *tree = ui->treeWidget;
+
+	QTreeWidgetItem *nd = tree->itemAt( pos );
+
+//	qDebug()<<pos<<nd->text(0);
+
+	QAction *newAct = new QAction(QIcon(":/Resource/warning32.ico"), tr("&Создать текст"), this);
+	newAct->setStatusTip(tr("Создать новый текст в выбранной папке"));
+	connect(newAct, SIGNAL(triggered()), this, SLOT(treeViewContextMenuCreateText()));
+
+	QAction *newAct2 = new QAction(QIcon(":/Resource/warning32.ico"), tr("&Создать папку"), this);
+	newAct2->setStatusTip(tr("Создать новую папку в выбранной папке"));
+	connect(newAct2, SIGNAL(triggered()), this, SLOT(treeViewContextMenuCreateFolder()));
+
+	QMenu menu(this);
+	menu.addAction(newAct);
+	menu.addAction(newAct2);
+
+//	QPoint pt(pos);
+	menu.exec( tree->mapToGlobal(pos) );
+}
+
+//---------------------------------------------------------------
+
+void MainWindow::treeViewContextMenuCreateText()
+{
+	qDebug() << "Create text is called";
+}
+
+//---------------------------------------------------------------
+
+void MainWindow::treeViewContextMenuCreateFolder()
+{
+	qDebug() << "Create folder is called";
 }
 
 //---------------------------------------------------------------

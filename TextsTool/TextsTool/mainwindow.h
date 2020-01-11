@@ -44,6 +44,9 @@ private slots:
 	void update();
 	void treeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 	void sortTypeComboboxIndexChanged(int index);
+	void treeViewPrepareContextMenu( const QPoint & pos );
+	void treeViewContextMenuCreateText();
+	void treeViewContextMenuCreateFolder();
 
 private:
     Ui::MainWindow *ui = nullptr;
