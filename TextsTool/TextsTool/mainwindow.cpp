@@ -192,4 +192,11 @@ int MainWindow::GetSortTypeIndex()
 
 }
 
+//---------------------------------------------------------------
+
+void MainWindow::SetFocusToTableCellAndStartEdit(QModelIndex index)
+{
+	ui->tableView->setCurrentIndex(index);
+	ui->tableView->edit(index);
+}
 

@@ -38,6 +38,7 @@ public:
 	QTreeWidget* getTreeWidget();
 	int GetSortTypeIndex();
 	std::vector<std::pair<QString, uint8_t>>& GetSortSelectors();
+	void SetFocusToTableCellAndStartEdit(QModelIndex index);
 
 private slots:
 	void on_pushButton_clicked();

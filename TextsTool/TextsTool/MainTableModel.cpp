@@ -114,6 +114,18 @@ int MainTableModel::calcLineByTextId(const std::string& textId)
 
 //---------------------------------------------------------------
 
+int MainTableModel::calcColumnByType(uint8_t attribType)
+{
+	for (int i = 0; i < _columnsToShow.size(); ++i) {
+		if (_dataBase->_attributeProps[_columnsToShow[i].attribIndex].type == attribType) {
+			return i;
+		}
+	}
+	return -1; // Это нормальная ситуация, если извне изменился текст, который отфильтрован в главной таблице
+}
+
+//---------------------------------------------------------------
+
 AttributeProperty* MainTableModel::getAttributeByType(uint8_t attribType)
 {
 	for (auto& attrib: _dataBase->_attributeProps) {

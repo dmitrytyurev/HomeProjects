@@ -48,6 +48,7 @@ public:
 	QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
 	void OnDataModif(bool columnsChanged, TEXTS_RECOLLECT_TYPE textsRecollectType,  std::vector<AttributeProperty*>* affectedAttributes, bool sortTypeChanged, int line);
 	int calcLineByTextId(const std::string& textId);
+	int calcColumnByType(uint8_t attribType);
 	AttributeProperty* getAttributeByType(uint8_t attribType);
 	AttributeProperty* getAttributeById(int attributId);
 	void Update(Ui::MainWindow* ui);
