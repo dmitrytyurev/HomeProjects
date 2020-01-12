@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->treeWidget->setColumnCount(1);
 	ui->treeWidget->setHeaderLabels(QStringList() << "Папки с текстами");
 	connect(ui->treeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(treeSelectionChanged(const QItemSelection&,const QItemSelection&)));
+	ui->treeWidget->setDragDropMode(QAbstractItemView::InternalMove);
 	ui->treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui->treeWidget, &QTreeWidget::customContextMenuRequested, this, &MainWindow::treeViewPrepareContextMenu);
 
