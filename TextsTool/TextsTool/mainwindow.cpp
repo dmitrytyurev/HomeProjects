@@ -43,6 +43,11 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui->treeWidget, &QTreeWidget::customContextMenuRequested, this, &MainWindow::treeViewPrepareContextMenu);
 
+	// --- Настройка tableView ---
+
+	ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(ui->tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tableViewPrepareContextMenu(QPoint)));
+
 	// --- Настройка comboBox ---
 	std::vector<std::pair<QString, uint8_t>> sortSelectorItems = { {"Без сортировки", 255},
 																   {"Id", AttributePropertyType::Id_t},
@@ -102,7 +107,7 @@ void MainWindow::treeViewPrepareContextMenu(const QPoint& pos)
 {
 	QTreeWidget *tree = ui->treeWidget;
 
-	QTreeWidgetItem *nd = tree->itemAt( pos );
+//	QTreeWidgetItem *nd = tree->itemAt( pos );
 
 //	qDebug()<<pos<<nd->text(0);
 
@@ -165,7 +170,6 @@ void MainWindow::on_pushButton_clicked()
 //---------------------------------------------------------------
 void MainWindow::SetModelForMainTable(QAbstractTableModel* model)
 {
-//	ui->tableView->setModel(nullptr);
 	ui->tableView->setModel(model);
 }
 
@@ -200,3 +204,31 @@ void MainWindow::SetFocusToTableCellAndStartEdit(QModelIndex index)
 	ui->tableView->edit(index);
 }
 
+//---------------------------------------------------------------
+
+void MainWindow::tableViewPrepareContextMenu(const QPoint & pos)
+{
+	QAction *newAct = new QAction(QIcon(":/Resource/warning32.ico"), tr("&Удалить текст"), this);
+	newAct->setStatusTip(tr("Удалить выбранный текст"));
+	connect(newAct, SIGNAL(triggered()), this, SLOT(tableViewContextMenuDeleteText()));
+
+	QMenu menu(this);
+	menu.addAction(newAct);
+
+	menu.exec(ui->tableView->mapToGlobal(pos));
+
+	//QModelIndex index = ui->tableView->indexAt(pos);
+}
+
+//---------------------------------------------------------------
+
+void MainWindow::tableViewContextMenuDeleteText()
+{
+	QModelIndexList indexes = ui->tableView->selectionModel()->selection().indexes();
+	for (int i = 0; i < indexes.count(); ++i)
+	{
+		QModelIndex index = indexes.at(i);
+//Log(std::to_string(index.row()));
+	}
+
+}

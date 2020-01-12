@@ -48,6 +48,8 @@ private slots:
 	void treeViewPrepareContextMenu( const QPoint & pos );
 	void treeViewContextMenuCreateText();
 	void treeViewContextMenuCreateFolder();
+	void tableViewPrepareContextMenu(const QPoint & pos);
+	void tableViewContextMenuDeleteText();
 
 private:
     Ui::MainWindow *ui = nullptr;
