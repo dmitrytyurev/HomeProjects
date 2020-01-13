@@ -6,6 +6,7 @@
 #include <QList>
 #include <QString>
 #include <QDebug>
+#include <QDropEvent>
 
 #include "createtextdialog.h"
 #include "../SharedSrc/SerializationBuffer.h"
@@ -233,3 +234,21 @@ void MainWindow::tableViewContextMenuDeleteText()
 	}
 
 }
+
+//---------------------------------------------------------------
+void QTreeWidgetMy::dragMoveEvent(QDragMoveEvent* event)
+{
+	itemStartDragFrom = this->currentItem();
+}
+
+//---------------------------------------------------------------
+
+void QTreeWidgetMy::dropEvent(QDropEvent *event) 
+{ 
+	QModelIndex index = indexAt(event->pos());
+	QTreeWidgetItem* item = itemFromIndex(index);
+
+	Log("dropEvent! from: " + std::to_string(uint32_t(itemStartDragFrom)) + " to: " + std::to_string(uint32_t(item)));
+}
+
+

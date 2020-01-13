@@ -211,6 +211,7 @@
     </QtMoc>
     <ClInclude Include="..\SharedSrc\SerializationBuffer.h" />
     <ClInclude Include="..\SharedSrc\Shared.h" />
+    <ClInclude Include="qtreewidgetmy.h" />
     <ClInclude Include="TextsBaseClasses.h" />
     <ClInclude Include="Utils.h" />
     <QtMoc Include="createtextdialog.h">
