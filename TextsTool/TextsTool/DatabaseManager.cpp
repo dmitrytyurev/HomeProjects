@@ -342,8 +342,6 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 
 //---------------------------------------------------------------
 
-// Важно: при любых изменениях текстов со стороны GUI надо записать -1 во timestamp’ы текста и непосредственный каталог
-
 void DatabaseManager::OnTextModifiedFromGUI(const FoundTextRefs& textRefs)
 {
 	if (textRefs.attrInTable->type == AttributePropertyType::BaseText_t) {
@@ -352,7 +350,33 @@ void DatabaseManager::OnTextModifiedFromGUI(const FoundTextRefs& textRefs)
 	else {
 		SendMsgChangeTextAttrib(textRefs);
 	}
-	ResetTextAndFolderTimestamps(textRefs);
+	textRefs.text->timestampModified = UINT32_MAX; // Подробности в описании поля
+	Folder* folder = FolderByTextId(textRefs.text->id);
+	if (folder) {
+		folder->timestampModified = UINT32_MAX; 	// Подробности в описании поля
+	}
+}
+
+//---------------------------------------------------------------
+
+Folder* DatabaseManager::FolderByTextId(const std::string& textId)
+{
+	for (auto& folder : _dataBase->_folders) {
+		for (auto& text : folder.texts) {
+			if (text->id == textId) {
+				return &folder;
+			}
+		}
+	}
+	Log("Error: ResetTextAndFolderTimestamps: text not found in folder");
+	return nullptr;
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::OnTextCreatedFromGUI(const std::string& textIdToCreate)
+{
+	SendMsgCreateNewText(textIdToCreate);
 }
 
 //---------------------------------------------------------------
@@ -360,22 +384,6 @@ void DatabaseManager::OnTextModifiedFromGUI(const FoundTextRefs& textRefs)
 void DatabaseManager::OnTextDeletedFromGUI(int textIndex)
 {
 	SendMsgDeleteText(textIndex);
-}
-
-//---------------------------------------------------------------
-
-void DatabaseManager::ResetTextAndFolderTimestamps(const FoundTextRefs& textRefs)
-{
-	textRefs.text->timestampModified = UINT32_MAX; // Это признак, что были изменения из GUI. Чтобы при стартовой синхронизации с сервером, точно была разница и эти данные пришли с сервера
-	for (auto& folder: _dataBase->_folders) {
-		for (auto& text: folder.texts) {
-			if (text->id == textRefs.text->id) {
-				folder.timestampModified = UINT32_MAX; 	// Это признак, что были изменения из GUI. Чтобы при стартовой синхронизации с сервером, точно была разница и эти данные пришли с сервера
-				return;
-			}
-		}
-	}
-	ExitMsg("ResetTextAndFolderTimestamps: text not found in folder");
 }
 
 //---------------------------------------------------------------
@@ -389,6 +397,29 @@ void DatabaseManager::SendMsgChangeTextAttrib(const FoundTextRefs& textRefs)
 	buf.PushUint8(textRefs.attrInText->id);
 	buf.PushUint8(textRefs.attrInText->type);
 	buf.PushString16(textRefs.attrInText->text);
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::SendMsgCreateNewText(const std::string& textId)
+{
+	// Найти выделенный каталог (в него будем добавлять текст)
+	uint32_t folderId = UINT32_MAX;
+	for (auto& folder : _dataBase->_folders) {
+		if (folder.uiTreeItem->isSelected()) {
+			folderId = folder.id;
+			break;
+		}
+	}
+	if (folderId == UINT32_MAX) {
+		return;
+	}
+	// Послать сообщение о создании текста
+	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
+	auto& buf = *_msgsQueueOut.back();
+	buf.PushUint8(EventType::CreateText);
+	buf.PushUint32(folderId);
+	buf.PushString8(textId);
 }
 
 //---------------------------------------------------------------
@@ -603,25 +634,3 @@ void DatabaseManager::AdjustFolderView(uint32_t parentId, QTreeWidgetItem *paren
 	}
 }
 
-//---------------------------------------------------------------
-
-void DatabaseManager::SendMsgCreateNewText(const std::string& textId)
-{
-	// Найти выделенный каталог (в него будем добавлять текст)
-	uint32_t folderId = UINT32_MAX;
-	for (auto& folder: _dataBase->_folders) {
-		if (folder.uiTreeItem->isSelected()) {
-			folderId = folder.id;
-			break;
-		}
-	}
-	if (folderId == UINT32_MAX) {
-		return;
-	}
-	// Послать сообщение о создании текста
-	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
-	auto& buf = *_msgsQueueOut.back();
-	buf.PushUint8(EventType::CreateText);
-	buf.PushUint32(folderId);
-	buf.PushString8(textId);
-}

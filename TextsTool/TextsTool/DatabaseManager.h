@@ -46,13 +46,13 @@ public:
 	static DatabaseManager& Instance();
 	void LoadBaseAndRequestSync(const std::string& dbName);
 	void OnTextModifiedFromGUI(const FoundTextRefs& textRefs);
+	void OnTextCreatedFromGUI(const std::string& textIdToCreate);
 	void OnTextDeletedFromGUI(int textIndex);
 	void ProcessMessageFromServer(const std::vector<uint8_t>& buf);
 	void SaveDatabase();
 	void Update(Ui::MainWindow* ui);
 	void TreeSelectionChanged();
 	void SortSelectionChanged(int index);
-	void SendMsgCreateNewText(const std::string& textId);
 
 private:
 	void ApplyDiffForSync(DeserializationBuffer& buf);
@@ -62,9 +62,10 @@ private:
 	std::string ModifyDbDeleteText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
 	void SendMsgChangeBaseText(const FoundTextRefs& textRefs);
 	void SendMsgChangeTextAttrib(const FoundTextRefs& textRefs);
+	void SendMsgCreateNewText(const std::string& textId);
 	void SendMsgDeleteText(int textIndex);
-	void ResetTextAndFolderTimestamps(const FoundTextRefs& textRefs);
 	void AdjustFolderView(uint32_t parentId, QTreeWidgetItem *parentTreeItem);
+	Folder* FolderByTextId(const std::string& textId);
 
 	static DatabaseManager* pthis;
 	std::vector<SerializationBufferPtr>   _msgsQueueOut; // Очередь сообщений, которые нужно отослать на сервер
