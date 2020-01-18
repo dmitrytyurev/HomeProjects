@@ -27,6 +27,6 @@ CreateTextDialog::~CreateTextDialog()
 void CreateTextDialog::okPressed()
 {
 	std::string textIdToCreate = ui->lineEdit->text().toLocal8Bit().constData();
-	DatabaseManager::Instance().SendMsgCreateNewText(textIdToCreate);
+	DatabaseManager::Instance().OnTextCreatedFromGUI(textIdToCreate);
 
 }
