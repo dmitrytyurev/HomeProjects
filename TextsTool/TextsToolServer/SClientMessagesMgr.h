@@ -63,7 +63,7 @@ public:
 	static bool ModifyDbDeleteAttribute(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts);
 	static bool ModifyDbRenameAttribute(DeserializationBuffer& buf, TextsDatabase& db);
 	static bool ModifyDbChangeAttributeVis(DeserializationBuffer& buf, TextsDatabase& db);
-	static bool ModifyDbDeleteText(DeserializationBuffer& buf, TextsDatabase& db, uint32_t& prevTsModified, uint32_t& prevOffsModified);
+	static bool ModifyDbDeleteText(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts, uint32_t& prevTsModified, uint32_t& prevOffsModified);
 	static bool ModifyDbMoveTextToFolder(DeserializationBuffer& buf, TextsDatabase& db, const std::string& modifierLogin, uint32_t ts, uint32_t offsInHistoryFile, uint32_t& prevTsModified, uint32_t& prevOffsModified);
 	static bool ModifyDbChangeBaseText(DeserializationBuffer& buf, TextsDatabase& db, const std::string& modifierLogin, uint32_t ts, uint32_t offsInHistoryFile, uint32_t& prevTsModified, uint32_t& prevOffsModified);
 	static bool ModifyDbChangeAttributeInText(DeserializationBuffer& buf, TextsDatabase& db, const std::string& modifierLogin, uint32_t ts, uint32_t offsInHistoryFile, uint32_t& prevTsModified, uint32_t& prevOffsModified);

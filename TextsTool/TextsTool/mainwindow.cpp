@@ -230,9 +230,9 @@ void MainWindow::tableViewContextMenuDeleteText()
 	for (int i = 0; i < indexes.count(); ++i)
 	{
 		QModelIndex index = indexes.at(i);
+		DatabaseManager::Instance().SendMsgDeleteText(index.row());
 //Log(std::to_string(index.row()));
 	}
-
 }
 
 //---------------------------------------------------------------

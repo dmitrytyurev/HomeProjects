@@ -164,7 +164,7 @@ printf("EventType::RequestSync\n");
 			{
 				uint32_t prevTsModified = 0;
 				uint32_t prevOffsModified = 0;
-				bool isSucces = ModifyDbDeleteText(*buf, *db, prevTsModified, prevOffsModified);                 // Изменения в базе
+				bool isSucces = ModifyDbDeleteText(*buf, *db, ts, prevTsModified, prevOffsModified);                 // Изменения в базе
 				SaveToHistory(db, client->_login, ts, *buf);   // Запись в файл истории
 				db->GetHistoryBuffer().PushUint32(prevTsModified);
 				db->GetHistoryBuffer().PushUint32(prevOffsModified);
@@ -369,13 +369,14 @@ bool SClientMessagesMgr::ModifyDbChangeAttributeVis(DeserializationBuffer& buf, 
 
 //===============================================================================
 
-bool SClientMessagesMgr::ModifyDbDeleteText(DeserializationBuffer& buf, TextsDatabase& db, uint32_t& prevTsModified, uint32_t& prevOffsModified)
+bool SClientMessagesMgr::ModifyDbDeleteText(DeserializationBuffer& buf, TextsDatabase& db, uint32_t ts, uint32_t& prevTsModified, uint32_t& prevOffsModified)
 {
 	std::string textId;
 	buf.GetString8(textId);
 	for (auto& f : db._folders) {
 		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
 		if (result != std::end(f.texts)) {
+			f.timestampModified = ts;
 			prevTsModified = (*result)->timestampModified;
 			prevOffsModified = (*result)->offsLastModified;
 			f.texts.erase(result);

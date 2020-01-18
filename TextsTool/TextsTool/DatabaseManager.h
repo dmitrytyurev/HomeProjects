@@ -46,6 +46,7 @@ public:
 	static DatabaseManager& Instance();
 	void LoadBaseAndRequestSync(const std::string& dbName);
 	void OnTextModifiedFromGUI(const FoundTextRefs& textRefs);
+	void OnTextDeletedFromGUI(int textIndex);
 	void ProcessMessageFromServer(const std::vector<uint8_t>& buf);
 	void SaveDatabase();
 	void Update(Ui::MainWindow* ui);
@@ -58,8 +59,10 @@ private:
 	std::string ModifyDbChangeBaseText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie, std::vector<AttributeProperty*>* affectedAttributes);
 	std::string ModifyDbChangeAttributeInText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifier, std::vector<AttributeProperty*>* affectedAttributes);
 	std::string ModifyDbCreateText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
+	std::string ModifyDbDeleteText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
 	void SendMsgChangeBaseText(const FoundTextRefs& textRefs);
 	void SendMsgChangeTextAttrib(const FoundTextRefs& textRefs);
+	void SendMsgDeleteText(int textIndex);
 	void ResetTextAndFolderTimestamps(const FoundTextRefs& textRefs);
 	void AdjustFolderView(uint32_t parentId, QTreeWidgetItem *parentTreeItem);
 

@@ -633,3 +633,16 @@ void MainTableModel::Update(Ui::MainWindow* ui)
 		++i;
 	}
 }
+
+//---------------------------------------------------------------
+
+const std::string& MainTableModel::GetTextIdByIndex(int index)
+{
+	if (index < 0 || index >= _textsToShow.size())
+	{
+		Log("Error: MainTableModel::GetTextIdByIndex: wrong index: " + std::to_string(index));
+		return "";
+	}
+	return _textsToShow[index]->id;
+}
+

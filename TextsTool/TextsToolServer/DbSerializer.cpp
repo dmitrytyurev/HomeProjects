@@ -315,7 +315,7 @@ void DbSerializer::LoadHistoryInner(const std::string& fullFileName)
 		{
 			uint32_t prevTsModified = 0;     // Модифицируем базу
 			uint32_t prevOffsModified = 0;
-			SClientMessagesMgr::ModifyDbDeleteText(buf, *_pDataBase, prevTsModified, prevOffsModified);
+			SClientMessagesMgr::ModifyDbDeleteText(buf, *_pDataBase, ts, prevTsModified, prevOffsModified);
 			buf.offset += sizeof(uint32_t) + sizeof(uint32_t); // Пропускаем ts предыдущего изменения текста текста (для поиска файла истории с инфой о нём) и смещение в файле истории до него
 		}
 		break;

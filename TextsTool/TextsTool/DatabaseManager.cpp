@@ -323,6 +323,13 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 			}
 		}
 		break;
+		case EventType::DeleteText:
+		{
+			Log("Msg: ChangeDeleteText");
+			std::string textId = ModifyDbDeleteText(dbuf, ts, loginOfModifier);
+			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
+		}
+		break;
 		default:
 			Log("Unknown actionType: " + std::to_string(actionType));
 		}
@@ -346,6 +353,13 @@ void DatabaseManager::OnTextModifiedFromGUI(const FoundTextRefs& textRefs)
 		SendMsgChangeTextAttrib(textRefs);
 	}
 	ResetTextAndFolderTimestamps(textRefs);
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::OnTextDeletedFromGUI(int textIndex)
+{
+	SendMsgDeleteText(textIndex);
 }
 
 //---------------------------------------------------------------
@@ -375,6 +389,17 @@ void DatabaseManager::SendMsgChangeTextAttrib(const FoundTextRefs& textRefs)
 	buf.PushUint8(textRefs.attrInText->id);
 	buf.PushUint8(textRefs.attrInText->type);
 	buf.PushString16(textRefs.attrInText->text);
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::SendMsgDeleteText(int textIndex)
+{
+	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
+	auto& buf = *_msgsQueueOut.back();
+	buf.PushUint8(EventType::DeleteText);
+	const std::string& textId = _mainTableModel->GetTextIdByIndex(textIndex);
+	buf.PushString8(textId);
 }
 
 //---------------------------------------------------------------
@@ -534,6 +559,24 @@ std::string DatabaseManager::ModifyDbCreateText(DeserializationBuffer& dbuf, uin
 		text->timestampCreated = ts;
 		text->timestampModified = ts;
 		text->loginOfLastModifier = loginOfModifie;
+	}
+	return textId;
+}
+
+//---------------------------------------------------------------
+
+std::string DatabaseManager::ModifyDbDeleteText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie)
+{
+	std::string textId;
+	dbuf.GetString8(textId);
+
+	for (auto& f : _dataBase->_folders) {
+		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
+		if (result != std::end(f.texts)) {
+			f.timestampModified = ts;
+			f.texts.erase(result);
+			break;
+		}
 	}
 	return textId;
 }
