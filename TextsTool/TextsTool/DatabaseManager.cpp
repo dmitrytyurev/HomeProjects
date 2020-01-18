@@ -376,7 +376,10 @@ Folder* DatabaseManager::FolderByTextId(const std::string& textId)
 
 void DatabaseManager::OnTextCreatedFromGUI(const std::string& textIdToCreate)
 {
-	SendMsgCreateNewText(textIdToCreate);
+	Folder* folder = FolderByTextId(textIdToCreate);
+	if (!folder) {   // Не должно быть уже теста с таким id
+		SendMsgCreateNewText(textIdToCreate);
+	}
 }
 
 //---------------------------------------------------------------

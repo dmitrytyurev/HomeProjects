@@ -80,6 +80,7 @@ private:
 	void SendToClients(const std::string& dbName, uint32_t ts, const DeserializationBuffer& buf, const std::string& loginOfLastModifier);
 	TextsDatabasePtr GetDbPtrByDbName(const std::string& dbName);
 	void FillDiffFolderInfo(SerializationBuffer* buffer, Folder& srvFolder, ClientFolder& cltFolder);
+	bool IsTextExist(TextsDatabasePtr& db, const std::string& textId);
 
 public:
 	STextsToolApp* _app = nullptr;

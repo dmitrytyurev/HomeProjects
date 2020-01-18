@@ -140,23 +140,28 @@ printf("EventType::RequestSync\n");
 				uint32_t folderId = buf->GetUint32();     // Изменения в базе
 				std::string textId;
 				buf->GetString8(textId);
-				auto& f = db->_folders;
-				auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
-				if (result != std::end(f)) {
-					result->timestampModified = ts;
-					result->texts.emplace_back(new TextTranslated);
-					TextTranslated& tt = *(result->texts.back());
-					tt.id = textId;
-					tt.loginOfLastModifier = client->_login;
-					tt.timestampCreated = ts;
-					tt.timestampModified = ts;
-					tt.offsLastModified = db->GetCurrentPosInHistoryFile();
-					tt.SaveToHistory(db, folderId);                             // Запись в файл истории
-					SerializationBufferPtr bufPtr = tt.SaveToPacket(folderId, client->_login);  // Разослать пакеты другим клиентам 
-					AddPacketToClients(bufPtr, client->_dbName);
+				if (IsTextExist(db, textId)) {
+					Log("SClientMessagesMgr::Update: EventCreateText: text already exist");
 				}
 				else {
-					Log("SClientMessagesMgr::Update: EventCreateText: folder not found");
+					auto& f = db->_folders;
+					auto result = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+					if (result != std::end(f)) {
+						result->timestampModified = ts;
+						result->texts.emplace_back(new TextTranslated);
+						TextTranslated& tt = *(result->texts.back());
+						tt.id = textId;
+						tt.loginOfLastModifier = client->_login;
+						tt.timestampCreated = ts;
+						tt.timestampModified = ts;
+						tt.offsLastModified = db->GetCurrentPosInHistoryFile();
+						tt.SaveToHistory(db, folderId);                             // Запись в файл истории
+						SerializationBufferPtr bufPtr = tt.SaveToPacket(folderId, client->_login);  // Разослать пакеты другим клиентам 
+						AddPacketToClients(bufPtr, client->_dbName);
+					}
+					else {
+						Log("SClientMessagesMgr::Update: EventCreateText: folder not found");
+					}
 				}
 			}
 			break;
@@ -823,4 +828,19 @@ TextsDatabasePtr SClientMessagesMgr::GetDbPtrByDbName(const std::string& dbName)
 		}
 	}
 	return nullptr;
+}
+
+//---------------------------------------------------------------
+
+
+bool SClientMessagesMgr::IsTextExist(TextsDatabasePtr& db, const std::string& textId)
+{
+	for (auto& folder : db->_folders) {  // Удалить атрибуты с таким id из всех текстов
+		for (auto& text : folder.texts) {
+			if (text->id == textId) {
+				return true;
+			}
+		}
+	}
+	return false;
 }
