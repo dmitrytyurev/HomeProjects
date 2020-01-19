@@ -1,9 +1,6 @@
-#include <QDebug>
 #include "deletefolderdialog.h"
 #include "ui_deletefolderdialog.h"
 #include "DatabaseManager.h"
-
-//---------------------------------------------------------------
 
 DeleteFolderDialog::DeleteFolderDialog(QWidget *parent) :
 	QDialog(parent),
@@ -15,8 +12,6 @@ DeleteFolderDialog::DeleteFolderDialog(QWidget *parent) :
 	ui->lineEdit->setFocus();
 }
 
-//---------------------------------------------------------------
-
 DeleteFolderDialog::~DeleteFolderDialog()
 {
 	delete ui;
@@ -26,7 +21,7 @@ DeleteFolderDialog::~DeleteFolderDialog()
 
 void DeleteFolderDialog::okPressed()
 {
-//	std::string FolderIdToDelete = ui->lineEdit->Folder().toLocal8Bit().constData();
-//	DatabaseManager::Instance().OnFolderDeletedFromGUI(textIdToDelete);
-
+	std::string FolderIdToDelete = ui->lineEdit->text().toLocal8Bit().constData();
+	// !!! Проверить проверочное слово (написать подсказку в окне)
+	DatabaseManager::Instance().OnFolderDeletedFromGUI();
 }

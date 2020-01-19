@@ -391,6 +391,49 @@ void DatabaseManager::OnTextDeletedFromGUI(int textIndex)
 
 //---------------------------------------------------------------
 
+void DatabaseManager::OnFolderCreatedFromGUI(const std::string& folderNameToCreate)
+{
+	SendMsgCreateNewFolder(folderNameToCreate);
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::OnFolderDeletedFromGUI()
+{
+	SendMsgDeleteFolder();
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::SendMsgCreateNewFolder(const std::string& textId)
+{
+	uint32_t parentFolderId = GetSelectedFolder();
+	if (parentFolderId == UINT32_MAX) {
+		return;
+	}
+	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
+	auto& buf = *_msgsQueueOut.back();
+	buf.PushUint8(EventType::CreateFolder);
+	buf.PushUint32(parentFolderId);
+	buf.PushString8(textId);
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::SendMsgDeleteFolder()
+{
+	uint32_t folderIdToDelete = GetSelectedFolder();
+	if (folderIdToDelete == UINT32_MAX) {
+		return;
+	}
+	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
+	auto& buf = *_msgsQueueOut.back();
+	buf.PushUint8(EventType::DeleteFolder);
+	buf.PushUint32(folderIdToDelete);
+}
+
+//---------------------------------------------------------------
+
 void DatabaseManager::SendMsgChangeTextAttrib(const FoundTextRefs& textRefs)
 {
 	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
@@ -407,13 +450,7 @@ void DatabaseManager::SendMsgChangeTextAttrib(const FoundTextRefs& textRefs)
 void DatabaseManager::SendMsgCreateNewText(const std::string& textId)
 {
 	// Найти выделенный каталог (в него будем добавлять текст)
-	uint32_t folderId = UINT32_MAX;
-	for (auto& folder : _dataBase->_folders) {
-		if (folder.uiTreeItem->isSelected()) {
-			folderId = folder.id;
-			break;
-		}
-	}
+	uint32_t folderId = GetSelectedFolder();
 	if (folderId == UINT32_MAX) {
 		return;
 	}
@@ -637,3 +674,14 @@ void DatabaseManager::AdjustFolderView(uint32_t parentId, QTreeWidgetItem *paren
 	}
 }
 
+//---------------------------------------------------------------
+
+uint32_t DatabaseManager::GetSelectedFolder()
+{
+	for (auto& folder : _dataBase->_folders) {
+		if (folder.uiTreeItem->isSelected()) { // Среди всех папок найдём выделенную и запустим от неё рекурсивный обход
+			return folder.id;
+		}
+	}
+	return UINT32_MAX;
+}

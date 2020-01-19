@@ -495,12 +495,11 @@ void MainTableModel::recollectTextsFromSelectedFolder()
 
 	// Заполним _textsToShow текстами, начиная с выбранного в дереве каталога рекурсивно (с учётом фильтра)
 	_textsToShow.clear();
-	for (auto& folder: _dataBase->_folders) {
-		if (folder.uiTreeItem->isSelected()) { // Среди всех папок найдём выделенную и запустим от неё рекурсивный обход
-			addFolderTextsToShowReq(folder.id, attribsFilter);
-			break;
-		}
+	uint32_t folderId = DatabaseManager::Instance().GetSelectedFolder();
+	if (folderId == UINT32_MAX) {
+		return;
 	}
+	addFolderTextsToShowReq(folderId, attribsFilter);
 }
 
 //---------------------------------------------------------------

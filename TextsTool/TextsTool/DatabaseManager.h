@@ -48,11 +48,14 @@ public:
 	void OnTextModifiedFromGUI(const FoundTextRefs& textRefs);
 	void OnTextCreatedFromGUI(const std::string& textIdToCreate);
 	void OnTextDeletedFromGUI(int textIndex);
+	void OnFolderCreatedFromGUI(const std::string& folderNameToCreate);
+	void OnFolderDeletedFromGUI();
 	void ProcessMessageFromServer(const std::vector<uint8_t>& buf);
 	void SaveDatabase();
 	void Update(Ui::MainWindow* ui);
 	void TreeSelectionChanged();
 	void SortSelectionChanged(int index);
+	uint32_t GetSelectedFolder();
 
 private:
 	void ApplyDiffForSync(DeserializationBuffer& buf);
@@ -64,6 +67,8 @@ private:
 	void SendMsgChangeTextAttrib(const FoundTextRefs& textRefs);
 	void SendMsgCreateNewText(const std::string& textId);
 	void SendMsgDeleteText(int textIndex);
+	void SendMsgCreateNewFolder(const std::string& textId);
+	void SendMsgDeleteFolder();
 	void AdjustFolderView(uint32_t parentId, QTreeWidgetItem *parentTreeItem);
 	Folder* FolderByTextId(const std::string& textId);
 

@@ -1,9 +1,6 @@
-#include <QDebug>
 #include "createfolderdialog.h"
 #include "ui_createfolderdialog.h"
 #include "DatabaseManager.h"
-
-//---------------------------------------------------------------
 
 CreateFolderDialog::CreateFolderDialog(QWidget *parent) :
 	QDialog(parent),
@@ -15,8 +12,6 @@ CreateFolderDialog::CreateFolderDialog(QWidget *parent) :
 	ui->lineEdit->setFocus();
 }
 
-//---------------------------------------------------------------
-
 CreateFolderDialog::~CreateFolderDialog()
 {
 	delete ui;
@@ -26,7 +21,6 @@ CreateFolderDialog::~CreateFolderDialog()
 
 void CreateFolderDialog::okPressed()
 {
-//	std::string FolderIdToCreate = ui->lineEdit->Folder().toLocal8Bit().constData();
-//	DatabaseManager::Instance().OnFolderCreatedFromGUI(textIdToCreate);
-
+	std::string FolderIdToCreate = ui->lineEdit->text().toLocal8Bit().constData();
+	DatabaseManager::Instance().OnFolderCreatedFromGUI(FolderIdToCreate);
 }
