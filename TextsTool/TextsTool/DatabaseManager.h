@@ -63,6 +63,8 @@ private:
 	std::string ModifyDbChangeAttributeInText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifier, std::vector<AttributeProperty*>* affectedAttributes);
 	std::string ModifyDbCreateText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
 	std::string ModifyDbDeleteText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
+	void ModifyDbCreateFolder(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
+	void ModifyDbDeleteFolder(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
 	void SendMsgChangeBaseText(const FoundTextRefs& textRefs);
 	void SendMsgChangeTextAttrib(const FoundTextRefs& textRefs);
 	void SendMsgCreateNewText(const std::string& textId);

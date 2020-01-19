@@ -330,6 +330,22 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
 		}
 		break;
+		case EventType::CreateFolder:
+		{
+			Log("Msg: ChangeCreateFolder");
+			ModifyDbCreateFolder(dbuf, ts, loginOfModifier);
+			AdjustFolderView(UINT32_MAX, nullptr);
+			MainWindow::Instance().getTreeWidget()->expandAll();
+//			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
+		}
+		case EventType::DeleteFolder:
+		{
+			Log("Msg: ChangeDeleteFolder");
+			ModifyDbDeleteFolder(dbuf, ts, loginOfModifier);
+			AdjustFolderView(UINT32_MAX, nullptr);
+			MainWindow::Instance().getTreeWidget()->expandAll();
+			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
+		}
 		default:
 			Log("Unknown actionType: " + std::to_string(actionType));
 		}
@@ -654,12 +670,41 @@ std::string DatabaseManager::ModifyDbDeleteText(DeserializationBuffer& dbuf, uin
 
 //---------------------------------------------------------------
 
+void DatabaseManager::ModifyDbCreateFolder(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie)
+{
+	uint32_t folderId = dbuf.GetUint32();
+	uint32_t parentFolderId = dbuf.GetUint32();
+	std::string folderName;
+	dbuf.GetString8(folderName);
+
+	_dataBase->_folders.emplace_back();
+	auto& newFolder = _dataBase->_folders.back();
+	newFolder.id = folderId;
+	newFolder.parentId = parentFolderId;
+	newFolder.name = folderName;
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::ModifyDbDeleteFolder(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie)
+{
+	uint32_t folderToDelId = dbuf.GetUint32();
+
+	auto& folders = _dataBase->_folders;
+	folders.erase(std::remove_if(folders.begin(), folders.end(), [folderToDelId](const auto& el) { return el.id == folderToDelId; }), folders.end());
+}
+
+//---------------------------------------------------------------
+
 void DatabaseManager::AdjustFolderView(uint32_t parentId, QTreeWidgetItem *parentTreeItem)
 {
 	for (auto& folder: _dataBase->_folders) {
 		if (folder.parentId == parentId) {
 			if (parentId == UINT32_MAX) {  // Корневая папка
 				QTreeWidgetItem* treeItem = new QTreeWidgetItem(MainWindow::Instance().getTreeWidget());
+				if (folder.uiTreeItem) {
+					delete folder.uiTreeItem;
+				}
 				folder.uiTreeItem = treeItem;
 				treeItem->setText(0, QString::fromStdString(folder.name));
 				AdjustFolderView(folder.id, treeItem);
