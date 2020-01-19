@@ -190,9 +190,11 @@
   <ItemGroup>
     <ClCompile Include="CHttpManager.cpp" />
     <ClCompile Include="CMessagesRepacker.cpp" />
+    <ClCompile Include="createfolderdialog.cpp" />
     <ClCompile Include="DatabaseManager.cpp" />
     <ClCompile Include="DbSerializer.cpp" />
     <ClCompile Include="..\SharedSrc\DeserializationBuffer.cpp" />
+    <ClCompile Include="deletefolderdialog.cpp" />
     <ClCompile Include="MainTableModel.cpp" />
     <ClCompile Include="..\SharedSrc\SerializationBuffer.cpp" />
     <ClCompile Include="TextsBaseClasses.cpp" />
@@ -204,6 +206,7 @@
   <ItemGroup>
     <ClInclude Include="CHttpManager.h" />
     <ClInclude Include="CMessagesRepacker.h" />
+    <QtMoc Include="createfolderdialog.h" />
     <ClInclude Include="DatabaseManager.h" />
     <ClInclude Include="DbSerializer.h" />
     <ClInclude Include="..\SharedSrc\DeserializationBuffer.h" />
@@ -211,6 +214,7 @@
     </QtMoc>
     <ClInclude Include="..\SharedSrc\SerializationBuffer.h" />
     <ClInclude Include="..\SharedSrc\Shared.h" />
+    <QtMoc Include="deletefolderdialog.h" />
     <ClInclude Include="qtreewidgetmy.h" />
     <ClInclude Include="TextsBaseClasses.h" />
     <ClInclude Include="Utils.h" />
@@ -238,8 +242,10 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <QtUic Include="createfolderdialog.ui" />
     <QtUic Include="createtextdialog.ui">
     </QtUic>
+    <QtUic Include="deletefolderdialog.ui" />
     <QtUic Include="mainwindow.ui">
     </QtUic>
   </ItemGroup>

@@ -9,6 +9,8 @@
 #include <QDropEvent>
 
 #include "createtextdialog.h"
+#include "createfolderdialog.h"
+#include "deletefolderdialog.h"
 #include "../SharedSrc/SerializationBuffer.h"
 #include "../SharedSrc/DeserializationBuffer.h"
 #include "CMessagesRepacker.h"
@@ -146,14 +148,16 @@ void MainWindow::treeViewContextMenuCreateText()
 
 void MainWindow::treeViewContextMenuCreateFolder()
 {
-	qDebug() << "Create folder is called";
+	CreateFolderDialog* createFolderDialog = new CreateFolderDialog(this);
+	createFolderDialog->show();
 }
 
 //---------------------------------------------------------------
 
 void MainWindow::treeViewContextMenuDeleteFolder()
 {
-	qDebug() << "Create folder is called";
+	DeleteFolderDialog* deleteFolderDialog = new DeleteFolderDialog(this);
+	deleteFolderDialog->show();
 }
 
 //---------------------------------------------------------------
