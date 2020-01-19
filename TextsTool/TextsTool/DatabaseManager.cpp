@@ -679,7 +679,7 @@ void DatabaseManager::AdjustFolderView(uint32_t parentId, QTreeWidgetItem *paren
 uint32_t DatabaseManager::GetSelectedFolder()
 {
 	for (auto& folder : _dataBase->_folders) {
-		if (folder.uiTreeItem->isSelected()) { // Среди всех папок найдём выделенную и запустим от неё рекурсивный обход
+		if (folder.uiTreeItem && folder.uiTreeItem->isSelected()) { // Среди всех папок найдём выделенную и запустим от неё рекурсивный обход
 			return folder.id;
 		}
 	}
