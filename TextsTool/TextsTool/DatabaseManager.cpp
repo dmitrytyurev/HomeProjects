@@ -669,6 +669,7 @@ void DatabaseManager::AdjustFolderView(uint32_t parentId, QTreeWidgetItem *paren
 				folder.uiTreeItem = treeItem;
 				treeItem->setText(0, QString::fromStdString(folder.name));
 				parentTreeItem->addChild(treeItem);
+				AdjustFolderView(folder.id, treeItem);
 			}
 		}
 	}
