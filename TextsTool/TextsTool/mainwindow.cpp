@@ -121,9 +121,14 @@ void MainWindow::treeViewPrepareContextMenu(const QPoint& pos)
 	newAct2->setStatusTip(tr("Создать новую папку в выбранной папке"));
 	connect(newAct2, SIGNAL(triggered()), this, SLOT(treeViewContextMenuCreateFolder()));
 
+	QAction *newAct3 = new QAction(QIcon(":/Resource/warning32.ico"), tr("&Удалить папку"), this);
+	newAct3->setStatusTip(tr("Удалить папку и все тексты в ней"));
+	connect(newAct3, SIGNAL(triggered()), this, SLOT(treeViewContextMenuDeleteFolder()));
+
 	QMenu menu(this);
 	menu.addAction(newAct);
 	menu.addAction(newAct2);
+	menu.addAction(newAct3);
 
 //	QPoint pt(pos);
 	menu.exec( tree->mapToGlobal(pos) );
@@ -140,6 +145,13 @@ void MainWindow::treeViewContextMenuCreateText()
 //---------------------------------------------------------------
 
 void MainWindow::treeViewContextMenuCreateFolder()
+{
+	qDebug() << "Create folder is called";
+}
+
+//---------------------------------------------------------------
+
+void MainWindow::treeViewContextMenuDeleteFolder()
 {
 	qDebug() << "Create folder is called";
 }
