@@ -71,7 +71,9 @@ private:
 	void SendMsgDeleteText(int textIndex);
 	void SendMsgCreateNewFolder(const std::string& textId);
 	void SendMsgDeleteFolder();
-	void AdjustFolderView(uint32_t parentId, QTreeWidgetItem *parentTreeItem);
+	void AdjustFolderView();
+	void AdjustFolderViewRec(uint32_t parentId, QTreeWidgetItem *parentTreeItem);
+	void ClearFolderViewRec(uint32_t parentId);
 	Folder* FolderByTextId(const std::string& textId);
 
 	static DatabaseManager* pthis;

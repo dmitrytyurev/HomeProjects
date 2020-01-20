@@ -4,6 +4,7 @@
 #include <fstream>
 #include <mutex>
 #include <QString>
+#include <qtreewidget.h>
 
 class DeserializationBuffer;
 class SerializationBuffer;
@@ -116,7 +117,7 @@ public:
 	std::string name;                // Имя папки
 	uint32_t parentId = 0;           // ID родительской папки, для корневой папки здесь UINT32_MAX
 	std::vector<TextTranslatedPtr> texts;  // Тексты лежащие непосредственно в папке
-	QTreeWidgetItem* uiTreeItem = nullptr; // Указатель на айтем в UI
+	std::unique_ptr<QTreeWidgetItem> uiTreeItem; // Указатель на айтем в UI
 };
 
 //===============================================================================

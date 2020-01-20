@@ -279,7 +279,7 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 		ApplyDiffForSync(dbuf);
 		_dataBase->_dbSerializer->SaveDatabase();
 //_dataBase->LogDatabase();
-		AdjustFolderView(UINT32_MAX, nullptr);
+		AdjustFolderView();
 		MainWindow::Instance().getTreeWidget()->expandAll();
 		_mainTableModel->OnDataModif(true, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
 	}
@@ -334,7 +334,7 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 		{
 			Log("Msg: ChangeCreateFolder");
 			ModifyDbCreateFolder(dbuf, ts, loginOfModifier);
-			AdjustFolderView(UINT32_MAX, nullptr);
+			AdjustFolderView();
 			MainWindow::Instance().getTreeWidget()->expandAll();
 //			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
 		}
@@ -343,7 +343,7 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 		{
 			Log("Msg: ChangeDeleteFolder");
 			ModifyDbDeleteFolder(dbuf, ts, loginOfModifier);
-			AdjustFolderView(UINT32_MAX, nullptr);
+			AdjustFolderView();
 			MainWindow::Instance().getTreeWidget()->expandAll();
 			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
 		}
@@ -698,25 +698,48 @@ void DatabaseManager::ModifyDbDeleteFolder(DeserializationBuffer& dbuf, uint32_t
 
 //---------------------------------------------------------------
 
-void DatabaseManager::AdjustFolderView(uint32_t parentId, QTreeWidgetItem *parentTreeItem)
+void DatabaseManager::AdjustFolderView()
+{
+	ClearFolderViewRec(UINT32_MAX);
+	AdjustFolderViewRec(UINT32_MAX, nullptr);
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::ClearFolderViewRec(uint32_t parentId)
+{
+	for (auto& folder : _dataBase->_folders) {
+		if (folder.parentId == parentId) {
+			if (parentId == UINT32_MAX) {  // Корневая папка
+				ClearFolderViewRec(folder.id);
+				folder.uiTreeItem.reset(nullptr);
+			}
+			else { // Некорневая папка
+				ClearFolderViewRec(folder.id);
+				folder.uiTreeItem.reset(nullptr);
+			}
+		}
+	}
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::AdjustFolderViewRec(uint32_t parentId, QTreeWidgetItem *parentTreeItem)
 {
 	for (auto& folder: _dataBase->_folders) {
 		if (folder.parentId == parentId) {
 			if (parentId == UINT32_MAX) {  // Корневая папка
 				QTreeWidgetItem* treeItem = new QTreeWidgetItem(MainWindow::Instance().getTreeWidget());
-				if (folder.uiTreeItem) {
-					delete folder.uiTreeItem;
-				}
-				folder.uiTreeItem = treeItem;
+				folder.uiTreeItem.reset(treeItem);
 				treeItem->setText(0, QString::fromStdString(folder.name));
-				AdjustFolderView(folder.id, treeItem);
+				AdjustFolderViewRec(folder.id, treeItem);
 			}
 			else { // Некорневая папка
 				QTreeWidgetItem *treeItem = new QTreeWidgetItem();
-				folder.uiTreeItem = treeItem;
+				folder.uiTreeItem.reset(treeItem);
 				treeItem->setText(0, QString::fromStdString(folder.name));
 				parentTreeItem->addChild(treeItem);
-				AdjustFolderView(folder.id, treeItem);
+				AdjustFolderViewRec(folder.id, treeItem);
 			}
 		}
 	}
