@@ -338,6 +338,7 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 			MainWindow::Instance().getTreeWidget()->expandAll();
 //			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
 		}
+		break;
 		case EventType::DeleteFolder:
 		{
 			Log("Msg: ChangeDeleteFolder");
@@ -346,6 +347,7 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 			MainWindow::Instance().getTreeWidget()->expandAll();
 			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
 		}
+		break;
 		default:
 			Log("Unknown actionType: " + std::to_string(actionType));
 		}
