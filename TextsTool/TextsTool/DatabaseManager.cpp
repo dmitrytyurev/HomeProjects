@@ -411,7 +411,11 @@ void DatabaseManager::OnTextDeletedFromGUI(int textIndex)
 
 void DatabaseManager::OnFolderCreatedFromGUI(const std::string& folderNameToCreate)
 {
-	SendMsgCreateNewFolder(folderNameToCreate);
+	uint32_t parentFolderId = GetSelectedFolder();
+	if (parentFolderId == UINT32_MAX) {
+		return;
+	}
+	SendMsgCreateNewFolder(folderNameToCreate, parentFolderId);
 }
 
 //---------------------------------------------------------------
@@ -423,12 +427,36 @@ void DatabaseManager::OnFolderDeletedFromGUI()
 
 //---------------------------------------------------------------
 
-void DatabaseManager::SendMsgCreateNewFolder(const std::string& textId)
+void DatabaseManager::OnFolderDraggedOntoFolder(QTreeWidgetItem* itemFrom, QTreeWidgetItem* itemTo)
 {
-	uint32_t parentFolderId = GetSelectedFolder();
-	if (parentFolderId == UINT32_MAX) {
+	auto& f = _dataBase->_folders;
+	auto folderFromIter = std::find_if(std::begin(f), std::end(f), [itemFrom](const Folder& el) { return el.uiTreeItem.get() == itemFrom; });
+	if (folderFromIter == std::end(f)) {
 		return;
 	}
+	auto folderToIter = std::find_if(std::begin(f), std::end(f), [itemTo](const Folder& el) { return el.uiTreeItem.get() == itemTo; });
+	if (folderToIter == std::end(f)) {
+		return;
+	}
+	SendMsgFolderChangeParent(folderFromIter->id, folderToIter->id);
+}
+
+//---------------------------------------------------------------
+
+
+void DatabaseManager::SendMsgFolderChangeParent(uint32_t folderId, uint32_t newParentFolderId)
+{
+	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
+	auto& buf = *_msgsQueueOut.back();
+	buf.PushUint8(EventType::ChangeFolderParent);
+	buf.PushUint32(folderId);
+	buf.PushUint32(newParentFolderId);
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::SendMsgCreateNewFolder(const std::string& textId, uint32_t parentFolderId)
+{
 	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
 	auto& buf = *_msgsQueueOut.back();
 	buf.PushUint8(EventType::CreateFolder);

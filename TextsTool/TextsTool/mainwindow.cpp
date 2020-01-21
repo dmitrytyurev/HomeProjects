@@ -265,6 +265,7 @@ void QTreeWidgetMy::dropEvent(QDropEvent *event)
 	QTreeWidgetItem* item = itemFromIndex(index);
 
 	Log("dropEvent! from: " + std::to_string(uint32_t(itemStartDragFrom)) + " to: " + std::to_string(uint32_t(item)));
+	DatabaseManager::Instance().OnFolderDraggedOntoFolder(itemStartDragFrom, item);
 }
 
 

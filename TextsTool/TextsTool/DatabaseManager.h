@@ -50,6 +50,7 @@ public:
 	void OnTextDeletedFromGUI(int textIndex);
 	void OnFolderCreatedFromGUI(const std::string& folderNameToCreate);
 	void OnFolderDeletedFromGUI();
+	void OnFolderDraggedOntoFolder(QTreeWidgetItem* itemFrom, QTreeWidgetItem* itemTo);
 	void ProcessMessageFromServer(const std::vector<uint8_t>& buf);
 	void SaveDatabase();
 	void Update(Ui::MainWindow* ui);
@@ -69,8 +70,9 @@ private:
 	void SendMsgChangeTextAttrib(const FoundTextRefs& textRefs);
 	void SendMsgCreateNewText(const std::string& textId);
 	void SendMsgDeleteText(int textIndex);
-	void SendMsgCreateNewFolder(const std::string& textId);
+	void SendMsgCreateNewFolder(const std::string& textId, uint32_t parentFolderId);
 	void SendMsgDeleteFolder();
+	void SendMsgFolderChangeParent(uint32_t folderId, uint32_t newParentFolderId);
 	void AdjustFolderView();
 	void AdjustFolderViewRec(uint32_t parentId, QTreeWidgetItem *parentTreeItem);
 	void ClearFolderViewRec(uint32_t parentId);
