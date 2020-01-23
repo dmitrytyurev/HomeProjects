@@ -60,12 +60,15 @@ public:
 
 private:
 	void ApplyDiffForSync(DeserializationBuffer& buf);
+
 	std::string ModifyDbChangeBaseText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie, std::vector<AttributeProperty*>* affectedAttributes);
 	std::string ModifyDbChangeAttributeInText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifier, std::vector<AttributeProperty*>* affectedAttributes);
 	std::string ModifyDbCreateText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
 	std::string ModifyDbDeleteText(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
 	void ModifyDbCreateFolder(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
 	void ModifyDbDeleteFolder(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
+	void ModifyDbChangeFolderParent(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
+
 	void SendMsgChangeBaseText(const FoundTextRefs& textRefs);
 	void SendMsgChangeTextAttrib(const FoundTextRefs& textRefs);
 	void SendMsgCreateNewText(const std::string& textId);
@@ -73,6 +76,7 @@ private:
 	void SendMsgCreateNewFolder(const std::string& textId, uint32_t parentFolderId);
 	void SendMsgDeleteFolder();
 	void SendMsgFolderChangeParent(uint32_t folderId, uint32_t newParentFolderId);
+	void ClearFolderView();
 	void AdjustFolderView();
 	void AdjustFolderViewRec(uint32_t parentId, QTreeWidgetItem *parentTreeItem);
 	void ClearFolderViewRec(uint32_t parentId);

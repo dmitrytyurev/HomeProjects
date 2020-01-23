@@ -276,6 +276,7 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 	case EventType::ReplySync:
 	{
 		Log("Msg: ReplySync");
+		ClearFolderView();
 		ApplyDiffForSync(dbuf);
 		_dataBase->_dbSerializer->SaveDatabase();
 //_dataBase->LogDatabase();
@@ -333,6 +334,7 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 		case EventType::CreateFolder:
 		{
 			Log("Msg: ChangeCreateFolder");
+			ClearFolderView();
 			ModifyDbCreateFolder(dbuf, ts, loginOfModifier);
 			AdjustFolderView();
 			MainWindow::Instance().getTreeWidget()->expandAll();
@@ -342,7 +344,18 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 		case EventType::DeleteFolder:
 		{
 			Log("Msg: ChangeDeleteFolder");
+			ClearFolderView();
 			ModifyDbDeleteFolder(dbuf, ts, loginOfModifier);
+			AdjustFolderView();
+			MainWindow::Instance().getTreeWidget()->expandAll();
+			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
+		}
+		break;
+		case EventType::ChangeFolderParent:
+		{
+			Log("Msg: ChangeFolderParent");
+			ClearFolderView();
+			ModifyDbChangeFolderParent(dbuf, ts, loginOfModifier);
 			AdjustFolderView();
 			MainWindow::Instance().getTreeWidget()->expandAll();
 			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
@@ -749,9 +762,29 @@ void DatabaseManager::ModifyDbDeleteFolder(DeserializationBuffer& dbuf, uint32_t
 
 //---------------------------------------------------------------
 
-void DatabaseManager::AdjustFolderView()
+void DatabaseManager::ModifyDbChangeFolderParent(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie)
+{
+	uint32_t folderId = dbuf.GetUint32();
+	uint32_t newParentFolderId = dbuf.GetUint32();
+
+	auto& f = _dataBase->_folders;
+	auto folderIt = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
+	if (folderIt != std::end(f)) {
+		folderIt->parentId = newParentFolderId;
+	}
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::ClearFolderView()
 {
 	ClearFolderViewRec(UINT32_MAX);
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::AdjustFolderView()
+{
 	AdjustFolderViewRec(UINT32_MAX, nullptr);
 }
 
