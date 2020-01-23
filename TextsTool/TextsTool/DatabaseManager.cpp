@@ -429,6 +429,9 @@ void DatabaseManager::OnFolderDeletedFromGUI()
 
 void DatabaseManager::OnFolderDraggedOntoFolder(QTreeWidgetItem* itemFrom, QTreeWidgetItem* itemTo)
 {
+	if (itemFrom == itemTo) {
+		return;
+	}
 	auto& f = _dataBase->_folders;
 	auto folderFromIter = std::find_if(std::begin(f), std::end(f), [itemFrom](const Folder& el) { return el.uiTreeItem.get() == itemFrom; });
 	if (folderFromIter == std::end(f)) {
@@ -438,8 +441,28 @@ void DatabaseManager::OnFolderDraggedOntoFolder(QTreeWidgetItem* itemFrom, QTree
 	if (folderToIter == std::end(f)) {
 		return;
 	}
+	if (IsFolderIndiseOtherFolderRec(folderFromIter->id, folderToIter->id)) {  // Если перетащили папку на одну из своих дочерних папок
+		return;
+	}
 	SendMsgFolderChangeParent(folderFromIter->id, folderToIter->id);
 }
+
+//---------------------------------------------------------------
+
+bool DatabaseManager::IsFolderIndiseOtherFolderRec(uint32_t folderIdToScan, uint32_t folderIdToFind)
+{
+	for (auto& folder: _dataBase->_folders)
+	{
+		if (folder.parentId == folderIdToScan)
+		{
+			if (folder.id == folderIdToFind || IsFolderIndiseOtherFolderRec(folder.id, folderIdToFind)) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 
 //---------------------------------------------------------------
 

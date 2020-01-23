@@ -77,6 +77,7 @@ private:
 	void AdjustFolderViewRec(uint32_t parentId, QTreeWidgetItem *parentTreeItem);
 	void ClearFolderViewRec(uint32_t parentId);
 	Folder* FolderByTextId(const std::string& textId);
+	bool IsFolderIndiseOtherFolderRec(uint32_t folderIdToScan, uint32_t folderIdToFind);
 
 	static DatabaseManager* pthis;
 	std::vector<SerializationBufferPtr>   _msgsQueueOut; // Очередь сообщений, которые нужно отослать на сервер
