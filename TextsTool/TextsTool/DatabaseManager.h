@@ -48,9 +48,11 @@ public:
 	void OnTextModifiedFromGUI(const FoundTextRefs& textRefs);
 	void OnTextCreatedFromGUI(const std::string& textIdToCreate);
 	void OnTextDeletedFromGUI(int textIndex);
+	void OnTextsCutFromGUI(const std::vector<int>& textsIndices);
 	void OnFolderCreatedFromGUI(const std::string& folderNameToCreate);
 	void OnFolderDeletedFromGUI();
 	void OnFolderDraggedOntoFolder(QTreeWidgetItem* itemFrom, QTreeWidgetItem* itemTo);
+	void OnPasteTextsFromGUI();
 	void ProcessMessageFromServer(const std::vector<uint8_t>& buf);
 	void SaveDatabase();
 	void Update(Ui::MainWindow* ui);
@@ -74,8 +76,10 @@ private:
 	void SendMsgCreateNewText(const std::string& textId);
 	void SendMsgDeleteText(int textIndex);
 	void SendMsgCreateNewFolder(const std::string& textId, uint32_t parentFolderId);
-	void SendMsgDeleteFolder();
+	void SendMsgDeleteFolder(uint32_t folderIdToDelete);
 	void SendMsgFolderChangeParent(uint32_t folderId, uint32_t newParentFolderId);
+	void SendMsgTextChangeFolder(const std::string& textId, uint32_t folderId);
+
 	void ClearFolderView();
 	void AdjustFolderView();
 	void AdjustFolderViewRec(uint32_t parentId, QTreeWidgetItem *parentTreeItem);
@@ -88,6 +92,7 @@ private:
 	std::vector<DeserializationBufferPtr> _msgsQueueIn;  // Очередь пришедших от сервера сообщений
 	TextsDatabasePtr _dataBase;
 	MainTableModelPtr _mainTableModel;  // Модель обеспечивающая доступ к данным главной таблицы текстов
+	std::vector<std::string> textsCutIds;     // ID текстов, которые были вырезаны через контекстное меню. При вызове команды вставки в другую папку они будут перенесены в неё
 	std::vector<int> _textsKeysRefs;  // Указатели на ключи текстов для быстрой сортировки
 	std::vector<TextsInterval> _intervals;
 };

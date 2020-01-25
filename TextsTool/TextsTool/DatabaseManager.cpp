@@ -422,6 +422,32 @@ void DatabaseManager::OnTextDeletedFromGUI(int textIndex)
 
 //---------------------------------------------------------------
 
+void DatabaseManager::OnTextsCutFromGUI(const std::vector<int>& textsIndices)
+{
+	textsCutIds.clear();
+	for (auto textIndex: textsIndices) {
+		const std::string& textId = _mainTableModel->GetTextIdByIndex(textIndex);
+		if (textId != "") {
+			textsCutIds.emplace_back(textId);
+		}
+	}
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::OnPasteTextsFromGUI()
+{
+	uint32_t folderId = GetSelectedFolder();
+	if (folderId == UINT32_MAX) {
+		return;
+	}
+	for (auto& textId: textsCutIds) {
+		SendMsgTextChangeFolder(textId, folderId);
+	}
+}
+
+//---------------------------------------------------------------
+
 void DatabaseManager::OnFolderCreatedFromGUI(const std::string& folderNameToCreate)
 {
 	uint32_t parentFolderId = GetSelectedFolder();
@@ -435,7 +461,11 @@ void DatabaseManager::OnFolderCreatedFromGUI(const std::string& folderNameToCrea
 
 void DatabaseManager::OnFolderDeletedFromGUI()
 {
-	SendMsgDeleteFolder();
+	uint32_t folderIdToDelete = GetSelectedFolder();
+	if (folderIdToDelete == UINT32_MAX) {
+		return;
+	}
+	SendMsgDeleteFolder(folderIdToDelete);
 }
 
 //---------------------------------------------------------------
@@ -479,7 +509,6 @@ bool DatabaseManager::IsFolderIndiseOtherFolderRec(uint32_t folderIdToScan, uint
 
 //---------------------------------------------------------------
 
-
 void DatabaseManager::SendMsgFolderChangeParent(uint32_t folderId, uint32_t newParentFolderId)
 {
 	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
@@ -487,6 +516,17 @@ void DatabaseManager::SendMsgFolderChangeParent(uint32_t folderId, uint32_t newP
 	buf.PushUint8(EventType::ChangeFolderParent);
 	buf.PushUint32(folderId);
 	buf.PushUint32(newParentFolderId);
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::SendMsgTextChangeFolder(const std::string& textId, uint32_t folderId)
+{
+	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
+	auto& buf = *_msgsQueueOut.back();
+	buf.PushUint8(EventType::MoveTextToFolder);
+	buf.PushString8(textId);
+	buf.PushUint32(folderId);
 }
 
 //---------------------------------------------------------------
@@ -502,12 +542,8 @@ void DatabaseManager::SendMsgCreateNewFolder(const std::string& textId, uint32_t
 
 //---------------------------------------------------------------
 
-void DatabaseManager::SendMsgDeleteFolder()
+void DatabaseManager::SendMsgDeleteFolder(uint32_t folderIdToDelete)
 {
-	uint32_t folderIdToDelete = GetSelectedFolder();
-	if (folderIdToDelete == UINT32_MAX) {
-		return;
-	}
 	_msgsQueueOut.emplace_back(std::make_shared<SerializationBuffer>());
 	auto& buf = *_msgsQueueOut.back();
 	buf.PushUint8(EventType::DeleteFolder);
