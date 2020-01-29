@@ -70,6 +70,7 @@ private:
 	void ModifyDbCreateFolder(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
 	void ModifyDbDeleteFolder(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
 	void ModifyDbChangeFolderParent(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
+	void ModifyDbMoveTextToFolder(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie);
 
 	void SendMsgChangeBaseText(const FoundTextRefs& textRefs);
 	void SendMsgChangeTextAttrib(const FoundTextRefs& textRefs);

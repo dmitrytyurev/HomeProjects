@@ -338,7 +338,6 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 			ModifyDbCreateFolder(dbuf, ts, loginOfModifier);
 			AdjustFolderView();
 			MainWindow::Instance().getTreeWidget()->expandAll();
-//			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
 		}
 		break;
 		case EventType::DeleteFolder:
@@ -358,6 +357,12 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 			ModifyDbChangeFolderParent(dbuf, ts, loginOfModifier);
 			AdjustFolderView();
 			MainWindow::Instance().getTreeWidget()->expandAll();
+			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
+		}
+		break;
+		case EventType::MoveTextToFolder:
+		{
+			ModifyDbMoveTextToFolder(dbuf, ts, loginOfModifier);
 			_mainTableModel->OnDataModif(false, TEXTS_RECOLLECT_TYPE::YES, nullptr, false, -1);
 		}
 		break;
@@ -807,6 +812,40 @@ void DatabaseManager::ModifyDbChangeFolderParent(DeserializationBuffer& dbuf, ui
 	auto folderIt = std::find_if(std::begin(f), std::end(f), [folderId](const Folder& el) { return el.id == folderId; });
 	if (folderIt != std::end(f)) {
 		folderIt->parentId = newParentFolderId;
+	}
+}
+
+//---------------------------------------------------------------
+
+void DatabaseManager::ModifyDbMoveTextToFolder(DeserializationBuffer& dbuf, uint32_t ts, const std::string& loginOfModifie)
+{
+	std::string textId;
+	dbuf.GetString8(textId);
+	uint32_t newFolderId = dbuf.GetUint32();
+
+	TextTranslatedPtr tmpTextPtr;
+	for (auto& f : _dataBase->_folders) {
+		auto result = std::find_if(std::begin(f.texts), std::end(f.texts), [&textId](const TextTranslatedPtr& el) { return el->id == textId; });
+		if (result != std::end(f.texts)) {
+			f.timestampModified = ts;
+			tmpTextPtr = *result;
+			f.texts.erase(result);
+			break;
+		}
+	}
+
+	if (!tmpTextPtr) {
+		return;
+	}
+
+	// Нашли текст, модифицируем его, ищем новый каталог для него и добавляем туда
+	tmpTextPtr->loginOfLastModifier = loginOfModifie;
+	tmpTextPtr->timestampModified = ts;
+
+	auto& f = _dataBase->_folders;
+	auto folderIt = std::find_if(std::begin(f), std::end(f), [newFolderId](const Folder& el) { return el.id == newFolderId; });
+	if (folderIt != std::end(f)) {
+		folderIt->texts.emplace_back(tmpTextPtr);
 	}
 }
 
