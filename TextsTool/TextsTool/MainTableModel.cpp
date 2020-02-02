@@ -152,7 +152,7 @@ AttributeProperty* MainTableModel::getAttributeById(int attributId)
 
 QVariant MainTableModel::data(const QModelIndex &index, int role) const
 {
-	if (!index.isValid() || !_dataBase || !_dataBase->isSynced || (role != Qt::DisplayRole &&  role != Qt::EditRole))	{
+	if (!index.isValid() || !_dataBase || !_dataBase->isSynced)	{
 		return QVariant();
 	}
 
@@ -161,6 +161,17 @@ QVariant MainTableModel::data(const QModelIndex &index, int role) const
 			index.row() < 0 ||
 			index.row() >= _textsToShow.size())	{
 		qDebug() << "Warning: " << index.row() << ", " << index.column();
+		return QVariant();
+	}
+
+	if (role == Qt::BackgroundRole) {
+		if (index.column() == 2 && index.row() == 1) {
+			return QColor(0, 255, 0);
+		}
+		return QVariant();
+	}
+
+	if (role != Qt::DisplayRole &&  role != Qt::EditRole) {
 		return QVariant();
 	}
 
