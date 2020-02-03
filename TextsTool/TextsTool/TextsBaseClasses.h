@@ -63,12 +63,18 @@ public:
 class AttributeInText
 {
 public:
+	enum TRANSLATE_STATUS {
+		NOT_ACTUAL,  // Зависимый перевод неактулен (базовый текст менялся после актуализации)
+		ACTUAL       // Зависимый перевод актулен (базовый текст не менялся после актуализации)
+	};
+
 	AttributeInText() {}
 	void LoadFullDump(DeserializationBuffer& buffer, const std::vector<uint8_t>& attributesIdToType);
 	void SaveFullDump(SerializationBuffer& buffer) const;
 	void Log(const std::string& prefix);
 
 	std::string text;       // Текстовые данные атрибута, если это текст
+	uint8_t translateStatus = 0; // Одно из значений TRANSLATE_STATUS, если это один из зависимых переводов
 	uint8_t flagState = 0;  // Состояние флажка, если это флажок;
 	uint8_t id = 0;         // ID атрибута, по которому можно узнать его тип
 	uint8_t type = 0;       // Значение одного из типов AttributeProperty::DataType. !!!Здесь копия для быстрого доступа! В файле не нужно, поскольку тип можно определить по ID атрибута
