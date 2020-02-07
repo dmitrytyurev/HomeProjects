@@ -56,17 +56,26 @@ void test()
 	atProp.id = 4;
 	atProp.isVisible = true;
 	atProp.visiblePosition = 4;
-	atProp.name = "BaseText";
+	atProp.name = "BaseTextRus";
 	db._attributeProps.emplace_back(atProp);
 
-	atProp.type = AttributePropertyType::CommonText_t;
+	atProp.type = AttributePropertyType::Translation_t;
 	atProp.id = 5;
 	atProp.isVisible = true;
 	atProp.visiblePosition = 5;
-	atProp.name = "CommonText";
+	atProp.name = "TranslateEng";
+	atProp.param2 = 6;  // !!! Ссылка на ID колонки статуса
 	db._attributeProps.emplace_back(atProp);
 
-	
+	atProp.type = AttributePropertyType::TranslationStatus_t;
+	atProp.id = 6;
+	atProp.isVisible = true;
+	atProp.visiblePosition = 6;
+	atProp.name = "TranslateEngStatus";
+	atProp.param2 = 5; // !!! Ссылка на ID колонки с переводом
+	db._attributeProps.emplace_back(atProp);
+
+
 
 	// ---------------------------------------------------   
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! При изменении базы, удалять базу на сервере, поскольку без именения таймстэмпов база не обновится !!!!!!!
@@ -93,11 +102,18 @@ void test()
 		textPtr->baseText = "BaseText2";
 		textPtr->id = "TextID2";
 		textPtr->timestampModified = 1021;
+
 		AttributeInText attInText;
 		attInText.id = 5;
-		attInText.text = "Common text";
-		attInText.type = AttributePropertyType::CommonText_t;
+		attInText.text = "Eng text";
+		attInText.type = AttributePropertyType::Translation_t;
 		textPtr->attributes.emplace_back(attInText);
+
+		attInText.id = 6;
+		attInText.uintValue = 1;
+		attInText.type = AttributePropertyType::TranslationStatus_t;
+		textPtr->attributes.emplace_back(attInText);
+
 		folder.texts.emplace_back(textPtr);
 	}
 
@@ -227,8 +243,8 @@ void Init()
 	app = std::make_unique<STextsToolApp>();
 	app->_httpMgr._connections._accounts.emplace_back("mylogin", "mypassword");
 
-	//test();
-	//exit(1);
+//test();
+//exit(1);
 
 	std::set<std::string> basesNames;
 	MakeDatabasesNamesList(databasesPath, basesNames);  // Подготовить список баз по этому пути

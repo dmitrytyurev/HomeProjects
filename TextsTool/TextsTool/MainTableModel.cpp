@@ -80,7 +80,13 @@ bool MainTableModel::getTextReferences(const QModelIndex &index, bool needCreate
 
 	for (auto& attribInText: result.text->attributes) {
 		if (attribInText.id == result.attrInTable->id) {
-			result.string = &attribInText.text;
+			if (result.attrInTable->type == AttributePropertyType::TranslationStatus_t) {
+				static std::string statusText = std::to_string(attribInText.uintValue);
+				result.string = &statusText;
+			}
+			else {
+				result.string = &attribInText.text;
+			}
 			result.attrInText = &attribInText;
 			return true;
 		}

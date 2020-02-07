@@ -377,6 +377,7 @@ void AttributeInText::LoadFullDump(DeserializationBuffer& buffer, const std::vec
 	}
 	break;
 	case AttributePropertyType::UintValue_t:
+	case AttributePropertyType::TranslationStatus_t:
 		uintValue = buffer.GetUint8();
 		break;
 
@@ -398,6 +399,7 @@ void AttributeInText::SaveFullDump(SerializationBuffer& buffer) const
 	}
 	break;
 	case AttributePropertyType::UintValue_t:
+	case AttributePropertyType::TranslationStatus_t:
 		buffer.PushUint8(uintValue);
 		break;
 
