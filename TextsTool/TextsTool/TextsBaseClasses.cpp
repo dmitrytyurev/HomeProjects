@@ -249,8 +249,8 @@ void AttributeInText::LoadFullDump(DeserializationBuffer& buffer, const std::vec
 		buffer.GetString16(text);
 	}
 	break;
-	case AttributePropertyType::Checkbox_t:
-		flagState = buffer.GetUint8();
+	case AttributePropertyType::UintValue_t:
+		uintValue = buffer.GetUint8();
 		break;
 
 	default:
@@ -270,8 +270,8 @@ void AttributeInText::SaveFullDump(SerializationBuffer& buffer) const
 		buffer.PushString16(text);
 	}
 	break;
-	case AttributePropertyType::Checkbox_t:
-		buffer.PushUint8(flagState);
+	case AttributePropertyType::UintValue_t:
+		buffer.PushUint8(uintValue);
 		break;
 
 	default:
@@ -285,7 +285,7 @@ void AttributeInText::Log(const std::string& prefix)
 {
 	::Log(prefix + "id: " + std::to_string(id));
 	::Log(prefix + "type: " + std::to_string(type));
-	::Log(prefix + "flagState: " + std::to_string(flagState));
+	::Log(prefix + "uintValue: " + std::to_string(uintValue));
 	::Log(prefix + "text: " + text);
 }
 

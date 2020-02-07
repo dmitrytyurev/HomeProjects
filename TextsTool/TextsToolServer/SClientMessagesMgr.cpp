@@ -540,9 +540,9 @@ bool  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 		}
 	}
 	break;
-	case AttributePropertyType::Checkbox_t:
+	case AttributePropertyType::UintValue_t:
 	{
-		attributeInText->flagState = buf.GetUint8();
+		attributeInText->uintValue = buf.GetUint8();
 	}
 	break;
 	default:

@@ -661,14 +661,14 @@ std::string DatabaseManager::ModifyDbChangeAttributeInText(DeserializationBuffer
 	uint8_t attribId = dbuf.GetUint8();
 	uint8_t attribDataType = dbuf.GetUint8();
 	std::string text;
-	uint8_t flagState = 0;
+	uint8_t uintValue = 0;
 	switch(attribDataType) {
 	case AttributePropertyType::Translation_t:
 	case AttributePropertyType::CommonText_t:
 		dbuf.GetString16(text);
 	break;
-	case AttributePropertyType::Checkbox_t:
-		flagState = dbuf.GetUint8();
+	case AttributePropertyType::UintValue_t:
+		uintValue = dbuf.GetUint8();
 	break;
 	default:
 		ExitMsg("DatabaseManager::ModifyDbChangeAttributeInText: unknown dataType");
@@ -714,8 +714,8 @@ std::string DatabaseManager::ModifyDbChangeAttributeInText(DeserializationBuffer
 			tmpTextPtr->attributes.erase(tmpTextPtr->attributes.begin() + indexElement);
 		}
 	break;
-	case AttributePropertyType::Checkbox_t:
-		attribInTextToModify->flagState = flagState;
+	case AttributePropertyType::UintValue_t:
+		attribInTextToModify->uintValue = uintValue;
 	break;
 	}
 
