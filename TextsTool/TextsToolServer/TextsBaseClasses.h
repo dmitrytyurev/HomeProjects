@@ -35,8 +35,10 @@ public:
 	uint8_t id = 0;           // ID атрибута
 	std::string name;         // Имя атрибута
 	uint8_t type = 0;         // Значение одного из типов AttributePropertyType
-	uint32_t param1 = 0;      // Параметр, зависящий от типа (для Translation_t - тут id языка)
-	uint32_t param2 = 0;      // Параметр, зависящий от типа (запас)
+	uint32_t param1 = 0;      // Параметр, зависящий от типа. Для Translation_t - тут id языка
+	uint32_t param2 = 0;      // Параметр, зависящий от типа:
+							  //   - Для Translation_t - тут id колонки TranslationStatus_t, содержащей статус перевода на данный язык
+							  //   - Для TranslationStatus_t - тут id колонки Translation_t, содержащей текст данного языка
 	uint8_t visiblePosition = 0;    // Визуальная позиция атрибута в таблице (даже если скрыт)
 	bool isVisible = false;         // Видимость атрибута
 	uint32_t timestampCreated = 0;  // Время создания
