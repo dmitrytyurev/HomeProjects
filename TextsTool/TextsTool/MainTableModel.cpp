@@ -50,6 +50,29 @@ int MainTableModel::columnCount(const QModelIndex &parent) const
 
 //---------------------------------------------------------------
 
+AttributeInText* getAttributeInText(TextTranslated* text, uint8_t columnId)
+{
+	for (auto& attribInText : text->attributes) {
+		if (attribInText.id == columnId) {
+			return &attribInText;
+		}
+	}
+	return nullptr;
+}
+
+//---------------------------------------------------------------
+
+bool isTranslateEmpty(TextTranslated* text, uint8_t columnId)
+{
+	AttributeInText* attribInText = getAttributeInText(text, columnId);
+	if (!attribInText) {
+		return true;
+	}
+	return attribInText->text.empty();
+}
+
+//---------------------------------------------------------------
+
 bool MainTableModel::getTextReferences(const QModelIndex &index, bool needCreateAttrIfNotFound, FoundTextRefs& result)
 {
 	result.text = _textsToShow[index.row()];
@@ -77,33 +100,46 @@ bool MainTableModel::getTextReferences(const QModelIndex &index, bool needCreate
 		result.string = &result.text->loginOfLastModifier;
 		return true;
 	}
-
-	for (auto& attribInText: result.text->attributes) {
-		if (attribInText.id == result.attrInTable->id) {
-			if (result.attrInTable->type == AttributePropertyType::TranslationStatus_t) {
-				static std::string statusText = std::to_string(attribInText.uintValue);
-				result.string = &statusText;
+	if (result.attrInTable->type == AttributePropertyType::TranslationStatus_t) {
+		AttributeInText* attributeInText = getAttributeInText(result.text, result.attrInTable->id);
+		static std::string staticText;
+		result.string = &staticText;
+		if (!attributeInText && !isTranslateEmpty(result.text, result.attrInTable->param2)) { // (см. описание структуры что в param2
+			staticText = "+";
+		}
+		else {
+			staticText = "-";
+		}
+		return true;
+	}
+	if (result.attrInTable->type == AttributePropertyType::Translation_t || result.attrInTable->type == AttributePropertyType::CommonText_t) {
+		AttributeInText* attributeInText = getAttributeInText(result.text, result.attrInTable->id);
+		if (!attributeInText) { // Не нашли AttributeInText с информацией о данной колонке
+			if (!needCreateAttrIfNotFound) {
+				return false;
 			}
-			else {
-				result.string = &attribInText.text;
-			}
+			result.wasAttrInTextCreated = true;
+			result.text->attributes.emplace_back();
+			AttributeInText& attribInText = result.text->attributes.back();
 			result.attrInText = &attribInText;
+			attribInText.id = result.attrInTable->id;
+			attribInText.type = result.attrInTable->type;
+			result.string = &attribInText.text;
 			return true;
 		}
+		result.attrInText = attributeInText; // Нашли AttributeInText с информацией о данной колонке
+		static std::string staticText;
+		result.string = &attributeInText->text;
+		return true;
 	}
-	if (!needCreateAttrIfNotFound) {
-		return false;
+	if (result.attrInTable->type == AttributePropertyType::UintValue_t) {
+		// !!! Сейчас в result возвращается только текст для чтения и записи, а тут надо возвращать числовое поле. Надо подумать, как доработать формат result и его обработку выше по коллстеку
+		// Для отображения значения можно вернуть вот так, а как обрабатывать изменение этого значения? (конвертацию введённой пользователем строки в число)
+		// staticText = std::to_string(attribInText.uintValue);
+		// result.string = &staticText;
+		return true;
 	}
-
-	result.wasAttrInTextCreated = true;
-	result.text->attributes.emplace_back();
-	AttributeInText& attribInText = result.text->attributes.back();
-	result.attrInText = &attribInText;
-	attribInText.id = result.attrInTable->id;
-	attribInText.type = result.attrInTable->type;
-	result.string = &attribInText.text;
-
-	return true;
+	return false;
 }
 
 //---------------------------------------------------------------
