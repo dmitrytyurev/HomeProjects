@@ -62,6 +62,7 @@ public slots:
 
 private:
 	bool getTextReferences(const QModelIndex &index, bool needCreateAttrIfNotFound, FoundTextRefs& result);
+	void ApplyEnteredTextIntoCell(FoundTextRefs& result, std::string textEntered);
 	void recollectTextsFromSelectedFolder();
 	// Заполнить ссылки на тексты, которые должны показывать (учитывая выбранную папку, начиная с которой показываем тексты и применённые фильтры).
 	void addFolderTextsToShowReq(uint32_t parentId, std::vector<AttributeProperty*>& attribsFilter);

@@ -79,36 +79,33 @@ bool MainTableModel::getTextReferences(const QModelIndex &index, bool needCreate
 
 	result.attrInTable = &_dataBase->_attributeProps[_columnsToShow[index.column()].attribIndex];
 	if (result.attrInTable->type == AttributePropertyType::Id_t) {
-		result.string = &result.text->id;
+		result.stringToShowInCell = result.text->id;
 		return true;
 	}
 	if (result.attrInTable->type == AttributePropertyType::BaseText_t) {
-		result.string = &result.text->baseText;
+		result.stringToShowInCell = result.text->baseText;
 		return true;
 	}
 	if (result.attrInTable->type == AttributePropertyType::CreationTimestamp_t) {
-		result.localString = Utils::ConvertTimestampToDate(result.text->timestampCreated);
-		result.string = &result.localString;
+		result.stringToShowInCell = Utils::ConvertTimestampToDate(result.text->timestampCreated);
 		return true;
 	}
 	if (result.attrInTable->type == AttributePropertyType::ModificationTimestamp_t) {
-		result.localString = result.text->timestampModified == UINT32_MAX ? "Syncing..." : Utils::ConvertTimestampToDate(result.text->timestampModified);
-		result.string = &result.localString;
+		result.stringToShowInCell = result.text->timestampModified == UINT32_MAX ? "Syncing..." : Utils::ConvertTimestampToDate(result.text->timestampModified);
 		return true;
 	}
 	if (result.attrInTable->type == AttributePropertyType::LoginOfLastModifier_t) {
-		result.string = &result.text->loginOfLastModifier;
+		result.stringToShowInCell = result.text->loginOfLastModifier;
 		return true;
 	}
 	if (result.attrInTable->type == AttributePropertyType::TranslationStatus_t) {
 		AttributeInText* attributeInText = getAttributeInText(result.text, result.attrInTable->id);
-		static std::string staticText;
-		result.string = &staticText;
+		result.attrInText = attributeInText; // AttributeInText с информацией о данной колонке
 		if (!attributeInText && !isTranslateEmpty(result.text, result.attrInTable->param2)) { // (см. описание структуры что в param2
-			staticText = "+";
+			result.stringToShowInCell = "+";
 		}
 		else {
-			staticText = "-";
+			result.stringToShowInCell = "-";
 		}
 		return true;
 	}
@@ -124,22 +121,82 @@ bool MainTableModel::getTextReferences(const QModelIndex &index, bool needCreate
 			result.attrInText = &attribInText;
 			attribInText.id = result.attrInTable->id;
 			attribInText.type = result.attrInTable->type;
-			result.string = &attribInText.text;
+			result.stringToShowInCell = attribInText.text;
 			return true;
 		}
 		result.attrInText = attributeInText; // Нашли AttributeInText с информацией о данной колонке
-		static std::string staticText;
-		result.string = &attributeInText->text;
+		result.stringToShowInCell = attributeInText->text;
 		return true;
 	}
 	if (result.attrInTable->type == AttributePropertyType::UintValue_t) {
-		// !!! Сейчас в result возвращается только текст для чтения и записи, а тут надо возвращать числовое поле. Надо подумать, как доработать формат result и его обработку выше по коллстеку
-		// Для отображения значения можно вернуть вот так, а как обрабатывать изменение этого значения? (конвертацию введённой пользователем строки в число)
-		// staticText = std::to_string(attribInText.uintValue);
-		// result.string = &staticText;
+		AttributeInText* attributeInText = getAttributeInText(result.text, result.attrInTable->id);
+		if (!attributeInText) { // Не нашли AttributeInText с информацией о данной колонке
+			if (!needCreateAttrIfNotFound) {
+				return false;
+			}
+			result.wasAttrInTextCreated = true;
+			result.text->attributes.emplace_back();
+			AttributeInText& attribInText = result.text->attributes.back();
+			result.attrInText = &attribInText;
+			attribInText.id = result.attrInTable->id;
+			attribInText.type = result.attrInTable->type;
+			return true;
+		}
+		result.attrInText = attributeInText; // Нашли AttributeInText с информацией о данной колонке
+		result.stringToShowInCell = std::to_string(attributeInText->uintValue);
 		return true;
 	}
 	return false;
+}
+
+//---------------------------------------------------------------
+
+
+void MainTableModel::ApplyEnteredTextIntoCell(FoundTextRefs& result, std::string textEntered)
+{
+	if (result.attrInTable->type == AttributePropertyType::BaseText_t) {
+		result.text->baseText = textEntered;
+		return;
+	}
+	if (result.attrInTable->type == AttributePropertyType::Translation_t || result.attrInTable->type == AttributePropertyType::CommonText_t) {
+		if (result.attrInText) {
+			result.attrInText->text = textEntered;
+		}
+	}
+	if (result.attrInTable->type == AttributePropertyType::UintValue_t) {
+		if (result.attrInText) {
+			if (textEntered.empty()) {
+				result.attrInText->uintValue = UINT_NO_VALUE;
+			}
+			else {
+				result.attrInText->uintValue = std::stoi(textEntered);
+			}
+		}
+		return;
+	}
+	if (result.attrInTable->type == AttributePropertyType::TranslationStatus_t) {
+		if (textEntered == "-") {
+			if (!result.attrInText) {
+				AttributeInText attribInText;
+				attribInText.uintValue = 1;
+				attribInText.id = result.attrInTable->id;
+				attribInText.type = result.attrInTable->type;
+				result.text->attributes.push_back(attribInText);
+				result.attrInText = &result.text->attributes.back();
+			}
+		}
+		else if (textEntered == "+") {  // Если текст перевода не пустой, то удалить статус-атрибут из текста (это будет означать, что текст перевода синхронизирован)
+			if (result.attrInText) {   
+				auto& attrs = result.text->attributes;
+				uint32_t translatedTextColumnId = result.attrInTable->param2; // id колонки, в которой переведённый текст, статус которого мы редактируем
+				auto TranslatedTextIter = std::find_if(std::begin(attrs), std::end(attrs), [translatedTextColumnId](const AttributeInText& el) { return el.id == translatedTextColumnId; });
+				if (TranslatedTextIter != std::end(attrs) && !TranslatedTextIter->text.empty()) {
+					result.attrInText->uintValue = UINT_NO_VALUE;
+				}
+			}
+		}
+		return;
+	}
 }
 
 //---------------------------------------------------------------
@@ -222,7 +279,7 @@ QVariant MainTableModel::data(const QModelIndex &index, int role) const
 	if (!isFound) {
 		return QVariant();
 	}
-	return QString(textRefs.string->c_str());
+	return QString(textRefs.stringToShowInCell.c_str());
 }
 
 //---------------------------------------------------------------
@@ -254,7 +311,7 @@ bool MainTableModel::setData(const QModelIndex &index, const QVariant &value, in
 		return false;
 	}
 
-	*textRefs.string = value.toString().toUtf8().data();
+	ApplyEnteredTextIntoCell(textRefs, value.toString().toUtf8().data());
 	DatabaseManager::Instance().OnTextModifiedFromGUI(textRefs);
 	std::vector<AttributeProperty*> affectedAttributes;
 	OnDataModif(false, TEXTS_RECOLLECT_TYPE::NO, nullptr, false, index.row()); // Не передаём заафеченную колонку, чтобы пересбор текстов и сортировка не происходили до возврата наших изменений с сервера

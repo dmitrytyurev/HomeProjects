@@ -30,8 +30,7 @@ struct FoundTextRefs
 	TextTranslated* text = nullptr;
 	AttributeInText* attrInText = nullptr;
 	AttributeProperty* attrInTable = nullptr;
-	std::string* string = nullptr;
-	std::string localString;
+	std::string stringToShowInCell;
 	bool wasAttrInTextCreated = false;
 };
 

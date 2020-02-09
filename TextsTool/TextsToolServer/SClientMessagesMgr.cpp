@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iterator>
 
+#include "..\SharedSrc\Shared.h"
 #include "Common.h"
 #include "DbSerializer.h"
 #include "SClientMessagesMgr.h"
@@ -541,8 +542,16 @@ bool  SClientMessagesMgr::ModifyDbChangeAttributeInText(
 	}
 	break;
 	case AttributePropertyType::UintValue_t:
+	case AttributePropertyType::TranslationStatus_t:
 	{
 		attributeInText->uintValue = buf.GetUint8();
+		if (attributeInText->uintValue == UINT_NO_VALUE) {
+			auto attribToDel = std::find_if(std::begin(tmpTextPtr->attributes), std::end(tmpTextPtr->attributes), [&attributeId](const AttributeInText& el) { return el.id == attributeId; });
+			if (attribToDel == std::end(tmpTextPtr->attributes)) {
+				ExitMsg("ModifyDbChangeAttributeInText: attribToDel == std::end(tmpTextPtr->attributes)");
+			}
+			tmpTextPtr->attributes.erase(result);
+		}
 	}
 	break;
 	default:

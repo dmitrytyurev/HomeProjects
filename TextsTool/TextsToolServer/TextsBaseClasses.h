@@ -56,8 +56,8 @@ public:
 	void SaveFullDump(SerializationBuffer& buffer) const;
 	void Log(const std::string& prefix);
 
-	std::string text;       // Текстовые данные атрибута, если это текст
-	uint8_t uintValue = 0;  // Значение целого типа
+	std::string text;       // Текстовые данные атрибута, если это текст. Если "", то атрибут удаляется (нет значения)
+	uint8_t uintValue = 0;  // Значение целого типа. Если UINT_NO_VALUE, то удаляется (нет значения)
 	uint8_t id = 0;         // ID атрибута, по которому можно узнать его тип
 	uint8_t type = 0;       // Значение одного из типов AttributeProperty::DataType. !!!Здесь копия для быстрого доступа! В файле не нужно, поскольку тип можно определить по ID атрибута
 };

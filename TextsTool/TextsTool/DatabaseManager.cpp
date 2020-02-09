@@ -380,12 +380,21 @@ void DatabaseManager::ProcessMessageFromServer(const std::vector<uint8_t>& buf)
 
 void DatabaseManager::OnTextModifiedFromGUI(const FoundTextRefs& textRefs)
 {
-	if (textRefs.attrInTable->type == AttributePropertyType::BaseText_t) {
+	// Отослать событие на сервер
+	switch (textRefs.attrInTable->type)
+	{
+	case AttributePropertyType::BaseText_t:
 		SendMsgChangeBaseText(textRefs);
-	}
-	else {
+	break;
+	case AttributePropertyType::Translation_t:
+	case AttributePropertyType::CommonText_t:
+	case AttributePropertyType::UintValue_t:
+	case AttributePropertyType::TranslationStatus_t:
 		SendMsgChangeTextAttrib(textRefs);
+	break;
 	}
+
+	// Установить признак модификации текста и каталога из интерфейса
 	textRefs.text->timestampModified = UINT32_MAX; // Подробности в описании поля
 	Folder* folder = FolderByTextId(textRefs.text->id);
 	if (folder) {
@@ -565,7 +574,17 @@ void DatabaseManager::SendMsgChangeTextAttrib(const FoundTextRefs& textRefs)
 	buf.PushString8(textRefs.text->id);
 	buf.PushUint8(textRefs.attrInText->id);
 	buf.PushUint8(textRefs.attrInText->type);
-	buf.PushString16(textRefs.attrInText->text);
+	if (textRefs.attrInText->type == AttributePropertyType::Translation_t ||
+		textRefs.attrInText->type == AttributePropertyType::CommonText_t
+		) {
+		buf.PushString16(textRefs.attrInText->text);
+	}
+	else
+		if (textRefs.attrInText->type == AttributePropertyType::UintValue_t ||
+			textRefs.attrInText->type == AttributePropertyType::TranslationStatus_t
+			) {
+			buf.PushUint8(textRefs.attrInText->uintValue);
+		}
 }
 
 //---------------------------------------------------------------
@@ -668,6 +687,7 @@ std::string DatabaseManager::ModifyDbChangeAttributeInText(DeserializationBuffer
 		dbuf.GetString16(text);
 	break;
 	case AttributePropertyType::UintValue_t:
+	case AttributePropertyType::TranslationStatus_t:
 		uintValue = dbuf.GetUint8();
 	break;
 	default:
@@ -715,7 +735,12 @@ std::string DatabaseManager::ModifyDbChangeAttributeInText(DeserializationBuffer
 		}
 	break;
 	case AttributePropertyType::UintValue_t:
+	case AttributePropertyType::TranslationStatus_t:
 		attribInTextToModify->uintValue = uintValue;
+		if (uintValue == UINT_NO_VALUE) {
+			int indexElement = attribInTextToModify - &tmpTextPtr->attributes[0];
+			tmpTextPtr->attributes.erase(tmpTextPtr->attributes.begin() + indexElement);
+		}
 	break;
 	}
 
