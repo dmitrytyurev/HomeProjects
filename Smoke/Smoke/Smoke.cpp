@@ -8,16 +8,20 @@
 //--------------------------------------------------------------------------------------------
 
 const int SceneSize = 200;
-const float Scale = 1.1f;
+float Scale = 1.6f;
+float SpeedSlowdown = 0.99f;
 
 //--------------------------------------------------------------------------------------------
 
 struct Cell
 {
 	float smokeDens = 0;
-	float smokeDensAdd = 0;
 	float speedX = 0;
 	float speedY = 0;
+
+	float smokeDensAdd = 0;
+	float speedXAdd = 0;
+	float speedYAdd = 0;
 };
 
 //--------------------------------------------------------------------------------------------
@@ -120,17 +124,22 @@ void update()
 				elem /= coeffsSum;
 			}
 
-			// Вычитаем плотность дыма текущей клетки из своей же клетки (аддитивная карта, будет пременена в конце кадра)
+			// Вычитаем плотность дыма и скорости текущей клетки из своей же клетки (аддитивная карта, будет пременена в конце кадра)
 			scene[x][y].smokeDensAdd -= scene[x][y].smokeDens;
+			scene[x][y].speedXAdd -= scene[x][y].speedX;
+			scene[x][y].speedYAdd -= scene[x][y].speedY;
 
-			// Прибавляем плотность дыма текущей клетки ко всем заффекченным клеткам с нормированными коэффициентами перекрытия по клеткам периметра (аддитивная карта, будет пременена в конце кадра)
+			// Прибавляем плотность дыма и скорости текущей клетки ко всем заффекченным клеткам с нормированными коэффициентами перекрытия по клеткам периметра (аддитивная карта, будет пременена в конце кадра)
 			int index = 0;
 			for (int yi = y1i; yi <= y2i; ++yi) {
 				for (int xi = x1i; xi <= x2i; ++xi) {
 					if (xi < 0 || xi >= SceneSize || yi < 0 || yi >= SceneSize) {
 						continue;
 					}
-					scene[xi][yi].smokeDensAdd += scene[x][y].smokeDens * coeffs[index++];
+					scene[xi][yi].smokeDensAdd += scene[x][y].smokeDens * coeffs[index];
+					scene[xi][yi].speedXAdd += scene[x][y].speedX * coeffs[index] * SpeedSlowdown;
+					scene[xi][yi].speedYAdd += scene[x][y].speedY * coeffs[index] * SpeedSlowdown;
+					index++;
 				}
 			}
 		}
@@ -140,10 +149,14 @@ void update()
 	for (int y = 0; y < SceneSize; ++y) {
 		for (int x = 0; x < SceneSize; ++x) {
 			scene[x][y].smokeDens += scene[x][y].smokeDensAdd;
+			scene[x][y].speedX += scene[x][y].speedXAdd;
+			scene[x][y].speedY += scene[x][y].speedYAdd;
 			if (scene[x][y].smokeDens < 0) {
 				exit_msg("smokeDens < 0 !");
 			}
 			scene[x][y].smokeDensAdd = 0;
+			scene[x][y].speedXAdd = 0;
+			scene[x][y].speedYAdd = 0;
 		}
 	}
 }
@@ -161,37 +174,34 @@ void update()
 
 //--------------------------------------------------------------------------------------------
 
-void setSourseSmokeDensity()
+void setSourseSmokeDensityAndSpeed(int frame)
 {
 	for (int y = 0; y < 10; ++y) {
 		for (int x = 0; x < 10; ++x) {
-			scene[x][100 + y].smokeDens = 0.3f;
+			if (frame < 200) {
+				scene[x][100 + y].smokeDens = 0.3f;
+			}
+			scene[x][100 + y].speedX = 0.4f;
+		}
+	}
+
+	for (int y = 0; y < 10; ++y) {
+		for (int x = 0; x < 10; ++x) {
+			scene[60+x][SceneSize-1-y].speedY = -1.f;
 		}
 	}
 }
 
 //--------------------------------------------------------------------------------------------
 
-
 void test1()
 {
-	// -------------
-	//scene[0][199].smokeDens = 1;
-	//scene[199][0].smokeDens = 0.6f;
-	//scene[199][199].smokeDens = 0.3f;
-	//saveSceneToBmp("smokeScene00.bmp");
-
-	// -------------
-	for (int y = 0; y < SceneSize; ++y) {
-		for (int x = 0; x < SceneSize; ++x) {
-			scene[x][y].speedX = 3.f;
-		}
-	}
-
-	for (int i = 0; i < 100; ++i) {
-		setSourseSmokeDensity();
+	Scale = 1.6f;
+	SpeedSlowdown = 0.99f;
+	for (int i = 0; i < 1000; ++i) {
+		setSourseSmokeDensityAndSpeed(i);
 		update();
-		if (i % 5 == 0) {
+		if (i % 25 == 0) {
 			char number[4];
 			number[0] = i / 100 + '0';
 			number[1] = (i % 100) / 10 + '0';
@@ -203,7 +213,6 @@ void test1()
 		printf("i=%d ", i);
 	}
 }
-
 
 //--------------------------------------------------------------------------------------------
 
