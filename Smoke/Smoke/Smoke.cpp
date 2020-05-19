@@ -51,7 +51,7 @@ void saveSceneToBmp(const std::string& fileName)
 	{
 		for (int x = 0; x < SceneSize; ++x)
 		{
-			uint8_t bright = std::min(int(scene[x][y].smokeDens * 255), 255);
+			uint8_t bright = std::min(int(scene[x][y].smokeDens * 128), 128);
 			int pixelOffs = (y * SceneSize + x) * 3;
 			bmpData[pixelOffs++] = bright;
 			bmpData[pixelOffs++] = bright;
@@ -163,18 +163,7 @@ void update()
 
 //--------------------------------------------------------------------------------------------
 
-//printf("%f", partAll);
-
-
-
-
-
-
-
-
-//--------------------------------------------------------------------------------------------
-
-void setSourseSmokeDensityAndSpeed(int frame)
+void setSourseSmokeDensityAndSpeed1(int frame)
 {
 	for (int y = 0; y < 10; ++y) {
 		for (int x = 0; x < 10; ++x) {
@@ -199,7 +188,7 @@ void test1()
 	Scale = 1.6f;
 	SpeedSlowdown = 0.99f;
 	for (int i = 0; i < 1000; ++i) {
-		setSourseSmokeDensityAndSpeed(i);
+		setSourseSmokeDensityAndSpeed1(i);
 		update();
 		if (i % 25 == 0) {
 			char number[4];
@@ -216,7 +205,218 @@ void test1()
 
 //--------------------------------------------------------------------------------------------
 
+void setSourseSmokeDensityAndSpeed2(int frame)
+{
+	for (int y = 0; y < 120; ++y) {
+		for (int x = 0; x < 10; ++x) {
+			if (frame < 200) {
+				scene[x][y].smokeDens = 0.3f;
+			}
+			scene[x][y].speedX = 0.5f;
+		}
+	}
+
+	for (int y = 0; y < 120; ++y) {
+		for (int x = 0; x < 10; ++x) {
+			scene[SceneSize - 1 - x][SceneSize - 1 - y].speedX = -0.5f;
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+void test2()
+{
+	Scale = 1.6f;
+	SpeedSlowdown = 0.99f;
+	for (int i = 0; i < 1000; ++i) {
+		setSourseSmokeDensityAndSpeed2(i);
+		update();
+		if (i % 25 == 0) {
+			char number[4];
+			number[0] = i / 100 + '0';
+			number[1] = (i % 100) / 10 + '0';
+			number[2] = (i % 10) + '0';
+			number[3] = 0;
+			std::string fname = std::string("frame") + (const char*)number + ".bmp";
+			saveSceneToBmp(fname);
+		}
+		printf("i=%d ", i);
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+inline void intersectVertLeft(float x, float y, float dirX, float dirY, float& newX, float& newY)
+{
+	newX = (float)(int)x;
+	if (newX == x) {
+		newX = (float)(((int)x) - 1);
+	}
+	newY = y - dirY * (x - newX) / dirX;
+}
+
+inline void intersectVertRight(float x, float y, float dirX, float dirY, float& newX, float& newY)
+{
+	newX = (float)(((int)x) + 1);
+	newY = y - dirY * (x - newX) / dirX;
+}
+
+inline void intersectHorUp(float x, float y, float dirX, float dirY, float& newX, float& newY)
+{
+	newY = (float)(int)y;
+	if (newY == y) {
+		newY = (float)(((int)y) - 1);
+	}
+	newX = x - dirX * (y - newY) / dirY;
+}
+
+inline void intersectHorDown(float x, float y, float dirX, float dirY, float& newX, float& newY)
+{
+	newY = (float)(((int)y) + 1);
+	newX = x - dirX * (y - newY) / dirY;
+}
+
+void intersect(float x, float y, float dirX, float dirY, float& newX, float& newY)
+{
+	if (dirX < 0) {
+		if (dirY < 0) {
+			if (fabs(dirX) < 0.001f) {
+				intersectHorUp(x, y, dirX, dirY, newX, newY);
+			}
+			else
+				if (fabs(dirY) < 0.001f) {
+					intersectVertLeft(x, y, dirX, dirY, newX, newY);
+				}
+				else {
+					float newX1 = 0;
+					float newY1 = 0;
+					intersectVertLeft(x, y, dirX, dirY, newX1, newY1);
+					float newX2 = 0;
+					float newY2 = 0;
+					intersectHorUp(x, y, dirX, dirY, newX2, newY2);
+					float dist1 = (x - newX1)*(x - newX1) + (y - newY1)*(y - newY1);
+					float dist2 = (x - newX2)*(x - newX2) + (y - newY2)*(y - newY2);
+					if (dist1 < dist2) {
+						newX = newX1;
+						newY = newY1;
+					}
+					else {
+						newX = newX2;
+						newY = newY2;
+					}
+				}
+		}
+		else {
+			if (fabs(dirX) < 0.001f) {
+				intersectHorDown(x, y, dirX, dirY, newX, newY);
+			}
+			else
+				if (fabs(dirY) < 0.001f) {
+					intersectVertLeft(x, y, dirX, dirY, newX, newY);
+				}
+				else {
+					float newX1 = 0;
+					float newY1 = 0;
+					intersectVertLeft(x, y, dirX, dirY, newX1, newY1);
+					float newX2 = 0;
+					float newY2 = 0;
+					intersectHorDown(x, y, dirX, dirY, newX2, newY2);
+					float dist1 = (x - newX1)*(x - newX1) + (y - newY1)*(y - newY1);
+					float dist2 = (x - newX2)*(x - newX2) + (y - newY2)*(y - newY2);
+					if (dist1 < dist2) {
+						newX = newX1;
+						newY = newY1;
+					}
+					else {
+						newX = newX2;
+						newY = newY2;
+					}
+				}
+		}
+	}
+	else {
+		if (dirY < 0) {
+			if (fabs(dirX) < 0.001f) {
+				intersectHorUp(x, y, dirX, dirY, newX, newY);
+			}
+			else
+				if (fabs(dirY) < 0.001f) {
+					intersectVertRight(x, y, dirX, dirY, newX, newY);
+				}
+				else {
+					float newX1 = 0;
+					float newY1 = 0;
+					intersectVertRight(x, y, dirX, dirY, newX1, newY1);
+					float newX2 = 0;
+					float newY2 = 0;
+					intersectHorUp(x, y, dirX, dirY, newX2, newY2);
+					float dist1 = (x - newX1)*(x - newX1) + (y - newY1)*(y - newY1);
+					float dist2 = (x - newX2)*(x - newX2) + (y - newY2)*(y - newY2);
+					if (dist1 < dist2) {
+						newX = newX1;
+						newY = newY1;
+					}
+					else {
+						newX = newX2;
+						newY = newY2;
+					}
+				}
+		}
+		else {
+			if (fabs(dirX) < 0.001f) {
+				intersectHorDown(x, y, dirX, dirY, newX, newY);
+			}
+			else
+				if (fabs(dirY) < 0.001f) {
+					intersectVertRight(x, y, dirX, dirY, newX, newY);
+				}
+				else {
+					float newX1 = 0;
+					float newY1 = 0;
+					intersectVertRight(x, y, dirX, dirY, newX1, newY1);
+					float newX2 = 0;
+					float newY2 = 0;
+					intersectHorDown(x, y, dirX, dirY, newX2, newY2);
+					float dist1 = (x - newX1)*(x - newX1) + (y - newY1)*(y - newY1);
+					float dist2 = (x - newX2)*(x - newX2) + (y - newY2)*(y - newY2);
+					if (dist1 < dist2) {
+						newX = newX1;
+						newY = newY1;
+					}
+					else {
+						newX = newX2;
+						newY = newY2;
+					}
+				}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+void test3()
+{
+	float x = 7.5f;
+	float y = 13.f;
+	float dirX = -7.f;
+	float dirY = -13.f;
+
+	float newX = 0;
+	float newY = 0;
+
+	for (int i = 0; i < 20; ++i) {
+		intersect(x, y, dirX, dirY, newX, newY);
+		printf("%f %f\n", newX, newY);
+		x = newX;
+		y = newY;
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+
 int main()
 {
-	test1();
+	test3();
 }
