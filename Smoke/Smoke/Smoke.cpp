@@ -375,351 +375,95 @@ inline void intersectBack(float x, float y, float z, float dirX, float dirY, flo
 
 void intersect(float x, float y, float z, float dirX, float dirY, float dirZ, float& newX, float& newY, float& newZ)
 {
+	float newX1 = 0;
+	float newY1 = 0;
+	float newZ1 = 0;
+	float newX2 = 0;
+	float newY2 = 0;
+	float newZ2 = 0;
+	float newX3 = 0;
+	float newY3 = 0;
+	float newZ3 = 0;
 	if (dirX < 0) {
 		if (dirY < 0) {
 			if (dirZ < 0) {
-				float newX1 = 0;
-				float newY1 = 0;
-				float newZ1 = 0;
 				intersectLeft(x, y, z, dirX, dirY, dirZ, newX1, newY1, newZ1);
-				float newX2 = 0;
-				float newY2 = 0;
-				float newZ2 = 0;
 				intersectUp(x, y, z, dirX, dirY, dirZ, newX2, newY2, newZ2);
-				float newX3 = 0;
-				float newY3 = 0;
-				float newZ3 = 0;
 				intersectFront(x, y, z, dirX, dirY, dirZ, newX3, newY3, newZ3);
-				float dist1 = distSq(x, y, z, newX1, newY1, newZ1);
-				float dist2 = distSq(x, y, z, newX2, newY2, newZ2);
-				float dist3 = distSq(x, y, z, newX3, newY3, newZ3);
-				if (dist1 < dist2) {
-					if (dist1 < dist3) {
-						newX = newX1;
-						newY = newY1;
-						newZ = newZ1;
-					}
-					else {
-						newX = newX3;
-						newY = newY3;
-						newZ = newZ3;
-					}
-				}
-				else {
-					if (dist2 < dist3) {
-						newX = newX2;
-						newY = newY2;
-						newZ = newZ2;
-					}
-					else {
-						newX = newX3;
-						newY = newY3;
-						newZ = newZ3;
-					}
-				}
 			}
 			else {
-				float newX1 = 0;
-				float newY1 = 0;
-				float newZ1 = 0;
 				intersectLeft(x, y, z, dirX, dirY, dirZ, newX1, newY1, newZ1);
-				float newX2 = 0;
-				float newY2 = 0;
-				float newZ2 = 0;
 				intersectUp(x, y, z, dirX, dirY, dirZ, newX2, newY2, newZ2);
-				float newX3 = 0;
-				float newY3 = 0;
-				float newZ3 = 0;
 				intersectBack(x, y, z, dirX, dirY, dirZ, newX3, newY3, newZ3);
-				float dist1 = distSq(x, y, z, newX1, newY1, newZ1);
-				float dist2 = distSq(x, y, z, newX2, newY2, newZ2);
-				float dist3 = distSq(x, y, z, newX3, newY3, newZ3);
-				if (dist1 < dist2) {
-					if (dist1 < dist3) {
-						newX = newX1;
-						newY = newY1;
-						newZ = newZ1;
-					}
-					else {
-						newX = newX3;
-						newY = newY3;
-						newZ = newZ3;
-					}
-				}
-				else {
-					if (dist2 < dist3) {
-						newX = newX2;
-						newY = newY2;
-						newZ = newZ2;
-					}
-					else {
-						newX = newX3;
-						newY = newY3;
-						newZ = newZ3;
-					}
-				}
 			}
 		}
 		else {
 			if (dirZ < 0) {
-				float newX1 = 0;
-				float newY1 = 0;
-				float newZ1 = 0;
 				intersectLeft(x, y, z, dirX, dirY, dirZ, newX1, newY1, newZ1);
-				float newX2 = 0;
-				float newY2 = 0;
-				float newZ2 = 0;
 				intersectDown(x, y, z, dirX, dirY, dirZ, newX2, newY2, newZ2);
-				float newX3 = 0;
-				float newY3 = 0;
-				float newZ3 = 0;
 				intersectFront(x, y, z, dirX, dirY, dirZ, newX3, newY3, newZ3);
-				float dist1 = distSq(x, y, z, newX1, newY1, newZ1);
-				float dist2 = distSq(x, y, z, newX2, newY2, newZ2);
-				float dist3 = distSq(x, y, z, newX3, newY3, newZ3);
-				if (dist1 < dist2) {
-					if (dist1 < dist3) {
-						newX = newX1;
-						newY = newY1;
-						newZ = newZ1;
-					}
-					else {
-						newX = newX3;
-						newY = newY3;
-						newZ = newZ3;
-					}
-				}
-				else {
-					if (dist2 < dist3) {
-						newX = newX2;
-						newY = newY2;
-						newZ = newZ2;
-					}
-					else {
-						newX = newX3;
-						newY = newY3;
-						newZ = newZ3;
-					}
-				}
 			}
 			else {
-				float newX1 = 0;
-				float newY1 = 0;
-				float newZ1 = 0;
 				intersectLeft(x, y, z, dirX, dirY, dirZ, newX1, newY1, newZ1);
-				float newX2 = 0;
-				float newY2 = 0;
-				float newZ2 = 0;
 				intersectDown(x, y, z, dirX, dirY, dirZ, newX2, newY2, newZ2);
-				float newX3 = 0;
-				float newY3 = 0;
-				float newZ3 = 0;
 				intersectBack(x, y, z, dirX, dirY, dirZ, newX3, newY3, newZ3);
-				float dist1 = distSq(x, y, z, newX1, newY1, newZ1);
-				float dist2 = distSq(x, y, z, newX2, newY2, newZ2);
-				float dist3 = distSq(x, y, z, newX3, newY3, newZ3);
-				if (dist1 < dist2) {
-					if (dist1 < dist3) {
-						newX = newX1;
-						newY = newY1;
-						newZ = newZ1;
-					}
-					else {
-						newX = newX3;
-						newY = newY3;
-						newZ = newZ3;
-					}
-				}
-				else {
-					if (dist2 < dist3) {
-						newX = newX2;
-						newY = newY2;
-						newZ = newZ2;
-					}
-					else {
-						newX = newX3;
-						newY = newY3;
-						newZ = newZ3;
-					}
-				}
 			}
 		}
 	}
 	else {
 		if (dirY < 0) {
 			if (dirZ < 0) {
-				float newX1 = 0;
-				float newY1 = 0;
-				float newZ1 = 0;
 				intersectRight(x, y, z, dirX, dirY, dirZ, newX1, newY1, newZ1);
-				float newX2 = 0;
-				float newY2 = 0;
-				float newZ2 = 0;
 				intersectUp(x, y, z, dirX, dirY, dirZ, newX2, newY2, newZ2);
-				float newX3 = 0;
-				float newY3 = 0;
-				float newZ3 = 0;
 				intersectFront(x, y, z, dirX, dirY, dirZ, newX3, newY3, newZ3);
-				float dist1 = distSq(x, y, z, newX1, newY1, newZ1);
-				float dist2 = distSq(x, y, z, newX2, newY2, newZ2);
-				float dist3 = distSq(x, y, z, newX3, newY3, newZ3);
-				if (dist1 < dist2) {
-					if (dist1 < dist3) {
-						newX = newX1;
-						newY = newY1;
-						newZ = newZ1;
-					}
-					else {
-						newX = newX3;
-						newY = newY3;
-						newZ = newZ3;
-					}
-				}
-				else {
-					if (dist2 < dist3) {
-						newX = newX2;
-						newY = newY2;
-						newZ = newZ2;
-					}
-					else {
-						newX = newX3;
-						newY = newY3;
-						newZ = newZ3;
-					}
-				}
 			}
 			else {
-				float newX1 = 0;
-				float newY1 = 0;
-				float newZ1 = 0;
 				intersectRight(x, y, z, dirX, dirY, dirZ, newX1, newY1, newZ1);
-				float newX2 = 0;
-				float newY2 = 0;
-				float newZ2 = 0;
 				intersectUp(x, y, z, dirX, dirY, dirZ, newX2, newY2, newZ2);
-				float newX3 = 0;
-				float newY3 = 0;
-				float newZ3 = 0;
 				intersectBack(x, y, z, dirX, dirY, dirZ, newX3, newY3, newZ3);
-				float dist1 = distSq(x, y, z, newX1, newY1, newZ1);
-				float dist2 = distSq(x, y, z, newX2, newY2, newZ2);
-				float dist3 = distSq(x, y, z, newX3, newY3, newZ3);
-				if (dist1 < dist2) {
-					if (dist1 < dist3) {
-						newX = newX1;
-						newY = newY1;
-						newZ = newZ1;
-					}
-					else {
-						newX = newX3;
-						newY = newY3;
-						newZ = newZ3;
-					}
-				}
-				else {
-					if (dist2 < dist3) {
-						newX = newX2;
-						newY = newY2;
-						newZ = newZ2;
-					}
-					else {
-						newX = newX3;
-						newY = newY3;
-						newZ = newZ3;
-					}
-				}
 			}
 		}
 		else {
 			if (dirZ < 0) {
-				float newX1 = 0;
-				float newY1 = 0;
-				float newZ1 = 0;
 				intersectRight(x, y, z, dirX, dirY, dirZ, newX1, newY1, newZ1);
-				float newX2 = 0;
-				float newY2 = 0;
-				float newZ2 = 0;
 				intersectDown(x, y, z, dirX, dirY, dirZ, newX2, newY2, newZ2);
-				float newX3 = 0;
-				float newY3 = 0;
-				float newZ3 = 0;
 				intersectFront(x, y, z, dirX, dirY, dirZ, newX3, newY3, newZ3);
-				float dist1 = distSq(x, y, z, newX1, newY1, newZ1);
-				float dist2 = distSq(x, y, z, newX2, newY2, newZ2);
-				float dist3 = distSq(x, y, z, newX3, newY3, newZ3);
-				if (dist1 < dist2) {
-					if (dist1 < dist3) {
-						newX = newX1;
-						newY = newY1;
-						newZ = newZ1;
-					}
-					else {
-						newX = newX3;
-						newY = newY3;
-						newZ = newZ3;
-					}
-				}
-				else {
-					if (dist2 < dist3) {
-						newX = newX2;
-						newY = newY2;
-						newZ = newZ2;
-					}
-					else {
-						newX = newX3;
-						newY = newY3;
-						newZ = newZ3;
-					}
-				}
 			}
 			else {
-				float newX1 = 0;
-				float newY1 = 0;
-				float newZ1 = 0;
 				intersectRight(x, y, z, dirX, dirY, dirZ, newX1, newY1, newZ1);
-				float newX2 = 0;
-				float newY2 = 0;
-				float newZ2 = 0;
 				intersectDown(x, y, z, dirX, dirY, dirZ, newX2, newY2, newZ2);
-				float newX3 = 0;
-				float newY3 = 0;
-				float newZ3 = 0;
 				intersectBack(x, y, z, dirX, dirY, dirZ, newX3, newY3, newZ3);
-				float dist1 = distSq(x, y, z, newX1, newY1, newZ1);
-				float dist2 = distSq(x, y, z, newX2, newY2, newZ2);
-				float dist3 = distSq(x, y, z, newX3, newY3, newZ3);
-				if (dist1 < dist2) {
-					if (dist1 < dist3) {
-						newX = newX1;
-						newY = newY1;
-						newZ = newZ1;
-					}
-					else {
-						newX = newX3;
-						newY = newY3;
-						newZ = newZ3;
-					}
-				}
-				else {
-					if (dist2 < dist3) {
-						newX = newX2;
-						newY = newY2;
-						newZ = newZ2;
-					}
-					else {
-						newX = newX3;
-						newY = newY3;
-						newZ = newZ3;
-					}
-				}
 			}
 		}
 	}
-
-
-
-
-
+	
+	float dist1 = distSq(x, y, z, newX1, newY1, newZ1);
+	float dist2 = distSq(x, y, z, newX2, newY2, newZ2);
+	float dist3 = distSq(x, y, z, newX3, newY3, newZ3);
+	if (dist1 < dist2) {
+		if (dist1 < dist3) {
+			newX = newX1;
+			newY = newY1;
+			newZ = newZ1;
+		}
+		else {
+			newX = newX3;
+			newY = newY3;
+			newZ = newZ3;
+		}
+	}
+	else {
+		if (dist2 < dist3) {
+			newX = newX2;
+			newY = newY2;
+			newZ = newZ2;
+		}
+		else {
+			newX = newX3;
+			newY = newY3;
+			newZ = newZ3;
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------
@@ -729,9 +473,9 @@ void test3()
 	float x = 10.9f;
 	float y = 6.f;
 	float z = 3.8f;
-	float dirX = -1.f;
-	float dirY = -1.f;
-	float dirZ = -1.f;
+	float dirX = 1.f;
+	float dirY = 1.f;
+	float dirZ = 1.f;
 
 	float newX = 0;
 	float newY = 0;
