@@ -246,170 +246,503 @@ void test2()
 }
 
 //--------------------------------------------------------------------------------------------
+// Ренедр
+//--------------------------------------------------------------------------------------------
 
-inline void intersectVertLeft(float x, float y, float dirX, float dirY, float& newX, float& newY)
+const float FarAway = 100000.f;
+
+inline float distSq(float x1, float y1, float z1, float x2, float y2, float z2)
 {
+	float dx = x1 - x2;
+	float dy = y1 - y2;
+	float dz = z1 - z2;
+	return dx * dx + dy * dy + dz * dz;
+}
+
+//--------------------------------------------------------------------------------------------
+
+inline void intersectLeft(float x, float y, float z, float dirX, float dirY, float dirZ, float& newX, float& newY, float& newZ)
+{
+	if (fabs(dirX) < 0.001f) {
+		newX = FarAway;
+		newY = FarAway;
+		newZ = FarAway;
+		return;
+	}
+
 	newX = (float)(int)x;
 	if (newX == x) {
 		newX = (float)(((int)x) - 1);
 	}
-	newY = y - dirY * (x - newX) / dirX;
+	float a = (newX - x) / dirX;
+	newY = y + dirY*a;
+	newZ = z + dirZ*a;
 }
 
-inline void intersectVertRight(float x, float y, float dirX, float dirY, float& newX, float& newY)
-{
-	newX = (float)(((int)x) + 1);
-	newY = y - dirY * (x - newX) / dirX;
-}
+//--------------------------------------------------------------------------------------------
 
-inline void intersectHorUp(float x, float y, float dirX, float dirY, float& newX, float& newY)
+inline void intersectUp(float x, float y, float z, float dirX, float dirY, float dirZ, float& newX, float& newY, float& newZ)
 {
+	if (fabs(dirY) < 0.001f) {
+		newX = FarAway;
+		newY = FarAway;
+		newZ = FarAway;
+		return;
+	}
+
 	newY = (float)(int)y;
 	if (newY == y) {
 		newY = (float)(((int)y) - 1);
 	}
-	newX = x - dirX * (y - newY) / dirY;
+	float a = (newY - y) / dirY;
+	newX = x + dirX * a;
+	newZ = z + dirZ * a;
 }
 
-inline void intersectHorDown(float x, float y, float dirX, float dirY, float& newX, float& newY)
+//--------------------------------------------------------------------------------------------
+
+inline void intersectFront(float x, float y, float z, float dirX, float dirY, float dirZ, float& newX, float& newY, float& newZ)
 {
-	newY = (float)(((int)y) + 1);
-	newX = x - dirX * (y - newY) / dirY;
+	if (fabs(dirZ) < 0.001f) {
+		newX = FarAway;
+		newY = FarAway;
+		newZ = FarAway;
+		return;
+	}
+
+	newZ = (float)(int)z;
+	if (newZ == z) {
+		newZ = (float)(((int)z) - 1);
+	}
+	float a = (newZ - z) / dirZ;
+	newX = x + dirX * a;
+	newY = y + dirY * a;
 }
 
-void intersect(float x, float y, float dirX, float dirY, float& newX, float& newY)
+//--------------------------------------------------------------------------------------------
+
+inline void intersectRight(float x, float y, float z, float dirX, float dirY, float dirZ, float& newX, float& newY, float& newZ)
+{
+	if (fabs(dirX) < 0.001f) {
+		newX = FarAway;
+		newY = FarAway;
+		newZ = FarAway;
+		return;
+	}
+
+	newX = (float)(((int)x) + 1);
+	float a = (newX - x) / dirX;
+	newY = y + dirY * a;
+	newZ = z + dirZ * a;
+}
+
+//--------------------------------------------------------------------------------------------
+
+inline void intersectDown(float x, float y, float z, float dirX, float dirY, float dirZ, float& newX, float& newY, float& newZ)
+{
+	if (fabs(dirY) < 0.001f) {
+		newX = FarAway;
+		newY = FarAway;
+		newZ = FarAway;
+		return;
+	}
+
+	newY = (float)(((int)y) + 1);
+	float a = (newY - y) / dirY;
+	newX = x + dirX * a;
+	newZ = z + dirZ * a;
+}
+
+//--------------------------------------------------------------------------------------------
+
+inline void intersectBack(float x, float y, float z, float dirX, float dirY, float dirZ, float& newX, float& newY, float& newZ)
+{
+	if (fabs(dirZ) < 0.001f) {
+		newX = FarAway;
+		newY = FarAway;
+		newZ = FarAway;
+		return;
+	}
+
+	newZ = (float)(((int)z) + 1);
+	float a = (newZ - z) / dirZ;
+	newX = x + dirX * a;
+	newY = y + dirY * a;
+}
+
+//--------------------------------------------------------------------------------------------
+
+
+void intersect(float x, float y, float z, float dirX, float dirY, float dirZ, float& newX, float& newY, float& newZ)
 {
 	if (dirX < 0) {
 		if (dirY < 0) {
-			if (fabs(dirX) < 0.001f) {
-				intersectHorUp(x, y, dirX, dirY, newX, newY);
-			}
-			else
-				if (fabs(dirY) < 0.001f) {
-					intersectVertLeft(x, y, dirX, dirY, newX, newY);
-				}
-				else {
-					float newX1 = 0;
-					float newY1 = 0;
-					intersectVertLeft(x, y, dirX, dirY, newX1, newY1);
-					float newX2 = 0;
-					float newY2 = 0;
-					intersectHorUp(x, y, dirX, dirY, newX2, newY2);
-					float dist1 = (x - newX1)*(x - newX1) + (y - newY1)*(y - newY1);
-					float dist2 = (x - newX2)*(x - newX2) + (y - newY2)*(y - newY2);
-					if (dist1 < dist2) {
+			if (dirZ < 0) {
+				float newX1 = 0;
+				float newY1 = 0;
+				float newZ1 = 0;
+				intersectLeft(x, y, z, dirX, dirY, dirZ, newX1, newY1, newZ1);
+				float newX2 = 0;
+				float newY2 = 0;
+				float newZ2 = 0;
+				intersectUp(x, y, z, dirX, dirY, dirZ, newX2, newY2, newZ2);
+				float newX3 = 0;
+				float newY3 = 0;
+				float newZ3 = 0;
+				intersectFront(x, y, z, dirX, dirY, dirZ, newX3, newY3, newZ3);
+				float dist1 = distSq(x, y, z, newX1, newY1, newZ1);
+				float dist2 = distSq(x, y, z, newX2, newY2, newZ2);
+				float dist3 = distSq(x, y, z, newX3, newY3, newZ3);
+				if (dist1 < dist2) {
+					if (dist1 < dist3) {
 						newX = newX1;
 						newY = newY1;
+						newZ = newZ1;
 					}
 					else {
-						newX = newX2;
-						newY = newY2;
+						newX = newX3;
+						newY = newY3;
+						newZ = newZ3;
 					}
 				}
+				else {
+					if (dist2 < dist3) {
+						newX = newX2;
+						newY = newY2;
+						newZ = newZ2;
+					}
+					else {
+						newX = newX3;
+						newY = newY3;
+						newZ = newZ3;
+					}
+				}
+			}
+			else {
+				float newX1 = 0;
+				float newY1 = 0;
+				float newZ1 = 0;
+				intersectLeft(x, y, z, dirX, dirY, dirZ, newX1, newY1, newZ1);
+				float newX2 = 0;
+				float newY2 = 0;
+				float newZ2 = 0;
+				intersectUp(x, y, z, dirX, dirY, dirZ, newX2, newY2, newZ2);
+				float newX3 = 0;
+				float newY3 = 0;
+				float newZ3 = 0;
+				intersectBack(x, y, z, dirX, dirY, dirZ, newX3, newY3, newZ3);
+				float dist1 = distSq(x, y, z, newX1, newY1, newZ1);
+				float dist2 = distSq(x, y, z, newX2, newY2, newZ2);
+				float dist3 = distSq(x, y, z, newX3, newY3, newZ3);
+				if (dist1 < dist2) {
+					if (dist1 < dist3) {
+						newX = newX1;
+						newY = newY1;
+						newZ = newZ1;
+					}
+					else {
+						newX = newX3;
+						newY = newY3;
+						newZ = newZ3;
+					}
+				}
+				else {
+					if (dist2 < dist3) {
+						newX = newX2;
+						newY = newY2;
+						newZ = newZ2;
+					}
+					else {
+						newX = newX3;
+						newY = newY3;
+						newZ = newZ3;
+					}
+				}
+			}
 		}
 		else {
-			if (fabs(dirX) < 0.001f) {
-				intersectHorDown(x, y, dirX, dirY, newX, newY);
-			}
-			else
-				if (fabs(dirY) < 0.001f) {
-					intersectVertLeft(x, y, dirX, dirY, newX, newY);
-				}
-				else {
-					float newX1 = 0;
-					float newY1 = 0;
-					intersectVertLeft(x, y, dirX, dirY, newX1, newY1);
-					float newX2 = 0;
-					float newY2 = 0;
-					intersectHorDown(x, y, dirX, dirY, newX2, newY2);
-					float dist1 = (x - newX1)*(x - newX1) + (y - newY1)*(y - newY1);
-					float dist2 = (x - newX2)*(x - newX2) + (y - newY2)*(y - newY2);
-					if (dist1 < dist2) {
+			if (dirZ < 0) {
+				float newX1 = 0;
+				float newY1 = 0;
+				float newZ1 = 0;
+				intersectLeft(x, y, z, dirX, dirY, dirZ, newX1, newY1, newZ1);
+				float newX2 = 0;
+				float newY2 = 0;
+				float newZ2 = 0;
+				intersectDown(x, y, z, dirX, dirY, dirZ, newX2, newY2, newZ2);
+				float newX3 = 0;
+				float newY3 = 0;
+				float newZ3 = 0;
+				intersectFront(x, y, z, dirX, dirY, dirZ, newX3, newY3, newZ3);
+				float dist1 = distSq(x, y, z, newX1, newY1, newZ1);
+				float dist2 = distSq(x, y, z, newX2, newY2, newZ2);
+				float dist3 = distSq(x, y, z, newX3, newY3, newZ3);
+				if (dist1 < dist2) {
+					if (dist1 < dist3) {
 						newX = newX1;
 						newY = newY1;
+						newZ = newZ1;
 					}
 					else {
-						newX = newX2;
-						newY = newY2;
+						newX = newX3;
+						newY = newY3;
+						newZ = newZ3;
 					}
 				}
+				else {
+					if (dist2 < dist3) {
+						newX = newX2;
+						newY = newY2;
+						newZ = newZ2;
+					}
+					else {
+						newX = newX3;
+						newY = newY3;
+						newZ = newZ3;
+					}
+				}
+			}
+			else {
+				float newX1 = 0;
+				float newY1 = 0;
+				float newZ1 = 0;
+				intersectLeft(x, y, z, dirX, dirY, dirZ, newX1, newY1, newZ1);
+				float newX2 = 0;
+				float newY2 = 0;
+				float newZ2 = 0;
+				intersectDown(x, y, z, dirX, dirY, dirZ, newX2, newY2, newZ2);
+				float newX3 = 0;
+				float newY3 = 0;
+				float newZ3 = 0;
+				intersectBack(x, y, z, dirX, dirY, dirZ, newX3, newY3, newZ3);
+				float dist1 = distSq(x, y, z, newX1, newY1, newZ1);
+				float dist2 = distSq(x, y, z, newX2, newY2, newZ2);
+				float dist3 = distSq(x, y, z, newX3, newY3, newZ3);
+				if (dist1 < dist2) {
+					if (dist1 < dist3) {
+						newX = newX1;
+						newY = newY1;
+						newZ = newZ1;
+					}
+					else {
+						newX = newX3;
+						newY = newY3;
+						newZ = newZ3;
+					}
+				}
+				else {
+					if (dist2 < dist3) {
+						newX = newX2;
+						newY = newY2;
+						newZ = newZ2;
+					}
+					else {
+						newX = newX3;
+						newY = newY3;
+						newZ = newZ3;
+					}
+				}
+			}
 		}
 	}
 	else {
 		if (dirY < 0) {
-			if (fabs(dirX) < 0.001f) {
-				intersectHorUp(x, y, dirX, dirY, newX, newY);
-			}
-			else
-				if (fabs(dirY) < 0.001f) {
-					intersectVertRight(x, y, dirX, dirY, newX, newY);
-				}
-				else {
-					float newX1 = 0;
-					float newY1 = 0;
-					intersectVertRight(x, y, dirX, dirY, newX1, newY1);
-					float newX2 = 0;
-					float newY2 = 0;
-					intersectHorUp(x, y, dirX, dirY, newX2, newY2);
-					float dist1 = (x - newX1)*(x - newX1) + (y - newY1)*(y - newY1);
-					float dist2 = (x - newX2)*(x - newX2) + (y - newY2)*(y - newY2);
-					if (dist1 < dist2) {
+			if (dirZ < 0) {
+				float newX1 = 0;
+				float newY1 = 0;
+				float newZ1 = 0;
+				intersectRight(x, y, z, dirX, dirY, dirZ, newX1, newY1, newZ1);
+				float newX2 = 0;
+				float newY2 = 0;
+				float newZ2 = 0;
+				intersectUp(x, y, z, dirX, dirY, dirZ, newX2, newY2, newZ2);
+				float newX3 = 0;
+				float newY3 = 0;
+				float newZ3 = 0;
+				intersectFront(x, y, z, dirX, dirY, dirZ, newX3, newY3, newZ3);
+				float dist1 = distSq(x, y, z, newX1, newY1, newZ1);
+				float dist2 = distSq(x, y, z, newX2, newY2, newZ2);
+				float dist3 = distSq(x, y, z, newX3, newY3, newZ3);
+				if (dist1 < dist2) {
+					if (dist1 < dist3) {
 						newX = newX1;
 						newY = newY1;
+						newZ = newZ1;
 					}
 					else {
-						newX = newX2;
-						newY = newY2;
+						newX = newX3;
+						newY = newY3;
+						newZ = newZ3;
 					}
 				}
+				else {
+					if (dist2 < dist3) {
+						newX = newX2;
+						newY = newY2;
+						newZ = newZ2;
+					}
+					else {
+						newX = newX3;
+						newY = newY3;
+						newZ = newZ3;
+					}
+				}
+			}
+			else {
+				float newX1 = 0;
+				float newY1 = 0;
+				float newZ1 = 0;
+				intersectRight(x, y, z, dirX, dirY, dirZ, newX1, newY1, newZ1);
+				float newX2 = 0;
+				float newY2 = 0;
+				float newZ2 = 0;
+				intersectUp(x, y, z, dirX, dirY, dirZ, newX2, newY2, newZ2);
+				float newX3 = 0;
+				float newY3 = 0;
+				float newZ3 = 0;
+				intersectBack(x, y, z, dirX, dirY, dirZ, newX3, newY3, newZ3);
+				float dist1 = distSq(x, y, z, newX1, newY1, newZ1);
+				float dist2 = distSq(x, y, z, newX2, newY2, newZ2);
+				float dist3 = distSq(x, y, z, newX3, newY3, newZ3);
+				if (dist1 < dist2) {
+					if (dist1 < dist3) {
+						newX = newX1;
+						newY = newY1;
+						newZ = newZ1;
+					}
+					else {
+						newX = newX3;
+						newY = newY3;
+						newZ = newZ3;
+					}
+				}
+				else {
+					if (dist2 < dist3) {
+						newX = newX2;
+						newY = newY2;
+						newZ = newZ2;
+					}
+					else {
+						newX = newX3;
+						newY = newY3;
+						newZ = newZ3;
+					}
+				}
+			}
 		}
 		else {
-			if (fabs(dirX) < 0.001f) {
-				intersectHorDown(x, y, dirX, dirY, newX, newY);
-			}
-			else
-				if (fabs(dirY) < 0.001f) {
-					intersectVertRight(x, y, dirX, dirY, newX, newY);
-				}
-				else {
-					float newX1 = 0;
-					float newY1 = 0;
-					intersectVertRight(x, y, dirX, dirY, newX1, newY1);
-					float newX2 = 0;
-					float newY2 = 0;
-					intersectHorDown(x, y, dirX, dirY, newX2, newY2);
-					float dist1 = (x - newX1)*(x - newX1) + (y - newY1)*(y - newY1);
-					float dist2 = (x - newX2)*(x - newX2) + (y - newY2)*(y - newY2);
-					if (dist1 < dist2) {
+			if (dirZ < 0) {
+				float newX1 = 0;
+				float newY1 = 0;
+				float newZ1 = 0;
+				intersectRight(x, y, z, dirX, dirY, dirZ, newX1, newY1, newZ1);
+				float newX2 = 0;
+				float newY2 = 0;
+				float newZ2 = 0;
+				intersectDown(x, y, z, dirX, dirY, dirZ, newX2, newY2, newZ2);
+				float newX3 = 0;
+				float newY3 = 0;
+				float newZ3 = 0;
+				intersectFront(x, y, z, dirX, dirY, dirZ, newX3, newY3, newZ3);
+				float dist1 = distSq(x, y, z, newX1, newY1, newZ1);
+				float dist2 = distSq(x, y, z, newX2, newY2, newZ2);
+				float dist3 = distSq(x, y, z, newX3, newY3, newZ3);
+				if (dist1 < dist2) {
+					if (dist1 < dist3) {
 						newX = newX1;
 						newY = newY1;
+						newZ = newZ1;
 					}
 					else {
-						newX = newX2;
-						newY = newY2;
+						newX = newX3;
+						newY = newY3;
+						newZ = newZ3;
 					}
 				}
+				else {
+					if (dist2 < dist3) {
+						newX = newX2;
+						newY = newY2;
+						newZ = newZ2;
+					}
+					else {
+						newX = newX3;
+						newY = newY3;
+						newZ = newZ3;
+					}
+				}
+			}
+			else {
+				float newX1 = 0;
+				float newY1 = 0;
+				float newZ1 = 0;
+				intersectRight(x, y, z, dirX, dirY, dirZ, newX1, newY1, newZ1);
+				float newX2 = 0;
+				float newY2 = 0;
+				float newZ2 = 0;
+				intersectDown(x, y, z, dirX, dirY, dirZ, newX2, newY2, newZ2);
+				float newX3 = 0;
+				float newY3 = 0;
+				float newZ3 = 0;
+				intersectBack(x, y, z, dirX, dirY, dirZ, newX3, newY3, newZ3);
+				float dist1 = distSq(x, y, z, newX1, newY1, newZ1);
+				float dist2 = distSq(x, y, z, newX2, newY2, newZ2);
+				float dist3 = distSq(x, y, z, newX3, newY3, newZ3);
+				if (dist1 < dist2) {
+					if (dist1 < dist3) {
+						newX = newX1;
+						newY = newY1;
+						newZ = newZ1;
+					}
+					else {
+						newX = newX3;
+						newY = newY3;
+						newZ = newZ3;
+					}
+				}
+				else {
+					if (dist2 < dist3) {
+						newX = newX2;
+						newY = newY2;
+						newZ = newZ2;
+					}
+					else {
+						newX = newX3;
+						newY = newY3;
+						newZ = newZ3;
+					}
+				}
+			}
 		}
 	}
+
+
+
+
+
 }
 
 //--------------------------------------------------------------------------------------------
 
 void test3()
 {
-	float x = 7.5f;
-	float y = 13.f;
-	float dirX = -7.f;
-	float dirY = -13.f;
+	float x = 10.9f;
+	float y = 6.f;
+	float z = 3.8f;
+	float dirX = -1.f;
+	float dirY = -1.f;
+	float dirZ = -1.f;
 
 	float newX = 0;
 	float newY = 0;
+	float newZ = 0;
 
-	for (int i = 0; i < 20; ++i) {
-		intersect(x, y, dirX, dirY, newX, newY);
-		printf("%f %f\n", newX, newY);
+	for (int i = 0; i < 1; ++i) {
+		intersect(x, y, z, dirX, dirY, dirZ, newX, newY, newZ);
+		printf("%f %f %f\n", newX, newY, newZ);
 		x = newX;
 		y = newY;
+		z = newZ;
 	}
 }
 
