@@ -7,13 +7,13 @@
 
 //--------------------------------------------------------------------------------------------
 
-const int SceneSize = 200;
+const int Scene2DSize = 200;
 float Scale = 1.6f;
 float SpeedSlowdown = 0.99f;
 
 //--------------------------------------------------------------------------------------------
 
-struct Cell
+struct Cell2D
 {
 	float smokeDens = 0;
 	float speedX = 0;
@@ -26,7 +26,7 @@ struct Cell
 
 //--------------------------------------------------------------------------------------------
 
-Cell scene[SceneSize][SceneSize];
+Cell2D scene2D[Scene2DSize][Scene2DSize];
 
 //--------------------------------------------------------------------------------------------
 
@@ -44,22 +44,22 @@ void _cdecl exit_msg(const char *text, ...)
 
 //--------------------------------------------------------------------------------------------
 
-void saveSceneToBmp(const std::string& fileName)
+void save2DSceneToBmp(const std::string& fileName)
 {
-	uint8_t* bmpData = new uint8_t[SceneSize * SceneSize * 3];
-	for (int y=0; y < SceneSize; ++y)
+	uint8_t* bmpData = new uint8_t[Scene2DSize * Scene2DSize * 3];
+	for (int y=0; y < Scene2DSize; ++y)
 	{
-		for (int x = 0; x < SceneSize; ++x)
+		for (int x = 0; x < Scene2DSize; ++x)
 		{
-			uint8_t bright = std::min(int(scene[x][y].smokeDens * 128), 128);
-			int pixelOffs = (y * SceneSize + x) * 3;
+			uint8_t bright = std::min(int(scene2D[x][y].smokeDens * 128), 128);
+			int pixelOffs = (y * Scene2DSize + x) * 3;
 			bmpData[pixelOffs++] = bright;
 			bmpData[pixelOffs++] = bright;
 			bmpData[pixelOffs++] = bright;
 		}
 	}
 	
-	save_bmp24(fileName.c_str(), SceneSize, SceneSize, (const char *)bmpData);
+	save_bmp24(fileName.c_str(), Scene2DSize, Scene2DSize, (const char *)bmpData);
 	delete[] bmpData;
 }
 
@@ -69,8 +69,8 @@ void update()
 {
 	std::vector<float> coeffs; // Коэффициенты зацепления заффекченных клатов для нормализации
 
-	for (int y = 0; y < SceneSize; ++y) {
-		for (int x = 0; x < SceneSize; ++x) {
+	for (int y = 0; y < Scene2DSize; ++y) {
+		for (int x = 0; x < Scene2DSize; ++x) {
 			// Расчитаем новые координаты углов текущей клетки после сдвига и расширения
 			float x1 = (float)x;
 			float y1 = (float)y;
@@ -78,10 +78,10 @@ void update()
 			float y2 = y1 + 1.f;
 			float xCenter = x1 + 0.5f;
 			float yCenter = y1 + 0.5f;
-			x1 = (x1 - xCenter) * Scale + xCenter + scene[x][y].speedX;
-			y1 = (y1 - yCenter) * Scale + yCenter + scene[x][y].speedY;
-			x2 = (x2 - xCenter) * Scale + xCenter + scene[x][y].speedX;
-			y2 = (y2 - yCenter) * Scale + yCenter + scene[x][y].speedY;
+			x1 = (x1 - xCenter) * Scale + xCenter + scene2D[x][y].speedX;
+			y1 = (y1 - yCenter) * Scale + yCenter + scene2D[x][y].speedY;
+			x2 = (x2 - xCenter) * Scale + xCenter + scene2D[x][y].speedX;
+			y2 = (y2 - yCenter) * Scale + yCenter + scene2D[x][y].speedY;
 
 			// Расчитаем какие клетки (и с каким весом) цепляет сдвинутая и расширенная текущая клетка
 			int x1i = ((int)(x1 + 1000)) - 1000;
@@ -125,20 +125,20 @@ void update()
 			}
 
 			// Вычитаем плотность дыма и скорости текущей клетки из своей же клетки (аддитивная карта, будет пременена в конце кадра)
-			scene[x][y].smokeDensAdd -= scene[x][y].smokeDens;
-			scene[x][y].speedXAdd -= scene[x][y].speedX;
-			scene[x][y].speedYAdd -= scene[x][y].speedY;
+			scene2D[x][y].smokeDensAdd -= scene2D[x][y].smokeDens;
+			scene2D[x][y].speedXAdd -= scene2D[x][y].speedX;
+			scene2D[x][y].speedYAdd -= scene2D[x][y].speedY;
 
 			// Прибавляем плотность дыма и скорости текущей клетки ко всем заффекченным клеткам с нормированными коэффициентами перекрытия по клеткам периметра (аддитивная карта, будет пременена в конце кадра)
 			int index = 0;
 			for (int yi = y1i; yi <= y2i; ++yi) {
 				for (int xi = x1i; xi <= x2i; ++xi) {
-					if (xi < 0 || xi >= SceneSize || yi < 0 || yi >= SceneSize) {
+					if (xi < 0 || xi >= Scene2DSize || yi < 0 || yi >= Scene2DSize) {
 						continue;
 					}
-					scene[xi][yi].smokeDensAdd += scene[x][y].smokeDens * coeffs[index];
-					scene[xi][yi].speedXAdd += scene[x][y].speedX * coeffs[index] * SpeedSlowdown;
-					scene[xi][yi].speedYAdd += scene[x][y].speedY * coeffs[index] * SpeedSlowdown;
+					scene2D[xi][yi].smokeDensAdd += scene2D[x][y].smokeDens * coeffs[index];
+					scene2D[xi][yi].speedXAdd += scene2D[x][y].speedX * coeffs[index] * SpeedSlowdown;
+					scene2D[xi][yi].speedYAdd += scene2D[x][y].speedY * coeffs[index] * SpeedSlowdown;
 					index++;
 				}
 			}
@@ -146,17 +146,17 @@ void update()
 	}
 
 	// Применяем карту аддитивки и очищаем её
-	for (int y = 0; y < SceneSize; ++y) {
-		for (int x = 0; x < SceneSize; ++x) {
-			scene[x][y].smokeDens += scene[x][y].smokeDensAdd;
-			scene[x][y].speedX += scene[x][y].speedXAdd;
-			scene[x][y].speedY += scene[x][y].speedYAdd;
-			if (scene[x][y].smokeDens < 0) {
+	for (int y = 0; y < Scene2DSize; ++y) {
+		for (int x = 0; x < Scene2DSize; ++x) {
+			scene2D[x][y].smokeDens += scene2D[x][y].smokeDensAdd;
+			scene2D[x][y].speedX += scene2D[x][y].speedXAdd;
+			scene2D[x][y].speedY += scene2D[x][y].speedYAdd;
+			if (scene2D[x][y].smokeDens < 0) {
 				exit_msg("smokeDens < 0 !");
 			}
-			scene[x][y].smokeDensAdd = 0;
-			scene[x][y].speedXAdd = 0;
-			scene[x][y].speedYAdd = 0;
+			scene2D[x][y].smokeDensAdd = 0;
+			scene2D[x][y].speedXAdd = 0;
+			scene2D[x][y].speedYAdd = 0;
 		}
 	}
 }
@@ -168,15 +168,15 @@ void setSourseSmokeDensityAndSpeed1(int frame)
 	for (int y = 0; y < 10; ++y) {
 		for (int x = 0; x < 10; ++x) {
 			if (frame < 200) {
-				scene[x][100 + y].smokeDens = 0.3f;
+				scene2D[x][100 + y].smokeDens = 0.3f;
 			}
-			scene[x][100 + y].speedX = 0.4f;
+			scene2D[x][100 + y].speedX = 0.4f;
 		}
 	}
 
 	for (int y = 0; y < 10; ++y) {
 		for (int x = 0; x < 10; ++x) {
-			scene[60+x][SceneSize-1-y].speedY = -1.f;
+			scene2D[60+x][Scene2DSize-1-y].speedY = -1.f;
 		}
 	}
 }
@@ -197,7 +197,7 @@ void test1()
 			number[2] = (i % 10) + '0';
 			number[3] = 0;
 			std::string fname = std::string("frame") +(const char*)number +".bmp";
-			saveSceneToBmp(fname);
+			save2DSceneToBmp(fname);
 		}
 		printf("i=%d ", i);
 	}
@@ -210,15 +210,15 @@ void setSourseSmokeDensityAndSpeed2(int frame)
 	for (int y = 0; y < 120; ++y) {
 		for (int x = 0; x < 10; ++x) {
 			if (frame < 200) {
-				scene[x][y].smokeDens = 0.3f;
+				scene2D[x][y].smokeDens = 0.3f;
 			}
-			scene[x][y].speedX = 0.5f;
+			scene2D[x][y].speedX = 0.5f;
 		}
 	}
 
 	for (int y = 0; y < 120; ++y) {
 		for (int x = 0; x < 10; ++x) {
-			scene[SceneSize - 1 - x][SceneSize - 1 - y].speedX = -0.5f;
+			scene2D[Scene2DSize - 1 - x][Scene2DSize - 1 - y].speedX = -0.5f;
 		}
 	}
 }
@@ -239,7 +239,7 @@ void test2()
 			number[2] = (i % 10) + '0';
 			number[3] = 0;
 			std::string fname = std::string("frame") + (const char*)number + ".bmp";
-			saveSceneToBmp(fname);
+			save2DSceneToBmp(fname);
 		}
 		printf("i=%d ", i);
 	}
@@ -250,6 +250,45 @@ void test2()
 //--------------------------------------------------------------------------------------------
 
 const float FarAway = 100000.f;
+const int ScreenSize = 300; // Размер экрана в пикселах
+const int SceneSize = 200;  // Размер сцены в единичных кубах
+const float cameraZinit = -200; // Позиция камеры по z в системе координат сетки
+const float MaxLightBright = 1000; // Максимальная яркость источника света
+const double ScatterCoeff = 0.00002; // Коэффициент рассеивания тумана
+const int SceneDrawNum = 400; // Сколько раз рендерим сцену
+
+struct LIGHT_BOX
+{
+	LIGHT_BOX(float bright_, float x1_, float y1_, float z1_, float x2_, float y2_, float z2_) : bright(bright_), x1(x1_), y1(y1_), z1(z1_), x2(x2_), y2(y2_), z2(z2_) {}
+
+	float bright = 0;
+	float x1 = 0;
+	float x2 = 0;
+	float y1 = 0;
+	float y2 = 0;
+	float z1 = 0;
+	float z2 = 0;
+};
+
+struct Cell
+{
+	float smokeDens = 0;
+};
+
+
+double screen[ScreenSize][ScreenSize];
+std::vector<LIGHT_BOX> lights;
+Cell scene[SceneSize][SceneSize][SceneSize];
+
+//--------------------------------------------------------------------------------------------
+
+inline float truncOneSide(float x)
+{
+	return (float)((int)((double)x + 1000) - 1000);
+}
+
+//--------------------------------------------------------------------------------------------
+
 
 inline float distSq(float x1, float y1, float z1, float x2, float y2, float z2)
 {
@@ -264,15 +303,12 @@ inline float distSq(float x1, float y1, float z1, float x2, float y2, float z2)
 inline void intersectLeft(float x, float y, float z, float dirX, float dirY, float dirZ, float& newX, float& newY, float& newZ)
 {
 	if (fabs(dirX) < 0.001f) {
-		newX = FarAway;
-		newY = FarAway;
-		newZ = FarAway;
 		return;
 	}
 
-	newX = (float)(int)x;
+	newX = truncOneSide(x);
 	if (newX == x) {
-		newX = (float)(((int)x) - 1);
+		newX = truncOneSide(x) - 1.f;
 	}
 	float a = (newX - x) / dirX;
 	newY = y + dirY*a;
@@ -284,15 +320,12 @@ inline void intersectLeft(float x, float y, float z, float dirX, float dirY, flo
 inline void intersectUp(float x, float y, float z, float dirX, float dirY, float dirZ, float& newX, float& newY, float& newZ)
 {
 	if (fabs(dirY) < 0.001f) {
-		newX = FarAway;
-		newY = FarAway;
-		newZ = FarAway;
 		return;
 	}
 
-	newY = (float)(int)y;
+	newY = truncOneSide(y);
 	if (newY == y) {
-		newY = (float)(((int)y) - 1);
+		newY = truncOneSide(y) - 1.f;
 	}
 	float a = (newY - y) / dirY;
 	newX = x + dirX * a;
@@ -304,15 +337,12 @@ inline void intersectUp(float x, float y, float z, float dirX, float dirY, float
 inline void intersectFront(float x, float y, float z, float dirX, float dirY, float dirZ, float& newX, float& newY, float& newZ)
 {
 	if (fabs(dirZ) < 0.001f) {
-		newX = FarAway;
-		newY = FarAway;
-		newZ = FarAway;
 		return;
 	}
 
-	newZ = (float)(int)z;
+	newZ = truncOneSide(z);
 	if (newZ == z) {
-		newZ = (float)(((int)z) - 1);
+		newZ = truncOneSide(z) - 1.f;
 	}
 	float a = (newZ - z) / dirZ;
 	newX = x + dirX * a;
@@ -324,9 +354,6 @@ inline void intersectFront(float x, float y, float z, float dirX, float dirY, fl
 inline void intersectRight(float x, float y, float z, float dirX, float dirY, float dirZ, float& newX, float& newY, float& newZ)
 {
 	if (fabs(dirX) < 0.001f) {
-		newX = FarAway;
-		newY = FarAway;
-		newZ = FarAway;
 		return;
 	}
 
@@ -341,9 +368,6 @@ inline void intersectRight(float x, float y, float z, float dirX, float dirY, fl
 inline void intersectDown(float x, float y, float z, float dirX, float dirY, float dirZ, float& newX, float& newY, float& newZ)
 {
 	if (fabs(dirY) < 0.001f) {
-		newX = FarAway;
-		newY = FarAway;
-		newZ = FarAway;
 		return;
 	}
 
@@ -358,9 +382,6 @@ inline void intersectDown(float x, float y, float z, float dirX, float dirY, flo
 inline void intersectBack(float x, float y, float z, float dirX, float dirY, float dirZ, float& newX, float& newY, float& newZ)
 {
 	if (fabs(dirZ) < 0.001f) {
-		newX = FarAway;
-		newY = FarAway;
-		newZ = FarAway;
 		return;
 	}
 
@@ -373,17 +394,17 @@ inline void intersectBack(float x, float y, float z, float dirX, float dirY, flo
 //--------------------------------------------------------------------------------------------
 
 
-void intersect(float x, float y, float z, float dirX, float dirY, float dirZ, float& newX, float& newY, float& newZ)
+void intersect(float x, float y, float z, float dirX, float dirY, float dirZ, float& newX, float& newY, float& newZ, int& cubeX, int& cubeY, int& cubeZ)
 {
-	float newX1 = 0;
-	float newY1 = 0;
-	float newZ1 = 0;
-	float newX2 = 0;
-	float newY2 = 0;
-	float newZ2 = 0;
-	float newX3 = 0;
-	float newY3 = 0;
-	float newZ3 = 0;
+	float newX1 = FarAway;
+	float newY1 = FarAway;
+	float newZ1 = FarAway;
+	float newX2 = FarAway;
+	float newY2 = FarAway;
+	float newZ2 = FarAway;
+	float newX3 = FarAway;
+	float newY3 = FarAway;
+	float newZ3 = FarAway;
 	if (dirX < 0) {
 		if (dirY < 0) {
 			if (dirZ < 0) {
@@ -464,25 +485,35 @@ void intersect(float x, float y, float z, float dirX, float dirY, float dirZ, fl
 			newZ = newZ3;
 		}
 	}
+
+	float centerX = (x + newX) * 0.5f;
+	float centerY = (y + newY) * 0.5f;
+	float centerZ = (z + newZ) * 0.5f;
+	cubeX = ((int)((double)centerX + 10000)) - 10000;
+	cubeY = ((int)((double)centerY + 10000)) - 10000;
+	cubeZ = ((int)((double)centerZ + 10000)) - 10000;
 }
 
 //--------------------------------------------------------------------------------------------
 
 void test3()
 {
-	float x = 10.9f;
-	float y = 6.f;
-	float z = 3.8f;
-	float dirX = 1.f;
-	float dirY = 1.f;
-	float dirZ = 1.f;
+	float x = 10.15f;
+	float y = 6.95f;
+	float z = 3.f;
+	float dirX = -0.1f;
+	float dirY = -0.1f;
+	float dirZ = -1.f;
 
 	float newX = 0;
 	float newY = 0;
 	float newZ = 0;
+	int cubeX = 0;
+	int cubeY = 0;
+	int cubeZ = 0;
 
-	for (int i = 0; i < 1; ++i) {
-		intersect(x, y, z, dirX, dirY, dirZ, newX, newY, newZ);
+	for (int i = 0; i < 4; ++i) {
+		intersect(x, y, z, dirX, dirY, dirZ, newX, newY, newZ, cubeX, cubeY, cubeZ);
 		printf("%f %f %f\n", newX, newY, newZ);
 		x = newX;
 		y = newY;
@@ -491,9 +522,135 @@ void test3()
 }
 
 //--------------------------------------------------------------------------------------------
+// Определить цвет пиксела и записать его в буфер screen
+//--------------------------------------------------------------------------------------------
 
+double randDouble()
+{
+	return ((double)rand()) / RAND_MAX;
+}
+
+void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float dirY, float dirZ)
+{
+	double lightDrop = 0;
+	double scatterProb = 0;
+
+	while(true) {
+		if (x < -1 || x > SceneSize + 1 || y < -1 || y > SceneSize + 1 || z < -1 || z > SceneSize + 1) {
+			return;
+		}
+		for (const auto& light : lights) {
+			if (x > light.x1 && x < light.x2 && y > light.y1 && y < light.y2 && z > light.z1 && z < light.z2) {
+				screen[xi][yi] += std::max(light.bright - lightDrop, 0.);
+				return;
+			}
+		}
+
+		float newX = 0;
+		float newY = 0;
+		float newZ = 0;
+		int cubeX = 0;
+		int cubeY = 0;
+		int cubeZ = 0;
+		intersect(x, y, z, dirX, dirY, dirZ, newX, newY, newZ, cubeX, cubeY, cubeZ);
+		float dist = sqrtf((x, y, z, newX, newY, newZ));
+		x = newX;
+		y = newY;
+		z = newZ;
+
+		float smokeDens = 0;
+		if (cubeX >= 0 && cubeX < SceneSize && cubeY >= 0 && cubeY < SceneSize && cubeZ >= 0 && cubeZ < SceneSize) {
+			smokeDens = scene[cubeX][cubeY][cubeZ].smokeDens;
+		}
+
+		lightDrop += smokeDens * dist * 0.2f;
+		if (lightDrop > MaxLightBright) {
+			return;
+		}
+
+		double curScatterProb = smokeDens * dist * ScatterCoeff;
+		scatterProb = 1. - (1. - scatterProb) * (1. - curScatterProb);
+		if (randDouble() < scatterProb) {
+			scatterProb = 0;
+			dirX = (float)(randDouble() * 2.f - 1.f);
+			dirY = (float)(randDouble() * 2.f - 1.f);
+			dirZ = (float)(randDouble() * 2.f - 1.f);
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+// Рендерить сцену в буфер screen
+//--------------------------------------------------------------------------------------------
+
+void renderScene()
+{
+	float cameraX = SceneSize / 2.f;
+	float cameraY = SceneSize / 2.f;
+	float cameraZ = cameraZinit;
+
+	double ratio = (double)SceneSize / (double)ScreenSize;
+	for (int yi = 0; yi < ScreenSize; ++yi)
+	{
+		for (int xi = 0; xi < ScreenSize; ++xi)
+		{
+			float x = (float)((((double)xi) + 0.5f) * ratio);
+			float y = (float)((((double)yi) + 0.5f) * ratio);
+			float z = 0;
+			float dirX = x - cameraX;
+			float dirY = y - cameraY;
+			float dirZ = z - cameraZ;
+
+			renderPixel(xi, yi, x, y, z, dirX, dirY, dirZ);
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+void saveSceneToBmp(const std::string& fileName)
+{
+	uint8_t* bmpData = new uint8_t[ScreenSize * ScreenSize * 3];
+	for (int y = 0; y < ScreenSize; ++y)
+	{
+		for (int x = 0; x < ScreenSize; ++x)
+		{
+			uint8_t bright = (uint8_t)(std::min(screen[x][y] / SceneDrawNum, 255.));
+			int pixelOffs = (y * ScreenSize + x) * 3;
+			bmpData[pixelOffs++] = bright;
+			bmpData[pixelOffs++] = bright;
+			bmpData[pixelOffs++] = bright;
+		}
+	}
+
+	save_bmp24(fileName.c_str(), ScreenSize, ScreenSize, (const char *)bmpData);
+	delete[] bmpData;
+}
+
+//--------------------------------------------------------------------------------------------
+
+void test4()
+{
+	lights.push_back(LIGHT_BOX(MaxLightBright, 10, 20, 150, 30, 50, 200));
+	lights.push_back(LIGHT_BOX(MaxLightBright, 180, 170, 0, 200, 200, 200));
+
+	for (int z = 30; z < 170; ++z) {
+		for (int y= 30; y < 170; ++y) {
+			for (int x = 30; x < 170; ++x) {
+				scene[x][y][z].smokeDens = 1.f;
+			}
+		}
+	}
+
+	for (int n=0; n < SceneDrawNum; ++n) {
+		renderScene();
+		printf("%d\n", n);
+	}
+
+	saveSceneToBmp("3dScene.bmp");
+}
 
 int main()
 {
-	test3();
+	test4();
 }
