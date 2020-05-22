@@ -7,9 +7,16 @@
 
 //--------------------------------------------------------------------------------------------
 
+double randDouble()
+{
+	return ((double)rand()) / RAND_MAX;
+}
+
+//--------------------------------------------------------------------------------------------
+
 const int Scene2DSize = 200;
-float Scale = 1.6f;
-float SpeedSlowdown = 0.99f;
+float Scale;
+double SpeedSlowdown;
 
 //--------------------------------------------------------------------------------------------
 
@@ -51,7 +58,7 @@ void save2DSceneToBmp(const std::string& fileName)
 	{
 		for (int x = 0; x < Scene2DSize; ++x)
 		{
-			uint8_t bright = std::min(int(scene2D[x][y].smokeDens * 128), 128);
+			uint8_t bright = std::min(int(scene2D[x][y].smokeDens * 255), 255);
 			int pixelOffs = (y * Scene2DSize + x) * 3;
 			bmpData[pixelOffs++] = bright;
 			bmpData[pixelOffs++] = bright;
@@ -67,7 +74,7 @@ void save2DSceneToBmp(const std::string& fileName)
 
 void update()
 {
-	std::vector<float> coeffs; // Коэффициенты зацепления заффекченных клатов для нормализации
+	std::vector<float> coeffs; // Коэффициенты зацепления зааффекченных клатов для нормализации
 
 	for (int y = 0; y < Scene2DSize; ++y) {
 		for (int x = 0; x < Scene2DSize; ++x) {
@@ -185,8 +192,8 @@ void setSourseSmokeDensityAndSpeed1(int frame)
 
 void test1()
 {
-	Scale = 1.6f;
-	SpeedSlowdown = 0.99f;
+	Scale = 1; // 1.6f;
+	SpeedSlowdown = 1; // 0.999f;
 	for (int i = 0; i < 1000; ++i) {
 		setSourseSmokeDensityAndSpeed1(i);
 		update();
@@ -210,7 +217,7 @@ void setSourseSmokeDensityAndSpeed2(int frame)
 	for (int y = 0; y < 120; ++y) {
 		for (int x = 0; x < 10; ++x) {
 			if (frame < 200) {
-				scene2D[x][y].smokeDens = 0.3f;
+				scene2D[x][y].smokeDens = randDouble()*0.6f;
 			}
 			scene2D[x][y].speedX = 0.5f;
 		}
@@ -218,7 +225,12 @@ void setSourseSmokeDensityAndSpeed2(int frame)
 
 	for (int y = 0; y < 120; ++y) {
 		for (int x = 0; x < 10; ++x) {
-			scene2D[Scene2DSize - 1 - x][Scene2DSize - 1 - y].speedX = -0.5f;
+			Cell2D& cell = scene2D[Scene2DSize - 1 - x][Scene2DSize - 1 - y];
+			cell.speedX = -0.5f;
+			if (randDouble() < 0.5)
+				cell.smokeDens = 0;
+			else
+				cell.smokeDens = 0.6f;
 		}
 	}
 }
@@ -227,12 +239,12 @@ void setSourseSmokeDensityAndSpeed2(int frame)
 
 void test2()
 {
-	Scale = 1.6f;
-	SpeedSlowdown = 0.99f;
+	Scale = 1.5f;
+	SpeedSlowdown = 0.995f;
 	for (int i = 0; i < 1000; ++i) {
 		setSourseSmokeDensityAndSpeed2(i);
 		update();
-		if (i % 25 == 0) {
+		if (i % 10 == 0) {
 			char number[4];
 			number[0] = i / 100 + '0';
 			number[1] = (i % 100) / 10 + '0';
@@ -525,11 +537,6 @@ void test3()
 // Определить цвет пиксела и записать его в буфер screen
 //--------------------------------------------------------------------------------------------
 
-double randDouble()
-{
-	return ((double)rand()) / RAND_MAX;
-}
-
 void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float dirY, float dirZ)
 {
 	double lightDrop = 0;
@@ -652,5 +659,6 @@ void test4()
 
 int main()
 {
-	test4();
+	test2();
+//	test4();
 }
