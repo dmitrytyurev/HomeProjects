@@ -6,6 +6,10 @@
 #include "bmp.h"
 
 //--------------------------------------------------------------------------------------------
+//FILE* f = fopen("WaveTable.txt", "wt");
+//fprintf(f, "%f\n", waveTable[i]);
+//fclose(f);
+//--------------------------------------------------------------------------------------------
 
 double randDouble()
 {
@@ -14,7 +18,24 @@ double randDouble()
 
 //--------------------------------------------------------------------------------------------
 
+void turnPoint(float x, float y, float angle, float& newX, float& newY)
+{
+	float s = sin(angle);
+	float c = cos(angle);
+	newX = x * c - y * s;
+	newY = x * s + y * c;
+}
+
+//--------------------------------------------------------------------------------------------
+
+const float PI = 3.14159f;
 const int Scene2DSize = 200;
+const int WaveTableSize = 1000;
+const float randomSpeedRotateAmpl = 0.01f;  // Амплитуды рандомного вращения скоростей
+const float randomSpeedRotateSpeed = 0.1f;  // Скорость рандомного вращения скоростей
+//--------------------------------------------------------------------------------------------
+
+float waveTable[WaveTableSize];
 float Scale;
 double SpeedSlowdown;
 
@@ -23,12 +44,15 @@ double SpeedSlowdown;
 struct Cell2D
 {
 	float smokeDens = 0;
+	float airDens = 0;
 	float speedX = 0;
 	float speedY = 0;
 
 	float smokeDensAdd = 0;
+	float airDensAdd = 0;
 	float speedXAdd = 0;
 	float speedYAdd = 0;
+	int waveTableRandomOffset = 0;
 };
 
 //--------------------------------------------------------------------------------------------
@@ -47,6 +71,16 @@ void _cdecl exit_msg(const char *text, ...)
 
 	printf("%s", tmpStr);
 	exit(1);
+}
+
+//--------------------------------------------------------------------------------------------
+
+void initWaveTable()
+{
+	for (int i = 0; i < WaveTableSize; ++i) {
+		float angle = ((float)i) / WaveTableSize * 2 * PI;
+		waveTable[i] = sin(angle) + sin(angle * 2) + sin(angle * 3) + sin(angle * 4);
+	}
 }
 
 //--------------------------------------------------------------------------------------------
@@ -72,7 +106,33 @@ void save2DSceneToBmp(const std::string& fileName)
 
 //--------------------------------------------------------------------------------------------
 
-void update()
+int xOffs[] = { -1, 0, 1, -1, 0, 1, -1, 0, 1 };
+int yOffs[] = { -1, -1, -1, 0, 0, 0, 1, 1, 1 };
+
+void caclAirDensGradient(int xi, int yi, float& dx, float& dy)
+{
+	if (xi <= 0 || xi >= Scene2DSize - 1 || yi <= 0 || yi >= Scene2DSize - 1) {
+		dx = 0;
+		dy = 0;
+		return;
+	}
+
+	dx = 0;
+	dy = 0;
+	for (int n1 = 0; n1 < 9; ++n1)
+	{
+		for (int n2 = n1 + 1; n2 < 9; ++n2)
+		{
+			float airDensDelta = scene2D[xi + xOffs[n1]][yi + yOffs[n1]].airDens - scene2D[xi + xOffs[n2]][yi + yOffs[n2]].airDens;
+			dx = (xOffs[n2] - xOffs[n1]) * airDensDelta;
+			dy = (yOffs[n2] - yOffs[n1]) * airDensDelta;
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+void update2dScene(int stepN)
 {
 	std::vector<float> coeffs; // Коэффициенты зацепления зааффекченных клатов для нормализации
 
@@ -133,10 +193,11 @@ void update()
 
 			// Вычитаем плотность дыма и скорости текущей клетки из своей же клетки (аддитивная карта, будет пременена в конце кадра)
 			scene2D[x][y].smokeDensAdd -= scene2D[x][y].smokeDens;
+			scene2D[x][y].airDensAdd -= scene2D[x][y].airDens;
 			scene2D[x][y].speedXAdd -= scene2D[x][y].speedX;
 			scene2D[x][y].speedYAdd -= scene2D[x][y].speedY;
 
-			// Прибавляем плотность дыма и скорости текущей клетки ко всем заффекченным клеткам с нормированными коэффициентами перекрытия по клеткам периметра (аддитивная карта, будет пременена в конце кадра)
+			// Прибавляем плотность дыма и скорости текущей клетки ко всем зааффекченным клеткам с нормированными коэффициентами перекрытия по клеткам периметра (аддитивная карта, будет пременена в конце кадра)
 			int index = 0;
 			for (int yi = y1i; yi <= y2i; ++yi) {
 				for (int xi = x1i; xi <= x2i; ++xi) {
@@ -144,69 +205,55 @@ void update()
 						continue;
 					}
 					scene2D[xi][yi].smokeDensAdd += scene2D[x][y].smokeDens * coeffs[index];
-					scene2D[xi][yi].speedXAdd += scene2D[x][y].speedX * coeffs[index] * SpeedSlowdown;
-					scene2D[xi][yi].speedYAdd += scene2D[x][y].speedY * coeffs[index] * SpeedSlowdown;
+					scene2D[xi][yi].airDensAdd += scene2D[x][y].airDens * coeffs[index];
+					scene2D[xi][yi].speedXAdd += scene2D[x][y].speedX * coeffs[index];
+					scene2D[xi][yi].speedYAdd += scene2D[x][y].speedY * coeffs[index];
 					index++;
 				}
 			}
 		}
 	}
-
+	
 	// Применяем карту аддитивки и очищаем её
 	for (int y = 0; y < Scene2DSize; ++y) {
 		for (int x = 0; x < Scene2DSize; ++x) {
 			scene2D[x][y].smokeDens += scene2D[x][y].smokeDensAdd;
+			scene2D[x][y].airDens += scene2D[x][y].airDensAdd;
 			scene2D[x][y].speedX += scene2D[x][y].speedXAdd;
 			scene2D[x][y].speedY += scene2D[x][y].speedYAdd;
+			scene2D[x][y].speedX = (float)(scene2D[x][y].speedX * SpeedSlowdown);
+			scene2D[x][y].speedY = (float)(scene2D[x][y].speedY * SpeedSlowdown);
+
 			if (scene2D[x][y].smokeDens < 0) {
-				exit_msg("smokeDens < 0 !");
+				printf("smokeDens = %f\n", scene2D[x][y].smokeDens);
+				scene2D[x][y].smokeDens = 0;
 			}
 			scene2D[x][y].smokeDensAdd = 0;
+			scene2D[x][y].airDensAdd = 0;
 			scene2D[x][y].speedXAdd = 0;
 			scene2D[x][y].speedYAdd = 0;
 		}
 	}
-}
 
-//--------------------------------------------------------------------------------------------
+	// Меняем поле скорости от давления
+	//for (int y = 1; y < Scene2DSize-1; ++y) {
+	//	for (int x = 1; x < Scene2DSize - 1; ++x) {
+	//		float dx = 0;
+	//		float dy = 0;
+	//		caclAirDensGradient(x, y, dx, dy);
+	//		scene2D[x][y].speedX += dx * 0.1f;
+	//		scene2D[x][y].speedY += dy * 0.1f;
+	//	}
+	//}
 
-void setSourseSmokeDensityAndSpeed1(int frame)
-{
-	for (int y = 0; y < 10; ++y) {
-		for (int x = 0; x < 10; ++x) {
-			if (frame < 200) {
-				scene2D[x][100 + y].smokeDens = 0.3f;
-			}
-			scene2D[x][100 + y].speedX = 0.4f;
+	// Поворачиваем рандомно немного вектора скорости и меняем их скорость
+	for (int y = 0; y < Scene2DSize; ++y) {
+		for (int x = 0; x < Scene2DSize; ++x) {
+			int index = (scene2D[x][y].waveTableRandomOffset + int(stepN * randomSpeedRotateSpeed)) % WaveTableSize;
+			float angle = waveTable[index] * randomSpeedRotateAmpl;
+			turnPoint(scene2D[x][y].speedX, scene2D[x][y].speedY, angle, scene2D[x][y].speedX, scene2D[x][y].speedY);
+			scene2D[x][y].speedX *= (1 + waveTable[index] * 0.05f); 
 		}
-	}
-
-	for (int y = 0; y < 10; ++y) {
-		for (int x = 0; x < 10; ++x) {
-			scene2D[60+x][Scene2DSize-1-y].speedY = -1.f;
-		}
-	}
-}
-
-//--------------------------------------------------------------------------------------------
-
-void test1()
-{
-	Scale = 1; // 1.6f;
-	SpeedSlowdown = 1; // 0.999f;
-	for (int i = 0; i < 1000; ++i) {
-		setSourseSmokeDensityAndSpeed1(i);
-		update();
-		if (i % 25 == 0) {
-			char number[4];
-			number[0] = i / 100 + '0';
-			number[1] = (i % 100) / 10 + '0';
-			number[2] = (i % 10) + '0';
-			number[3] = 0;
-			std::string fname = std::string("frame") +(const char*)number +".bmp";
-			save2DSceneToBmp(fname);
-		}
-		printf("i=%d ", i);
 	}
 }
 
@@ -216,10 +263,14 @@ void setSourseSmokeDensityAndSpeed2(int frame)
 {
 	for (int y = 0; y < 120; ++y) {
 		for (int x = 0; x < 10; ++x) {
-			if (frame < 200) {
-				scene2D[x][y].smokeDens = randDouble()*0.6f;
+			if (frame < 100) {
+				scene2D[x][y].smokeDens = (float)(randDouble()*0.6f);
+			}
+			else {
+				scene2D[x][y].smokeDens = 0;
 			}
 			scene2D[x][y].speedX = 0.5f;
+			scene2D[x][y].airDens = 0.1f;
 		}
 	}
 
@@ -227,10 +278,17 @@ void setSourseSmokeDensityAndSpeed2(int frame)
 		for (int x = 0; x < 10; ++x) {
 			Cell2D& cell = scene2D[Scene2DSize - 1 - x][Scene2DSize - 1 - y];
 			cell.speedX = -0.5f;
-			if (randDouble() < 0.5)
+			cell.airDens = 0.1f;
+
+			if (frame < 100) {
+				if (randDouble() < 0.5)
+					cell.smokeDens = 0;
+				else
+					cell.smokeDens = 0.6f;
+			}
+			else {
 				cell.smokeDens = 0;
-			else
-				cell.smokeDens = 0.6f;
+			}
 		}
 	}
 }
@@ -241,9 +299,25 @@ void test2()
 {
 	Scale = 1.5f;
 	SpeedSlowdown = 0.995f;
+	initWaveTable();
+
+	//for (int y = 0; y < Scene2DSize; ++y) {
+	//	for (int x = 0; x < Scene2DSize; ++x) {
+	//		scene2D[x][y].airDens = 0.1f;
+	//	}
+	//}
+
+	for (int y = 0; y < Scene2DSize; ++y) {
+		for (int x = 0; x < Scene2DSize; ++x) {
+			scene2D[x][y].waveTableRandomOffset = rand() * WaveTableSize / RAND_MAX;
+		}
+	}
+
+	
+
 	for (int i = 0; i < 1000; ++i) {
 		setSourseSmokeDensityAndSpeed2(i);
-		update();
+		update2dScene(i);
 		if (i % 10 == 0) {
 			char number[4];
 			number[0] = i / 100 + '0';
