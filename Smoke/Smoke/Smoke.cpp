@@ -18,12 +18,12 @@ double randDouble()
 
 //--------------------------------------------------------------------------------------------
 
-void turnPoint(float x, float y, float angle, float& newX, float& newY)
+void turnPoint(float x, float y, double angle, float& newX, float& newY)
 {
-	float s = sin(angle);
-	float c = cos(angle);
-	newX = x * c - y * s;
-	newY = x * s + y * c;
+	double s = sin(angle);
+	double c = cos(angle);
+	newX = (float)(x * c - y * s);
+	newY = (float)(x * s + y * c);
 }
 
 //--------------------------------------------------------------------------------------------
@@ -31,8 +31,8 @@ void turnPoint(float x, float y, float angle, float& newX, float& newY)
 const float PI = 3.14159f;
 const int Scene2DSize = 200;
 const int WaveTableSize = 1000;
-const float randomSpeedRotateAmpl = 0.01f;  // Амплитуды рандомного вращения скоростей
-const float randomSpeedRotateSpeed = 0.1f;  // Скорость рандомного вращения скоростей
+const float randomSpeedRotateAmpl = 0.05f;  // Амплитуды рандомного вращения скоростей
+const float randomSpeedRotateSpeed = 0.3f;  // Скорость рандомного вращения скоростей
 //--------------------------------------------------------------------------------------------
 
 float waveTable[WaveTableSize];
@@ -47,6 +47,8 @@ struct Cell2D
 	float airDens = 0;
 	float speedX = 0;
 	float speedY = 0;
+	float avgSpeedX = 0;
+	float avgSpeedY = 0;
 
 	float smokeDensAdd = 0;
 	float airDensAdd = 0;
@@ -93,6 +95,7 @@ void save2DSceneToBmp(const std::string& fileName)
 		for (int x = 0; x < Scene2DSize; ++x)
 		{
 			uint8_t bright = std::min(int(scene2D[x][y].smokeDens * 255), 255);
+			//uint8_t bright = std::min(fabs(scene2D[x][y].speedX * 128), 255.f);
 			int pixelOffs = (y * Scene2DSize + x) * 3;
 			bmpData[pixelOffs++] = bright;
 			bmpData[pixelOffs++] = bright;
@@ -138,23 +141,67 @@ void update2dScene(int stepN)
 
 	for (int y = 0; y < Scene2DSize; ++y) {
 		for (int x = 0; x < Scene2DSize; ++x) {
+			Cell2D& cell = scene2D[x][y];
 			// Расчитаем новые координаты углов текущей клетки после сдвига и расширения
 			float x1 = (float)x;
 			float y1 = (float)y;
 			float x2 = x1 + 1.f;
 			float y2 = y1 + 1.f;
+
+			//float xCenter = x1 + 0.5f;
+			//float yCenter = y1 + 0.5f;
+			//x1 = (x1 - xCenter) * Scale + xCenter + cell.speedX;
+			//y1 = (y1 - yCenter) * Scale + yCenter + cell.speedY;
+			//x2 = (x2 - xCenter) * Scale + xCenter + cell.speedX;
+			//y2 = (y2 - yCenter) * Scale + yCenter + cell.speedY;
+
+
+
+
+			// Сначала расширяем
 			float xCenter = x1 + 0.5f;
 			float yCenter = y1 + 0.5f;
-			x1 = (x1 - xCenter) * Scale + xCenter + scene2D[x][y].speedX;
-			y1 = (y1 - yCenter) * Scale + yCenter + scene2D[x][y].speedY;
-			x2 = (x2 - xCenter) * Scale + xCenter + scene2D[x][y].speedX;
-			y2 = (y2 - yCenter) * Scale + yCenter + scene2D[x][y].speedY;
+			x1 = (x1 - xCenter) * Scale + xCenter;
+			y1 = (y1 - yCenter) * Scale + yCenter;
+			x2 = (x2 - xCenter) * Scale + xCenter;
+			y2 = (y2 - yCenter) * Scale + yCenter;
+
+			// Корретируем новую позицию, чтобы из-за расширения не зацепить клетки позади по ходу движения
+			if (fabs(cell.speedX) > 0.001f || fabs(cell.speedY) > 0.001f) {
+				float delta = (float)x - x1; // На сколько увеличенная клетка вылазит за пределы старой клетки (с одной стороны)
+				float comX = 0;
+				float comY = 0;
+				if (fabs(cell.speedX) < fabs(cell.speedY)) {
+					float k = fabs(cell.speedX / cell.speedY);
+					comY = cell.speedY < 0 ? -delta : delta;
+					comX = cell.speedX < 0 ? -delta * k : delta * k;
+				}
+				else {
+					float k = fabs(cell.speedY / cell.speedX);
+					comX = cell.speedX < 0 ? -delta : delta;
+					comY = cell.speedY < 0 ? -delta * k : delta * k;
+				}
+				x1 += comX;
+				x2 += comX;
+				y1 += comY;
+				y2 += comY;
+			}
+
+			// Сдвиг клиенти по вектору движения
+			x1 += cell.speedX;
+			y1 += cell.speedY;
+			x2 += cell.speedX;
+			y2 += cell.speedY;
+
+
+
+
 
 			// Расчитаем какие клетки (и с каким весом) цепляет сдвинутая и расширенная текущая клетка
-			int x1i = ((int)(x1 + 1000)) - 1000;
-			int y1i = ((int)(y1 + 1000)) - 1000;
-			int x2i = ((int)(x2 + 1000)) - 1000;
-			int y2i = ((int)(y2 + 1000)) - 1000;
+			int x1i = ((int)(x1 + 1000.)) - 1000;
+			int y1i = ((int)(y1 + 1000.)) - 1000;
+			int x2i = ((int)(x2 + 1000.)) - 1000;
+			int y2i = ((int)(y2 + 1000.)) - 1000;
 
 			coeffs.clear();
 			float coeffsSum = 0;
@@ -192,10 +239,10 @@ void update2dScene(int stepN)
 			}
 
 			// Вычитаем плотность дыма и скорости текущей клетки из своей же клетки (аддитивная карта, будет пременена в конце кадра)
-			scene2D[x][y].smokeDensAdd -= scene2D[x][y].smokeDens;
-			scene2D[x][y].airDensAdd -= scene2D[x][y].airDens;
-			scene2D[x][y].speedXAdd -= scene2D[x][y].speedX;
-			scene2D[x][y].speedYAdd -= scene2D[x][y].speedY;
+			cell.smokeDensAdd -= cell.smokeDens;
+			cell.airDensAdd -= cell.airDens;
+			cell.speedXAdd -= cell.speedX;
+			cell.speedYAdd -= cell.speedY;
 
 			// Прибавляем плотность дыма и скорости текущей клетки ко всем зааффекченным клеткам с нормированными коэффициентами перекрытия по клеткам периметра (аддитивная карта, будет пременена в конце кадра)
 			int index = 0;
@@ -204,10 +251,10 @@ void update2dScene(int stepN)
 					if (xi < 0 || xi >= Scene2DSize || yi < 0 || yi >= Scene2DSize) {
 						continue;
 					}
-					scene2D[xi][yi].smokeDensAdd += scene2D[x][y].smokeDens * coeffs[index];
-					scene2D[xi][yi].airDensAdd += scene2D[x][y].airDens * coeffs[index];
-					scene2D[xi][yi].speedXAdd += scene2D[x][y].speedX * coeffs[index];
-					scene2D[xi][yi].speedYAdd += scene2D[x][y].speedY * coeffs[index];
+					scene2D[xi][yi].smokeDensAdd += cell.smokeDens * coeffs[index];
+					scene2D[xi][yi].airDensAdd += cell.airDens * coeffs[index];
+					scene2D[xi][yi].speedXAdd += cell.speedX * coeffs[index];
+					scene2D[xi][yi].speedYAdd += cell.speedY * coeffs[index];
 					index++;
 				}
 			}
@@ -217,44 +264,70 @@ void update2dScene(int stepN)
 	// Применяем карту аддитивки и очищаем её
 	for (int y = 0; y < Scene2DSize; ++y) {
 		for (int x = 0; x < Scene2DSize; ++x) {
-			scene2D[x][y].smokeDens += scene2D[x][y].smokeDensAdd;
-			scene2D[x][y].airDens += scene2D[x][y].airDensAdd;
-			scene2D[x][y].speedX += scene2D[x][y].speedXAdd;
-			scene2D[x][y].speedY += scene2D[x][y].speedYAdd;
-			scene2D[x][y].speedX = (float)(scene2D[x][y].speedX * SpeedSlowdown);
-			scene2D[x][y].speedY = (float)(scene2D[x][y].speedY * SpeedSlowdown);
+			Cell2D& cell = scene2D[x][y];
 
-			if (scene2D[x][y].smokeDens < 0) {
-				printf("smokeDens = %f\n", scene2D[x][y].smokeDens);
-				scene2D[x][y].smokeDens = 0;
+			cell.smokeDens += cell.smokeDensAdd;
+			cell.airDens += cell.airDensAdd;
+			cell.speedX += cell.speedXAdd;
+			cell.speedY += cell.speedYAdd;
+			cell.speedX = (float)(cell.speedX * SpeedSlowdown);
+			cell.speedY = (float)(cell.speedY * SpeedSlowdown);
+
+			if (cell.speedX > 1) cell.speedX = 1;
+			if (cell.speedX < -1) cell.speedX = -1;
+			if (cell.speedY > 1) cell.speedY = 1;
+			if (cell.speedY < -1) cell.speedY = -1;
+
+			if (cell.smokeDens < 0) {
+				//printf("smokeDens = %f\n", cell.smokeDens);
+				cell.smokeDens = 0;
 			}
-			scene2D[x][y].smokeDensAdd = 0;
-			scene2D[x][y].airDensAdd = 0;
-			scene2D[x][y].speedXAdd = 0;
-			scene2D[x][y].speedYAdd = 0;
+			cell.smokeDensAdd = 0;
+			cell.airDensAdd = 0;
+			cell.speedXAdd = 0;
+			cell.speedYAdd = 0;
 		}
 	}
 
 	// Меняем поле скорости от давления
 	//for (int y = 1; y < Scene2DSize-1; ++y) {
 	//	for (int x = 1; x < Scene2DSize - 1; ++x) {
+	//		Cell2D& cell = scene2D[x][y];
 	//		float dx = 0;
 	//		float dy = 0;
 	//		caclAirDensGradient(x, y, dx, dy);
-	//		scene2D[x][y].speedX += dx * 0.1f;
-	//		scene2D[x][y].speedY += dy * 0.1f;
+	//		cell.speedX += dx * 0.1f;
+	//		cell.speedY += dy * 0.1f;
 	//	}
 	//}
 
-	// Поворачиваем рандомно немного вектора скорости и меняем их скорость
+	 //Поворачиваем рандомно немного вектора скорости и меняем их скорость
 	for (int y = 0; y < Scene2DSize; ++y) {
 		for (int x = 0; x < Scene2DSize; ++x) {
-			int index = (scene2D[x][y].waveTableRandomOffset + int(stepN * randomSpeedRotateSpeed)) % WaveTableSize;
-			float angle = waveTable[index] * randomSpeedRotateAmpl;
-			turnPoint(scene2D[x][y].speedX, scene2D[x][y].speedY, angle, scene2D[x][y].speedX, scene2D[x][y].speedY);
-			scene2D[x][y].speedX *= (1 + waveTable[index] * 0.05f); 
+			Cell2D& cell = scene2D[x][y];
+			int index = (cell.waveTableRandomOffset + int(stepN * randomSpeedRotateSpeed)) % WaveTableSize;
+			double angle = waveTable[index] * randomSpeedRotateAmpl;
+
+			turnPoint(cell.speedX, cell.speedY, angle, cell.speedX, cell.speedY);
+			cell.speedX *= (1 + waveTable[index] * 0.02f); 
 		}
 	}
+
+	 // Усредняем поле скоростей, чтобы не накапливались эффекты положительной обратной связи
+	for (int y = 1; y < Scene2DSize-1; ++y) {
+		for (int x = 1; x < Scene2DSize - 1; ++x) {
+			scene2D[x][y].avgSpeedX = (scene2D[x][y].speedX + scene2D[x - 1][y].speedX + scene2D[x + 1][y].speedX + scene2D[x][y - 1].speedX + scene2D[x][y + 1].speedX + scene2D[x - 1][y - 1].speedX + scene2D[x + 1][y - 1].speedX + scene2D[x - 1][y + 1].speedX + scene2D[x + 1][y + 1].speedX) / 9;
+			scene2D[x][y].avgSpeedY = (scene2D[x][y].speedY + scene2D[x - 1][y].speedY + scene2D[x + 1][y].speedY + scene2D[x][y - 1].speedY + scene2D[x][y + 1].speedY + scene2D[x - 1][y - 1].speedY + scene2D[x + 1][y - 1].speedY + scene2D[x - 1][y + 1].speedY + scene2D[x + 1][y + 1].speedY) / 9;
+		}
+	}
+	for (int y = 1; y < Scene2DSize - 1; ++y) {
+		for (int x = 1; x < Scene2DSize - 1; ++x) {
+			scene2D[x][y].speedX = scene2D[x][y].avgSpeedX;
+			scene2D[x][y].speedY = scene2D[x][y].avgSpeedY;
+		}
+	}
+
+
 }
 
 //--------------------------------------------------------------------------------------------
@@ -263,14 +336,15 @@ void setSourseSmokeDensityAndSpeed2(int frame)
 {
 	for (int y = 0; y < 120; ++y) {
 		for (int x = 0; x < 10; ++x) {
+			Cell2D& cell = scene2D[x][y];
+			cell.speedX = 0.5f;
+			cell.airDens = 0.1f;
 			if (frame < 100) {
-				scene2D[x][y].smokeDens = (float)(randDouble()*0.6f);
+				cell.smokeDens = (float)(randDouble()*0.6f);
 			}
 			else {
-				scene2D[x][y].smokeDens = 0;
+				cell.smokeDens = 0;
 			}
-			scene2D[x][y].speedX = 0.5f;
-			scene2D[x][y].airDens = 0.1f;
 		}
 	}
 
@@ -297,7 +371,7 @@ void setSourseSmokeDensityAndSpeed2(int frame)
 
 void test2()
 {
-	Scale = 1.5f;
+	Scale = 1.f; // 1.005f; // 1.002f; // 1.5f;
 	SpeedSlowdown = 0.995f;
 	initWaveTable();
 
@@ -309,7 +383,8 @@ void test2()
 
 	for (int y = 0; y < Scene2DSize; ++y) {
 		for (int x = 0; x < Scene2DSize; ++x) {
-			scene2D[x][y].waveTableRandomOffset = rand() * WaveTableSize / RAND_MAX;
+			//scene2D[x][y].waveTableRandomOffset = (int)((x + y)*15);
+			scene2D[x][y].waveTableRandomOffset = randDouble() * 999;
 		}
 	}
 
@@ -318,7 +393,7 @@ void test2()
 	for (int i = 0; i < 1000; ++i) {
 		setSourseSmokeDensityAndSpeed2(i);
 		update2dScene(i);
-		if (i % 10 == 0) {
+		if (i % 1 == 0) {
 			char number[4];
 			number[0] = i / 100 + '0';
 			number[1] = (i % 100) / 10 + '0';
@@ -731,8 +806,64 @@ void test4()
 	saveSceneToBmp("3dScene.bmp");
 }
 
+//--------------------------------------------------------------------------------------------
+
+void test5()
+{
+	Scale = 1.5f;
+
+	float x1 = 10;
+	float x2 = 11;
+	float y1 = 5;
+	float y2 = 6;
+
+	Cell2D cell;
+	cell.speedX = 0.2f;
+	cell.speedY = 0.2f;
+	float x = x1;
+
+	// Сначала расширяем
+	float xCenter = x1 + 0.5f;
+	float yCenter = y1 + 0.5f;
+	x1 = (x1 - xCenter) * Scale + xCenter;
+	y1 = (y1 - yCenter) * Scale + yCenter;
+	x2 = (x2 - xCenter) * Scale + xCenter;
+	y2 = (y2 - yCenter) * Scale + yCenter;
+
+	// Корретируем новую позицию, чтобы из-за расширения не зацепить клетки позади по ходу движения
+	if (fabs(cell.speedX) > 0.001f || fabs(cell.speedY) > 0.001f) {
+		float delta = (float)x - x1; // На сколько увеличенная клетка вылазит за пределы старой клетки (с одной стороны)
+		float comX = 0;
+		float comY = 0;
+		if (fabs(cell.speedX) < fabs(cell.speedY)) {
+			float k = fabs(cell.speedX / cell.speedY);
+			comY = cell.speedY < 0 ? -delta : delta;
+			comX = cell.speedX < 0 ? -delta * k : delta * k;
+		}
+		else {
+			float k = fabs(cell.speedY / cell.speedX);
+			comX = cell.speedX < 0 ? -delta : delta;
+			comY = cell.speedY < 0 ? -delta * k : delta * k;
+		}
+		x1 += comX;
+		x2 += comX;
+		y1 += comY;
+		y2 += comY;
+	}
+
+	// Сдвиг клиенти по вектору движения
+	x1 += cell.speedX;
+	y1 += cell.speedY;
+	x2 += cell.speedX;
+	y2 += cell.speedY;
+
+}
+
 int main()
 {
-	test2();
+//	printf("%f\n", signf(-1.5f));
 //	test4();
+
+	test2();
+	//test5();
 }
