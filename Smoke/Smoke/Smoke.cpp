@@ -55,6 +55,7 @@ struct Cell2D
 	float speedXAdd = 0;
 	float speedYAdd = 0;
 	int waveTableRandomOffset = 0;
+	int avgWaveTableRandomOffset = 0;
 };
 
 //--------------------------------------------------------------------------------------------
@@ -371,8 +372,8 @@ void setSourseSmokeDensityAndSpeed2(int frame)
 
 void test2()
 {
-	Scale = 1.f; // 1.005f; // 1.002f; // 1.5f;
-	SpeedSlowdown = 0.995f;
+	Scale = 1.02f; // 1.005f; // 1.002f; // 1.5f;
+	SpeedSlowdown = 0.999f;
 	initWaveTable();
 
 	//for (int y = 0; y < Scene2DSize; ++y) {
@@ -383,12 +384,22 @@ void test2()
 
 	for (int y = 0; y < Scene2DSize; ++y) {
 		for (int x = 0; x < Scene2DSize; ++x) {
-			//scene2D[x][y].waveTableRandomOffset = (int)((x + y)*15);
 			scene2D[x][y].waveTableRandomOffset = randDouble() * 999;
 		}
 	}
 
-	
+	// Разблурить рандомные оффсеты 
+	for (int y = 1; y < Scene2DSize - 1; ++y) {
+		for (int x = 1; x < Scene2DSize - 1; ++x) {
+			scene2D[x][y].avgWaveTableRandomOffset = (scene2D[x][y].waveTableRandomOffset + scene2D[x - 1][y].waveTableRandomOffset + scene2D[x + 1][y].waveTableRandomOffset + scene2D[x][y - 1].waveTableRandomOffset + scene2D[x][y + 1].waveTableRandomOffset + scene2D[x - 1][y - 1].waveTableRandomOffset + scene2D[x + 1][y - 1].waveTableRandomOffset + scene2D[x - 1][y + 1].waveTableRandomOffset + scene2D[x + 1][y + 1].waveTableRandomOffset) / 9;
+		}
+	}
+	for (int y = 1; y < Scene2DSize - 1; ++y) {
+		for (int x = 1; x < Scene2DSize - 1; ++x) {
+			scene2D[x][y].waveTableRandomOffset = scene2D[x][y].avgWaveTableRandomOffset;
+		}
+	}
+
 
 	for (int i = 0; i < 1000; ++i) {
 		setSourseSmokeDensityAndSpeed2(i);
