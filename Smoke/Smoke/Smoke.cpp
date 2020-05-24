@@ -11,28 +11,12 @@
 //fclose(f);
 //--------------------------------------------------------------------------------------------
 
-double randDouble()
-{
-	return ((double)rand()) / RAND_MAX;
-}
-
-//--------------------------------------------------------------------------------------------
-
-void turnPoint(float x, float y, double angle, float& newX, float& newY)
-{
-	double s = sin(angle);
-	double c = cos(angle);
-	newX = (float)(x * c - y * s);
-	newY = (float)(x * s + y * c);
-}
-
-//--------------------------------------------------------------------------------------------
-
 const float PI = 3.14159f;
 const int Scene2DSize = 200;
 const int WaveTableSize = 1000;
-const float randomSpeedRotateAmpl = 0.05f;  // Амплитуды рандомного вращения скоростей
-const float randomSpeedRotateSpeed = 0.3f;  // Скорость рандомного вращения скоростей
+float randomSpeedRotateAmpl;  // Амплитуда рандомного вращения скоростей
+float randomSpeedRotateSpeed;  // Скорость рандомного вращения скоростей
+float randomSpeedAccelerateAml; // Амплитуда андомного изменения скоростей
 //--------------------------------------------------------------------------------------------
 
 float waveTable[WaveTableSize];
@@ -64,6 +48,40 @@ Cell2D scene2D[Scene2DSize][Scene2DSize];
 
 //--------------------------------------------------------------------------------------------
 
+struct ObjectToPlace
+{
+	ObjectToPlace(int x_, int y_, int srcBuferIndex_, float newOuterRadius_) : x(x_), y(y_), srcBuferIndex(srcBuferIndex_), newOuterRadius(newOuterRadius_) {}
+	float calcInnerRadius() const;
+
+	int x = 0;                // Позиция центра, куда 
+	int y = 0;                //                      будем ставить объект
+
+	int srcBuferIndex = 0;    // Индекс Src-буфера, из которого возьмём объект
+	float newOuterRadius = 0; // Новый внешний радиус, с которым будет установлен объект
+};
+std::vector<ObjectToPlace> objects;
+
+//--------------------------------------------------------------------------------------------
+
+struct Buffer
+{
+	void clear();
+	void fillParameters();
+
+	float cells[Scene2DSize][Scene2DSize];
+	int centerX = 0;
+	int centerY = 0;
+	float innerRadius = 0;
+	float outerRadius = 0;
+};
+const int BuffersNum = 10;
+
+Buffer srcBuffers[BuffersNum];
+Buffer dstBuffers[BuffersNum];
+
+//--------------------------------------------------------------------------------------------
+
+
 void _cdecl exit_msg(const char *text, ...)
 {
 	static char tmpStr[1024];
@@ -74,6 +92,39 @@ void _cdecl exit_msg(const char *text, ...)
 
 	printf("%s", tmpStr);
 	exit(1);
+}
+
+//--------------------------------------------------------------------------------------------
+
+int rand(int min, int max)
+{
+	return rand() * (max - min + 1) / (RAND_MAX + 1) + min;
+}
+
+//--------------------------------------------------------------------------------------------
+
+float  randf(float min, float max)
+{
+	return rand() * (max - min) / RAND_MAX  + min;
+}
+
+//--------------------------------------------------------------------------------------------
+
+inline float calcDist(float x1, float y1, float x2, float y2)
+{
+	float dx = x1 - x2;
+	float dy = y1 - y2;
+	return sqrt(dx * dx + dy * dy);
+}
+
+//--------------------------------------------------------------------------------------------
+
+void turnPoint(float x, float y, double angle, float& newX, float& newY)
+{
+	double s = sin(angle);
+	double c = cos(angle);
+	newX = (float)(x * c - y * s);
+	newY = (float)(x * s + y * c);
 }
 
 //--------------------------------------------------------------------------------------------
@@ -95,8 +146,8 @@ void save2DSceneToBmp(const std::string& fileName)
 	{
 		for (int x = 0; x < Scene2DSize; ++x)
 		{
-			uint8_t bright = std::min(int(scene2D[x][y].smokeDens * 255), 255);
-			//uint8_t bright = std::min(fabs(scene2D[x][y].speedX * 128), 255.f);
+			uint8_t bright = std::min(int(scene2D[x][y].smokeDens * 255), 255);          // Плотности 2d-сцены
+			//uint8_t bright = std::min(fabs(scene2D[x][y].speedX * 128), 255.f);          // Карта скоростей 2d-сцены
 			int pixelOffs = (y * Scene2DSize + x) * 3;
 			bmpData[pixelOffs++] = bright;
 			bmpData[pixelOffs++] = bright;
@@ -104,6 +155,26 @@ void save2DSceneToBmp(const std::string& fileName)
 		}
 	}
 	
+	save_bmp24(fileName.c_str(), Scene2DSize, Scene2DSize, (const char *)bmpData);
+	delete[] bmpData;
+}
+//--------------------------------------------------------------------------------------------
+
+void saveDstBufToBmp(const std::string& fileName, int bufIndex)
+{
+	uint8_t* bmpData = new uint8_t[Scene2DSize * Scene2DSize * 3];
+	for (int y = 0; y < Scene2DSize; ++y)
+	{
+		for (int x = 0; x < Scene2DSize; ++x)
+		{
+			uint8_t bright = std::min(int(dstBuffers[bufIndex].cells[x][y] * 255), 255);            // Dst буфер
+			int pixelOffs = (y * Scene2DSize + x) * 3;
+			bmpData[pixelOffs++] = bright;
+			bmpData[pixelOffs++] = bright;
+			bmpData[pixelOffs++] = bright;
+		}
+	}
+
 	save_bmp24(fileName.c_str(), Scene2DSize, Scene2DSize, (const char *)bmpData);
 	delete[] bmpData;
 }
@@ -306,11 +377,13 @@ void update2dScene(int stepN)
 	for (int y = 0; y < Scene2DSize; ++y) {
 		for (int x = 0; x < Scene2DSize; ++x) {
 			Cell2D& cell = scene2D[x][y];
-			int index = (cell.waveTableRandomOffset + int(stepN * randomSpeedRotateSpeed)) % WaveTableSize;
+			float scalarSpeed = sqrt(cell.speedX*cell.speedX + cell.speedY*cell.speedY);
+			int index = (cell.waveTableRandomOffset + int(stepN * randomSpeedRotateSpeed * scalarSpeed * 3)) % WaveTableSize;
 			double angle = waveTable[index] * randomSpeedRotateAmpl;
 
 			turnPoint(cell.speedX, cell.speedY, angle, cell.speedX, cell.speedY);
-			cell.speedX *= (1 + waveTable[index] * 0.02f); 
+			cell.speedX *= (1 + waveTable[index] * randomSpeedAccelerateAml);
+			cell.speedY *= (1 + waveTable[index] * randomSpeedAccelerateAml);
 		}
 	}
 
@@ -341,7 +414,7 @@ void setSourseSmokeDensityAndSpeed2(int frame)
 			cell.speedX = 0.5f;
 			cell.airDens = 0.1f;
 			if (frame < 100) {
-				cell.smokeDens = (float)(randDouble()*0.6f);
+				cell.smokeDens = randf(0, 0.6f);
 			}
 			else {
 				cell.smokeDens = 0;
@@ -356,7 +429,7 @@ void setSourseSmokeDensityAndSpeed2(int frame)
 			cell.airDens = 0.1f;
 
 			if (frame < 100) {
-				if (randDouble() < 0.5)
+				if (randf(0.f, 1.f) < 0.5)
 					cell.smokeDens = 0;
 				else
 					cell.smokeDens = 0.6f;
@@ -370,10 +443,14 @@ void setSourseSmokeDensityAndSpeed2(int frame)
 
 //--------------------------------------------------------------------------------------------
 
-void test2()
+void test2Render2dAnimation()
 {
 	Scale = 1.02f; // 1.005f; // 1.002f; // 1.5f;
 	SpeedSlowdown = 0.999f;
+	randomSpeedRotateAmpl = 0.05f;
+	randomSpeedRotateSpeed = 0.3f;
+	randomSpeedAccelerateAml = 0;
+
 	initWaveTable();
 
 	//for (int y = 0; y < Scene2DSize; ++y) {
@@ -384,7 +461,7 @@ void test2()
 
 	for (int y = 0; y < Scene2DSize; ++y) {
 		for (int x = 0; x < Scene2DSize; ++x) {
-			scene2D[x][y].waveTableRandomOffset = randDouble() * 999;
+			scene2D[x][y].waveTableRandomOffset = rand(0, 999);
 		}
 	}
 
@@ -418,7 +495,236 @@ void test2()
 }
 
 //--------------------------------------------------------------------------------------------
-// Ренедр
+
+void Buffer::clear()
+{
+	centerX = 0;
+	centerY = 0;
+	innerRadius = 0;
+	outerRadius = 0;
+	for (int y = 0; y < Scene2DSize; ++y) {
+		for (int x = 0; x < Scene2DSize; ++x) {
+			cells[x][y] = 0;
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+void Buffer::fillParameters()
+{
+	// Найти описанный прямоугольник вокруг картинки в cells
+	int x1 = 0;
+	int x2 = 0;
+	int y1 = 0;
+	int y2 = 0;
+	for (int y = 0; y < Scene2DSize; ++y) {
+		for (int x = 0; x < Scene2DSize; ++x) {
+			if (cells[x][y] > 0) {
+				y1 = y;
+				goto m1;
+			}
+		}
+	}
+m1:	for (int y = Scene2DSize-1; y >= 0; --y) {
+		for (int x = 0; x < Scene2DSize; ++x) {
+			if (cells[x][y] > 0) {
+				y2 = y;
+				goto m2;
+			}
+		}
+	}
+m2:	for (int x = 0; x < Scene2DSize; ++x) {
+		for (int y = 0; y < Scene2DSize; ++y) {
+			if (cells[x][y] > 0) {
+				x1 = x;
+				goto m3;
+			}
+		}
+	}
+m3:	for (int x = Scene2DSize - 1; x >= 0; --x) {
+		for (int y = 0; y < Scene2DSize; ++y) {
+			if (cells[x][y] > 0) {
+				x2 = x;
+				goto m4;
+			}
+		}
+	}
+m4: centerX = (x1 + x2) / 2;
+    centerY = (y1 + y2) / 2;
+
+	// Расчитать innerRadius, outerRadius
+	innerRadius = FLT_MAX;
+	outerRadius = 0;
+	for (int y = 0; y < Scene2DSize; ++y) {
+		for (int x = 0; x < Scene2DSize; ++x) {
+			float dist = calcDist((float)x, (float)y, (float)centerX, (float)centerY);
+			if (cells[x][y] == 0) {
+				if (dist < innerRadius) {
+					innerRadius = dist;
+				}
+			}
+			else {
+				if (dist > outerRadius) {
+					outerRadius = dist;
+				}
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+float ObjectToPlace::calcInnerRadius() const
+{
+	return newOuterRadius / srcBuffers[srcBuferIndex].outerRadius * srcBuffers[srcBuferIndex].innerRadius;
+}
+
+
+//--------------------------------------------------------------------------------------------
+
+void calcPosForNewObject(int& bestX_, int& bestY_)
+{
+	int bestX = 0;
+	int bestY = 0;
+	float bestSum = FLT_MAX;
+
+	for (int y = 0; y < Scene2DSize; ++y) {
+		for (int x = 0; x < Scene2DSize; ++x) {
+			// Если точка слишком близко хотя бы к одному объекту, то она не подходит
+			for (const auto& obj: objects) {
+				float dist = calcDist((float)x, (float)y, (float)obj.x, (float)obj.y);
+				if (dist < obj.calcInnerRadius() * 0.7f) {                                                      // const !!!
+					goto m1;
+				}
+			}
+			// Если точка дальше внешнего радиуса всех объектов, то она не подходит
+			int i;
+			for (i = 0; i < (int)objects.size(); ++i) {
+				const ObjectToPlace& obj = objects[i];
+				float dist = calcDist((float)x, (float)y, (float)obj.x, (float)obj.y);
+				if (dist < obj.calcInnerRadius() * 1.1f) {                                                      // const !!!
+					break;
+				}
+			}
+			if (i == objects.size()) {
+				continue;
+			}
+			// Из остальных точек выбираем с минимальной суммой расстояний до центров объектов
+			float sum;
+			sum = 0;
+			for (const auto& obj : objects) {
+				sum += calcDist((float)x, (float)y, (float)obj.x, (float)obj.y);                        // !!! Попробовать минимизировать сумму квадратов разностей
+			}
+			if (sum < bestSum) {
+				bestSum = sum;
+				bestX = x;
+				bestY = y;
+			}
+m1:;
+		}
+	}
+	bestX_ = bestX;
+	bestY_ = bestY;
+}
+
+//--------------------------------------------------------------------------------------------
+
+void renderLastObjectToDstBufer(int dstBuferIndex)
+{
+	const ObjectToPlace& obj = objects.back();
+	const Buffer& srcBuffer = srcBuffers[obj.srcBuferIndex];
+	Buffer& dstBuffer = dstBuffers[dstBuferIndex];
+	                                                                    // !!! Добавить произовльный угол вращения и другие параметры
+	// Расчитать описаный бокс в dstBuffer, куда будем рендерить объект
+	int x1 = std::max(obj.x - (int)obj.newOuterRadius - 10, 0);
+	int y1 = std::max(obj.y - (int)obj.newOuterRadius - 10, 0);
+	int x2 = std::min(obj.x + (int)obj.newOuterRadius + 10, Scene2DSize);
+	int y2 = std::min(obj.y + (int)obj.newOuterRadius + 10, Scene2DSize);
+
+	float scale = srcBuffer.outerRadius / obj.newOuterRadius;
+	for (int y = y1; y <= y2; ++y) {
+		for (int x = x1; x <= x2; ++x) {
+			int srcX = (int)((x - obj.x) * scale + srcBuffer.centerX);
+			int srcY = (int)((y - obj.y) * scale + srcBuffer.centerY);
+			float srcVal = 0;
+			if (srcX >= 0 && srcX < Scene2DSize && srcY >= 0 && srcY < Scene2DSize) {
+				srcVal = srcBuffer.cells[srcX][srcY];
+			}
+			float dstVal = dstBuffer.cells[x][y];
+			dstBuffer.cells[x][y] = 1 - (1 - srcVal) * (1 - dstVal);
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+void test6Generate2dCloud()
+{
+	// Отрендерить круг в нулевой Src буффер
+	const float radius = 50;
+	for (int y = 0; y < Scene2DSize; ++y) {
+		for (int x = 0; x < Scene2DSize; ++x) {
+			float dx = x - Scene2DSize / 2.f;
+			float dy = y - Scene2DSize / 2.f;
+			float dist = sqrt(dx * dx + dy * dy);
+			if (dist < radius) {
+				float ratio = dist / radius;
+				srcBuffers[0].cells[x][y] = (cos(ratio * PI) + 1) * 0.5f * 0.03f;                                // const !!!
+			}
+		}
+	}
+	srcBuffers[0].fillParameters();
+
+	// Раскопировать по остальным Src буферам
+	for (int i = 1; i < BuffersNum; ++i) {
+		srcBuffers[i] = srcBuffers[0];
+	}
+
+	for (int fractalStep = 0; fractalStep < 3; ++fractalStep) {                                                  // const !!!
+		// Расчитаем параметры и отрендерим большие объекта из маленьких
+		for (int bufIndex = 0; bufIndex < BuffersNum; ++bufIndex) {
+			objects.clear();
+			dstBuffers[bufIndex].clear();
+			const int SmallObjectInBig = 20;                                                                     // const !!!
+			for (int i = 0; i < SmallObjectInBig; ++i) {
+				int srcBuferIndex = rand(0, BuffersNum - 1);
+				float newOuterRadius = randf(5.f, 50.f);                                                        // const !!!
+				if (i == 0) {
+					objects.emplace_back(ObjectToPlace(Scene2DSize / 2, Scene2DSize / 2, srcBuferIndex, newOuterRadius));
+				}
+				else {
+					int newX = 0;
+					int newY = 0;
+					calcPosForNewObject(newX, newY);
+					if (fractalStep == 2) {                                                                           // const !!!
+						newX += rand(-30, 30);                                                                        // const !!!
+						newY += rand(-30, 30);                                                                        // const !!!
+					}
+					objects.emplace_back(ObjectToPlace(newX, newY, srcBuferIndex, newOuterRadius));
+				}
+				renderLastObjectToDstBufer(bufIndex);
+			}
+			// Рассчитать параметры сгенерированного изображения
+			dstBuffers[bufIndex].fillParameters();
+			// Сохранить на диск сгенерированное изображение
+			char number[4];
+			number[0] = bufIndex / 100 + '0';
+			number[1] = (bufIndex % 100) / 10 + '0';
+			number[2] = (bufIndex % 10) + '0';
+			number[3] = 0;
+			std::string fname = std::string("Cloud//cloud") + (const char*)number + ".bmp";
+			saveDstBufToBmp(fname, bufIndex);
+		}
+		// Скопируем большие буфера в маленькие
+		for (int i = 0; i < BuffersNum; ++i) {
+			srcBuffers[i] = dstBuffers[i];
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+// Ренедер
 //--------------------------------------------------------------------------------------------
 
 const float FarAway = 100000.f;
@@ -426,8 +732,8 @@ const int ScreenSize = 300; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -200; // Позиция камеры по z в системе координат сетки
 const float MaxLightBright = 1000; // Максимальная яркость источника света
-const double ScatterCoeff = 0.00002; // Коэффициент рассеивания тумана
-const int SceneDrawNum = 400; // Сколько раз рендерим сцену
+const double ScatterCoeff = 0.002; // Коэффициент рассеивания тумана  0.00002;
+const int SceneDrawNum = 500; // Сколько раз рендерим сцену
 
 struct LIGHT_BOX
 {
@@ -737,11 +1043,11 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 
 		double curScatterProb = smokeDens * dist * ScatterCoeff;
 		scatterProb = 1. - (1. - scatterProb) * (1. - curScatterProb);
-		if (randDouble() < scatterProb) {
-			scatterProb = 0;
-			dirX = (float)(randDouble() * 2.f - 1.f);
-			dirY = (float)(randDouble() * 2.f - 1.f);
-			dirZ = (float)(randDouble() * 2.f - 1.f);
+		if (randf(0.f, 1.f) < scatterProb) {
+			scatterProb = 0;                                                  
+			dirX = randf(-1.f, 1.f);                   // !!! Рандомный угол выбирать в поляной системе координат, иначе плотность вероятности по телесному углу неравномерна!
+			dirY = randf(-1.f, 1.f);
+			dirZ = randf(-1.f, 1.f);
 		}
 	}
 }
@@ -796,13 +1102,13 @@ void saveSceneToBmp(const std::string& fileName)
 
 //--------------------------------------------------------------------------------------------
 
-void test4()
+void test4Render3dScene()
 {
-	lights.push_back(LIGHT_BOX(MaxLightBright, 10, 20, 150, 30, 50, 200));
+	lights.push_back(LIGHT_BOX(MaxLightBright, 10, 70, 0, 30, 150, 200));
 	lights.push_back(LIGHT_BOX(MaxLightBright, 180, 170, 0, 200, 200, 200));
 
 	for (int z = 30; z < 170; ++z) {
-		for (int y= 30; y < 170; ++y) {
+		for (int y= 130; y < 200; ++y) {
 			for (int x = 30; x < 170; ++x) {
 				scene[x][y][z].smokeDens = 1.f;
 			}
@@ -870,11 +1176,12 @@ void test5()
 
 }
 
+//--------------------------------------------------------------------------------------------
+
+
 int main()
 {
-//	printf("%f\n", signf(-1.5f));
-//	test4();
-
-	test2();
-	//test5();
+	//test4Render3dScene();
+	//test2Render2dAnimation();
+	test6Generate2dCloud();
 }
