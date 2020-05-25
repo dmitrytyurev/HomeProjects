@@ -639,8 +639,8 @@ void renderLastObjectToDstBufer(int dstBuferIndex)
 	// Расчитать описаный бокс в dstBuffer, куда будем рендерить объект
 	int x1 = std::max(obj.x - (int)obj.newOuterRadius - 10, 0);
 	int y1 = std::max(obj.y - (int)obj.newOuterRadius - 10, 0);
-	int x2 = std::min(obj.x + (int)obj.newOuterRadius + 10, Scene2DSize);
-	int y2 = std::min(obj.y + (int)obj.newOuterRadius + 10, Scene2DSize);
+	int x2 = std::min(obj.x + (int)obj.newOuterRadius + 10, Scene2DSize-1);
+	int y2 = std::min(obj.y + (int)obj.newOuterRadius + 10, Scene2DSize-1);
 
 	float scale = srcBuffer.outerRadius / obj.newOuterRadius;
 	for (int y = y1; y <= y2; ++y) {
@@ -661,6 +661,7 @@ void renderLastObjectToDstBufer(int dstBuferIndex)
 
 void test6Generate2dCloud()
 {
+	srand(5890);
 	// Отрендерить круг в нулевой Src буффер
 	const float radius = 50;
 	for (int y = 0; y < Scene2DSize; ++y) {
