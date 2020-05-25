@@ -4,14 +4,17 @@
 #include <stdarg.h>
 #include <algorithm>
 #include "bmp.h"
+#include "utils.h"
+
 
 //--------------------------------------------------------------------------------------------
 //FILE* f = fopen("WaveTable.txt", "wt");
 //fprintf(f, "%f\n", waveTable[i]);
 //fclose(f);
 //--------------------------------------------------------------------------------------------
+void generate3dCloud(std::vector<float>& dst, int size);
+//--------------------------------------------------------------------------------------------
 
-const float PI = 3.14159f;
 const int Scene2DSize = 200;
 const int WaveTableSize = 1000;
 float randomSpeedRotateAmpl;  // Амплитуда рандомного вращения скоростей
@@ -92,29 +95,6 @@ void _cdecl exit_msg(const char *text, ...)
 
 	printf("%s", tmpStr);
 	exit(1);
-}
-
-//--------------------------------------------------------------------------------------------
-
-int rand(int min, int max)
-{
-	return rand() * (max - min + 1) / (RAND_MAX + 1) + min;
-}
-
-//--------------------------------------------------------------------------------------------
-
-float  randf(float min, float max)
-{
-	return rand() * (max - min) / RAND_MAX  + min;
-}
-
-//--------------------------------------------------------------------------------------------
-
-inline float calcDist(float x1, float y1, float x2, float y2)
-{
-	float dx = x1 - x2;
-	float dy = y1 - y2;
-	return sqrt(dx * dx + dy * dy);
 }
 
 //--------------------------------------------------------------------------------------------
@@ -779,7 +759,7 @@ const int SceneSize = 200;  // Размер сцены в единичных к�
 const float cameraZinit = -200; // Позиция камеры по z в системе координат сетки
 const float MaxLightBright = 1000; // Максимальная яркость источника света
 const double ScatterCoeff = 0.002; // Коэффициент рассеивания тумана  0.00002;
-const int SceneDrawNum = 500; // Сколько раз рендерим сцену
+const int SceneDrawNum = 50; // Сколько раз рендерим сцену
 
 struct LIGHT_BOX
 {
@@ -1153,10 +1133,23 @@ void test4Render3dScene()
 	lights.push_back(LIGHT_BOX(MaxLightBright, 10, 70, 0, 30, 150, 200));
 	lights.push_back(LIGHT_BOX(MaxLightBright, 180, 170, 0, 200, 200, 200));
 
-	for (int z = 30; z < 170; ++z) {
-		for (int y= 130; y < 200; ++y) {
-			for (int x = 30; x < 170; ++x) {
-				scene[x][y][z].smokeDens = 1.f;
+	//for (int z = 30; z < 170; ++z) {
+	//	for (int y= 130; y < 200; ++y) {
+	//		for (int x = 30; x < 170; ++x) {
+	//			scene[x][y][z].smokeDens = 1.f;
+	//		}
+	//	}
+	//}
+
+	std::vector<float> cloudBuf;
+	printf("Generate cloud start\n");
+	generate3dCloud(cloudBuf, SceneSize);
+	printf("Generate cloud end\n");
+
+	for (int z = 0; z < SceneSize; ++z) {
+		for (int y= 0; y < SceneSize; ++y) {
+			for (int x = 0; x < SceneSize; ++x) {
+				scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
 			}
 		}
 	}
@@ -1227,7 +1220,7 @@ void test5()
 
 int main()
 {
-	//test4Render3dScene();
+	test4Render3dScene();
 	//test2Render2dAnimation();
-	test6Generate2dCloud();
+	//test6Generate2dCloud();
 }
