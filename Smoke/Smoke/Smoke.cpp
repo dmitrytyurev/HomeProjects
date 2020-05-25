@@ -709,7 +709,7 @@ void test6Generate2dCloud()
 			float dist = sqrt(dx * dx + dy * dy);
 			if (dist < radius) {
 				float ratio = dist / radius;
-				srcBuffers[0].cells[x][y] = (cos(ratio * PI) + 1) * 0.5f*0.03f;                                // const !!!
+				srcBuffers[0].cells[x][y] = (cos(ratio * PI) + 1) * 0.5f*0.04f;                                // const !!!
 			}
 		}
 	}
