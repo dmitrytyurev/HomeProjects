@@ -307,8 +307,8 @@ void renderLast3dObjectToDstBufer(std::vector<float>& dstBuffer, int bufSize)
 				int srcY = (int)((y - obj.y) * scale + srcBuffer.centerY);
 				int srcZ = (int)((z - obj.z) * scale + srcBuffer.centerZ);
 				float srcVal = 0;
-				if (srcX >= 0 && srcX < bufSize && srcY >= 0 && srcY < bufSize && srcZ >= 0 && srcZ < bufSize) {
-					srcVal = srcBuffer.cells[srcZ*bufSize*bufSize + srcY*bufSize + srcX];
+				if (srcX >= 0 && srcX < halfSize && srcY >= 0 && srcY < halfSize && srcZ >= 0 && srcZ < halfSize) {
+					srcVal = srcBuffer.cells[srcZ*halfSize*halfSize + srcY* halfSize + srcX];
 				}
 				float dstVal = dstBuffer[z*bufSize*bufSize + y*bufSize + x];
 				dstBuffer[z*bufSize*bufSize + y * bufSize + x] = 1 - (1 - srcVal) * (1 - dstVal);
