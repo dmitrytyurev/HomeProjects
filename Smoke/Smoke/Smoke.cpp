@@ -564,7 +564,7 @@ m4: centerX = (x1 + x2) / 2;
 					innerRadius = dist;
 				}
 			}
-			else {
+			if (cells[x][y] > 0) {
 				if (dist > outerRadius) {
 					outerRadius = dist;
 				}
@@ -580,30 +580,58 @@ float ObjectToPlace::calcInnerRadius() const
 	return newOuterRadius / srcBuffers[srcBuferIndex].outerRadius * srcBuffers[srcBuferIndex].innerRadius;
 }
 
-
 //--------------------------------------------------------------------------------------------
 
-void calcPosForNewObject(int& bestX_, int& bestY_)
+void calcPosForNewObject(int& bestX_, int& bestY_, float innerRadiusOfNewObject, float density)
 {
+	// Найти центр описанного бокса для всех текущих позиций объектов
+	int xMin = INT_MAX;
+	int yMin = INT_MAX;
+	int xMax = INT_MIN;
+	int yMax = INT_MIN;
+	for (const auto& obj : objects) {
+		if (obj.x < xMin) xMin = obj.x;
+		if (obj.y < yMin) yMin = obj.y;
+		if (obj.x > xMax) xMax = obj.x;
+		if (obj.y > yMax) yMax = obj.y;
+	}
+	int xCenter = (xMin + xMax) / 2;
+	int yCenter = (yMin + yMax) / 2;
+
+	// Выберем интервалы, в которых будем перебирать точки так, чтобы объект формировался примерно по центру рабочей области
+	int x1 = 0;
+	int x2 = Scene2DSize / 2;
+	if (xCenter < Scene2DSize / 2) {
+		x1 = Scene2DSize / 2;
+		x2 = Scene2DSize;
+	}
+	int y1 = 0;
+	int y2 = Scene2DSize / 2;
+	if (yCenter < Scene2DSize / 2) {
+		y1 = Scene2DSize / 2;
+		y2 = Scene2DSize;
+	}
+
+	// Перебор точек и выбор лучшей для нового объекта
 	int bestX = 0;
 	int bestY = 0;
 	float bestSum = FLT_MAX;
 
-	for (int y = 0; y < Scene2DSize; ++y) {
-		for (int x = 0; x < Scene2DSize; ++x) {
+	for (int y = y1; y < y2; ++y) {
+		for (int x = x1; x < x2; ++x) {
 			// Если точка слишком близко хотя бы к одному объекту, то она не подходит
 			for (const auto& obj: objects) {
 				float dist = calcDist((float)x, (float)y, (float)obj.x, (float)obj.y);
-				if (dist < obj.calcInnerRadius() * 0.7f) {                                                      // const !!!
+				if (dist < density*(obj.calcInnerRadius() + innerRadiusOfNewObject)) {
 					goto m1;
 				}
 			}
-			// Если точка дальше внешнего радиуса всех объектов, то она не подходит
+			// Если точка слишком далеко ото всех объектов, то она не подходит
 			int i;
 			for (i = 0; i < (int)objects.size(); ++i) {
 				const ObjectToPlace& obj = objects[i];
 				float dist = calcDist((float)x, (float)y, (float)obj.x, (float)obj.y);
-				if (dist < obj.calcInnerRadius() * 1.1f) {                                                      // const !!!
+				if (dist < obj.calcInnerRadius() + innerRadiusOfNewObject) {
 					break;
 				}
 			}
@@ -682,7 +710,8 @@ void test6Generate2dCloud()
 		srcBuffers[i] = srcBuffers[0];
 	}
 
-	for (int fractalStep = 0; fractalStep < 3; ++fractalStep) {                                                  // const !!!
+	const int FractalStepNum = 3;                                                                                // const !!!   
+	for (int fractalStep = 0; fractalStep < FractalStepNum; ++fractalStep) {                                                  
 		// Расчитаем параметры и отрендерим большие объекта из маленьких
 		for (int bufIndex = 0; bufIndex < BuffersNum; ++bufIndex) {
 			objects.clear();
@@ -690,22 +719,28 @@ void test6Generate2dCloud()
 			const int SmallObjectInBig = 20;                                                                     // const !!!
 			for (int i = 0; i < SmallObjectInBig; ++i) {
 				int srcBuferIndex = rand(0, BuffersNum - 1);
-				float newOuterRadius = randf(5.f, 50.f);                                                        // const !!!
+				float newOuterRadius = randf(15.f, 50.f);                                                        // const !!!
+				float innerRadiusOfNewObject = newOuterRadius / srcBuffers[srcBuferIndex].outerRadius * srcBuffers[srcBuferIndex].innerRadius;
 				if (i == 0) {
 					objects.emplace_back(ObjectToPlace(Scene2DSize / 2, Scene2DSize / 2, srcBuferIndex, newOuterRadius));
 				}
 				else {
 					int newX = 0;
 					int newY = 0;
-					calcPosForNewObject(newX, newY);
-					if (fractalStep == 2) {                                                                           // const !!!
-						newX += rand(-30, 30);                                                                        // const !!!
-						newY += rand(-30, 30);                                                                        // const !!!
-					}
+					float density = fractalStep < FractalStepNum - 1 ? 0.3f : 0.5f;                                  // const !!!
+					calcPosForNewObject(newX, newY, innerRadiusOfNewObject, density); 
 					objects.emplace_back(ObjectToPlace(newX, newY, srcBuferIndex, newOuterRadius));
 				}
 				renderLastObjectToDstBufer(bufIndex);
 			}
+
+//if (fractalStep == FractalStepNum - 1 && bufIndex == 0) {
+//	for (const auto& obj : objects) {
+//		printf("%d %d, %f\n", obj.x, obj.y, obj.calcInnerRadius());
+//		dstBuffers[bufIndex].cells[obj.x][obj.y] = 1.f;
+//	}
+//}
+
 			// Рассчитать параметры сгенерированного изображения
 			dstBuffers[bufIndex].fillParameters();
 			// Сохранить на диск сгенерированное изображение
