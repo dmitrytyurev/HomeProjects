@@ -553,13 +553,23 @@ m3:	for (int x = Scene2DSize - 1; x >= 0; --x) {
 m4: centerX = (x1 + x2) / 2;
     centerY = (y1 + y2) / 2;
 
+	// Расчитать максимальную яркость
+	float maxBright = 0;
+	for (int y = 0; y < Scene2DSize; ++y) {
+		for (int x = 0; x < Scene2DSize; ++x) {
+			if (cells[x][y] > maxBright) {
+				maxBright = cells[x][y];
+			}
+		}
+	}
+	
 	// Расчитать innerRadius, outerRadius
 	innerRadius = FLT_MAX;
 	outerRadius = 0;
 	for (int y = 0; y < Scene2DSize; ++y) {
 		for (int x = 0; x < Scene2DSize; ++x) {
 			float dist = calcDist((float)x, (float)y, (float)centerX, (float)centerY);
-			if (cells[x][y] == 0) {
+			if (cells[x][y] < maxBright * 0.05f) {  // 0.05f
 				if (dist < innerRadius) {
 					innerRadius = dist;
 				}
@@ -699,7 +709,7 @@ void test6Generate2dCloud()
 			float dist = sqrt(dx * dx + dy * dy);
 			if (dist < radius) {
 				float ratio = dist / radius;
-				srcBuffers[0].cells[x][y] = (cos(ratio * PI) + 1) * 0.5f * 0.03f;                                // const !!!
+				srcBuffers[0].cells[x][y] = (cos(ratio * PI) + 1) * 0.5f*0.03f;                                // const !!!
 			}
 		}
 	}
@@ -727,7 +737,7 @@ void test6Generate2dCloud()
 				else {
 					int newX = 0;
 					int newY = 0;
-					float density = fractalStep < FractalStepNum - 1 ? 0.3f : 0.5f;                                  // const !!!
+					float density = fractalStep < FractalStepNum - 1 ? 0.28f : 0.6f;                                  // const !!!
 					calcPosForNewObject(newX, newY, innerRadiusOfNewObject, density); 
 					objects.emplace_back(ObjectToPlace(newX, newY, srcBuferIndex, newOuterRadius));
 				}
