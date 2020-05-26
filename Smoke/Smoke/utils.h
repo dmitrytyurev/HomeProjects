@@ -35,3 +35,19 @@ inline float  randf(float min, float max)
 	return rand() * (max - min) / RAND_MAX + min;
 }
 
+//--------------------------------------------------------------------------------------------
+
+inline float normalize(float& x, float& y, float& z, bool& succes)
+{
+	float dist = sqrt(x*x + y*y + z*z);
+	if (dist < 0.0001f) {
+		succes = false;
+		return dist;
+	}
+	succes = true;
+	x /= dist;
+	y /= dist;
+	z /= dist;
+	return dist;
+}
+

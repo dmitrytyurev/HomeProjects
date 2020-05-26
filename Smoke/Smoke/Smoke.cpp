@@ -5,6 +5,8 @@
 #include <algorithm>
 #include "bmp.h"
 #include "utils.h"
+#include "functional"
+#include <time.h>
 
 
 //--------------------------------------------------------------------------------------------
@@ -116,6 +118,29 @@ void initWaveTable()
 		waveTable[i] = sin(angle) + sin(angle * 2) + sin(angle * 3) + sin(angle * 4);
 	}
 }
+
+//--------------------------------------------------------------------------------------------
+
+void saveToBmp(const std::string& fileName, int sizeX, int sizeY, std::function<uint8_t (int x, int y)> getPixel)
+{
+	uint8_t* bmpData = new uint8_t[sizeX * sizeY * 3];
+	for (int y = 0; y < sizeY; ++y)
+	{
+		for (int x = 0; x < sizeX; ++x)
+		{
+			uint8_t bright = getPixel(x, y);
+			int pixelOffs = (y * sizeX + x) * 3;
+			bmpData[pixelOffs++] = bright;
+			bmpData[pixelOffs++] = bright;
+			bmpData[pixelOffs++] = bright;
+		}
+	}
+
+	save_bmp24(fileName.c_str(), sizeX, sizeY, (const char *)bmpData);
+	delete[] bmpData;
+}
+
+
 
 //--------------------------------------------------------------------------------------------
 
@@ -467,7 +492,7 @@ void test2Render2dAnimation()
 			number[1] = (i % 100) / 10 + '0';
 			number[2] = (i % 10) + '0';
 			number[3] = 0;
-			std::string fname = std::string("frame") + (const char*)number + ".bmp";
+			std::string fname = std::string("Animation2d/frame") + (const char*)number + ".bmp";
 			save2DSceneToBmp(fname);
 		}
 		printf("i=%d ", i);
@@ -757,9 +782,9 @@ const float FarAway = 100000.f;
 const int ScreenSize = 300; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -200; // Позиция камеры по z в системе координат сетки
-const float MaxLightBright = 1000; // Максимальная яркость источника света
-const double ScatterCoeff = 0.002; // Коэффициент рассеивания тумана  0.00002;
-const int SceneDrawNum = 50; // Сколько раз рендерим сцену
+const float MaxLightBright = 16000; // Максимальная яркость источника света
+const double ScatterCoeff = 2; // Коэффициент рассеивания тумана  0.00002;
+const int SceneDrawNum = 16000; // Сколько раз рендерим сцену
 
 struct LIGHT_BOX
 {
@@ -777,6 +802,10 @@ struct LIGHT_BOX
 struct Cell
 {
 	float smokeDens = 0;
+	float normalX = 0;
+	float normalY = 0;
+	float normalZ = 0;
+	float surfaceCoeff = 0;  // 0 - анизатропная среда, 1 - поверхность с резким градиентом
 };
 
 
@@ -1026,21 +1055,75 @@ void test3()
 }
 
 //--------------------------------------------------------------------------------------------
+void calcNormalsAndSurfInterp()
+{
+	const int radius = 1;
+	for (int z = radius; z < SceneSize-radius; ++z)	{
+		for (int y = radius; y < SceneSize - radius; ++y) {
+			for (int x = radius; x < SceneSize - radius; ++x) {
+				float dx = 0;
+				float dy = 0;
+				float dz = 0;
+				float surfaceCoeff = 0;
+
+				for (int z2 = z - radius; z2 <= z + radius; ++z2) {
+					for (int y2 = y - radius; y2 <= y + radius; ++y2) {
+						for (int x2 = x - radius; x2 <= x + radius; ++x2) {
+							if (x2 < x + radius) {
+								dx -= scene[x2 + 1][y2][z2].smokeDens - scene[x2][y2][z2].smokeDens;
+							}
+							if (y2 < y + radius) {
+								dy -= scene[x2][y2 + 1][z2].smokeDens - scene[x2][y2][z2].smokeDens;
+							}
+							if (z2 < z + radius) {
+								dz -= scene[x2][y2][z2 + 1].smokeDens - scene[x2][y2][z2].smokeDens;
+							}
+						}
+					}
+				}
+				bool succes = false;
+				float dist = normalize(dx, dy, dz, succes);
+				if (!succes) {
+					dx = 1.f;
+					dy = 0.f;
+					dz = 0.f;
+				}
+				else {
+					surfaceCoeff = dist * 0.25f - 0.25f;                                   //  !!! const  5->1, 1->0
+					surfaceCoeff = std::min(std::max(surfaceCoeff, 0.f), 1.f);
+				}
+				scene[x][y][z].normalX = dx;
+				scene[x][y][z].normalY = dy;
+				scene[x][y][z].normalZ = dz;
+				scene[x][y][z].surfaceCoeff = surfaceCoeff;
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------
 // Определить цвет пиксела и записать его в буфер screen
 //--------------------------------------------------------------------------------------------
 
 void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float dirY, float dirZ)
 {
-	double lightDrop = 0;
+	const float sceneExtendX1 = 0;    // !!! const 
+	const float sceneExtendX2 = 60;   // !!! const 
+	const float sceneExtendY1 = 0;    // !!! const 
+	const float sceneExtendY2 = 0;    // !!! const 
+	const float sceneExtendZ1 = 0;    // !!! const 
+	const float sceneExtendZ2 = 0;    // !!! const 
+	double lightDropAbs = 0;
+	double lightDropMul = 1;
 	double scatterProb = 0;
 
 	while(true) {
-		if (x < -1 || x > SceneSize + 1 || y < -1 || y > SceneSize + 1 || z < -1 || z > SceneSize + 1) {
+		if (x < -sceneExtendX1 || x > SceneSize + sceneExtendX2 || y < -sceneExtendY1 || y > SceneSize + sceneExtendY2 || z < -sceneExtendZ1 || z > SceneSize + sceneExtendZ2) {
 			return;
 		}
 		for (const auto& light : lights) {
 			if (x > light.x1 && x < light.x2 && y > light.y1 && y < light.y2 && z > light.z1 && z < light.z2) {
-				screen[xi][yi] += std::max(light.bright - lightDrop, 0.);
+				screen[xi][yi] += std::max(light.bright - lightDropAbs, 0.) * lightDropMul;
 				return;
 			}
 		}
@@ -1053,28 +1136,51 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 		int cubeZ = 0;
 		intersect(x, y, z, dirX, dirY, dirZ, newX, newY, newZ, cubeX, cubeY, cubeZ);
 		float dist = sqrtf((x, y, z, newX, newY, newZ));
-		x = newX;
-		y = newY;
-		z = newZ;
 
 		float smokeDens = 0;
 		if (cubeX >= 0 && cubeX < SceneSize && cubeY >= 0 && cubeY < SceneSize && cubeZ >= 0 && cubeZ < SceneSize) {
 			smokeDens = scene[cubeX][cubeY][cubeZ].smokeDens;
 		}
 
-		lightDrop += smokeDens * dist * 0.2f;
-		if (lightDrop > MaxLightBright) {
+		if (smokeDens != 0) {  // z > 70
+			dirX = randf(-1.f, 1.f);                // !!! Рандомный угол выбирать в поляной системе координат, иначе плотность вероятности по телесному углу неравномерна!
+			dirY = randf(-1.f, 1.f);
+			dirZ = randf(-1.f, 1.f);
+			bool succes = false;
+			normalize(dirX, dirY, dirZ, succes);
+			if (!succes) {
+				dirX = 1.f;
+				dirY = 0;
+				dirZ = 0;
+			}
+			Cell& cell = scene[cubeX][cubeY][cubeZ];
+			float mul = std::max(cell.normalX * dirX + cell.normalY * dirY + cell.normalZ * dirZ, 0.f);
+			lightDropMul *= mul;
+			if (lightDropMul < 0.0001f) {
+				return;
+			}
+		}
+		else {
+			x = newX;
+			y = newY;
+			z = newZ;
+		}
+
+
+		lightDropAbs += smokeDens * dist * 0.2f;
+		if (lightDropAbs > MaxLightBright) {
 			return;
 		}
 
-		double curScatterProb = smokeDens * dist * ScatterCoeff;
-		scatterProb = 1. - (1. - scatterProb) * (1. - curScatterProb);
-		if (randf(0.f, 1.f) < scatterProb) {
-			scatterProb = 0;                                                  
-			dirX = randf(-1.f, 1.f);                   // !!! Рандомный угол выбирать в поляной системе координат, иначе плотность вероятности по телесному углу неравномерна!
-			dirY = randf(-1.f, 1.f);
-			dirZ = randf(-1.f, 1.f);
-		}
+
+		//double curScatterProb = smokeDens * dist * ScatterCoeff;
+		//scatterProb = 1. - (1. - scatterProb) * (1. - curScatterProb);
+		//if (randf(0.f, 1.f) < scatterProb) {
+		//	scatterProb = 0;                                                  
+		//	dirX = randf(-1.f, 1.f);                   // !!! Рандомный угол выбирать в поляной системе координат, иначе плотность вероятности по телесному углу неравномерна!
+		//	dirY = randf(-1.f, 1.f);
+		//	dirZ = randf(-1.f, 1.f);
+		//}
 	}
 }
 
@@ -1082,16 +1188,16 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 // Рендерить сцену в буфер screen
 //--------------------------------------------------------------------------------------------
 
-void renderScene()
+void renderScene(int x1, int y1, int x2, int y2)
 {
 	float cameraX = SceneSize / 2.f;
 	float cameraY = SceneSize / 2.f;
 	float cameraZ = cameraZinit;
 
 	double ratio = (double)SceneSize / (double)ScreenSize;
-	for (int yi = 0; yi < ScreenSize; ++yi)
+	for (int yi = y1; yi < y2; ++yi)
 	{
-		for (int xi = 0; xi < ScreenSize; ++xi)
+		for (int xi = x1; xi < x2; ++xi)
 		{
 			float x = (float)((((double)xi) + 0.5f) * ratio);
 			float y = (float)((((double)yi) + 0.5f) * ratio);
@@ -1107,31 +1213,11 @@ void renderScene()
 
 //--------------------------------------------------------------------------------------------
 
-void saveSceneToBmp(const std::string& fileName)
-{
-	uint8_t* bmpData = new uint8_t[ScreenSize * ScreenSize * 3];
-	for (int y = 0; y < ScreenSize; ++y)
-	{
-		for (int x = 0; x < ScreenSize; ++x)
-		{
-			uint8_t bright = (uint8_t)(std::min(screen[x][y] / SceneDrawNum, 255.));
-			int pixelOffs = (y * ScreenSize + x) * 3;
-			bmpData[pixelOffs++] = bright;
-			bmpData[pixelOffs++] = bright;
-			bmpData[pixelOffs++] = bright;
-		}
-	}
-
-	save_bmp24(fileName.c_str(), ScreenSize, ScreenSize, (const char *)bmpData);
-	delete[] bmpData;
-}
-
-//--------------------------------------------------------------------------------------------
-
 void test4Render3dScene()
 {
-	lights.push_back(LIGHT_BOX(MaxLightBright, 10, 70, 0, 30, 150, 200));
-	lights.push_back(LIGHT_BOX(MaxLightBright, 180, 170, 0, 200, 200, 200));
+	//lights.push_back(LIGHT_BOX(MaxLightBright, 10, 70, 0, 30, 120, 200));
+//	lights.push_back(LIGHT_BOX(MaxLightBright, 210, 50, 0, 215, 150, 30));
+	lights.push_back(LIGHT_BOX(MaxLightBright, 250, 40, -20, 255, 160, 40));
 
 	//for (int z = 30; z < 170; ++z) {
 	//	for (int y= 130; y < 200; ++y) {
@@ -1141,26 +1227,72 @@ void test4Render3dScene()
 	//	}
 	//}
 
-	std::vector<float> cloudBuf;
-	printf("Generate cloud start\n");
-	generate3dCloud(cloudBuf, SceneSize);
-	printf("Generate cloud end\n");
+	{
+		std::vector<float> cloudBuf;
+		printf("Generate cloud start\n");
+		generate3dCloud(cloudBuf, SceneSize);
+		printf("Generate cloud end\n");
 
-	for (int z = 0; z < SceneSize; ++z) {
-		for (int y= 0; y < SceneSize; ++y) {
-			for (int x = 0; x < SceneSize; ++x) {
-				scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
+		for (int z = 0; z < SceneSize; ++z) {
+			for (int y = 0; y < SceneSize; ++y) {
+				for (int x = 0; x < SceneSize; ++x) {
+					scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
+				}
 			}
 		}
 	}
 
-	for (int n=0; n < SceneDrawNum; ++n) {
-		renderScene();
-		printf("%d\n", n);
-	}
+	//// Генерим зубчатую сферу для теста
+	//for (int z = 0; z < 200; ++z) {
+	//	for (int y = 0; y < 200; ++y) {
+	//		for (int x = 0; x < 200; ++x) {
+	//			int dx = (x - (100-95)) / 20;
+	//			int dy = (y - (100+95)) / 20;
+	//			int dz = (z - 100) / 20;
+	//			if (dx*dx + dy * dy + dz * dz < 12) {
+	//				scene[x][y][z].smokeDens = 1.f;
+	//			}
+	//			else
+	//			{
+	//				scene[x][y][z].smokeDens = 0.f;
+	//			}
+	//		}
+	//	}
+	//}
 
-	saveSceneToBmp("3dScene.bmp");
+	// Заполняем нормали и коэффициенты поверхности
+	calcNormalsAndSurfInterp();
+
+	//int count = 100;
+	//for (int z = 1; z < 200; ++z) {
+	//	for (int y = 1; y < 200; ++y) {
+	//		for (int x = 1; x < 200; ++x) {
+	//			if (scene[x][y][z].smokeDens == 1.f && scene[x][y][z-1].smokeDens == 0.f) {
+	//				printf("%f %f %f, sc: %f\n", scene[x][y][z].normalX, scene[x][y][z].normalY, scene[x][y][z].normalZ, scene[x][y][z].surfaceCoeff);
+	//				if (--count == 0) {
+	//					exit_msg("done");
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+
+
+
+	for (int n=0; n < SceneDrawNum; ++n) {
+		//srand(time(NULL));
+		printf("Rendernig frame %d of %d\n", n, SceneDrawNum);
+//		renderScene(0, 0, ScreenSize, ScreenSize);
+//		renderScene(150-20, 150-20, 150+20, 150+20);
+//		renderScene(20, 80, 210, 270);  // Сдвинутый кубический шар
+		renderScene(138, 146, 305, 205);
+	}
+	
+	saveToBmp("Scenes/3dScene.bmp", ScreenSize, ScreenSize, [](int x, int y) { return (uint8_t)(std::min(screen[x][y] / SceneDrawNum, 255.)); });
 }
+
+
+
 
 //--------------------------------------------------------------------------------------------
 

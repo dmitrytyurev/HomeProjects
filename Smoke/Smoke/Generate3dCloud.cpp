@@ -1,15 +1,25 @@
 ﻿#include "pch.h"
 #include <iostream>
 #include <vector>
+#include <functional>
 #include <stdarg.h>
 #include <algorithm>
 #include "bmp.h"
 #include "utils.h"
 
 //--------------------------------------------------------------------------------------------
+// Прототипы
+//--------------------------------------------------------------------------------------------
+void saveToBmp(const std::string& fileName, int sizeX, int sizeY, std::function<uint8_t(int x, int y)> getPixel);
+
+//--------------------------------------------------------------------------------------------
+// Константы
+//--------------------------------------------------------------------------------------------
 
 const int BuffersNum = 10;
 
+//--------------------------------------------------------------------------------------------
+// Структуры
 //--------------------------------------------------------------------------------------------
 
 struct Buffer3D
@@ -42,6 +52,8 @@ struct Object3dToPlace
 };
 
 
+//--------------------------------------------------------------------------------------------
+// Глобальные переменные
 //--------------------------------------------------------------------------------------------
 
 int fullSize = 0;
@@ -318,8 +330,34 @@ void renderLast3dObjectToDstBufer(std::vector<float>& dstBuffer, int bufSize)
 }
 //--------------------------------------------------------------------------------------------
 
+void saveCloud(std::vector<float>& dst, int size)
+{
+	FILE* f = fopen("Cloud.bin", "wb");
+	if (f) {
+		fwrite(&dst[0], size*size*size * sizeof(float), 1, f);
+		fclose(f);
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+void loadCloud(std::vector<float>& dst, int size)
+{
+	FILE* f = fopen("Cloud.bin", "rb");
+	if (f) {
+		dst.resize(size*size*size);
+		fread(&dst[0], size*size*size * sizeof(float), 1, f);
+		fclose(f);
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
 void generate3dCloud(std::vector<float>& dst, int size)
 {
+	loadCloud(dst, size);
+	return;
+
 	fullSize = size;
 	halfSize = size / 2;
 	for (int i=0; i<BuffersNum; ++i)
@@ -371,7 +409,8 @@ void generate3dCloud(std::vector<float>& dst, int size)
 					int newX = 0;
 					int newY = 0;
 					int newZ = 0;
-					calc3dPosForNewObject(newX, newY, newZ, innerRadiusOfNewObject, 0.28f, halfSize);                         // const !!!
+					float density = fractalStep == 0 ? 0.2f : 0.5f;                                                                 // const !!! 0.28
+					calc3dPosForNewObject(newX, newY, newZ, innerRadiusOfNewObject, density, halfSize);                         
 					objects.emplace_back(Object3dToPlace(newX, newY, newZ, srcBuferIndex, newOuterRadius));
 				}
 				renderLast3dObjectToDstBufer(dstBuffers[bufIndex].cells, halfSize);
@@ -403,9 +442,23 @@ void generate3dCloud(std::vector<float>& dst, int size)
 			int newX = 0;
 			int newY = 0;
 			int newZ = 0;
-			calc3dPosForNewObject(newX, newY, newZ, innerRadiusOfNewObject, 0.6f, fullSize);                                // const !!!
+			calc3dPosForNewObject(newX, newY, newZ, innerRadiusOfNewObject, 0.6f, fullSize);                                // const !!! 0.6
 			objects.emplace_back(Object3dToPlace(newX, newY, newZ, srcBuferIndex, newOuterRadius));
 		}
 		renderLast3dObjectToDstBufer(dst, fullSize);
 	}
+
+	int sliceY = 3 * size / 10;
+	saveToBmp("Slices/3dCloudSlice_0.bmp", size, size, [dst, sliceY, size](int x, int y) { return (uint8_t)(std::min(dst[(size - 1 - y) * size * size + sliceY * size + x] * 255.f, 255.f)); });
+	sliceY = 4 * size / 10;
+	saveToBmp("Slices/3dCloudSlice_1.bmp", size, size, [dst, sliceY, size](int x, int y) { return (uint8_t)(std::min(dst[(size - 1 - y) * size * size + sliceY * size + x] * 255.f, 255.f)); });
+	sliceY = 5 * size / 10;
+	saveToBmp("Slices/3dCloudSlice_2.bmp", size, size, [dst, sliceY, size](int x, int y) { return (uint8_t)(std::min(dst[(size - 1 - y) * size * size + sliceY * size + x] * 255.f, 255.f)); });
+	sliceY = 6 * size / 10;
+	saveToBmp("Slices/3dCloudSlice_3.bmp", size, size, [dst, sliceY, size](int x, int y) { return (uint8_t)(std::min(dst[(size - 1 - y) * size * size + sliceY * size + x] * 255.f, 255.f)); });
+	sliceY = 7 * size / 10;
+	saveToBmp("Slices/3dCloudSlice_4.bmp", size, size, [dst, sliceY, size](int x, int y) { return (uint8_t)(std::min(dst[(size - 1 - y) * size * size + sliceY * size + x] * 255.f, 255.f)); });
+
+	saveCloud(dst, size);
+	exit(1);
 }
