@@ -782,9 +782,9 @@ const float FarAway = 100000.f;
 const int ScreenSize = 300; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -200; // Позиция камеры по z в системе координат сетки
-const float MaxLightBright = 12000; // Максимальная яркость источника света
+const float MaxLightBright = 4000; // Максимальная яркость источника света
 const double ScatterCoeff = 2; // Коэффициент рассеивания тумана  0.00002;
-const int SceneDrawNum = 200; // Сколько раз рендерим сцену
+const int SceneDrawNum = 10000; // Сколько раз рендерим сцену
 
 struct LIGHT_BOX
 {
@@ -802,7 +802,7 @@ struct LIGHT_BOX
 struct Cell
 {
 	float smokeDens = 0;
-	float normalX = 0;
+	float normalX = 1;
 	float normalY = 0;
 	float normalZ = 0;
 	float surfaceCoeff = 0;  // 0 - анизатропная среда, 1 - поверхность с резким градиентом
@@ -1090,7 +1090,7 @@ void calcNormalsAndSurfInterp()
 				}
 				else {
 					surfaceCoeff = dist * 0.25f - 0.25f;                                   //  !!! const  5->1, 1->0
-					surfaceCoeff = std::min(std::max(surfaceCoeff, 0.f), 1.f);
+					surfaceCoeff = std::min(std::max(surfaceCoeff, 0.f), 0.9f);            //  !!! const
 				}
 				scene[x][y][z].normalX = dx;
 				scene[x][y][z].normalY = dy;
@@ -1111,11 +1111,10 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 	const float sceneExtendX2 = 55;   // !!! const 
 	const float sceneExtendY1 = 55;    // !!! const 
 	const float sceneExtendY2 = 0;    // !!! const 
-	const float sceneExtendZ1 = 20;    // !!! const 
+	const float sceneExtendZ1 = 0;    // !!! const   20 bug!
 	const float sceneExtendZ2 = 0;    // !!! const 
 	double lightDropAbs = 0;
 	double lightDropMul = 1;
-	double scatterProb = 0;
 
 	while(true) {
 		if (x < -sceneExtendX1 || x > SceneSize + sceneExtendX2 || y < -sceneExtendY1 || y > SceneSize + sceneExtendY2 || z < -sceneExtendZ1 || z > SceneSize + sceneExtendZ2) {
@@ -1137,12 +1136,17 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 		intersect(x, y, z, dirX, dirY, dirZ, newX, newY, newZ, cubeX, cubeY, cubeZ);
 		float dist = sqrtf((x, y, z, newX, newY, newZ));
 
-		float smokeDens = 0;
+		Cell cell;
 		if (cubeX >= 0 && cubeX < SceneSize && cubeY >= 0 && cubeY < SceneSize && cubeZ >= 0 && cubeZ < SceneSize) {
-			smokeDens = scene[cubeX][cubeY][cubeZ].smokeDens;
+			cell = scene[cubeX][cubeY][cubeZ];
 		}
 
-		if (smokeDens != 0) {  // z > 70
+		double curScatterProb = cell.smokeDens * dist * ScatterCoeff;
+		bool needScatter = false;
+		needScatter = randf(0.f, 1.f) < curScatterProb;
+		//needScatter = smokeDens != 0;
+
+		if (needScatter) {
 			dirX = randf(-1.f, 1.f);                // !!! Рандомный угол выбирать в поляной системе координат, иначе плотность вероятности по телесному углу неравномерна!
 			dirY = randf(-1.f, 1.f);
 			dirZ = randf(-1.f, 1.f);
@@ -1153,12 +1157,12 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 				dirY = 0;
 				dirZ = 0;
 			}
-			Cell& cell = scene[cubeX][cubeY][cubeZ];
 			float mul = std::max(cell.normalX * dirX + cell.normalY * dirY + cell.normalZ * dirZ, 0.f);
-			//lightDropMul *= mul;
-			//if (lightDropMul < 0.0001f) {
-			//	return;
-			//}
+//			mul = 1.f - (1.f - mul) * cell.surfaceCoeff;  // surfaceCoeff интерполирует между mul и 1 (убирает влияение mul тем сильнее, чем более анизотропная среда)
+//			lightDropMul *= mul;
+			if (lightDropMul < 0.0001f) {
+				return;
+			}
 		}
 		else {
 			x = newX;
@@ -1166,21 +1170,12 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 			z = newZ;
 		}
 
-
-		lightDropAbs += smokeDens * dist * 0.2f;
+		float add = cell.smokeDens * dist * 0.2f;                               // !!! const
+		add *= (1.f - cell.surfaceCoeff);                   
+		lightDropAbs += add;
 		if (lightDropAbs > MaxLightBright) {
 			return;
 		}
-
-
-		//double curScatterProb = smokeDens * dist * ScatterCoeff;
-		//scatterProb = 1. - (1. - scatterProb) * (1. - curScatterProb);
-		//if (randf(0.f, 1.f) < scatterProb) {
-		//	scatterProb = 0;                                                  
-		//	dirX = randf(-1.f, 1.f);                   // !!! Рандомный угол выбирать в поляной системе координат, иначе плотность вероятности по телесному углу неравномерна!
-		//	dirY = randf(-1.f, 1.f);
-		//	dirZ = randf(-1.f, 1.f);
-		//}
 	}
 }
 
@@ -1188,7 +1183,7 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 // Рендерить сцену в буфер screen
 //--------------------------------------------------------------------------------------------
 
-void renderScene(int x1, int y1, int x2, int y2)
+void renderScene(int x1, int y1, int x2, int y2, int frame, int screenSize)
 {
 	float cameraX = SceneSize / 2.f;
 	float cameraY = SceneSize / 2.f;
@@ -1199,6 +1194,12 @@ void renderScene(int x1, int y1, int x2, int y2)
 	{
 		for (int xi = x1; xi < x2; ++xi)
 		{
+			if (frame > 200 && xi > 0 && xi < screenSize-1 && yi > 0 && yi < screenSize - 1) {
+				if (screen[xi][yi] == 0 && screen[xi + 1][yi] == 0 && screen[xi - 1][yi] == 0 && screen[xi][yi + 1] == 0 && screen[xi][yi - 1] == 0) {
+					continue;
+				}
+			}
+
 			float x = (float)((((double)xi) + 0.5f) * ratio);
 			float y = (float)((((double)yi) + 0.5f) * ratio);
 			float z = 0;
@@ -1215,9 +1216,9 @@ void renderScene(int x1, int y1, int x2, int y2)
 
 void test4Render3dScene()
 {
-//	lights.push_back(LIGHT_BOX(MaxLightBright*0.5f, 0, 170, 0, 30, 200, 30));
-//	lights.push_back(LIGHT_BOX(MaxLightBright, 0, -55, 0, 50, -50, 100));
-	lights.push_back(LIGHT_BOX(MaxLightBright, 250, 40, -20, 255, 160, 40));
+	lights.push_back(LIGHT_BOX(MaxLightBright*0.5f, 0, 170, 0, 30, 200, 30));
+	lights.push_back(LIGHT_BOX(MaxLightBright, 0, -55, 0, 50, -50, 100));
+	lights.push_back(LIGHT_BOX(MaxLightBright*0.7f, 250, 40, -20, 255, 160, 40));
 
 	//for (int z = 30; z < 170; ++z) {
 	//	for (int y= 130; y < 200; ++y) {
@@ -1233,10 +1234,10 @@ void test4Render3dScene()
 		generate3dCloud(cloudBuf, SceneSize);
 		printf("Generate cloud end\n");
 
-		for (int z = 0; z < SceneSize; ++z) {
+		for (int z = 25; z < SceneSize; ++z) {                                                                         // !!! const
 			for (int y = 0; y < SceneSize; ++y) {
 				for (int x = 0; x < SceneSize; ++x) {
-					scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
+					scene[x][y][z].smokeDens = cloudBuf[(z-25)*SceneSize*SceneSize + y * SceneSize + x];                 // !!! const
 				}
 			}
 		}
@@ -1283,28 +1284,22 @@ void test4Render3dScene()
 		//srand(time(NULL));
 		printf("Rendernig frame %d of %d\n", n, SceneDrawNum);
 //		renderScene(0, 0, ScreenSize, ScreenSize);
-		renderScene(48, 57, 259, 259);
+		renderScene(48, 57, 259, 259, n, ScreenSize);
 //		renderScene(20, 80, 210, 270);  // Сдвинутый кубический шар
 
-		if (n == 50) {
-			saveToBmp("Scenes/3dScene_Cloud50.bmp", ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n+1), 255.)); });
-		}
-		if (n == 100) {
-			saveToBmp("Scenes/3dScene_Cloud100.bmp", ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
-		}
-		if (n == 150) {
-			saveToBmp("Scenes/3dScene_Cloud150.bmp", ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
-		}
-		if (n == 200) {
-			saveToBmp("Scenes/3dScene_Cloud200.bmp", ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
-		}
-		if (n == 250) {
-			saveToBmp("Scenes/3dScene_Cloud250.bmp", ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
-		}
+		if ((n % 30) == 0 || n == SceneDrawNum-1) {
 
+			char number[6];
+			number[0] = (n % 100000) / 10000 + '0';
+			number[1] = (n % 10000) / 1000 + '0';
+			number[2] = (n % 1000) / 100 + '0';
+			number[3] = (n % 100) / 10 + '0';
+			number[4] = (n % 10) + '0';
+			number[5] = 0;
+			std::string fname = std::string("Scenes/3dScene_Cloud") + (const char*)number + ".bmp";
+			saveToBmp(fname, ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
+		}
 	}
-	
-	saveToBmp("Scenes/3dScene.bmp", ScreenSize, ScreenSize, [](int x, int y) { return (uint8_t)(std::min(screen[x][y] / SceneDrawNum, 255.)); });
 }
 
 

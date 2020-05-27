@@ -409,7 +409,7 @@ void generate3dCloud(std::vector<float>& dst, int size)
 					int newX = 0;
 					int newY = 0;
 					int newZ = 0;
-					float density = fractalStep == 0 ? 0.2f : 0.5f;                                                                 // const !!! 0.28
+					float density = fractalStep == 0 ? 0.4f : 0.5f;                                                                 // const !!! 0.28
 					calc3dPosForNewObject(newX, newY, newZ, innerRadiusOfNewObject, density, halfSize);                         
 					objects.emplace_back(Object3dToPlace(newX, newY, newZ, srcBuferIndex, newOuterRadius));
 				}
@@ -460,5 +460,5 @@ void generate3dCloud(std::vector<float>& dst, int size)
 	saveToBmp("Slices/3dCloudSlice_4.bmp", size, size, [dst, sliceY, size](int x, int y) { return (uint8_t)(std::min(dst[(size - 1 - y) * size * size + sliceY * size + x] * 255.f, 255.f)); });
 
 	saveCloud(dst, size);
-	exit(1);
+//	exit(1);
 }
