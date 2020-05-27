@@ -782,8 +782,8 @@ const float FarAway = 100000.f;
 const int ScreenSize = 300; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -200; // Позиция камеры по z в системе координат сетки
-const float MaxLightBright = 4000; // Максимальная яркость источника света
-const double ScatterCoeff = 2; // Коэффициент рассеивания тумана  0.00002;
+const float MaxLightBright = 12000; // Максимальная яркость источника света
+const double ScatterCoeff = 40; // Коэффициент рассеивания тумана  0.00002;
 const int SceneDrawNum = 10000; // Сколько раз рендерим сцену
 
 struct LIGHT_BOX
@@ -1134,7 +1134,7 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 		int cubeY = 0;
 		int cubeZ = 0;
 		intersect(x, y, z, dirX, dirY, dirZ, newX, newY, newZ, cubeX, cubeY, cubeZ);
-		float dist = sqrtf((x, y, z, newX, newY, newZ));
+		float dist = calcDist(x, y, z, newX, newY, newZ);
 
 		Cell cell;
 		if (cubeX >= 0 && cubeX < SceneSize && cubeY >= 0 && cubeY < SceneSize && cubeZ >= 0 && cubeZ < SceneSize) {
@@ -1159,7 +1159,7 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 			}
 			float mul = std::max(cell.normalX * dirX + cell.normalY * dirY + cell.normalZ * dirZ, 0.f);
 //			mul = 1.f - (1.f - mul) * cell.surfaceCoeff;  // surfaceCoeff интерполирует между mul и 1 (убирает влияение mul тем сильнее, чем более анизотропная среда)
-//			lightDropMul *= mul;
+			lightDropMul *= mul;
 			if (lightDropMul < 0.0001f) {
 				return;
 			}
@@ -1170,7 +1170,7 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 			z = newZ;
 		}
 
-		float add = cell.smokeDens * dist * 0.2f;                               // !!! const
+		float add = cell.smokeDens * dist * 4.f;                               // !!! const
 		add *= (1.f - cell.surfaceCoeff);                   
 		lightDropAbs += add;
 		if (lightDropAbs > MaxLightBright) {
@@ -1218,7 +1218,7 @@ void test4Render3dScene()
 {
 	lights.push_back(LIGHT_BOX(MaxLightBright*0.5f, 0, 170, 0, 30, 200, 30));
 	lights.push_back(LIGHT_BOX(MaxLightBright, 0, -55, 0, 50, -50, 100));
-	lights.push_back(LIGHT_BOX(MaxLightBright*0.7f, 250, 40, -20, 255, 160, 40));
+	lights.push_back(LIGHT_BOX(MaxLightBright*0.7f, 250, 40, 0, 255, 160, 40));
 
 	//for (int z = 30; z < 170; ++z) {
 	//	for (int y= 130; y < 200; ++y) {
