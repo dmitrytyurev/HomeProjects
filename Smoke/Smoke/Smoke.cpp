@@ -812,6 +812,12 @@ struct Cell
 double screen[ScreenSize][ScreenSize];
 std::vector<LIGHT_BOX> lights;
 Cell scene[SceneSize][SceneSize][SceneSize];
+float sceneBBoxX1;
+float sceneBBoxX2;
+float sceneBBoxY1;
+float sceneBBoxY2;
+float sceneBBoxZ1;
+float sceneBBoxZ2;
 
 //--------------------------------------------------------------------------------------------
 
@@ -1105,19 +1111,15 @@ void calcNormalsAndSurfInterp()
 // Определить цвет пиксела и записать его в буфер screen
 //--------------------------------------------------------------------------------------------
 
+
+
 void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float dirY, float dirZ)
 {
-	const float sceneExtendX1 = 0;    // !!! const 
-	const float sceneExtendX2 = 55;   // !!! const 
-	const float sceneExtendY1 = 55;    // !!! const 
-	const float sceneExtendY2 = 0;    // !!! const 
-	const float sceneExtendZ1 = 0;    // !!! const   20 bug!
-	const float sceneExtendZ2 = 0;    // !!! const 
 	double lightDropAbs = 0;
 	double lightDropMul = 1;
 
 	while(true) {
-		if (x < -sceneExtendX1 || x > SceneSize + sceneExtendX2 || y < -sceneExtendY1 || y > SceneSize + sceneExtendY2 || z < -sceneExtendZ1 || z > SceneSize + sceneExtendZ2) {
+		if (x < sceneBBoxX1 || x > sceneBBoxX2 || y < sceneBBoxY1 || y > sceneBBoxY2 || z < sceneBBoxZ1 || z > sceneBBoxZ2) {
 			return;
 		}
 		for (const auto& light : lights) {
@@ -1214,80 +1216,74 @@ void renderScene(int x1, int y1, int x2, int y2, int frame, int screenSize)
 
 //--------------------------------------------------------------------------------------------
 
+void fillSceneBbox()
+{
+	sceneBBoxX1 = 0;
+	sceneBBoxY1 = 0;
+	sceneBBoxZ1 = 0;
+	sceneBBoxX2 = SceneSize;
+	sceneBBoxY2 = SceneSize;
+	sceneBBoxZ2 = SceneSize;
+	for (const auto& light : lights) {
+		if (light.x1 < sceneBBoxX1) {
+			sceneBBoxX1 = light.x1;
+		}
+		if (light.x2 > sceneBBoxX2) {
+			sceneBBoxX2 = light.x2;
+		}
+		if (light.y1 < sceneBBoxY1) {
+			sceneBBoxY1 = light.y1;
+		}
+		if (light.y2 > sceneBBoxY2) {
+			sceneBBoxY2 = light.y2;
+		}
+		if (light.z1 < sceneBBoxZ1) {
+			sceneBBoxZ1 = light.z1;
+		}
+		if (light.z2 > sceneBBoxZ2) {
+			sceneBBoxZ2 = light.z2;
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
 void test4Render3dScene()
 {
 	lights.push_back(LIGHT_BOX(MaxLightBright*0.5f, 0, 170, 0, 30, 200, 30));
 	lights.push_back(LIGHT_BOX(MaxLightBright, 0, -55, 0, 50, -50, 100));
-	lights.push_back(LIGHT_BOX(MaxLightBright*0.7f, 250, 40, 0, 255, 160, 40));
+	lights.push_back(LIGHT_BOX(MaxLightBright*0.7f, 250, 40, -35, 255, 160, 10));
 
-	//for (int z = 30; z < 170; ++z) {
-	//	for (int y= 130; y < 200; ++y) {
-	//		for (int x = 30; x < 170; ++x) {
-	//			scene[x][y][z].smokeDens = 1.f;
-	//		}
-	//	}
-	//}
+	// Заполнить BBOX сцены по лампочкам
+	fillSceneBbox();
 
+	// Загрузить объект
 	{
 		std::vector<float> cloudBuf;
 		printf("Generate cloud start\n");
 		generate3dCloud(cloudBuf, SceneSize);
 		printf("Generate cloud end\n");
 
-		for (int z = 25; z < SceneSize; ++z) {                                                                         // !!! const
+		for (int z = 0; z < SceneSize; ++z) {
 			for (int y = 0; y < SceneSize; ++y) {
 				for (int x = 0; x < SceneSize; ++x) {
-					scene[x][y][z].smokeDens = cloudBuf[(z-25)*SceneSize*SceneSize + y * SceneSize + x];                 // !!! const
+					scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
 				}
 			}
 		}
 	}
 
-	//// Генерим зубчатую сферу для теста
-	//for (int z = 0; z < 200; ++z) {
-	//	for (int y = 0; y < 200; ++y) {
-	//		for (int x = 0; x < 200; ++x) {
-	//			int dx = (x - (100-95)) / 20;
-	//			int dy = (y - (100+95)) / 20;
-	//			int dz = (z - 100) / 20;
-	//			if (dx*dx + dy * dy + dz * dz < 12) {
-	//				scene[x][y][z].smokeDens = 1.f;
-	//			}
-	//			else
-	//			{
-	//				scene[x][y][z].smokeDens = 0.f;
-	//			}
-	//		}
-	//	}
-	//}
-
 	// Заполняем нормали и коэффициенты поверхности
 	calcNormalsAndSurfInterp();
 
-	//int count = 100;
-	//for (int z = 1; z < 200; ++z) {
-	//	for (int y = 1; y < 200; ++y) {
-	//		for (int x = 1; x < 200; ++x) {
-	//			if (scene[x][y][z].smokeDens == 1.f && scene[x][y][z-1].smokeDens == 0.f) {
-	//				printf("%f %f %f, sc: %f\n", scene[x][y][z].normalX, scene[x][y][z].normalY, scene[x][y][z].normalZ, scene[x][y][z].surfaceCoeff);
-	//				if (--count == 0) {
-	//					exit_msg("done");
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-
-
-
+	// Рендерим все кадры сцены
 	for (int n=0; n < SceneDrawNum; ++n) {
 		//srand(time(NULL));
 		printf("Rendernig frame %d of %d\n", n, SceneDrawNum);
 //		renderScene(0, 0, ScreenSize, ScreenSize);
 		renderScene(48, 57, 259, 259, n, ScreenSize);
-//		renderScene(20, 80, 210, 270);  // Сдвинутый кубический шар
 
-		if ((n % 30) == 0 || n == SceneDrawNum-1) {
+		if ((n % 100) == 0 || n == SceneDrawNum-1) {
 
 			char number[6];
 			number[0] = (n % 100000) / 10000 + '0';
@@ -1359,7 +1355,34 @@ void test5()
 }
 
 //--------------------------------------------------------------------------------------------
+//  // Генерация куба
+//for (int z = 30; z < 170; ++z) {
+//	for (int y= 130; y < 200; ++y) {
+//		for (int x = 30; x < 170; ++x) {
+//			scene[x][y][z].smokeDens = 1.f;
+//		}
+//	}
+//}
 
+	//// Генерим зубчатую сферу для теста
+	//for (int z = 0; z < 200; ++z) {
+	//	for (int y = 0; y < 200; ++y) {
+	//		for (int x = 0; x < 200; ++x) {
+	//			int dx = (x - (100-95)) / 20;
+	//			int dy = (y - (100+95)) / 20;
+	//			int dz = (z - 100) / 20;
+	//			if (dx*dx + dy * dy + dz * dz < 12) {
+	//				scene[x][y][z].smokeDens = 1.f;
+	//			}
+	//			else
+	//			{
+	//				scene[x][y][z].smokeDens = 0.f;
+	//			}
+	//		}
+	//	}
+	//}
+
+//--------------------------------------------------------------------------------------------
 
 int main()
 {
