@@ -341,9 +341,9 @@ void saveCloud(std::vector<float>& dst, int size)
 
 //--------------------------------------------------------------------------------------------
 
-void loadCloud(std::vector<float>& dst, int size)
+void load3dCloud(const std::string& fname, std::vector<float>& dst, int size)
 {
-	FILE* f = fopen("Cloud.bin", "rb");
+	FILE* f = fopen(fname.c_str(), "rb");
 	if (f) {
 		dst.resize(size*size*size);
 		fread(&dst[0], size*size*size * sizeof(float), 1, f);
@@ -351,16 +351,14 @@ void loadCloud(std::vector<float>& dst, int size)
 	}
 }
 
+
 //--------------------------------------------------------------------------------------------
 
-void generate3dCloud(std::vector<float>& dst, int size)
+void generate3dCloudImpl(std::vector<float>& dst, int bufSize)
 {
-	loadCloud(dst, size);
-	return;
-
-	fullSize = size;
-	halfSize = size / 2;
-	for (int i=0; i<BuffersNum; ++i)
+	fullSize = bufSize;
+	halfSize = bufSize / 2;
+	for (int i = 0; i < BuffersNum; ++i)
 	{
 		srcBuffers[i].reinit(halfSize);
 		dstBuffers[i].reinit(halfSize);
@@ -378,7 +376,8 @@ void generate3dCloud(std::vector<float>& dst, int size)
 				float dist = calcDist((float)x, (float)y, (float)z, halfSize / 2.f, halfSize / 2.f, halfSize / 2.f);
 				if (dist < radius) {
 					float ratio = dist / radius;
-					srcBuffers[0].cells[z*halfSize*halfSize + y*halfSize + x] = (cos(ratio * PI) + 1) * 0.5f*0.04f;                                // const !!!
+					srcBuffers[0].cells[z*halfSize*halfSize + y * halfSize + x] = (cos(ratio * PI) + 1) * 0.5f*0.04f;                                // const !!!
+//srcBuffers[0].cells[z*halfSize*halfSize + y * halfSize + x] = 1.f;
 				}
 			}
 		}
@@ -403,14 +402,14 @@ void generate3dCloud(std::vector<float>& dst, int size)
 				float newOuterRadius = randf(8.f, 25.f);                                                        // const !!!
 				float innerRadiusOfNewObject = newOuterRadius / srcBuffers[srcBuferIndex].outerRadius * srcBuffers[srcBuferIndex].innerRadius;
 				if (i == 0) {
-					objects.emplace_back(Object3dToPlace(halfSize/2, halfSize/2, halfSize/2, srcBuferIndex, newOuterRadius));
+					objects.emplace_back(Object3dToPlace(halfSize / 2, halfSize / 2, halfSize / 2, srcBuferIndex, newOuterRadius));
 				}
 				else {
 					int newX = 0;
 					int newY = 0;
 					int newZ = 0;
-					float density = fractalStep == 0 ? 0.4f : 0.5f;                                                                 // const !!! 0.28
-					calc3dPosForNewObject(newX, newY, newZ, innerRadiusOfNewObject, density, halfSize);                         
+					float density = fractalStep == 0 ? 0.4f : 0.5f;                                                                 // const !!! 
+					calc3dPosForNewObject(newX, newY, newZ, innerRadiusOfNewObject, density, halfSize);
 					objects.emplace_back(Object3dToPlace(newX, newY, newZ, srcBuferIndex, newOuterRadius));
 				}
 				renderLast3dObjectToDstBufer(dstBuffers[bufIndex].cells, halfSize);
@@ -447,18 +446,25 @@ void generate3dCloud(std::vector<float>& dst, int size)
 		}
 		renderLast3dObjectToDstBufer(dst, fullSize);
 	}
+}
 
-	int sliceY = 3 * size / 10;
-	saveToBmp("Slices/3dCloudSlice_0.bmp", size, size, [dst, sliceY, size](int x, int y) { return (uint8_t)(std::min(dst[(size - 1 - y) * size * size + sliceY * size + x] * 255.f, 255.f)); });
-	sliceY = 4 * size / 10;
-	saveToBmp("Slices/3dCloudSlice_1.bmp", size, size, [dst, sliceY, size](int x, int y) { return (uint8_t)(std::min(dst[(size - 1 - y) * size * size + sliceY * size + x] * 255.f, 255.f)); });
-	sliceY = 5 * size / 10;
-	saveToBmp("Slices/3dCloudSlice_2.bmp", size, size, [dst, sliceY, size](int x, int y) { return (uint8_t)(std::min(dst[(size - 1 - y) * size * size + sliceY * size + x] * 255.f, 255.f)); });
-	sliceY = 6 * size / 10;
-	saveToBmp("Slices/3dCloudSlice_3.bmp", size, size, [dst, sliceY, size](int x, int y) { return (uint8_t)(std::min(dst[(size - 1 - y) * size * size + sliceY * size + x] * 255.f, 255.f)); });
-	sliceY = 7 * size / 10;
-	saveToBmp("Slices/3dCloudSlice_4.bmp", size, size, [dst, sliceY, size](int x, int y) { return (uint8_t)(std::min(dst[(size - 1 - y) * size * size + sliceY * size + x] * 255.f, 255.f)); });
+//--------------------------------------------------------------------------------------------
 
-	saveCloud(dst, size);
-//	exit(1);
+void generate3dCloud(int bufSize)
+{
+	std::vector<float> dst;
+	generate3dCloudImpl(dst, bufSize);
+
+	int sliceY = 3 * bufSize / 10;
+	saveToBmp("Slices/3dCloudSlice_0.bmp", bufSize, bufSize, [dst, sliceY, bufSize](int x, int y) { return (uint8_t)(std::min(dst[(bufSize - 1 - y) * bufSize * bufSize + sliceY * bufSize + x] * 255.f, 255.f)); });
+	sliceY = 4 * bufSize / 10;
+	saveToBmp("Slices/3dCloudSlice_1.bmp", bufSize, bufSize, [dst, sliceY, bufSize](int x, int y) { return (uint8_t)(std::min(dst[(bufSize - 1 - y) * bufSize * bufSize + sliceY * bufSize + x] * 255.f, 255.f)); });
+	sliceY = 5 * bufSize / 10;
+	saveToBmp("Slices/3dCloudSlice_2.bmp", bufSize, bufSize, [dst, sliceY, bufSize](int x, int y) { return (uint8_t)(std::min(dst[(bufSize - 1 - y) * bufSize * bufSize + sliceY * bufSize + x] * 255.f, 255.f)); });
+	sliceY = 6 * bufSize / 10;
+	saveToBmp("Slices/3dCloudSlice_3.bmp", bufSize, bufSize, [dst, sliceY, bufSize](int x, int y) { return (uint8_t)(std::min(dst[(bufSize - 1 - y) * bufSize * bufSize + sliceY * bufSize + x] * 255.f, 255.f)); });
+	sliceY = 7 * bufSize / 10;
+	saveToBmp("Slices/3dCloudSlice_4.bmp", bufSize, bufSize, [dst, sliceY, bufSize](int x, int y) { return (uint8_t)(std::min(dst[(bufSize - 1 - y) * bufSize * bufSize + sliceY * bufSize + x] * 255.f, 255.f)); });
+
+	saveCloud(dst, bufSize);
 }

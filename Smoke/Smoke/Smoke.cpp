@@ -14,7 +14,8 @@
 //fprintf(f, "%f\n", waveTable[i]);
 //fclose(f);
 //--------------------------------------------------------------------------------------------
-void generate3dCloud(std::vector<float>& dst, int size);
+void generate3dCloud(int size);
+void load3dCloud(const std::string& fname, std::vector<float>& dst, int size);
 //--------------------------------------------------------------------------------------------
 
 const int Scene2DSize = 200;
@@ -783,7 +784,7 @@ const int ScreenSize = 300; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -200; // Позиция камеры по z в системе координат сетки
 const float MaxLightBright = 12000; // Максимальная яркость источника света
-const double ScatterCoeff = 40; // Коэффициент рассеивания тумана  0.00002;
+const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана  0.00002;
 const int SceneDrawNum = 10000; // Сколько раз рендерим сцену
 
 struct LIGHT_BOX
@@ -1095,7 +1096,7 @@ void calcNormalsAndSurfInterp()
 					dz = 0.f;
 				}
 				else {
-					surfaceCoeff = dist * 0.25f - 0.25f;                                   //  !!! const  5->1, 1->0
+					surfaceCoeff = dist * 0.5f;                                            //  !!! const
 					surfaceCoeff = std::min(std::max(surfaceCoeff, 0.f), 0.9f);            //  !!! const
 				}
 				scene[x][y][z].normalX = dx;
@@ -1257,16 +1258,29 @@ void test4Render3dScene()
 	// Заполнить BBOX сцены по лампочкам
 	fillSceneBbox();
 
-	// Загрузить объект
+	// Загрузить объекты
 	{
 		std::vector<float> cloudBuf;
-		printf("Generate cloud start\n");
-		generate3dCloud(cloudBuf, SceneSize);
-		printf("Generate cloud end\n");
-
+		load3dCloud("Objects/Smoke.bin", cloudBuf, SceneSize);
 		for (int z = 0; z < SceneSize; ++z) {
 			for (int y = 0; y < SceneSize; ++y) {
-				for (int x = 0; x < SceneSize; ++x) {
+				for (int x = 0; x < 70; ++x) {
+					scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
+				}
+			}
+		}
+		load3dCloud("Objects/CloudHard.bin", cloudBuf, SceneSize);
+		for (int z = 0; z < SceneSize; ++z) {
+			for (int y = 0; y < SceneSize; ++y) {
+				for (int x = 70; x < 130; ++x) {
+					scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
+				}
+			}
+		}
+		load3dCloud("Objects/CloudSoft.bin", cloudBuf, SceneSize);
+		for (int z = 0; z < SceneSize; ++z) {
+			for (int y = 0; y < SceneSize; ++y) {
+				for (int x = 130; x < SceneSize; ++x) {
 					scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
 				}
 			}
@@ -1276,12 +1290,47 @@ void test4Render3dScene()
 	// Заполняем нормали и коэффициенты поверхности
 	calcNormalsAndSurfInterp();
 
+	int count = 0;
+	for (int z = 0; z < SceneSize; ++z) {
+		for (int y = 0; y < SceneSize; ++y) {
+			for (int x = 0; x < 70; ++x) {
+				if (scene[x][y][z].surfaceCoeff > 0.89f) {
+					++count;
+				}
+			}
+		}
+	}
+	printf("count1: %d\n", count);
+	count = 0;
+	for (int z = 0; z < SceneSize; ++z) {
+		for (int y = 0; y < SceneSize; ++y) {
+			for (int x = 70; x < 130; ++x) {
+				if (scene[x][y][z].surfaceCoeff > 0.89f) {
+					++count;
+				}
+			}
+		}
+	}
+	printf("count2: %d\n", count);
+	count = 0;
+	for (int z = 0; z < SceneSize; ++z) {
+		for (int y = 0; y < SceneSize; ++y) {
+			for (int x = 130; x < SceneSize; ++x) {
+				if (scene[x][y][z].surfaceCoeff > 0.89f) {
+					++count;
+				}
+			}
+		}
+	}
+	printf("count3: %d\n", count);
+
+
+
+
 	// Рендерим все кадры сцены
 	for (int n=0; n < SceneDrawNum; ++n) {
-		//srand(time(NULL));
 		printf("Rendernig frame %d of %d\n", n, SceneDrawNum);
-//		renderScene(0, 0, ScreenSize, ScreenSize);
-		renderScene(48, 57, 259, 259, n, ScreenSize);
+		renderScene(0, 0, ScreenSize, ScreenSize, n, ScreenSize);
 
 		if ((n % 100) == 0 || n == SceneDrawNum-1) {
 
@@ -1386,7 +1435,6 @@ void test5()
 
 int main()
 {
+//	generate3dCloud(SceneSize);
 	test4Render3dScene();
-	//test2Render2dAnimation();
-	//test6Generate2dCloud();
 }
