@@ -782,9 +782,9 @@ const float FarAway = 100000.f;
 const int ScreenSize = 300; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -200; // Позиция камеры по z в системе координат сетки
-const float MaxLightBright = 16000; // Максимальная яркость источника света
+const float MaxLightBright = 12000; // Максимальная яркость источника света
 const double ScatterCoeff = 2; // Коэффициент рассеивания тумана  0.00002;
-const int SceneDrawNum = 16000; // Сколько раз рендерим сцену
+const int SceneDrawNum = 200; // Сколько раз рендерим сцену
 
 struct LIGHT_BOX
 {
@@ -1108,10 +1108,10 @@ void calcNormalsAndSurfInterp()
 void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float dirY, float dirZ)
 {
 	const float sceneExtendX1 = 0;    // !!! const 
-	const float sceneExtendX2 = 60;   // !!! const 
-	const float sceneExtendY1 = 0;    // !!! const 
+	const float sceneExtendX2 = 55;   // !!! const 
+	const float sceneExtendY1 = 55;    // !!! const 
 	const float sceneExtendY2 = 0;    // !!! const 
-	const float sceneExtendZ1 = 0;    // !!! const 
+	const float sceneExtendZ1 = 20;    // !!! const 
 	const float sceneExtendZ2 = 0;    // !!! const 
 	double lightDropAbs = 0;
 	double lightDropMul = 1;
@@ -1155,10 +1155,10 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 			}
 			Cell& cell = scene[cubeX][cubeY][cubeZ];
 			float mul = std::max(cell.normalX * dirX + cell.normalY * dirY + cell.normalZ * dirZ, 0.f);
-			lightDropMul *= mul;
-			if (lightDropMul < 0.0001f) {
-				return;
-			}
+			//lightDropMul *= mul;
+			//if (lightDropMul < 0.0001f) {
+			//	return;
+			//}
 		}
 		else {
 			x = newX;
@@ -1215,8 +1215,8 @@ void renderScene(int x1, int y1, int x2, int y2)
 
 void test4Render3dScene()
 {
-	//lights.push_back(LIGHT_BOX(MaxLightBright, 10, 70, 0, 30, 120, 200));
-//	lights.push_back(LIGHT_BOX(MaxLightBright, 210, 50, 0, 215, 150, 30));
+//	lights.push_back(LIGHT_BOX(MaxLightBright*0.5f, 0, 170, 0, 30, 200, 30));
+//	lights.push_back(LIGHT_BOX(MaxLightBright, 0, -55, 0, 50, -50, 100));
 	lights.push_back(LIGHT_BOX(MaxLightBright, 250, 40, -20, 255, 160, 40));
 
 	//for (int z = 30; z < 170; ++z) {
@@ -1283,9 +1283,25 @@ void test4Render3dScene()
 		//srand(time(NULL));
 		printf("Rendernig frame %d of %d\n", n, SceneDrawNum);
 //		renderScene(0, 0, ScreenSize, ScreenSize);
-//		renderScene(150-20, 150-20, 150+20, 150+20);
+		renderScene(48, 57, 259, 259);
 //		renderScene(20, 80, 210, 270);  // Сдвинутый кубический шар
-		renderScene(138, 146, 305, 205);
+
+		if (n == 50) {
+			saveToBmp("Scenes/3dScene_Cloud50.bmp", ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n+1), 255.)); });
+		}
+		if (n == 100) {
+			saveToBmp("Scenes/3dScene_Cloud100.bmp", ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
+		}
+		if (n == 150) {
+			saveToBmp("Scenes/3dScene_Cloud150.bmp", ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
+		}
+		if (n == 200) {
+			saveToBmp("Scenes/3dScene_Cloud200.bmp", ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
+		}
+		if (n == 250) {
+			saveToBmp("Scenes/3dScene_Cloud250.bmp", ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
+		}
+
 	}
 	
 	saveToBmp("Scenes/3dScene.bmp", ScreenSize, ScreenSize, [](int x, int y) { return (uint8_t)(std::min(screen[x][y] / SceneDrawNum, 255.)); });
