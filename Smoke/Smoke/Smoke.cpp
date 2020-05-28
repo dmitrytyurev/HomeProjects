@@ -1173,12 +1173,12 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 			z = newZ;
 		}
 
-		float add = cell.smokeDens * dist * 4.f;                               // !!! const
-		add *= (1.f - cell.surfaceCoeff);                   
-		lightDropAbs += add;
-		if (lightDropAbs > MaxLightBright) {
-			return;
-		}
+		//float add = cell.smokeDens * dist * 4.f;                               // !!! const
+		//add *= (1.f - cell.surfaceCoeff);                   
+		//lightDropAbs += add;
+		//if (lightDropAbs > MaxLightBright) {
+		//	return;
+		//}
 	}
 }
 
@@ -1254,6 +1254,9 @@ void test4Render3dScene()
 	lights.push_back(LIGHT_BOX(MaxLightBright*0.5f, 0, 170, 0, 30, 200, 30));
 	lights.push_back(LIGHT_BOX(MaxLightBright, 0, -55, 0, 50, -50, 100));
 	lights.push_back(LIGHT_BOX(MaxLightBright*0.7f, 250, 40, -35, 255, 160, 10));
+
+	lights.push_back(LIGHT_BOX(MaxLightBright, 70, 90, 50,   150, 110, 60));
+
 
 	// Заполнить BBOX сцены по лампочкам
 	fillSceneBbox();
