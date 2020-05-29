@@ -783,13 +783,12 @@ const float FarAway = 100000.f;
 const int ScreenSize = 300; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -200; // Позиция камеры по z в системе координат сетки
-const float MaxLightBright = 12000; // Максимальная яркость источника света
 const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана  0.00002;
 const int SceneDrawNum = 10000; // Сколько раз рендерим сцену
 
 struct LIGHT_BOX
 {
-	LIGHT_BOX(float bright_, float x1_, float y1_, float z1_, float x2_, float y2_, float z2_) : bright(bright_), x1(x1_), y1(y1_), z1(z1_), x2(x2_), y2(y2_), z2(z2_) {}
+	LIGHT_BOX(float bright_, float x1_, float y1_, float z1_, float x2_, float y2_, float z2_, bool inner_) : bright(bright_), x1(x1_), y1(y1_), z1(z1_), x2(x2_), y2(y2_), z2(z2_), inner(inner_) {}
 
 	float bright = 0;
 	float x1 = 0;
@@ -798,6 +797,7 @@ struct LIGHT_BOX
 	float y2 = 0;
 	float z1 = 0;
 	float z2 = 0;
+	bool inner = false;
 };
 
 struct Cell
@@ -1064,40 +1064,66 @@ void test3()
 //--------------------------------------------------------------------------------------------
 void calcNormalsAndSurfInterp()
 {
-	const int radius = 1;
+	const int radius = 5;
 	for (int z = radius; z < SceneSize-radius; ++z)	{
 		for (int y = radius; y < SceneSize - radius; ++y) {
 			for (int x = radius; x < SceneSize - radius; ++x) {
 				float dx = 0;
 				float dy = 0;
 				float dz = 0;
-				float surfaceCoeff = 0;
+				float dist = 0;
 
 				for (int z2 = z - radius; z2 <= z + radius; ++z2) {
 					for (int y2 = y - radius; y2 <= y + radius; ++y2) {
 						for (int x2 = x - radius; x2 <= x + radius; ++x2) {
 							if (x2 < x + radius) {
-								dx -= scene[x2 + 1][y2][z2].smokeDens - scene[x2][y2][z2].smokeDens;
+								float curDx = scene[x2 + 1][y2][z2].smokeDens - scene[x2][y2][z2].smokeDens;
+								dx -= curDx;
+								dist += curDx * curDx;
 							}
 							if (y2 < y + radius) {
-								dy -= scene[x2][y2 + 1][z2].smokeDens - scene[x2][y2][z2].smokeDens;
+								float curDy = scene[x2][y2 + 1][z2].smokeDens - scene[x2][y2][z2].smokeDens;
+								dy -= curDy;
+								dist += curDy * curDy;
 							}
 							if (z2 < z + radius) {
-								dz -= scene[x2][y2][z2 + 1].smokeDens - scene[x2][y2][z2].smokeDens;
+								float curDz = scene[x2][y2][z2 + 1].smokeDens - scene[x2][y2][z2].smokeDens;
+								dz -= curDz;
+								dist += curDz * curDz;
 							}
 						}
 					}
 				}
 				bool succes = false;
-				float dist = normalize(dx, dy, dz, succes);
+				normalize(dx, dy, dz, succes);
+				float surfaceCoeff = 0;
+//if (x == 50 && y == 140 && z == 55) {
+//printf("%f %f %f\n", dx, dy, dz);
+//for (int z2 = z - radius; z2 <= z + radius; ++z2) {
+//	for (int y2 = y - radius; y2 <= y + radius; ++y2) {
+//		for (int x2 = x - radius; x2 <= x + radius; ++x2) {
+//			if (x2 < x + radius) {
+//				printf("x: %f %f\n", scene[x2 + 1][y2][z2].smokeDens, scene[x2][y2][z2].smokeDens);
+//			}
+//			if (y2 < y + radius) {
+//				printf("y: %f %f\n", scene[x2][y2 + 1][z2].smokeDens, scene[x2][y2][z2].smokeDens);
+//			}
+//			if (z2 < z + radius) {
+//				printf("z: %f %f\n", scene[x2][y2][z2 + 1].smokeDens, scene[x2][y2][z2].smokeDens);
+//			}
+//		}
+//	}
+//}
+//}
+
 				if (!succes) {
 					dx = 1.f;
 					dy = 0.f;
 					dz = 0.f;
 				}
 				else {
-					surfaceCoeff = dist * 0.5f;                                            //  !!! const
-					surfaceCoeff = std::min(std::max(surfaceCoeff, 0.f), 0.9f);            //  !!! const
+					surfaceCoeff = dist * 0.5f;                                           //  !!! const
+					surfaceCoeff = std::min(std::max(surfaceCoeff, 0.f), 1.f);
 				}
 				scene[x][y][z].normalX = dx;
 				scene[x][y][z].normalY = dy;
@@ -1123,12 +1149,17 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 		if (x < sceneBBoxX1 || x > sceneBBoxX2 || y < sceneBBoxY1 || y > sceneBBoxY2 || z < sceneBBoxZ1 || z > sceneBBoxZ2) {
 			return;
 		}
-		for (const auto& light : lights) {
-			if (x > light.x1 && x < light.x2 && y > light.y1 && y < light.y2 && z > light.z1 && z < light.z2) {
-				screen[xi][yi] += std::max(light.bright - lightDropAbs, 0.) * lightDropMul;
-				return;
-			}
-		}
+		//for (const auto& light : lights) {
+		//	if (x > light.x1 && x < light.x2 && y > light.y1 && y < light.y2 && z > light.z1 && z < light.z2) {
+		//		if (!light.inner) {
+		//			screen[xi][yi] += std::max(light.bright - lightDropAbs, 0.) * lightDropMul;
+		//		}
+		//		else {
+		//			screen[xi][yi] += std::max(light.bright - lightDropAbs, 0.);
+		//		}
+		//		return;
+		//	}
+		//}
 
 		float newX = 0;
 		float newY = 0;
@@ -1150,6 +1181,12 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 		//needScatter = smokeDens != 0;
 
 		if (needScatter) {
+//if (cell.surfaceCoeff < 0.9999f) {
+//printf("gotcha: %f %d %d %d\n", cell.surfaceCoeff, cubeX, cubeY, cubeZ);
+//}
+screen[xi][yi] += cell.surfaceCoeff * 255;
+return;
+
 			dirX = randf(-1.f, 1.f);                // !!! Рандомный угол выбирать в поляной системе координат, иначе плотность вероятности по телесному углу неравномерна!
 			dirY = randf(-1.f, 1.f);
 			dirZ = randf(-1.f, 1.f);
@@ -1162,10 +1199,12 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 			}
 			float mul = std::max(cell.normalX * dirX + cell.normalY * dirY + cell.normalZ * dirZ, 0.f);
 //			mul = 1.f - (1.f - mul) * cell.surfaceCoeff;  // surfaceCoeff интерполирует между mul и 1 (убирает влияение mul тем сильнее, чем более анизотропная среда)
+
+
 			lightDropMul *= mul;
-			if (lightDropMul < 0.0001f) {
-				return;
-			}
+			//if (lightDropMul < 0.0001f) {
+			//	return;
+			//}
 		}
 		else {
 			x = newX;
@@ -1251,11 +1290,11 @@ void fillSceneBbox()
 
 void test4Render3dScene()
 {
-	lights.push_back(LIGHT_BOX(MaxLightBright*0.5f, 0, 170, 0, 30, 200, 30));
-	lights.push_back(LIGHT_BOX(MaxLightBright, 0, -55, 0, 50, -50, 100));
-	lights.push_back(LIGHT_BOX(MaxLightBright*0.7f, 250, 40, -35, 255, 160, 10));
+	lights.push_back(LIGHT_BOX(6000, 0, 170, 0, 30, 200, 30, false));
+	lights.push_back(LIGHT_BOX(12000, 0, -55, 0, 50, -50, 100, false));
+	lights.push_back(LIGHT_BOX(8400, 250, 40, -35, 255, 160, 10, false));
 
-	lights.push_back(LIGHT_BOX(MaxLightBright, 70, 90, 50,   150, 110, 60));
+	lights.push_back(LIGHT_BOX(4000, 55, 100, 70,   150, 103, 73, true));
 
 
 	// Заполнить BBOX сцены по лампочкам
@@ -1292,43 +1331,6 @@ void test4Render3dScene()
 
 	// Заполняем нормали и коэффициенты поверхности
 	calcNormalsAndSurfInterp();
-
-	int count = 0;
-	for (int z = 0; z < SceneSize; ++z) {
-		for (int y = 0; y < SceneSize; ++y) {
-			for (int x = 0; x < 70; ++x) {
-				if (scene[x][y][z].surfaceCoeff > 0.89f) {
-					++count;
-				}
-			}
-		}
-	}
-	printf("count1: %d\n", count);
-	count = 0;
-	for (int z = 0; z < SceneSize; ++z) {
-		for (int y = 0; y < SceneSize; ++y) {
-			for (int x = 70; x < 130; ++x) {
-				if (scene[x][y][z].surfaceCoeff > 0.89f) {
-					++count;
-				}
-			}
-		}
-	}
-	printf("count2: %d\n", count);
-	count = 0;
-	for (int z = 0; z < SceneSize; ++z) {
-		for (int y = 0; y < SceneSize; ++y) {
-			for (int x = 130; x < SceneSize; ++x) {
-				if (scene[x][y][z].surfaceCoeff > 0.89f) {
-					++count;
-				}
-			}
-		}
-	}
-	printf("count3: %d\n", count);
-
-
-
 
 	// Рендерим все кадры сцены
 	for (int n=0; n < SceneDrawNum; ++n) {
@@ -1438,6 +1440,8 @@ void test5()
 
 int main()
 {
-//	generate3dCloud(SceneSize);
-	test4Render3dScene();
+	generate3dCloud(SceneSize);
+//	test4Render3dScene();
 }
+
+// Косинус должен стремиться к 0.636f

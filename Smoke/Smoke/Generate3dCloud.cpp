@@ -26,6 +26,7 @@ struct Buffer3D
 {
 	void reinit(int sizeXYZ_);
 	void fillParameters();
+	void printParameters();
 
 	std::vector<float> cells;
 	int sizeXYZ = 0;
@@ -84,6 +85,13 @@ void Buffer3D::reinit(int sizeXYZ_)
 }
 
 //--------------------------------------------------------------------------------------------
+void Buffer3D::printParameters()
+{
+	printf("innerRadius = %f, outerRadius = %f\n", innerRadius, outerRadius);
+}
+
+//--------------------------------------------------------------------------------------------
+
 
 void Buffer3D::fillParameters()
 {
@@ -414,6 +422,15 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize)
 				}
 				renderLast3dObjectToDstBufer(dstBuffers[bufIndex].cells, halfSize);
 			}
+
+			if (fractalStep == 0 && bufIndex == 0)
+				saveToBmp("Slices/Buffer0_0.bmp", halfSize, halfSize, [ds = dstBuffers[bufIndex].cells, hs = halfSize](int x, int y) { return (uint8_t)(std::min(ds[(hs - 1 - y) * hs * hs + hs / 2 * hs + x] * 255.f, 255.f)); });
+			if (fractalStep == 0 && bufIndex == 1)
+				saveToBmp("Slices/Buffer0_1.bmp", halfSize, halfSize, [ds = dstBuffers[bufIndex].cells, hs = halfSize](int x, int y) { return (uint8_t)(std::min(ds[(hs - 1 - y) * hs * hs + hs / 2 * hs + x] * 255.f, 255.f)); });
+			if (fractalStep == 1 && bufIndex == 0)
+				saveToBmp("Slices/Buffer1_0.bmp", halfSize, halfSize, [ds = dstBuffers[bufIndex].cells, hs = halfSize](int x, int y) { return (uint8_t)(std::min(ds[(hs - 1 - y) * hs * hs + hs / 2 * hs + x] * 255.f, 255.f)); });
+			if (fractalStep == 1 && bufIndex == 1)
+				saveToBmp("Slices/Buffer1_1.bmp", halfSize, halfSize, [ds = dstBuffers[bufIndex].cells, hs = halfSize](int x, int y) { return (uint8_t)(std::min(ds[(hs - 1 - y) * hs * hs + hs / 2 * hs + x] * 255.f, 255.f)); });
 
 			// Рассчитать параметры сгенерированного изображения
 			dstBuffers[bufIndex].fillParameters();
