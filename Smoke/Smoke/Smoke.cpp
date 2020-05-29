@@ -1294,7 +1294,7 @@ void test4Render3dScene()
 	lights.push_back(LIGHT_BOX(12000, 0, -55, 0, 50, -50, 100, false));
 	lights.push_back(LIGHT_BOX(8400, 250, 40, -35, 255, 160, 10, false));
 
-	lights.push_back(LIGHT_BOX(4000, 55, 100, 70,   150, 103, 73, true));
+//	lights.push_back(LIGHT_BOX(4000, 55, 100, 70,   150, 103, 73, true));
 
 
 	// Заполнить BBOX сцены по лампочкам
@@ -1306,7 +1306,7 @@ void test4Render3dScene()
 		load3dCloud("Objects/Smoke.bin", cloudBuf, SceneSize);
 		for (int z = 0; z < SceneSize; ++z) {
 			for (int y = 0; y < SceneSize; ++y) {
-				for (int x = 0; x < 70; ++x) {
+				for (int x = 0; x < 50; ++x) {
 					scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
 				}
 			}
@@ -1314,7 +1314,7 @@ void test4Render3dScene()
 		load3dCloud("Objects/CloudHard.bin", cloudBuf, SceneSize);
 		for (int z = 0; z < SceneSize; ++z) {
 			for (int y = 0; y < SceneSize; ++y) {
-				for (int x = 70; x < 130; ++x) {
+				for (int x = 50; x < 100; ++x) {
 					scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
 				}
 			}
@@ -1322,7 +1322,15 @@ void test4Render3dScene()
 		load3dCloud("Objects/CloudSoft.bin", cloudBuf, SceneSize);
 		for (int z = 0; z < SceneSize; ++z) {
 			for (int y = 0; y < SceneSize; ++y) {
-				for (int x = 130; x < SceneSize; ++x) {
+				for (int x = 100; x < 150; ++x) {
+					scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
+				}
+			}
+		}
+		load3dCloud("Objects/CloudExtraSoft.bin", cloudBuf, SceneSize);
+		for (int z = 0; z < SceneSize; ++z) {
+			for (int y = 0; y < SceneSize; ++y) {
+				for (int x = 150; x < SceneSize; ++x) {
 					scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
 				}
 			}
@@ -1337,7 +1345,7 @@ void test4Render3dScene()
 		printf("Rendernig frame %d of %d\n", n, SceneDrawNum);
 		renderScene(0, 0, ScreenSize, ScreenSize, n, ScreenSize);
 
-		if ((n % 100) == 0 || n == SceneDrawNum-1) {
+		if ((n % 30) == 0 || n == SceneDrawNum-1) {
 
 			char number[6];
 			number[0] = (n % 100000) / 10000 + '0';
@@ -1440,8 +1448,8 @@ void test5()
 
 int main()
 {
-	generate3dCloud(SceneSize);
-//	test4Render3dScene();
+//	generate3dCloud(SceneSize);
+	test4Render3dScene();
 }
 
 // Косинус должен стремиться к 0.636f
