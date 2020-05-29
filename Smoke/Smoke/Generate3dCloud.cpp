@@ -27,6 +27,7 @@ struct Buffer3D
 	void reinit(int sizeXYZ_);
 	void fillParameters();
 	void printParameters();
+	void blur(int radius);
 
 	std::vector<float> cells;
 	int sizeXYZ = 0;
@@ -88,6 +89,34 @@ void Buffer3D::reinit(int sizeXYZ_)
 void Buffer3D::printParameters()
 {
 	printf("innerRadius = %f, outerRadius = %f\n", innerRadius, outerRadius);
+}
+
+//--------------------------------------------------------------------------------------------
+
+void Buffer3D::blur(int radius)
+{
+	std::vector<float> tmpBuf;
+	tmpBuf.resize(sizeXYZ*sizeXYZ*sizeXYZ);
+	for (int z = 0; z < sizeXYZ; ++z) {
+		for (int y = 0; y < sizeXYZ; ++y) {
+			for (int x = 0; x < sizeXYZ; ++x) {
+				float sumBright = 0;
+				int num = 0;
+				for (int z2 = z-radius; z2 <= z+radius; ++z2) {
+					for (int y2 = y-radius; y2 < y+radius; ++y2) {
+						for (int x2 = x-radius; x2 < x+radius; ++x2) {
+							if (x2 > 0 && x2 < sizeXYZ && y2>0 && y2 < sizeXYZ &&z2>0 && z2 < sizeXYZ) {
+								sumBright += cells[z2*sizeXYZ*sizeXYZ + y2*sizeXYZ + x2];
+								++num;
+							}
+						}
+					}
+				}
+				tmpBuf[z*sizeXYZ*sizeXYZ + y * sizeXYZ + x] = sumBright / num;
+			}
+		}
+	}
+	cells = tmpBuf;
 }
 
 //--------------------------------------------------------------------------------------------
