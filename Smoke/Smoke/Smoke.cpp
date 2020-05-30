@@ -780,7 +780,7 @@ void test6Generate2dCloud()
 //--------------------------------------------------------------------------------------------
 
 const float FarAway = 100000.f;
-const int ScreenSize = 300; // Размер экрана в пикселах
+const int ScreenSize = 400; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -200; // Позиция камеры по z в системе координат сетки
 const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана  0.00002;
@@ -1219,7 +1219,6 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 		double curScatterProb = cell.smokeDens * dist * ScatterCoeff;
 		bool needScatter = false;
 		needScatter = randf(0.f, 1.f) < curScatterProb;
-		//needScatter = smokeDens != 0;
 
 		if (needScatter) {
 //screen[xi][yi] += cell.surfaceCoeff * 255;
@@ -1340,7 +1339,7 @@ void test4Render3dScene()
 		load3dCloud("Objects/Smoke.bin", cloudBuf, SceneSize);
 		for (int z = 0; z < SceneSize; ++z) {
 			for (int y = 0; y < SceneSize; ++y) {
-				for (int x = 0; x < 50; ++x) {
+				for (int x = 0; x < 65; ++x) {
 					scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
 				}
 			}
@@ -1348,7 +1347,7 @@ void test4Render3dScene()
 		load3dCloud("Objects/CloudHard.bin", cloudBuf, SceneSize);
 		for (int z = 0; z < SceneSize; ++z) {
 			for (int y = 0; y < SceneSize; ++y) {
-				for (int x = 50; x < 100; ++x) {
+				for (int x = 65; x < 100; ++x) {
 					scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
 				}
 			}
