@@ -35,3 +35,19 @@ double NodeLeaf::GetDensity(float x, float y, float z)
 	return (cos(ratio * PI) + 1) * 0.5 * 0.04;                                                                            // const !!!
    //return  1.;                                    // Для генерации туч
 }
+
+//--------------------------------------------------------------------------------------------
+
+void NodeBranch::generate3dCloud(std::vector<float>& dst, int bufSize)
+{
+	dst.resize(bufSize*bufSize*bufSize);
+
+	for (int z = 0; z < bufSize; ++z) {
+		printf("z: %d\n", z);
+		for (int y = 0; y < bufSize; ++y) {
+			for (int x = 0; x < bufSize; ++x) {
+				dst[z*bufSize*bufSize + y * bufSize + x] = (float)GetDensity((float)x, (float)y, (float)z);
+			}
+		}
+	}
+}

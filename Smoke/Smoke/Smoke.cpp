@@ -1481,7 +1481,7 @@ void test5()
 
 int main()
 {
-	//	generate3dCloud(SceneSize);
-	test4Render3dScene();
+	generate3dCloud(SceneSize);
+	//test4Render3dScene();
 }
 

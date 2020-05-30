@@ -26,10 +26,11 @@ const int BuffersNum = 10;
 struct Buffer3D
 {
 	void reinit(int sizeXYZ_);
-	void fillParameters();
+	void fillParameters(NodeBase* nodeBase);
 	void printParameters();
 	void blur(int radius);
 
+	std::shared_ptr<NodeBase> node;
 	std::vector<float> cells;
 	int sizeXYZ = 0;
 	int centerX = 0;
@@ -64,7 +65,7 @@ int halfSize = 0;
 static Buffer3D srcBuffers[BuffersNum];
 static Buffer3D dstBuffers[BuffersNum];
 static std::vector<Object3dToPlace> objects;
-
+NodeBranch object;
 
 //--------------------------------------------------------------------------------------------
 
@@ -123,7 +124,7 @@ void Buffer3D::blur(int radius)
 //--------------------------------------------------------------------------------------------
 
 
-void Buffer3D::fillParameters()
+void Buffer3D::fillParameters(NodeBase* nodeBase)
 {
 	// Найти описанный прямоугольник вокруг картинки в cells
 	int x1 = 0;
@@ -196,9 +197,20 @@ m5:	for (int x = halfSize - 1; x >= 0; --x) {
 	}
 }
 
-m6: centerX = (x1 + x2) / 2;
+m6:	centerX = (x1 + x2) / 2;
 	centerY = (y1 + y2) / 2;
 	centerZ = (z1 + z2) / 2;
+
+	// Заполнить ноду
+	nodeBase->bboxX1 = (float)x1;
+	nodeBase->bboxX2 = (float)x2;
+    nodeBase->bboxY1 = (float)y1;
+	nodeBase->bboxY2 = (float)y2;
+	nodeBase->bboxZ1 = (float)z1;
+	nodeBase->bboxZ2 = (float)z2;
+	nodeBase->xCenter = (float)centerX;
+	nodeBase->yCenter = (float)centerY;
+	nodeBase->zCenter = (float)centerZ;
 
 	// Расчитать максимальную яркость
 	float maxBright = 0;
@@ -420,7 +432,10 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize)
 			}
 		}
 	}
-	srcBuffers[0].fillParameters();
+
+	std::shared_ptr<NodeBase> pLeaf = std::make_shared<NodeLeaf>();
+	srcBuffers[0].fillParameters(pLeaf.get());
+	srcBuffers[0].node = pLeaf;
 
 	// Раскопировать по остальным Src буферам
 	for (int i = 1; i < BuffersNum; ++i) {
@@ -432,6 +447,7 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize)
 		// Расчитаем параметры и отрендерим большие объекты из маленьких
 		for (int bufIndex = 0; bufIndex < BuffersNum; ++bufIndex) {
 			printf("bufIndex=%d, fractalStep=%d\n", bufIndex, fractalStep);
+			std::shared_ptr<NodeBranch> pBranch = std::make_shared<NodeBranch>();
 			objects.clear();
 			dstBuffers[bufIndex].reinit(halfSize);
 			const int SmallObjectInBig = 90;                                                                     // const !!!
@@ -451,6 +467,7 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize)
 					objects.emplace_back(Object3dToPlace(newX, newY, newZ, srcBuferIndex, newOuterRadius));
 				}
 				renderLast3dObjectToDstBufer(dstBuffers[bufIndex].cells, halfSize);
+				pBranch->childNodes.emplace_back((float)objects.back().x, (float)objects.back().y, (float)objects.back().z, newOuterRadius / srcBuffers[srcBuferIndex].outerRadius, srcBuffers[srcBuferIndex].node);
 			}
 
 			if (fractalStep == 0 && bufIndex == 0)
@@ -462,8 +479,8 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize)
 			if (fractalStep == 1 && bufIndex == 1)
 				saveToBmp("Slices/Buffer1_1.bmp", halfSize, halfSize, [ds = dstBuffers[bufIndex].cells, hs = halfSize](int x, int y) { return (uint8_t)(std::min(ds[(hs - 1 - y) * hs * hs + hs / 2 * hs + x] * 255.f, 255.f)); });
 
-			// Рассчитать параметры сгенерированного изображения
-			dstBuffers[bufIndex].fillParameters();
+			dstBuffers[bufIndex].fillParameters(pBranch.get());    // Рассчитать параметры сгенерированного изображения, заполнить параметры соответствующей ноды
+			dstBuffers[bufIndex].node = pBranch;
 		}
 		// Скопируем выходные буфера во входные
 		for (int i = 0; i < BuffersNum; ++i) {
@@ -492,7 +509,13 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize)
 			objects.emplace_back(Object3dToPlace(newX, newY, newZ, srcBuferIndex, newOuterRadius));
 		}
 		renderLast3dObjectToDstBufer(dst, fullSize);
+		object.childNodes.emplace_back((float)objects.back().x, (float)objects.back().y, (float)objects.back().z, newOuterRadius / srcBuffers[srcBuferIndex].outerRadius, srcBuffers[srcBuferIndex].node);
 	}
+//printf("object.generate3dCloud\n");
+//object.bboxX2 = bufSize;
+//object.bboxY2 = bufSize;
+//object.bboxZ2 = bufSize;
+//object.generate3dCloud(dst, bufSize);
 }
 
 //--------------------------------------------------------------------------------------------
@@ -515,3 +538,5 @@ void generate3dCloud(int bufSize)
 
 	saveCloud(dst, bufSize);
 }
+
+

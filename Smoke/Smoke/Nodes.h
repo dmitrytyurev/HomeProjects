@@ -6,6 +6,9 @@ struct NodeBase;
 
 struct NodeRef
 {
+	NodeRef() = default;
+	NodeRef(float xPos_, float yPos_, float zPos_, float scale_, std::shared_ptr<NodeBase>& childNode_) : xPos(xPos_), yPos(yPos_), zPos(zPos_), scale(scale_), childNode(childNode_) {}
+
 	float xPos = 0.f;  // Позиция (в системе координат ноды (ноль в левом верхнем углу)), в которую будет помещена родительская нода (в эту точку будет помещён центр её глифа)
 	float yPos = 0.f;
 	float zPos = 0.f;
@@ -34,6 +37,7 @@ struct NodeBranch: public NodeBase
 	std::vector<NodeRef> childNodes;
 
 	double GetDensity(float x, float y, float z);  // Дать плотность в точке (в системе координат глифа)
+	void generate3dCloud(std::vector<float>& dst, int bufSize);
 };
 
 struct NodeLeaf : public NodeBase
