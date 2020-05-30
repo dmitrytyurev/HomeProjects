@@ -154,12 +154,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="bmp.h" />
+    <ClInclude Include="Nodes.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bmp.cpp" />
     <ClCompile Include="Generate3dCloud.cpp" />
+    <ClCompile Include="Nodes.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
