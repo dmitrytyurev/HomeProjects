@@ -1062,6 +1062,43 @@ void test3()
 }
 
 //--------------------------------------------------------------------------------------------
+
+//float piecewiseLinearFunction(float x)
+//{
+//	struct Segment
+//	{
+//		Segment(float k_, float b_) : k(k_), b(b_) {}
+//		float k = 0;
+//		float b = 0;
+//	};
+//	static std::vector<std::pair<float, float>> piecewiseFunc;
+//	static std::vector<Segment> segments;
+//	static bool isInited = false;
+//	if (!isInited) {
+//		piecewiseFunc.emplace_back(std::pair<float, float>(0.f, 0.f));
+//		piecewiseFunc.emplace_back(std::pair<float, float>(0.39f, 0.f));
+//		piecewiseFunc.emplace_back(std::pair<float, float>(0.4f, 1.f));
+//		piecewiseFunc.emplace_back(std::pair<float, float>(1.f, 1.f));
+//		for (int i = 0; i < (int)piecewiseFunc.size() - 1; ++i) {
+//			float k = (piecewiseFunc[i + 1].second - piecewiseFunc[i].second) / (piecewiseFunc[i + 1].first - piecewiseFunc[i].first);
+//			float b = piecewiseFunc[i].second - k * piecewiseFunc[i].first;
+//			segments.emplace_back(Segment(k, b));
+//		}
+//		isInited = true;
+//	}
+//	for (int i = 0; i < (int)piecewiseFunc.size() - 1; ++i) {
+//		if (x >= piecewiseFunc[i].first && x <= piecewiseFunc[i + 1].first) {
+//			return segments[i].k * x + segments[i].b;
+//		}
+//	}
+//	printf("ERROR: piecewiseLinearFunction, out of range, x = %f\n", x);
+//	return 0.f;
+//}
+//
+
+
+//--------------------------------------------------------------------------------------------
+
 void calcNormalsAndSurfInterp()
 {
 	const int radius = 5;
@@ -1124,6 +1161,10 @@ void calcNormalsAndSurfInterp()
 				else {
 					surfaceCoeff = dist * 0.5f;                                           //  !!! const
 					surfaceCoeff = std::min(std::max(surfaceCoeff, 0.f), 1.f);
+					if (surfaceCoeff > 0.4f)                                              //  !!! const
+						surfaceCoeff = 1.f;
+					else
+						surfaceCoeff = 0.f;
 				}
 				scene[x][y][z].normalX = dx;
 				scene[x][y][z].normalY = dy;
@@ -1149,17 +1190,17 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 		if (x < sceneBBoxX1 || x > sceneBBoxX2 || y < sceneBBoxY1 || y > sceneBBoxY2 || z < sceneBBoxZ1 || z > sceneBBoxZ2) {
 			return;
 		}
-		//for (const auto& light : lights) {
-		//	if (x > light.x1 && x < light.x2 && y > light.y1 && y < light.y2 && z > light.z1 && z < light.z2) {
-		//		if (!light.inner) {
-		//			screen[xi][yi] += std::max(light.bright - lightDropAbs, 0.) * lightDropMul;
-		//		}
-		//		else {
-		//			screen[xi][yi] += std::max(light.bright - lightDropAbs, 0.);
-		//		}
-		//		return;
-		//	}
-		//}
+		for (const auto& light : lights) {
+			if (x > light.x1 && x < light.x2 && y > light.y1 && y < light.y2 && z > light.z1 && z < light.z2) {
+				if (!light.inner) {
+					screen[xi][yi] += std::max(light.bright - lightDropAbs, 0.) * lightDropMul;
+				}
+				else {
+					screen[xi][yi] += std::max(light.bright - lightDropAbs, 0.);
+				}
+				return;
+			}
+		}
 
 		float newX = 0;
 		float newY = 0;
@@ -1181,11 +1222,8 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 		//needScatter = smokeDens != 0;
 
 		if (needScatter) {
-//if (cell.surfaceCoeff < 0.9999f) {
-//printf("gotcha: %f %d %d %d\n", cell.surfaceCoeff, cubeX, cubeY, cubeZ);
-//}
-screen[xi][yi] += cell.surfaceCoeff * 255;
-return;
+//screen[xi][yi] += cell.surfaceCoeff * 255;
+//return;
 
 			dirX = randf(-1.f, 1.f);                // !!! Рандомный угол выбирать в поляной системе координат, иначе плотность вероятности по телесному углу неравномерна!
 			dirY = randf(-1.f, 1.f);
@@ -1198,13 +1236,9 @@ return;
 				dirZ = 0;
 			}
 			float mul = std::max(cell.normalX * dirX + cell.normalY * dirY + cell.normalZ * dirZ, 0.f);
-//			mul = 1.f - (1.f - mul) * cell.surfaceCoeff;  // surfaceCoeff интерполирует между mul и 1 (убирает влияение mul тем сильнее, чем более анизотропная среда)
-
-
+			const float qw = 0.636f;                                                                        // !!! const
+			mul = qw - (qw - mul) * cell.surfaceCoeff;  // surfaceCoeff интерполирует между mul и 1 (убирает влияение mul тем сильнее, чем более анизотропная среда)
 			lightDropMul *= mul;
-			//if (lightDropMul < 0.0001f) {
-			//	return;
-			//}
 		}
 		else {
 			x = newX;
@@ -1448,8 +1482,7 @@ void test5()
 
 int main()
 {
-//	generate3dCloud(SceneSize);
+	//	generate3dCloud(SceneSize);
 	test4Render3dScene();
 }
 
-// Косинус должен стремиться к 0.636f
