@@ -37,7 +37,7 @@ struct NodeBranch: public NodeBase
 	std::vector<NodeRef> childNodes;
 
 	double GetDensity(float x, float y, float z, bool isSmoke);  // Дать плотность в точке (в системе координат глифа)
-	void generate3dCloud(std::vector<float>& dst, int bufSize, float scale, bool isSmoke);
+	void generate3dCloud(std::vector<float>& dst, int bufSize, float xPos, float yPos, float zPos, float scale, bool isSmoke);
 };
 
 struct NodeLeaf : public NodeBase

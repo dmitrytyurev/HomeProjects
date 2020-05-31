@@ -42,11 +42,11 @@ double NodeLeaf::GetDensity(float x, float y, float z, bool isHardBrush)
 
 //--------------------------------------------------------------------------------------------
 
-void NodeBranch::generate3dCloud(std::vector<float>& dst, int bufSize, float scale, bool isHardBrush)
+void NodeBranch::generate3dCloud(std::vector<float>& dst, int bufSize, float xPos, float yPos, float zPos, float scale, bool isHardBrush)
 {
 	bboxX1 = 0.f;
 	bboxY1 = 0.f;
-	bboxZ1 = 0.f;
+	bboxZ1 = 0.f;                  // !!! Если объект при генерации обрезается гранью z1, то здесь можно задать -100 и перестанет обрезаться
 	bboxX2 = (float)bufSize;
 	bboxY2 = (float)bufSize;
 	bboxZ2 = (float)bufSize;
@@ -57,10 +57,10 @@ void NodeBranch::generate3dCloud(std::vector<float>& dst, int bufSize, float sca
 	dst.resize(bufSize*bufSize*bufSize);
 
 	for (int z = 0; z < bufSize; ++z) {
-		printf("z: %d\n", z);
+		printf("z: %d of %d\n", z, bufSize);
 		for (int y = 0; y < bufSize; ++y) {
 			for (int x = 0; x < bufSize; ++x) {
-				dst[z*bufSize*bufSize + y * bufSize + x] = (float)GetDensity((x - xCenter)/scale, (y - yCenter)/scale, (z-zCenter)/scale, isHardBrush);
+				dst[z*bufSize*bufSize + y * bufSize + x] = (float)GetDensity((x - xPos)/scale, (y - yPos)/scale, (z - zPos)/scale, isHardBrush);
 			}
 		}
 	}

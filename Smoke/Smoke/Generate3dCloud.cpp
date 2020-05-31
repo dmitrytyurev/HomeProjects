@@ -403,7 +403,7 @@ void load3dCloud(const std::string& fname, std::vector<float>& dst, int size)
 
 //--------------------------------------------------------------------------------------------
 
-void generate3dCloudImpl(std::vector<float>& dst, int bufSize, bool isHardBrush)
+void generate3dCloudImpl(std::vector<float>& dst, int bufSize, bool isHardBrush, float xPos, float yPos, float zPos, float scale)
 {
 	NodeBranch object;
 	
@@ -501,7 +501,7 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize, bool isHardBrush)
 	for (int i = 0; i < SmallObjectInBig; ++i) {
 		printf("i = %d\n", i);
 		int srcBuferIndex = rand(0, BuffersNum - 1);
-		float newOuterRadius = randf(15.f, 50.f);                                                        // const !!!
+		float newOuterRadius = randf(15.f, 40.f);                                                        // const !!!
 		float innerRadiusOfNewObject = newOuterRadius / srcBuffers[srcBuferIndex].outerRadius * srcBuffers[srcBuferIndex].innerRadius;
 		if (i == 0) {
 			objects.emplace_back(Object3dToPlace(fullSize / 2, fullSize / 2, fullSize / 2, srcBuferIndex, newOuterRadius));
@@ -516,17 +516,17 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize, bool isHardBrush)
 //		renderLast3dObjectToDstBufer(dst, fullSize);
 		object.childNodes.emplace_back((float)objects.back().x, (float)objects.back().y, (float)objects.back().z, newOuterRadius / srcBuffers[srcBuferIndex].outerRadius, srcBuffers[srcBuferIndex].node);
 	}
-printf("object.generate3dCloud\n");
-object.generate3dCloud(dst, bufSize, 1.f, isHardBrush);
+	printf("Final rendering of the cloud...\n");
+	object.generate3dCloud(dst, bufSize, xPos, yPos, zPos, scale, isHardBrush);
 }
 
 //--------------------------------------------------------------------------------------------
 
-void generate3dCloud(int randSeed, bool isHardBrush, int bufSize)
+void generate3dCloud(int randSeed, bool isHardBrush, int bufSize, float xPos, float yPos, float zPos, float scale)
 {
 	srand(randSeed);
 	std::vector<float> dst;
-	generate3dCloudImpl(dst, bufSize, isHardBrush);
+	generate3dCloudImpl(dst, bufSize, isHardBrush, xPos, yPos, zPos, scale);
 
 	int sliceY = 3 * bufSize / 10;
 	saveToBmp("Slices/3dCloudSlice_0.bmp", bufSize, bufSize, [dst, sliceY, bufSize](int x, int y) { return (uint8_t)(std::min(dst[(bufSize - 1 - y) * bufSize * bufSize + sliceY * bufSize + x] * 255.f, 255.f)); });

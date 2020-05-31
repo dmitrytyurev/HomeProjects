@@ -9,7 +9,7 @@
 #include <time.h>
 
 //--------------------------------------------------------------------------------------------
-void generate3dCloud(int randSeed, bool isHardBrush, int size);
+void generate3dCloud(int randSeed, bool isHardBrush, int size, float xPos, float yPos, float zPos, float scale);
 void load3dCloud(const std::string& fname, std::vector<float>& dst, int size);
 
 //--------------------------------------------------------------------------------------------
@@ -623,7 +623,7 @@ void render3dScene(int randSeedForLog)
 void RenderRandom(bool isHardBrush)
 {
 	for (int i = 1; i < 1000; ++i) {
-		generate3dCloud(i, isHardBrush, SceneSize);
+		generate3dCloud(i, isHardBrush, SceneSize, SceneSize/2, SceneSize/2, SceneSize/2, 1.f);
 		render3dScene(i);
 	}
 }
@@ -635,7 +635,7 @@ int main()
 {
 	RenderRandom(true);
 
-//	generate3dCloud(4, true, SceneSize);
+//	generate3dCloud(4, true, SceneSize, SceneSize/2, SceneSize/2, SceneSize/2, 1.f);
 //	render3dScene(4);
 
 }
