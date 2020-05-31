@@ -14,7 +14,7 @@
 //fprintf(f, "%f\n", waveTable[i]);
 //fclose(f);
 //--------------------------------------------------------------------------------------------
-void generate3dCloud(int size);
+void generate3dCloud(int randSeed, int size);
 void load3dCloud(const std::string& fname, std::vector<float>& dst, int size);
 //--------------------------------------------------------------------------------------------
 
@@ -428,11 +428,11 @@ void test2Render2dAnimation()
 //--------------------------------------------------------------------------------------------
 
 const float FarAway = 100000.f;
-const int ScreenSize = 400; // Размер экрана в пикселах
+const int ScreenSize = 200; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -200; // Позиция камеры по z в системе координат сетки
 const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана  0.00002;
-const int SceneDrawNum = 10000; // Сколько раз рендерим сцену
+const int SceneDrawNum = 100; // Сколько раз рендерим сцену
 
 struct LIGHT_BOX
 {
@@ -684,69 +684,6 @@ void intersect(float x, float y, float z, float dirX, float dirY, float dirZ, fl
 
 //--------------------------------------------------------------------------------------------
 
-void test3()
-{
-	float x = 10.15f;
-	float y = 6.95f;
-	float z = 3.f;
-	float dirX = -0.1f;
-	float dirY = -0.1f;
-	float dirZ = -1.f;
-
-	float newX = 0;
-	float newY = 0;
-	float newZ = 0;
-	int cubeX = 0;
-	int cubeY = 0;
-	int cubeZ = 0;
-
-	for (int i = 0; i < 4; ++i) {
-		intersect(x, y, z, dirX, dirY, dirZ, newX, newY, newZ, cubeX, cubeY, cubeZ);
-		printf("%f %f %f\n", newX, newY, newZ);
-		x = newX;
-		y = newY;
-		z = newZ;
-	}
-}
-
-//--------------------------------------------------------------------------------------------
-
-//float piecewiseLinearFunction(float x)
-//{
-//	struct Segment
-//	{
-//		Segment(float k_, float b_) : k(k_), b(b_) {}
-//		float k = 0;
-//		float b = 0;
-//	};
-//	static std::vector<std::pair<float, float>> piecewiseFunc;
-//	static std::vector<Segment> segments;
-//	static bool isInited = false;
-//	if (!isInited) {
-//		piecewiseFunc.emplace_back(std::pair<float, float>(0.f, 0.f));
-//		piecewiseFunc.emplace_back(std::pair<float, float>(0.39f, 0.f));
-//		piecewiseFunc.emplace_back(std::pair<float, float>(0.4f, 1.f));
-//		piecewiseFunc.emplace_back(std::pair<float, float>(1.f, 1.f));
-//		for (int i = 0; i < (int)piecewiseFunc.size() - 1; ++i) {
-//			float k = (piecewiseFunc[i + 1].second - piecewiseFunc[i].second) / (piecewiseFunc[i + 1].first - piecewiseFunc[i].first);
-//			float b = piecewiseFunc[i].second - k * piecewiseFunc[i].first;
-//			segments.emplace_back(Segment(k, b));
-//		}
-//		isInited = true;
-//	}
-//	for (int i = 0; i < (int)piecewiseFunc.size() - 1; ++i) {
-//		if (x >= piecewiseFunc[i].first && x <= piecewiseFunc[i + 1].first) {
-//			return segments[i].k * x + segments[i].b;
-//		}
-//	}
-//	printf("ERROR: piecewiseLinearFunction, out of range, x = %f\n", x);
-//	return 0.f;
-//}
-//
-
-
-//--------------------------------------------------------------------------------------------
-
 void calcNormalsAndSurfInterp()
 {
 	const int radius = 5;
@@ -969,54 +906,81 @@ void fillSceneBbox()
 
 //--------------------------------------------------------------------------------------------
 
-void test4Render3dScene()
+void loadObjects()
 {
+	std::vector<float> cloudBuf;
+
+	load3dCloud("Cloud.bin", cloudBuf, SceneSize);
+	for (int z = 0; z < SceneSize; ++z) {
+		for (int y = 0; y < SceneSize; ++y) {
+			for (int x = 0; x < SceneSize; ++x) {
+				scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
+			}
+		}
+	}
+
+	//load3dCloud("Objects/Smoke.bin", cloudBuf, SceneSize);
+	//for (int z = 0; z < SceneSize; ++z) {
+	//	for (int y = 0; y < SceneSize; ++y) {
+	//		for (int x = 0; x < 65; ++x) {
+	//			scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
+	//		}
+	//	}
+	//}
+	//load3dCloud("Objects/CloudHard.bin", cloudBuf, SceneSize);
+	//for (int z = 0; z < SceneSize; ++z) {
+	//	for (int y = 0; y < SceneSize; ++y) {
+	//		for (int x = 65; x < 100; ++x) {
+	//			scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
+	//		}
+	//	}
+	//}
+	//load3dCloud("Objects/CloudSoft.bin", cloudBuf, SceneSize);
+	//for (int z = 0; z < SceneSize; ++z) {
+	//	for (int y = 0; y < SceneSize; ++y) {
+	//		for (int x = 100; x < 150; ++x) {
+	//			scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
+	//		}
+	//	}
+	//}
+	//load3dCloud("Objects/CloudExtraSoft.bin", cloudBuf, SceneSize);
+	//for (int z = 0; z < SceneSize; ++z) {
+	//	for (int y = 0; y < SceneSize; ++y) {
+	//		for (int x = 150; x < SceneSize; ++x) {
+	//			scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
+	//		}
+	//	}
+	//}
+}
+
+//--------------------------------------------------------------------------------------------
+
+void screenClear()
+{
+	for (int y = 0; y < ScreenSize; ++y) {
+		for (int x = 0; x < ScreenSize; ++x) {
+			screen[x][y] = 0.;
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+void render3dScene(int randSeedForLog)
+{
+	lights.clear();
+	screenClear();
+
 	lights.push_back(LIGHT_BOX(6000, 0, 170, 0, 30, 200, 30, false));
 	lights.push_back(LIGHT_BOX(12000, 0, -55, 0, 50, -50, 100, false));
 	lights.push_back(LIGHT_BOX(8400, 250, 40, -35, 255, 160, 10, false));
-
 //	lights.push_back(LIGHT_BOX(4000, 55, 100, 70,   150, 103, 73, true));
-
 
 	// Заполнить BBOX сцены по лампочкам
 	fillSceneBbox();
 
 	// Загрузить объекты
-	{
-		std::vector<float> cloudBuf;
-		load3dCloud("Objects/Smoke.bin", cloudBuf, SceneSize);
-		for (int z = 0; z < SceneSize; ++z) {
-			for (int y = 0; y < SceneSize; ++y) {
-				for (int x = 0; x < 65; ++x) {
-					scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
-				}
-			}
-		}
-		load3dCloud("Objects/CloudHard.bin", cloudBuf, SceneSize);
-		for (int z = 0; z < SceneSize; ++z) {
-			for (int y = 0; y < SceneSize; ++y) {
-				for (int x = 65; x < 100; ++x) {
-					scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
-				}
-			}
-		}
-		load3dCloud("Objects/CloudSoft.bin", cloudBuf, SceneSize);
-		for (int z = 0; z < SceneSize; ++z) {
-			for (int y = 0; y < SceneSize; ++y) {
-				for (int x = 100; x < 150; ++x) {
-					scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
-				}
-			}
-		}
-		load3dCloud("Objects/CloudExtraSoft.bin", cloudBuf, SceneSize);
-		for (int z = 0; z < SceneSize; ++z) {
-			for (int y = 0; y < SceneSize; ++y) {
-				for (int x = 150; x < SceneSize; ++x) {
-					scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
-				}
-			}
-		}
-	}
+	loadObjects();
 
 	// Заполняем нормали и коэффициенты поверхности
 	calcNormalsAndSurfInterp();
@@ -1026,110 +990,50 @@ void test4Render3dScene()
 		printf("Rendernig frame %d of %d\n", n, SceneDrawNum);
 		renderScene(0, 0, ScreenSize, ScreenSize, n, ScreenSize);
 
-		if ((n % 30) == 0 || n == SceneDrawNum-1) {
-
-			char number[6];
-			number[0] = (n % 100000) / 10000 + '0';
-			number[1] = (n % 10000) / 1000 + '0';
-			number[2] = (n % 1000) / 100 + '0';
-			number[3] = (n % 100) / 10 + '0';
-			number[4] = (n % 10) + '0';
-			number[5] = 0;
-			std::string fname = std::string("Scenes/3dScene_Cloud") + (const char*)number + ".bmp";
-			saveToBmp(fname, ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
-		}
+		//if ((n % 50) == 0 || n == SceneDrawNum-1) {
+		//	char number[6];
+		//	number[0] = (n % 100000) / 10000 + '0';
+		//	number[1] = (n % 10000) / 1000 + '0';
+		//	number[2] = (n % 1000) / 100 + '0';
+		//	number[3] = (n % 100) / 10 + '0';
+		//	number[4] = (n % 10) + '0';
+		//	number[5] = 0;
+		//	std::string fname = std::string("Scenes/3dScene_Cloud") + (const char*)number + ".bmp";
+		//	saveToBmp(fname, ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
+		//}
 	}
+
+	char number[6];
+	int n = randSeedForLog;
+	number[0] = (n % 100000) / 10000 + '0';
+	number[1] = (n % 10000) / 1000 + '0';
+	number[2] = (n % 1000) / 100 + '0';
+	number[3] = (n % 100) / 10 + '0';
+	number[4] = (n % 10) + '0';
+	number[5] = 0;
+	std::string fname = std::string("Scenes/3dScene_Cloud_Rand") + (const char*)number + ".bmp";
+	saveToBmp(fname, ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (SceneDrawNum + 1), 255.)); });
 }
-
-
 
 
 //--------------------------------------------------------------------------------------------
 
-void test5()
+void RenderRandom()
 {
-	Scale = 1.5f;
-
-	float x1 = 10;
-	float x2 = 11;
-	float y1 = 5;
-	float y2 = 6;
-
-	Cell2D cell;
-	cell.speedX = 0.2f;
-	cell.speedY = 0.2f;
-	float x = x1;
-
-	// Сначала расширяем
-	float xCenter = x1 + 0.5f;
-	float yCenter = y1 + 0.5f;
-	x1 = (x1 - xCenter) * Scale + xCenter;
-	y1 = (y1 - yCenter) * Scale + yCenter;
-	x2 = (x2 - xCenter) * Scale + xCenter;
-	y2 = (y2 - yCenter) * Scale + yCenter;
-
-	// Корретируем новую позицию, чтобы из-за расширения не зацепить клетки позади по ходу движения
-	if (fabs(cell.speedX) > 0.001f || fabs(cell.speedY) > 0.001f) {
-		float delta = (float)x - x1; // На сколько увеличенная клетка вылазит за пределы старой клетки (с одной стороны)
-		float comX = 0;
-		float comY = 0;
-		if (fabs(cell.speedX) < fabs(cell.speedY)) {
-			float k = fabs(cell.speedX / cell.speedY);
-			comY = cell.speedY < 0 ? -delta : delta;
-			comX = cell.speedX < 0 ? -delta * k : delta * k;
-		}
-		else {
-			float k = fabs(cell.speedY / cell.speedX);
-			comX = cell.speedX < 0 ? -delta : delta;
-			comY = cell.speedY < 0 ? -delta * k : delta * k;
-		}
-		x1 += comX;
-		x2 += comX;
-		y1 += comY;
-		y2 += comY;
+	for (int i = 1; i < 1000; ++i) {
+		generate3dCloud(i, SceneSize);
+		render3dScene(i);
 	}
-
-	// Сдвиг клиенти по вектору движения
-	x1 += cell.speedX;
-	y1 += cell.speedY;
-	x2 += cell.speedX;
-	y2 += cell.speedY;
-
 }
 
 //--------------------------------------------------------------------------------------------
-//  // Генерация куба
-//for (int z = 30; z < 170; ++z) {
-//	for (int y= 130; y < 200; ++y) {
-//		for (int x = 30; x < 170; ++x) {
-//			scene[x][y][z].smokeDens = 1.f;
-//		}
-//	}
-//}
 
-	//// Генерим зубчатую сферу для теста
-	//for (int z = 0; z < 200; ++z) {
-	//	for (int y = 0; y < 200; ++y) {
-	//		for (int x = 0; x < 200; ++x) {
-	//			int dx = (x - (100-95)) / 20;
-	//			int dy = (y - (100+95)) / 20;
-	//			int dz = (z - 100) / 20;
-	//			if (dx*dx + dy * dy + dz * dz < 12) {
-	//				scene[x][y][z].smokeDens = 1.f;
-	//			}
-	//			else
-	//			{
-	//				scene[x][y][z].smokeDens = 0.f;
-	//			}
-	//		}
-	//	}
-	//}
-
-//--------------------------------------------------------------------------------------------
 
 int main()
 {
-	generate3dCloud(SceneSize);
-	//test4Render3dScene();
+	RenderRandom();
+	generate3dCloud(4, SceneSize);
+//	render3dScene(0);
+
 }
 

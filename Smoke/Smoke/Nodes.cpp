@@ -32,8 +32,8 @@ double NodeLeaf::GetDensity(float x, float y, float z)
 	}
 	float dist = sqrt(distSq);
 	float ratio = dist / radius;
-	return (cos(ratio * PI) + 1) * 0.5 * 0.04;                                                                            // const !!!
-   //return  1.;                                    // Для генерации туч
+//	return (cos(ratio * PI) + 1) * 0.5 * 0.04;                                                                            // const !!!
+return  1.;                                    // Для генерации туч
 }
 
 //--------------------------------------------------------------------------------------------

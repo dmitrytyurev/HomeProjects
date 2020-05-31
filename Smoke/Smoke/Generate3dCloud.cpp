@@ -380,9 +380,9 @@ void renderLast3dObjectToDstBufer(std::vector<float>& dstBuffer, int bufSize)
 }
 //--------------------------------------------------------------------------------------------
 
-void saveCloud(std::vector<float>& dst, int size)
+void saveCloud(const std::string& fname, std::vector<float>& dst, int size)
 {
-	FILE* f = fopen("Cloud.bin", "wb");
+	FILE* f = fopen(fname.c_str(), "wb");
 	if (f) {
 		fwrite(&dst[0], size*size*size * sizeof(float), 1, f);
 		fclose(f);
@@ -406,6 +406,7 @@ void load3dCloud(const std::string& fname, std::vector<float>& dst, int size)
 
 void generate3dCloudImpl(std::vector<float>& dst, int bufSize)
 {
+	object.childNodes.clear();
 	fullSize = bufSize;
 	halfSize = bufSize / 2;
 	for (int i = 0; i < BuffersNum; ++i)
@@ -427,7 +428,7 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize)
 				if (dist < radius) {
 					float ratio = dist / radius;
 					srcBuffers[0].cells[z*halfSize*halfSize + y * halfSize + x] = (cos(ratio * PI) + 1) * 0.5f*0.04f;                                // const !!!
-//srcBuffers[0].cells[z*halfSize*halfSize + y * halfSize + x] = 1.f;
+srcBuffers[0].cells[z*halfSize*halfSize + y * halfSize + x] = 1.f;
 				}
 			}
 		}
@@ -505,23 +506,24 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize)
 			int newX = 0;
 			int newY = 0;
 			int newZ = 0;
-			calc3dPosForNewObject(newX, newY, newZ, innerRadiusOfNewObject, 0.6f, fullSize);                                // const !!! 0.6
+			calc3dPosForNewObject(newX, newY, newZ, innerRadiusOfNewObject, 0.75f, fullSize);                                // const !!! 0.6
 			objects.emplace_back(Object3dToPlace(newX, newY, newZ, srcBuferIndex, newOuterRadius));
 		}
-		renderLast3dObjectToDstBufer(dst, fullSize);
+//		renderLast3dObjectToDstBufer(dst, fullSize);
 		object.childNodes.emplace_back((float)objects.back().x, (float)objects.back().y, (float)objects.back().z, newOuterRadius / srcBuffers[srcBuferIndex].outerRadius, srcBuffers[srcBuferIndex].node);
 	}
-//printf("object.generate3dCloud\n");
-//object.bboxX2 = bufSize;
-//object.bboxY2 = bufSize;
-//object.bboxZ2 = bufSize;
-//object.generate3dCloud(dst, bufSize);
+printf("object.generate3dCloud\n");
+object.bboxX2 = (float)bufSize;
+object.bboxY2 = (float)bufSize;
+object.bboxZ2 = (float)bufSize;
+object.generate3dCloud(dst, bufSize);
 }
 
 //--------------------------------------------------------------------------------------------
 
-void generate3dCloud(int bufSize)
+void generate3dCloud(int randSeed, int bufSize)
 {
+	srand(randSeed);
 	std::vector<float> dst;
 	generate3dCloudImpl(dst, bufSize);
 
@@ -536,7 +538,15 @@ void generate3dCloud(int bufSize)
 	sliceY = 7 * bufSize / 10;
 	saveToBmp("Slices/3dCloudSlice_4.bmp", bufSize, bufSize, [dst, sliceY, bufSize](int x, int y) { return (uint8_t)(std::min(dst[(bufSize - 1 - y) * bufSize * bufSize + sliceY * bufSize + x] * 255.f, 255.f)); });
 
-	saveCloud(dst, bufSize);
+	saveCloud("Cloud.bin", dst, bufSize);
 }
 
+/*
+- переключить на новый способ и проверить, что генерит то, что в файлах (старый способ)
+- добавить в generate3dCloud параметр hardBrush
+- добавить в generate3dCloud параметры блура (делается постэффектом. сначала куб 50х50 заполняется шумом, блурится с неким радиусом (параметр), нормируется и умножается на амплитуду (параметр) затем значения в нём используются, как радиус блура готового облака)
 
+
+
+
+*/
