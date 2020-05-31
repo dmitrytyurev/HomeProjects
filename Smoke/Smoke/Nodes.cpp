@@ -42,15 +42,25 @@ double NodeLeaf::GetDensity(float x, float y, float z, bool isHardBrush)
 
 //--------------------------------------------------------------------------------------------
 
-void NodeBranch::generate3dCloud(std::vector<float>& dst, int bufSize, bool isHardBrush)
+void NodeBranch::generate3dCloud(std::vector<float>& dst, int bufSize, float scale, bool isHardBrush)
 {
+	bboxX1 = 0.f;
+	bboxY1 = 0.f;
+	bboxZ1 = 0.f;
+	bboxX2 = (float)bufSize;
+	bboxY2 = (float)bufSize;
+	bboxZ2 = (float)bufSize;
+	xCenter = bufSize / 2.f;
+	yCenter = bufSize / 2.f;
+	zCenter = bufSize / 2.f;
+
 	dst.resize(bufSize*bufSize*bufSize);
 
 	for (int z = 0; z < bufSize; ++z) {
 		printf("z: %d\n", z);
 		for (int y = 0; y < bufSize; ++y) {
 			for (int x = 0; x < bufSize; ++x) {
-				dst[z*bufSize*bufSize + y * bufSize + x] = (float)GetDensity((float)x, (float)y, (float)z, isHardBrush);
+				dst[z*bufSize*bufSize + y * bufSize + x] = (float)GetDensity((x - xCenter)/scale, (y - yCenter)/scale, (z-zCenter)/scale, isHardBrush);
 			}
 		}
 	}

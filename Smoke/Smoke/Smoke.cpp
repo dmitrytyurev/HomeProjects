@@ -13,18 +13,16 @@ void generate3dCloud(int randSeed, bool isHardBrush, int size);
 void load3dCloud(const std::string& fname, std::vector<float>& dst, int size);
 
 //--------------------------------------------------------------------------------------------
+// Ренедер
+//--------------------------------------------------------------------------------------------
 
-void _cdecl exit_msg(const char *text, ...)
-{
-	static char tmpStr[1024];
-	va_list args;
-	va_start(args, text);
-	vsprintf_s(tmpStr, sizeof(tmpStr), text, args);
-	va_end(args);
+const float FarAway = 100000.f;
+const int ScreenSize = 200; // Размер экрана в пикселах
+const int SceneSize = 200;  // Размер сцены в единичных кубах
+const float cameraZinit = -200; // Позиция камеры по z в системе координат сетки
+const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана  0.00002;
+const int SceneDrawNum = 400; // Сколько раз рендерим сцену
 
-	printf("%s", tmpStr);
-	exit(1);
-}
 
 
 //--------------------------------------------------------------------------------------------
@@ -47,20 +45,6 @@ void saveToBmp(const std::string& fileName, int sizeX, int sizeY, std::function<
 	save_bmp24(fileName.c_str(), sizeX, sizeY, (const char *)bmpData);
 	delete[] bmpData;
 }
-
-
-
-
-//--------------------------------------------------------------------------------------------
-// Ренедер
-//--------------------------------------------------------------------------------------------
-
-const float FarAway = 100000.f;
-const int ScreenSize = 200; // Размер экрана в пикселах
-const int SceneSize = 200;  // Размер сцены в единичных кубах
-const float cameraZinit = -200; // Позиция камеры по z в системе координат сетки
-const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана  0.00002;
-const int SceneDrawNum = 500; // Сколько раз рендерим сцену
 
 struct LIGHT_BOX
 {
@@ -103,18 +87,7 @@ inline float truncOneSide(float x)
 	return (float)((int)((double)x + 1000) - 1000);
 }
 
-//--------------------------------------------------------------------------------------------
-
-
-inline float distSq(float x1, float y1, float z1, float x2, float y2, float z2)
-{
-	float dx = x1 - x2;
-	float dy = y1 - y2;
-	float dz = z1 - z2;
-	return dx * dx + dy * dy + dz * dz;
-}
-
-//--------------------------------------------------------------------------------------------
+///--------------------------------------------------------------------------------------------
 
 inline void intersectLeft(float x, float y, float z, float dirX, float dirY, float dirZ, float& newX, float& newY, float& newZ)
 {
@@ -661,6 +634,7 @@ void RenderRandom(bool isHardBrush)
 int main()
 {
 	RenderRandom(true);
+
 //	generate3dCloud(4, true, SceneSize);
 //	render3dScene(4);
 

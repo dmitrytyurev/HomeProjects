@@ -65,7 +65,6 @@ int halfSize = 0;
 static Buffer3D srcBuffers[BuffersNum];
 static Buffer3D dstBuffers[BuffersNum];
 static std::vector<Object3dToPlace> objects;
-NodeBranch object;
 
 //--------------------------------------------------------------------------------------------
 
@@ -406,7 +405,8 @@ void load3dCloud(const std::string& fname, std::vector<float>& dst, int size)
 
 void generate3dCloudImpl(std::vector<float>& dst, int bufSize, bool isHardBrush)
 {
-	object.childNodes.clear();
+	NodeBranch object;
+	
 	fullSize = bufSize;
 	halfSize = bufSize / 2;
 	for (int i = 0; i < BuffersNum; ++i)
@@ -517,10 +517,7 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize, bool isHardBrush)
 		object.childNodes.emplace_back((float)objects.back().x, (float)objects.back().y, (float)objects.back().z, newOuterRadius / srcBuffers[srcBuferIndex].outerRadius, srcBuffers[srcBuferIndex].node);
 	}
 printf("object.generate3dCloud\n");
-object.bboxX2 = (float)bufSize;
-object.bboxY2 = (float)bufSize;
-object.bboxZ2 = (float)bufSize;
-object.generate3dCloud(dst, bufSize, isHardBrush);
+object.generate3dCloud(dst, bufSize, 0.85f, isHardBrush);
 }
 
 //--------------------------------------------------------------------------------------------
