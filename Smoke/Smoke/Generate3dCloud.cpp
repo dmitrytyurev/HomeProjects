@@ -517,7 +517,7 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize, bool isHardBrush)
 		object.childNodes.emplace_back((float)objects.back().x, (float)objects.back().y, (float)objects.back().z, newOuterRadius / srcBuffers[srcBuferIndex].outerRadius, srcBuffers[srcBuferIndex].node);
 	}
 printf("object.generate3dCloud\n");
-object.generate3dCloud(dst, bufSize, 0.85f, isHardBrush);
+object.generate3dCloud(dst, bufSize, 1.f, isHardBrush);
 }
 
 //--------------------------------------------------------------------------------------------
