@@ -19,7 +19,7 @@ struct NodeRef
 
 struct NodeBase
 {
-	virtual double GetDensity(float x, float y, float z) = 0;  // Дать плотность в точке (в системе координат глифа)
+	virtual double GetDensity(float x, float y, float z, bool isSmoke) = 0;  // Дать плотность в точке (в системе координат глифа)
 
 	float xCenter = 0;  // Центр глифа ноды в системе координат ноды 
 	float yCenter = 0;
@@ -36,13 +36,13 @@ struct NodeBranch: public NodeBase
 {
 	std::vector<NodeRef> childNodes;
 
-	double GetDensity(float x, float y, float z);  // Дать плотность в точке (в системе координат глифа)
-	void generate3dCloud(std::vector<float>& dst, int bufSize);
+	double GetDensity(float x, float y, float z, bool isSmoke);  // Дать плотность в точке (в системе координат глифа)
+	void generate3dCloud(std::vector<float>& dst, int bufSize, bool isSmoke);
 };
 
 struct NodeLeaf : public NodeBase
 {
-	double GetDensity(float x, float y, float z);  // Дать плотность в точке (в системе координат глифа)
+	double GetDensity(float x, float y, float z, bool isSmoke);  // Дать плотность в точке (в системе координат глифа)
 };
 
 

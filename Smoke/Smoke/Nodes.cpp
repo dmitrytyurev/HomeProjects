@@ -3,7 +3,7 @@
 #include "utils.h"
 //--------------------------------------------------------------------------------------------
 
-double NodeBranch::GetDensity(float x, float y, float z)
+double NodeBranch::GetDensity(float x, float y, float z, bool isHardBrush)
 {
 	x += xCenter;  // Переходим из системы координат глифа ноды в систему координат ноды
 	y += yCenter;
@@ -15,14 +15,14 @@ double NodeBranch::GetDensity(float x, float y, float z)
 
 	double result = 1.;
 	for (const auto& nodeRef: childNodes) {
-		result *= 1. - nodeRef.childNode->GetDensity((x - nodeRef.xPos)/nodeRef.scale, (y - nodeRef.yPos) / nodeRef.scale, (z - nodeRef.zPos) / nodeRef.scale);
+		result *= 1. - nodeRef.childNode->GetDensity((x - nodeRef.xPos)/nodeRef.scale, (y - nodeRef.yPos) / nodeRef.scale, (z - nodeRef.zPos) / nodeRef.scale, isHardBrush);
 	}
 	return 1. - result;
 }
 
 //--------------------------------------------------------------------------------------------
 
-double NodeLeaf::GetDensity(float x, float y, float z)
+double NodeLeaf::GetDensity(float x, float y, float z, bool isHardBrush)
 {
 	const float radius = 40;                                                                                                // const !!!
 	float distSq = x * x + y * y + z * z;  // Квадрат расстояние от центра кисти до запрошенной точки
@@ -30,15 +30,19 @@ double NodeLeaf::GetDensity(float x, float y, float z)
 	if (distSq > radius*radius) {
 		return 0.;
 	}
-	float dist = sqrt(distSq);
-	float ratio = dist / radius;
-//	return (cos(ratio * PI) + 1) * 0.5 * 0.04;                                                                            // const !!!
-return  1.;                                    // Для генерации туч
+	if (isHardBrush) {
+		return  1.;                                    // Для генерации плотного дыма
+	}
+	else {
+		float dist = sqrt(distSq);
+		float ratio = dist / radius;
+		return (cos(ratio * PI) + 1) * 0.5 * 0.04;                                                                            // const !!!
+	}
 }
 
 //--------------------------------------------------------------------------------------------
 
-void NodeBranch::generate3dCloud(std::vector<float>& dst, int bufSize)
+void NodeBranch::generate3dCloud(std::vector<float>& dst, int bufSize, bool isHardBrush)
 {
 	dst.resize(bufSize*bufSize*bufSize);
 
@@ -46,7 +50,7 @@ void NodeBranch::generate3dCloud(std::vector<float>& dst, int bufSize)
 		printf("z: %d\n", z);
 		for (int y = 0; y < bufSize; ++y) {
 			for (int x = 0; x < bufSize; ++x) {
-				dst[z*bufSize*bufSize + y * bufSize + x] = (float)GetDensity((float)x, (float)y, (float)z);
+				dst[z*bufSize*bufSize + y * bufSize + x] = (float)GetDensity((float)x, (float)y, (float)z, isHardBrush);
 			}
 		}
 	}
