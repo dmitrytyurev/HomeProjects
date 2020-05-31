@@ -9,7 +9,7 @@
 #include <time.h>
 
 //--------------------------------------------------------------------------------------------
-void generate3dCloud(int randSeed, bool isHardBrush, int size, float xPos, float yPos, float zPos, float scale);
+void generate3dCloud(int randSeed, bool isHardBrush, int size, float xPos, float yPos, float zPos, float scale, int frqRadius, int maxRadius);
 void load3dCloud(const std::string& fname, std::vector<float>& dst, int size);
 
 //--------------------------------------------------------------------------------------------
@@ -287,7 +287,7 @@ void intersect(float x, float y, float z, float dirX, float dirY, float dirZ, fl
 
 void calcNormalsAndSurfInterp()
 {
-	const int radius = 5;
+	const int radius = 5;                                                                      // !!!const
 	for (int z = radius; z < SceneSize-radius; ++z)	{
 		for (int y = radius; y < SceneSize - radius; ++y) {
 			for (int x = radius; x < SceneSize - radius; ++x) {
@@ -622,8 +622,8 @@ void render3dScene(int randSeedForLog)
 
 void RenderRandom(bool isHardBrush)
 {
-	for (int i = 1; i < 1000; ++i) {
-		generate3dCloud(i, isHardBrush, SceneSize, SceneSize/2, SceneSize/2, SceneSize/2, 1.f);
+	for (int i = 5; i < 1000; ++i) {
+		generate3dCloud(i, isHardBrush, SceneSize, SceneSize/2, SceneSize/2, SceneSize/2, 1.f, 0, 0);
 		render3dScene(i);
 	}
 }
@@ -633,10 +633,27 @@ void RenderRandom(bool isHardBrush)
 
 int main()
 {
-	RenderRandom(true);
+//	RenderRandom(true);
 
-//	generate3dCloud(4, true, SceneSize, SceneSize/2, SceneSize/2, SceneSize/2, 1.f);
-//	render3dScene(4);
+	generate3dCloud(5, true, SceneSize, SceneSize/2, SceneSize/2, SceneSize/2, 1.f, 5, 10);
+	render3dScene(50);
+	generate3dCloud(5, true, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f, 5, 20);
+	render3dScene(51);
+	generate3dCloud(5, true, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f, 5, 30);
+	render3dScene(52);
 
+	generate3dCloud(5, true, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f, 10, 10);
+	render3dScene(53);
+	generate3dCloud(5, true, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f, 10, 20);
+	render3dScene(54);
+	generate3dCloud(5, true, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f, 10, 30);
+	render3dScene(55);
+
+	generate3dCloud(5, true, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f, 20, 10);
+	render3dScene(56);
+	generate3dCloud(5, true, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f, 20, 20);
+	render3dScene(57);
+	generate3dCloud(5, true, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f, 20, 30);
+	render3dScene(58);
 }
 

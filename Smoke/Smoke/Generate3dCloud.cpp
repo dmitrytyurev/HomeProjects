@@ -18,6 +18,7 @@ void saveToBmp(const std::string& fileName, int sizeX, int sizeY, std::function<
 //--------------------------------------------------------------------------------------------
 
 const int BuffersNum = 10;
+const int BlurBufferSize = 100;
 
 //--------------------------------------------------------------------------------------------
 // Структуры
@@ -65,6 +66,8 @@ int halfSize = 0;
 static Buffer3D srcBuffers[BuffersNum];
 static Buffer3D dstBuffers[BuffersNum];
 static std::vector<Object3dToPlace> objects;
+float blurRadiuses[BlurBufferSize][BlurBufferSize][BlurBufferSize]; // Коэффициент разблуривания (пересчитывается в радиус разблуривания в каждой точке)
+
 
 //--------------------------------------------------------------------------------------------
 
@@ -520,13 +523,99 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize, bool isHardBrush,
 	object.generate3dCloud(dst, bufSize, xPos, yPos, zPos, scale, isHardBrush);
 }
 
+
 //--------------------------------------------------------------------------------------------
 
-void generate3dCloud(int randSeed, bool isHardBrush, int bufSize, float xPos, float yPos, float zPos, float scale)
+void initBlurBuffer(int frqRadius, int maxRadius)
+{
+	static float tmpBuffer[BlurBufferSize][BlurBufferSize][BlurBufferSize];
+
+	// Рандромный шум
+	for (int z = 0; z < BlurBufferSize; ++z) {
+		for (int y = 0; y < BlurBufferSize; ++y) {
+			for (int x = 0; x < BlurBufferSize; ++x) {
+				tmpBuffer[x][y][z] = randf(0.f, 1.f);
+			}
+		}
+	}
+
+	// Блур рандомного шума с заданным радиусом
+	int pointsAffected = (frqRadius * 2 + 1) * (frqRadius * 2 + 1) * (frqRadius * 2 + 1);
+	for (int z = frqRadius; z < BlurBufferSize - frqRadius; ++z) {
+		for (int y = frqRadius; y < BlurBufferSize - frqRadius; ++y) {
+			for (int x = frqRadius; x < BlurBufferSize - frqRadius; ++x) {
+				float sum = 0;
+				for (int z2 = z - frqRadius; z2 <= z + frqRadius; ++z2) {
+					for (int y2 = y - frqRadius; y2 <= y + frqRadius; ++y2) {
+						for (int x2 = x - frqRadius; x2 <= x + frqRadius; ++x2) {
+							sum += tmpBuffer[x2][y2][z2];
+						}
+					}
+				}
+				blurRadiuses[x][y][z] = sum / pointsAffected;
+			}
+		}
+	}
+
+	// Нормирование на заданную амплитуду. Сначала поиск максимума
+	float maxVal = 0;
+	for (int z = 0; z < BlurBufferSize; ++z) {
+		for (int y = 0; y < BlurBufferSize; ++y) {
+			for (int x = 0; x < BlurBufferSize; ++x) {
+				if (blurRadiuses[x][y][z] > maxVal) {
+					maxVal = blurRadiuses[x][y][z];
+				}
+			}
+		}
+	}
+	for (int z = 0; z < BlurBufferSize; ++z) {
+		for (int y = 0; y < BlurBufferSize; ++y) {
+			for (int x = 0; x < BlurBufferSize; ++x) {
+				float val = blurRadiuses[x][y][z] / maxVal * (maxRadius + 0.99f);
+				blurRadiuses[x][y][z] = val;
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+void blurGeneratedCloud(std::vector<float>& dst, int bufSize, int maxRadius)
+{
+	std::vector<float> tmpBuf = dst;
+
+	for (int z = maxRadius; z < bufSize - maxRadius; ++z) {
+		for (int y = maxRadius; y < bufSize - maxRadius; ++y) {
+			for (int x = maxRadius; x < bufSize - maxRadius; ++x) {
+				int radius = (int)blurRadiuses[x*BlurBufferSize/bufSize][y*BlurBufferSize/bufSize][z*BlurBufferSize/bufSize];
+				int pointsAffected = (radius * 2 + 1) * (radius * 2 + 1) * (radius * 2 + 1);
+				float sum = 0;
+				for (int z2 = z - radius; z2 <= z + radius; ++z2) {
+					for (int y2 = y - radius; y2 <= y + radius; ++y2) {
+						for (int x2 = x - radius; x2 <= x + radius; ++x2) {
+							sum += tmpBuf[z2*bufSize*bufSize + y2*bufSize + x2];
+						}
+					}
+				}
+				dst[z*bufSize*bufSize + y*bufSize + x] = sum / pointsAffected;
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+void generate3dCloud(int randSeed, bool isHardBrush, int bufSize, float xPos, float yPos, float zPos, float scale, int frqRadius, int maxRadius)
 {
 	srand(randSeed);
 	std::vector<float> dst;
 	generate3dCloudImpl(dst, bufSize, isHardBrush, xPos, yPos, zPos, scale);
+
+	// Блурим сгенерённое облако в соответствии с параметрами блура
+	if (maxRadius > 0) {
+		initBlurBuffer(frqRadius, maxRadius);
+		blurGeneratedCloud(dst, bufSize, maxRadius);
+	}
 
 	int sliceY = 3 * bufSize / 10;
 	saveToBmp("Slices/3dCloudSlice_0.bmp", bufSize, bufSize, [dst, sliceY, bufSize](int x, int y) { return (uint8_t)(std::min(dst[(bufSize - 1 - y) * bufSize * bufSize + sliceY * bufSize + x] * 255.f, 255.f)); });
