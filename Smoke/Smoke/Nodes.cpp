@@ -65,3 +65,79 @@ void NodeBranch::generate3dCloud(std::vector<float>& dst, int bufSize, float xPo
 		}
 	}
 }
+
+//--------------------------------------------------------------------------------------------
+
+void NodeBranch::serializeAll(const std::string& fileName)
+{
+	std::vector<NodeBase*> serialized;
+
+	FILE* f = fopen(fileName.c_str(), "wt");
+	serializeNode(f, [&serialized](NodeBase* pNodeBase) {  
+		bool isSerialized = std::find(serialized.begin(), serialized.end(), pNodeBase) != serialized.end(); 
+		serialized.push_back(pNodeBase);  
+		return isSerialized;  
+	});
+	fclose(f);
+}
+
+//--------------------------------------------------------------------------------------------
+
+
+void NodeBase::serializeBase(FILE* f)
+{
+	fwrite(&xCenter, sizeof(float), 1, f);
+	fwrite(&yCenter, sizeof(float), 1, f);
+	fwrite(&zCenter, sizeof(float), 1, f);
+	fwrite(&bboxX1, sizeof(float), 1, f);
+	fwrite(&bboxY1, sizeof(float), 1, f);
+	fwrite(&bboxZ1, sizeof(float), 1, f);
+	fwrite(&bboxX2, sizeof(float), 1, f);
+	fwrite(&bboxY2, sizeof(float), 1, f);
+	fwrite(&bboxZ2, sizeof(float), 1, f);
+}
+
+//--------------------------------------------------------------------------------------------
+
+void NodeRef::serialize(FILE* f) const
+{
+	fwrite(&xPos, sizeof(float), 1, f);
+	fwrite(&yPos, sizeof(float), 1, f);
+	fwrite(&zPos, sizeof(float), 1, f);
+	fwrite(&scale, sizeof(float), 1, f);
+	fwrite(&r, sizeof(int), 1, f);
+	fwrite(&g, sizeof(int), 1, f);
+	fwrite(&b, sizeof(int), 1, f);
+	fwrite(&a, sizeof(int), 1, f);
+	uint64_t nodeId = (uint64_t)childNode.get();
+	fwrite(&nodeId, sizeof(uint64_t), 1, f);
+}
+
+
+//--------------------------------------------------------------------------------------------
+
+void NodeBranch::serializeNode(FILE* f, const std::function<bool(NodeBase*)>& isSerializedAlready)
+{
+	if (isSerializedAlready(this)) {
+		return;
+	}
+	serializeBase(f);
+	int childNodesNum = (int)childNodes.size();
+	fwrite(&childNodesNum, sizeof(int), 1, f);
+	for (const auto& node : childNodes) {
+		node.serialize(f);
+	}
+	for (const auto& node : childNodes) {
+		node.childNode->serializeNode(f, isSerializedAlready);
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+void NodeLeaf::serializeNode(FILE* f, const std::function<bool(NodeBase*)>& isSerializedAlready)
+{
+	if (isSerializedAlready(this)) {
+		return;
+	}
+}
+

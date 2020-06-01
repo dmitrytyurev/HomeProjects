@@ -567,10 +567,8 @@ void checkOutOfRange(std::vector<float>& dst, int bufSize)
 
 //--------------------------------------------------------------------------------------------
 
-void generate3dCloudImpl(std::vector<float>& dst, int bufSize, bool isHardBrush, float xPos, float yPos, float zPos, float scale)
+void generate3dCloudImpl(NodeBranch& object, std::vector<float>& dst, int bufSize, bool isHardBrush, float xPos, float yPos, float zPos, float scale)
 {
-	NodeBranch object;
-	
 	fullSize = bufSize;
 	halfSize = bufSize / 2;
 	for (int i = 0; i < BuffersNum; ++i)
@@ -661,9 +659,6 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize, bool isHardBrush,
 				saveToBmp("Slices/Buffer1_3.bmp", halfSize, halfSize, [ds = dstBuffers[bufIndex].cells, hs = halfSize](int x, int y) { return (uint8_t)(std::min(ds[(hs - 1 - y) * hs * hs + hs / 2 * hs + x] * 255.f, 255.f)); });
 
 			dstBuffers[bufIndex].fillParameters(pBranch.get());    // Рассчитать параметры сгенерированного изображения, заполнить параметры соответствующей ноды
-			if (fractalStep <= 1 && bufIndex <= 3) {
-				printf("%d %d %f\n", fractalStep, bufIndex, dstBuffers[bufIndex].innerRadius);
-			}
 			dstBuffers[bufIndex].node = pBranch;
 		}
 		// Скопируем выходные буфера во входные
@@ -716,8 +711,11 @@ void generate3dCloud(int randSeed, bool isHardBrush, int bufSize, float xPos, fl
 	fclose(f);
 
 	srand(randSeed);
+
 	std::vector<float> dst;
-	generate3dCloudImpl(dst, bufSize, isHardBrush, xPos, yPos, zPos, scale);
+	NodeBranch object;
+	generate3dCloudImpl(object, dst, bufSize, isHardBrush, xPos, yPos, zPos, scale);
+	object.serializeAll(std::string("ObjectsVector/Object") + digit5intFormat(randSeed) + ".ove");
 
 	// Блурим сгенерённое облако в соответствии с параметрами блура
 	if (maxRadius > 0) {
@@ -736,7 +734,7 @@ void generate3dCloud(int randSeed, bool isHardBrush, int bufSize, float xPos, fl
 	sliceY = 7 * bufSize / 10;
 	saveToBmp("Slices/3dCloudSlice_4.bmp", bufSize, bufSize, [dst, sliceY, bufSize](int x, int y) { return (uint8_t)(std::min(dst[(bufSize - 1 - y) * bufSize * bufSize + sliceY * bufSize + x] * 255.f, 255.f)); });
 
-	saveCloud("Cloud.bin", dst, bufSize);
+	saveCloud(std::string("Objects/") + digit5intFormat(randSeed) + ".bin", dst, bufSize);
 }
 
 /*

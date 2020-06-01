@@ -605,16 +605,8 @@ void render3dScene(int randSeedForLog)
 		//}
 	}
 
-	char number[6];
-	int n = randSeedForLog;
-	number[0] = (n % 100000) / 10000 + '0';
-	number[1] = (n % 10000) / 1000 + '0';
-	number[2] = (n % 1000) / 100 + '0';
-	number[3] = (n % 100) / 10 + '0';
-	number[4] = (n % 10) + '0';
-	number[5] = 0;
-	std::string fname = std::string("Scenes/3dScene_Cloud_Rand") + (const char*)number + ".bmp";
-	saveToBmp(fname, ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (SceneDrawNum + 1), 255.)); });
+	std::string fname = std::string("Scenes/3dScene_Cloud_Rand") + digit5intFormat(randSeedForLog) + ".bmp";
+	saveToBmp(fname, ScreenSize, ScreenSize, [](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (SceneDrawNum + 1), 255.)); });
 }
 
 
@@ -623,8 +615,6 @@ void render3dScene(int randSeedForLog)
 void RenderRandom(bool isHardBrush)
 {
 	for (int i = 0; i < 1000; ++i) {
-//if (i == 1 || i==7 || i==9)
-//continue;
 		generate3dCloud(i, isHardBrush, SceneSize, SceneSize/2, SceneSize/2, SceneSize/2, 1.f, 0, 0);
 		render3dScene(i);
 	}

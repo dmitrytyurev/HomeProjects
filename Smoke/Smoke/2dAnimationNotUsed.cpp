@@ -373,3 +373,43 @@ void test2Render2dAnimation()
 	}
 }
 
+
+
+	{
+		std::shared_ptr<NodeBase> pLeaf = std::make_shared<NodeLeaf>();
+		pLeaf->id = 100;
+
+		std::shared_ptr<NodeBranch> pBr101 = std::make_shared<NodeBranch>();
+		pBr101->id = 101;
+		pBr101->childNodes.push_back(NodeRef(0, 0, 0, 0, pLeaf));
+
+		std::shared_ptr<NodeBranch> pBr102 = std::make_shared<NodeBranch>();
+		pBr102->id = 102;
+		pBr102->childNodes.push_back(NodeRef(0, 0, 0, 0, pLeaf));
+
+		std::shared_ptr<NodeBranch> pBr103 = std::make_shared<NodeBranch>();
+		pBr103->id = 103;
+		pBr103->childNodes.push_back(NodeRef(0, 0, 0, 0, std::shared_ptr<NodeBase>(pBr101)));
+		pBr103->childNodes.push_back(NodeRef(0, 0, 0, 0, std::shared_ptr<NodeBase>(pBr102)));
+
+		std::shared_ptr<NodeBranch> pBr104 = std::make_shared<NodeBranch>();
+		pBr104->id = 104;
+		pBr104->childNodes.push_back(NodeRef(0, 0, 0, 0, std::shared_ptr<NodeBase>(pBr101)));
+		pBr104->childNodes.push_back(NodeRef(0, 0, 0, 0, std::shared_ptr<NodeBase>(pBr102)));
+
+		object.id = 105;
+		object.childNodes.push_back(NodeRef(0, 0, 0, 0, std::shared_ptr<NodeBase>(pBr103)));
+		object.childNodes.push_back(NodeRef(0, 0, 0, 0, std::shared_ptr<NodeBase>(pBr104)));
+
+		object.serialize("Test.bin");
+		exit_msg("Test done");
+	}
+
+
+
+
+
+
+
+
+

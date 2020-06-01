@@ -66,4 +66,19 @@ inline float normalize(float& x, float& y, float& z, bool& succes)
 	return dist;
 }
 
+//--------------------------------------------------------------------------------------------
+
+inline std::string digit5intFormat(int n)
+{
+	char number[6];
+	number[0] = (n % 100000) / 10000 + '0';
+	number[1] = (n % 10000) / 1000 + '0';
+	number[2] = (n % 1000) / 100 + '0';
+	number[3] = (n % 100) / 10 + '0';
+	number[4] = (n % 10) + '0';
+	number[5] = 0;
+	return number;
+}
+
+
 
