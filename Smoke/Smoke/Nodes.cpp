@@ -121,6 +121,8 @@ void NodeBranch::serializeNode(FILE* f, const std::function<bool(NodeBase*)>& is
 	if (isSerializedAlready(this)) {
 		return;
 	}
+	uint64_t nodeId = (uint64_t)this;
+	fwrite(&nodeId, sizeof(uint64_t), 1, f);
 	serializeBase(f);
 	int childNodesNum = (int)childNodes.size();
 	fwrite(&childNodesNum, sizeof(int), 1, f);
