@@ -68,6 +68,14 @@ static Buffer3D dstBuffers[BuffersNum];
 static std::vector<Object3dToPlace> objects;
 float blurRadiuses[BlurBufferSize][BlurBufferSize][BlurBufferSize]; // Коэффициент разблуривания (пересчитывается в радиус разблуривания в каждой точке)
 
+//--------------------------------------------------------------------------------------------
+
+void logOutOfRange()
+{
+	FILE* f = fopen("Error.txt", "at");
+	fprintf(f, "Out of range!\n");
+	fclose(f);
+}
 
 //--------------------------------------------------------------------------------------------
 
@@ -199,7 +207,13 @@ m5:	for (int x = halfSize - 1; x >= 0; --x) {
 	}
 }
 
-m6:	centerX = (x1 + x2) / 2;
+m6:	
+	if (x1 == 0 || x2 == halfSize - 1 || y1 == 0 || y2 == halfSize - 1)
+	{
+		logOutOfRange();
+	}
+	
+	centerX = (x1 + x2) / 2;
 	centerY = (y1 + y2) / 2;
 	centerZ = (z1 + z2) / 2;
 
@@ -403,6 +417,64 @@ void load3dCloud(const std::string& fname, std::vector<float>& dst, int size)
 	}
 }
 
+//--------------------------------------------------------------------------------------------
+
+void checkOutOfRange(std::vector<float>& dst, int bufSize)
+{
+	for (int y = 0; y < bufSize; ++y) {
+		for (int x = 0; x < bufSize; ++x) {
+			if (dst[y * bufSize + x] > 0) {
+				logOutOfRange();
+				return;
+			}
+		}
+	}
+
+	for (int y = 0; y < bufSize; ++y) {
+		for (int x = 0; x < bufSize; ++x) {
+			if (dst[(bufSize - 1)*bufSize*bufSize + y * bufSize + x] > 0) {
+				logOutOfRange();
+				return;
+			}
+		}
+	}
+
+	for (int z = 0; z < bufSize; ++z) {
+		for (int x = 0; x < bufSize; ++x) {
+			if (dst[z*bufSize*bufSize + x] > 0) {
+				logOutOfRange();
+				return;
+			}
+		}
+	}
+
+	for (int z = 0; z < bufSize; ++z) {
+		for (int x = 0; x < bufSize; ++x) {
+			if (dst[z*bufSize*bufSize + (bufSize - 1) * bufSize + x] > 0) {
+				logOutOfRange();
+				return;
+			}
+		}
+	}
+
+	for (int y = 0; y < bufSize; ++y) {
+		for (int z = 0; z < bufSize; ++z) {
+			if (dst[z*bufSize*bufSize + y * bufSize] > 0) {
+				logOutOfRange();
+				return;
+			}
+		}
+	}
+
+	for (int y = 0; y < bufSize; ++y) {
+		for (int z = 0; z < bufSize; ++z) {
+			if (dst[z*bufSize*bufSize + y * bufSize + (bufSize - 1)] > 0) {
+				logOutOfRange();
+				return;
+			}
+		}
+	}
+}
 
 //--------------------------------------------------------------------------------------------
 
@@ -521,6 +593,7 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize, bool isHardBrush,
 	}
 	printf("Final rendering of the cloud...\n");
 	object.generate3dCloud(dst, bufSize, xPos, yPos, zPos, scale, isHardBrush);
+	checkOutOfRange(dst, bufSize);
 }
 
 
@@ -607,6 +680,10 @@ void blurGeneratedCloud(std::vector<float>& dst, int bufSize, int maxRadius)
 
 void generate3dCloud(int randSeed, bool isHardBrush, int bufSize, float xPos, float yPos, float zPos, float scale, int frqRadius, int maxRadius)
 {
+	FILE* f = fopen("Error.txt", "at");
+	fprintf(f, "Start generating with seed: %d\n", randSeed);
+	fclose(f);
+
 	srand(randSeed);
 	std::vector<float> dst;
 	generate3dCloudImpl(dst, bufSize, isHardBrush, xPos, yPos, zPos, scale);

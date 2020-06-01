@@ -16,3 +16,4 @@ void _cdecl exit_msg(const char *text, ...)
 	exit(1);
 }
 
+
