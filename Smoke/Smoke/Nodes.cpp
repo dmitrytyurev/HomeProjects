@@ -141,5 +141,10 @@ void NodeLeaf::serializeNode(FILE* f, const std::function<bool(NodeBase*)>& isSe
 	if (isSerializedAlready(this)) {
 		return;
 	}
+	uint64_t nodeId = (uint64_t)this;
+	fwrite(&nodeId, sizeof(uint64_t), 1, f);
+	serializeBase(f);
+	int childNodesNum = 0;
+	fwrite(&childNodesNum, sizeof(int), 1, f);
 }
 
