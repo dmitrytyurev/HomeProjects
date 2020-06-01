@@ -79,6 +79,95 @@ void logOutOfRange()
 
 //--------------------------------------------------------------------------------------------
 
+void logOutOfRange2()
+{
+	FILE* f = fopen("Error.txt", "at");
+	fprintf(f, "Out of range the whole!\n");
+	fclose(f);
+}
+
+
+//--------------------------------------------------------------------------------------------
+
+void initBlurBuffer(int frqRadius, int maxRadius)
+{
+	static float tmpBuffer[BlurBufferSize][BlurBufferSize][BlurBufferSize];
+
+	// Рандромный шум
+	for (int z = 0; z < BlurBufferSize; ++z) {
+		for (int y = 0; y < BlurBufferSize; ++y) {
+			for (int x = 0; x < BlurBufferSize; ++x) {
+				tmpBuffer[x][y][z] = randf(0.f, 1.f);
+			}
+		}
+	}
+
+	// Блур рандомного шума с заданным радиусом
+	int pointsAffected = (frqRadius * 2 + 1) * (frqRadius * 2 + 1) * (frqRadius * 2 + 1);
+	for (int z = frqRadius; z < BlurBufferSize - frqRadius; ++z) {
+		for (int y = frqRadius; y < BlurBufferSize - frqRadius; ++y) {
+			for (int x = frqRadius; x < BlurBufferSize - frqRadius; ++x) {
+				float sum = 0;
+				for (int z2 = z - frqRadius; z2 <= z + frqRadius; ++z2) {
+					for (int y2 = y - frqRadius; y2 <= y + frqRadius; ++y2) {
+						for (int x2 = x - frqRadius; x2 <= x + frqRadius; ++x2) {
+							sum += tmpBuffer[x2][y2][z2];
+						}
+					}
+				}
+				blurRadiuses[x][y][z] = sum / pointsAffected;
+			}
+		}
+	}
+
+	// Нормирование на заданную амплитуду. Сначала поиск максимума
+	float maxVal = 0;
+	for (int z = 0; z < BlurBufferSize; ++z) {
+		for (int y = 0; y < BlurBufferSize; ++y) {
+			for (int x = 0; x < BlurBufferSize; ++x) {
+				if (blurRadiuses[x][y][z] > maxVal) {
+					maxVal = blurRadiuses[x][y][z];
+				}
+			}
+		}
+	}
+	for (int z = 0; z < BlurBufferSize; ++z) {
+		for (int y = 0; y < BlurBufferSize; ++y) {
+			for (int x = 0; x < BlurBufferSize; ++x) {
+				float val = blurRadiuses[x][y][z] / maxVal * (maxRadius + 0.99f);
+				blurRadiuses[x][y][z] = val;
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+void blurGeneratedCloud(std::vector<float>& dst, int bufSize, int maxRadius)
+{
+	std::vector<float> tmpBuf = dst;
+
+	for (int z = maxRadius; z < bufSize - maxRadius; ++z) {
+		for (int y = maxRadius; y < bufSize - maxRadius; ++y) {
+			for (int x = maxRadius; x < bufSize - maxRadius; ++x) {
+				int radius = (int)blurRadiuses[x*BlurBufferSize / bufSize][y*BlurBufferSize / bufSize][z*BlurBufferSize / bufSize];
+				int pointsAffected = (radius * 2 + 1) * (radius * 2 + 1) * (radius * 2 + 1);
+				float sum = 0;
+				for (int z2 = z - radius; z2 <= z + radius; ++z2) {
+					for (int y2 = y - radius; y2 <= y + radius; ++y2) {
+						for (int x2 = x - radius; x2 <= x + radius; ++x2) {
+							sum += tmpBuf[z2*bufSize*bufSize + y2 * bufSize + x2];
+						}
+					}
+				}
+				dst[z*bufSize*bufSize + y * bufSize + x] = sum / pointsAffected;
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
 void Buffer3D::reinit(int sizeXYZ_)
 {
 	sizeXYZ = sizeXYZ_;
@@ -332,7 +421,7 @@ void calc3dPosForNewObject(int& bestX_, int& bestY_, int& bestZ_, float innerRad
 				for (i = 0; i < (int)objects.size(); ++i) {
 					const Object3dToPlace& obj = objects[i];
 					float dist = calcDist((float)x, (float)y, (float)z, (float)obj.x, (float)obj.y, (float)obj.z);
-					if (dist < obj.calcInnerRadius() + innerRadiusOfNewObject) {
+					if (dist < 2*(obj.calcInnerRadius() + innerRadiusOfNewObject)) {
 						break;
 					}
 				}
@@ -424,7 +513,7 @@ void checkOutOfRange(std::vector<float>& dst, int bufSize)
 	for (int y = 0; y < bufSize; ++y) {
 		for (int x = 0; x < bufSize; ++x) {
 			if (dst[y * bufSize + x] > 0) {
-				logOutOfRange();
+				logOutOfRange2();
 				return;
 			}
 		}
@@ -433,7 +522,7 @@ void checkOutOfRange(std::vector<float>& dst, int bufSize)
 	for (int y = 0; y < bufSize; ++y) {
 		for (int x = 0; x < bufSize; ++x) {
 			if (dst[(bufSize - 1)*bufSize*bufSize + y * bufSize + x] > 0) {
-				logOutOfRange();
+				logOutOfRange2();
 				return;
 			}
 		}
@@ -442,7 +531,7 @@ void checkOutOfRange(std::vector<float>& dst, int bufSize)
 	for (int z = 0; z < bufSize; ++z) {
 		for (int x = 0; x < bufSize; ++x) {
 			if (dst[z*bufSize*bufSize + x] > 0) {
-				logOutOfRange();
+				logOutOfRange2();
 				return;
 			}
 		}
@@ -451,7 +540,7 @@ void checkOutOfRange(std::vector<float>& dst, int bufSize)
 	for (int z = 0; z < bufSize; ++z) {
 		for (int x = 0; x < bufSize; ++x) {
 			if (dst[z*bufSize*bufSize + (bufSize - 1) * bufSize + x] > 0) {
-				logOutOfRange();
+				logOutOfRange2();
 				return;
 			}
 		}
@@ -460,7 +549,7 @@ void checkOutOfRange(std::vector<float>& dst, int bufSize)
 	for (int y = 0; y < bufSize; ++y) {
 		for (int z = 0; z < bufSize; ++z) {
 			if (dst[z*bufSize*bufSize + y * bufSize] > 0) {
-				logOutOfRange();
+				logOutOfRange2();
 				return;
 			}
 		}
@@ -469,7 +558,7 @@ void checkOutOfRange(std::vector<float>& dst, int bufSize)
 	for (int y = 0; y < bufSize; ++y) {
 		for (int z = 0; z < bufSize; ++z) {
 			if (dst[z*bufSize*bufSize + y * bufSize + (bufSize - 1)] > 0) {
-				logOutOfRange();
+				logOutOfRange2();
 				return;
 			}
 		}
@@ -522,7 +611,12 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize, bool isHardBrush,
 		srcBuffers[i] = srcBuffers[0];
 	}
 
-	const int FractalStepNum = 2;                                                                                // const !!!   
+	const int FractalStepNum = 2;                                                              // const !!!   
+	int SmallObjectsInBig[FractalStepNum+1] = {50, 50, 20};                                    // const !!!
+	float newOuterRadiusesMin[FractalStepNum+1] = {8.f, 8.f, 25.f};                            // const !!!
+	float newOuterRadiusesMax[FractalStepNum+1] = { 15.f, 15.f, 35.f };                        // const !!!
+	float densities[FractalStepNum+1] = {0.4f, 0.75f, 1.4f};                                   // const !!!  {0.4f, 0.7f, 1.4f} хорошо, но надо чуть шершавее
+
 	for (int fractalStep = 0; fractalStep < FractalStepNum; ++fractalStep) {
 		// Расчитаем параметры и отрендерим большие объекты из маленьких
 		for (int bufIndex = 0; bufIndex < BuffersNum; ++bufIndex) {
@@ -530,10 +624,10 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize, bool isHardBrush,
 			std::shared_ptr<NodeBranch> pBranch = std::make_shared<NodeBranch>();
 			objects.clear();
 			dstBuffers[bufIndex].reinit(halfSize);
-			const int SmallObjectInBig = 90;                                                                     // const !!!
+			int SmallObjectInBig = SmallObjectsInBig[fractalStep];
 			for (int i = 0; i < SmallObjectInBig; ++i) {
 				int srcBuferIndex = rand(0, BuffersNum - 1);
-				float newOuterRadius = randf(8.f, 25.f);                                                        // const !!!
+				float newOuterRadius = randf(newOuterRadiusesMin[fractalStep], newOuterRadiusesMax[fractalStep]);
 				float innerRadiusOfNewObject = newOuterRadius / srcBuffers[srcBuferIndex].outerRadius * srcBuffers[srcBuferIndex].innerRadius;
 				if (i == 0) {
 					objects.emplace_back(Object3dToPlace(halfSize / 2, halfSize / 2, halfSize / 2, srcBuferIndex, newOuterRadius));
@@ -542,8 +636,7 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize, bool isHardBrush,
 					int newX = 0;
 					int newY = 0;
 					int newZ = 0;
-					float density = fractalStep == 0 ? 0.4f : 0.5f;                                                                 // const !!! 
-					calc3dPosForNewObject(newX, newY, newZ, innerRadiusOfNewObject, density, halfSize);
+					calc3dPosForNewObject(newX, newY, newZ, innerRadiusOfNewObject, densities[fractalStep], halfSize);
 					objects.emplace_back(Object3dToPlace(newX, newY, newZ, srcBuferIndex, newOuterRadius));
 				}
 				renderLast3dObjectToDstBufer(dstBuffers[bufIndex].cells, halfSize);
@@ -554,12 +647,23 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize, bool isHardBrush,
 				saveToBmp("Slices/Buffer0_0.bmp", halfSize, halfSize, [ds = dstBuffers[bufIndex].cells, hs = halfSize](int x, int y) { return (uint8_t)(std::min(ds[(hs - 1 - y) * hs * hs + hs / 2 * hs + x] * 255.f, 255.f)); });
 			if (fractalStep == 0 && bufIndex == 1)
 				saveToBmp("Slices/Buffer0_1.bmp", halfSize, halfSize, [ds = dstBuffers[bufIndex].cells, hs = halfSize](int x, int y) { return (uint8_t)(std::min(ds[(hs - 1 - y) * hs * hs + hs / 2 * hs + x] * 255.f, 255.f)); });
+			if (fractalStep == 0 && bufIndex == 2)
+				saveToBmp("Slices/Buffer0_2.bmp", halfSize, halfSize, [ds = dstBuffers[bufIndex].cells, hs = halfSize](int x, int y) { return (uint8_t)(std::min(ds[(hs - 1 - y) * hs * hs + hs / 2 * hs + x] * 255.f, 255.f)); });
+			if (fractalStep == 0 && bufIndex == 3)
+				saveToBmp("Slices/Buffer0_3.bmp", halfSize, halfSize, [ds = dstBuffers[bufIndex].cells, hs = halfSize](int x, int y) { return (uint8_t)(std::min(ds[(hs - 1 - y) * hs * hs + hs / 2 * hs + x] * 255.f, 255.f)); });
 			if (fractalStep == 1 && bufIndex == 0)
 				saveToBmp("Slices/Buffer1_0.bmp", halfSize, halfSize, [ds = dstBuffers[bufIndex].cells, hs = halfSize](int x, int y) { return (uint8_t)(std::min(ds[(hs - 1 - y) * hs * hs + hs / 2 * hs + x] * 255.f, 255.f)); });
 			if (fractalStep == 1 && bufIndex == 1)
 				saveToBmp("Slices/Buffer1_1.bmp", halfSize, halfSize, [ds = dstBuffers[bufIndex].cells, hs = halfSize](int x, int y) { return (uint8_t)(std::min(ds[(hs - 1 - y) * hs * hs + hs / 2 * hs + x] * 255.f, 255.f)); });
+			if (fractalStep == 1 && bufIndex == 2)
+				saveToBmp("Slices/Buffer1_2.bmp", halfSize, halfSize, [ds = dstBuffers[bufIndex].cells, hs = halfSize](int x, int y) { return (uint8_t)(std::min(ds[(hs - 1 - y) * hs * hs + hs / 2 * hs + x] * 255.f, 255.f)); });
+			if (fractalStep == 1 && bufIndex == 3)
+				saveToBmp("Slices/Buffer1_3.bmp", halfSize, halfSize, [ds = dstBuffers[bufIndex].cells, hs = halfSize](int x, int y) { return (uint8_t)(std::min(ds[(hs - 1 - y) * hs * hs + hs / 2 * hs + x] * 255.f, 255.f)); });
 
 			dstBuffers[bufIndex].fillParameters(pBranch.get());    // Рассчитать параметры сгенерированного изображения, заполнить параметры соответствующей ноды
+			if (fractalStep <= 1 && bufIndex <= 3) {
+				printf("%d %d %f\n", fractalStep, bufIndex, dstBuffers[bufIndex].innerRadius);
+			}
 			dstBuffers[bufIndex].node = pBranch;
 		}
 		// Скопируем выходные буфера во входные
@@ -572,11 +676,11 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize, bool isHardBrush,
 	printf("Final pass\n");
 	objects.clear();
 	dst.resize(fullSize*fullSize*fullSize);
-	const int SmallObjectInBig = 90;                                                                     // const !!!
+	int SmallObjectInBig = SmallObjectsInBig[FractalStepNum];
 	for (int i = 0; i < SmallObjectInBig; ++i) {
 		printf("i = %d\n", i);
 		int srcBuferIndex = rand(0, BuffersNum - 1);
-		float newOuterRadius = randf(15.f, 40.f);                                                        // const !!!
+		float newOuterRadius = randf(newOuterRadiusesMin[FractalStepNum], newOuterRadiusesMax[FractalStepNum]);
 		float innerRadiusOfNewObject = newOuterRadius / srcBuffers[srcBuferIndex].outerRadius * srcBuffers[srcBuferIndex].innerRadius;
 		if (i == 0) {
 			objects.emplace_back(Object3dToPlace(fullSize / 2, fullSize / 2, fullSize / 2, srcBuferIndex, newOuterRadius));
@@ -585,96 +689,23 @@ void generate3dCloudImpl(std::vector<float>& dst, int bufSize, bool isHardBrush,
 			int newX = 0;
 			int newY = 0;
 			int newZ = 0;
-			calc3dPosForNewObject(newX, newY, newZ, innerRadiusOfNewObject, 0.75f, fullSize);                                // const !!! 0.6
+			calc3dPosForNewObject(newX, newY, newZ, innerRadiusOfNewObject, densities[FractalStepNum], fullSize);
 			objects.emplace_back(Object3dToPlace(newX, newY, newZ, srcBuferIndex, newOuterRadius));
 		}
-//		renderLast3dObjectToDstBufer(dst, fullSize);
+		renderLast3dObjectToDstBufer(dst, fullSize);
 		object.childNodes.emplace_back((float)objects.back().x, (float)objects.back().y, (float)objects.back().z, newOuterRadius / srcBuffers[srcBuferIndex].outerRadius, srcBuffers[srcBuferIndex].node);
 	}
 	printf("Final rendering of the cloud...\n");
-	object.generate3dCloud(dst, bufSize, xPos, yPos, zPos, scale, isHardBrush);
+//	object.generate3dCloud(dst, bufSize, xPos, yPos, zPos, scale, isHardBrush);
 	checkOutOfRange(dst, bufSize);
 }
 
-
 //--------------------------------------------------------------------------------------------
-
-void initBlurBuffer(int frqRadius, int maxRadius)
+void renderAndASaveSlices()
 {
-	static float tmpBuffer[BlurBufferSize][BlurBufferSize][BlurBufferSize];
 
-	// Рандромный шум
-	for (int z = 0; z < BlurBufferSize; ++z) {
-		for (int y = 0; y < BlurBufferSize; ++y) {
-			for (int x = 0; x < BlurBufferSize; ++x) {
-				tmpBuffer[x][y][z] = randf(0.f, 1.f);
-			}
-		}
-	}
-
-	// Блур рандомного шума с заданным радиусом
-	int pointsAffected = (frqRadius * 2 + 1) * (frqRadius * 2 + 1) * (frqRadius * 2 + 1);
-	for (int z = frqRadius; z < BlurBufferSize - frqRadius; ++z) {
-		for (int y = frqRadius; y < BlurBufferSize - frqRadius; ++y) {
-			for (int x = frqRadius; x < BlurBufferSize - frqRadius; ++x) {
-				float sum = 0;
-				for (int z2 = z - frqRadius; z2 <= z + frqRadius; ++z2) {
-					for (int y2 = y - frqRadius; y2 <= y + frqRadius; ++y2) {
-						for (int x2 = x - frqRadius; x2 <= x + frqRadius; ++x2) {
-							sum += tmpBuffer[x2][y2][z2];
-						}
-					}
-				}
-				blurRadiuses[x][y][z] = sum / pointsAffected;
-			}
-		}
-	}
-
-	// Нормирование на заданную амплитуду. Сначала поиск максимума
-	float maxVal = 0;
-	for (int z = 0; z < BlurBufferSize; ++z) {
-		for (int y = 0; y < BlurBufferSize; ++y) {
-			for (int x = 0; x < BlurBufferSize; ++x) {
-				if (blurRadiuses[x][y][z] > maxVal) {
-					maxVal = blurRadiuses[x][y][z];
-				}
-			}
-		}
-	}
-	for (int z = 0; z < BlurBufferSize; ++z) {
-		for (int y = 0; y < BlurBufferSize; ++y) {
-			for (int x = 0; x < BlurBufferSize; ++x) {
-				float val = blurRadiuses[x][y][z] / maxVal * (maxRadius + 0.99f);
-				blurRadiuses[x][y][z] = val;
-			}
-		}
-	}
 }
 
-//--------------------------------------------------------------------------------------------
-
-void blurGeneratedCloud(std::vector<float>& dst, int bufSize, int maxRadius)
-{
-	std::vector<float> tmpBuf = dst;
-
-	for (int z = maxRadius; z < bufSize - maxRadius; ++z) {
-		for (int y = maxRadius; y < bufSize - maxRadius; ++y) {
-			for (int x = maxRadius; x < bufSize - maxRadius; ++x) {
-				int radius = (int)blurRadiuses[x*BlurBufferSize/bufSize][y*BlurBufferSize/bufSize][z*BlurBufferSize/bufSize];
-				int pointsAffected = (radius * 2 + 1) * (radius * 2 + 1) * (radius * 2 + 1);
-				float sum = 0;
-				for (int z2 = z - radius; z2 <= z + radius; ++z2) {
-					for (int y2 = y - radius; y2 <= y + radius; ++y2) {
-						for (int x2 = x - radius; x2 <= x + radius; ++x2) {
-							sum += tmpBuf[z2*bufSize*bufSize + y2*bufSize + x2];
-						}
-					}
-				}
-				dst[z*bufSize*bufSize + y*bufSize + x] = sum / pointsAffected;
-			}
-		}
-	}
-}
 
 //--------------------------------------------------------------------------------------------
 
