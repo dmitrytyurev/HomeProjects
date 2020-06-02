@@ -1,5 +1,6 @@
 #include "pch.h"
 #include <stdarg.h>
+#include <string>
 #include <algorithm>
 
 //--------------------------------------------------------------------------------------------
@@ -16,4 +17,12 @@ void _cdecl exit_msg(const char *text, ...)
 	exit(1);
 }
 
+//--------------------------------------------------------------------------------------------
+
+void log(const std::string& str)
+{
+	FILE* f = fopen("Error.txt", "at");
+	fprintf(f, str.c_str());
+	fclose(f);
+}
 

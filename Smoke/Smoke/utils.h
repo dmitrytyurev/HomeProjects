@@ -80,5 +80,7 @@ inline std::string digit5intFormat(int n)
 	return number;
 }
 
+//--------------------------------------------------------------------------------------------
 
+void log(const std::string& str);
 

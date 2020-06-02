@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include <iostream>
 #include <vector>
+#include <string>
 #include <functional>
 #include <stdarg.h>
 #include <algorithm>
@@ -18,7 +19,6 @@ void saveToBmp(const std::string& fileName, int sizeX, int sizeY, std::function<
 //--------------------------------------------------------------------------------------------
 
 const int BuffersNum = 10;
-const int BlurBufferSize = 100;
 
 //--------------------------------------------------------------------------------------------
 // Структуры
@@ -66,105 +66,6 @@ int halfSize = 0;
 static Buffer3D srcBuffers[BuffersNum];
 static Buffer3D dstBuffers[BuffersNum];
 static std::vector<Object3dToPlace> objects;
-float blurRadiuses[BlurBufferSize][BlurBufferSize][BlurBufferSize]; // Коэффициент разблуривания (пересчитывается в радиус разблуривания в каждой точке)
-
-//--------------------------------------------------------------------------------------------
-
-void logOutOfRange()
-{
-	FILE* f = fopen("Error.txt", "at");
-	fprintf(f, "Out of range!\n");
-	fclose(f);
-}
-
-//--------------------------------------------------------------------------------------------
-
-void logOutOfRange2()
-{
-	FILE* f = fopen("Error.txt", "at");
-	fprintf(f, "Out of range the whole!\n");
-	fclose(f);
-}
-
-
-//--------------------------------------------------------------------------------------------
-
-void initBlurBuffer(int frqRadius, int maxRadius)
-{
-	static float tmpBuffer[BlurBufferSize][BlurBufferSize][BlurBufferSize];
-
-	// Рандромный шум
-	for (int z = 0; z < BlurBufferSize; ++z) {
-		for (int y = 0; y < BlurBufferSize; ++y) {
-			for (int x = 0; x < BlurBufferSize; ++x) {
-				tmpBuffer[x][y][z] = randf(0.f, 1.f);
-			}
-		}
-	}
-
-	// Блур рандомного шума с заданным радиусом
-	int pointsAffected = (frqRadius * 2 + 1) * (frqRadius * 2 + 1) * (frqRadius * 2 + 1);
-	for (int z = frqRadius; z < BlurBufferSize - frqRadius; ++z) {
-		for (int y = frqRadius; y < BlurBufferSize - frqRadius; ++y) {
-			for (int x = frqRadius; x < BlurBufferSize - frqRadius; ++x) {
-				float sum = 0;
-				for (int z2 = z - frqRadius; z2 <= z + frqRadius; ++z2) {
-					for (int y2 = y - frqRadius; y2 <= y + frqRadius; ++y2) {
-						for (int x2 = x - frqRadius; x2 <= x + frqRadius; ++x2) {
-							sum += tmpBuffer[x2][y2][z2];
-						}
-					}
-				}
-				blurRadiuses[x][y][z] = sum / pointsAffected;
-			}
-		}
-	}
-
-	// Нормирование на заданную амплитуду. Сначала поиск максимума
-	float maxVal = 0;
-	for (int z = 0; z < BlurBufferSize; ++z) {
-		for (int y = 0; y < BlurBufferSize; ++y) {
-			for (int x = 0; x < BlurBufferSize; ++x) {
-				if (blurRadiuses[x][y][z] > maxVal) {
-					maxVal = blurRadiuses[x][y][z];
-				}
-			}
-		}
-	}
-	for (int z = 0; z < BlurBufferSize; ++z) {
-		for (int y = 0; y < BlurBufferSize; ++y) {
-			for (int x = 0; x < BlurBufferSize; ++x) {
-				float val = blurRadiuses[x][y][z] / maxVal * (maxRadius + 0.99f);
-				blurRadiuses[x][y][z] = val;
-			}
-		}
-	}
-}
-
-//--------------------------------------------------------------------------------------------
-
-void blurGeneratedCloud(std::vector<float>& dst, int bufSize, int maxRadius)
-{
-	std::vector<float> tmpBuf = dst;
-
-	for (int z = maxRadius; z < bufSize - maxRadius; ++z) {
-		for (int y = maxRadius; y < bufSize - maxRadius; ++y) {
-			for (int x = maxRadius; x < bufSize - maxRadius; ++x) {
-				int radius = (int)blurRadiuses[x*BlurBufferSize / bufSize][y*BlurBufferSize / bufSize][z*BlurBufferSize / bufSize];
-				int pointsAffected = (radius * 2 + 1) * (radius * 2 + 1) * (radius * 2 + 1);
-				float sum = 0;
-				for (int z2 = z - radius; z2 <= z + radius; ++z2) {
-					for (int y2 = y - radius; y2 <= y + radius; ++y2) {
-						for (int x2 = x - radius; x2 <= x + radius; ++x2) {
-							sum += tmpBuf[z2*bufSize*bufSize + y2 * bufSize + x2];
-						}
-					}
-				}
-				dst[z*bufSize*bufSize + y * bufSize + x] = sum / pointsAffected;
-			}
-		}
-	}
-}
 
 //--------------------------------------------------------------------------------------------
 
@@ -299,7 +200,7 @@ m5:	for (int x = halfSize - 1; x >= 0; --x) {
 m6:	
 	if (x1 == 0 || x2 == halfSize - 1 || y1 == 0 || y2 == halfSize - 1)
 	{
-		logOutOfRange();
+		log("Out of range!\n");
 	}
 	
 	centerX = (x1 + x2) / 2;
@@ -513,7 +414,7 @@ void checkOutOfRange(std::vector<float>& dst, int bufSize)
 	for (int y = 0; y < bufSize; ++y) {
 		for (int x = 0; x < bufSize; ++x) {
 			if (dst[y * bufSize + x] > 0) {
-				logOutOfRange2();
+				log("Out of range the whole!\n");
 				return;
 			}
 		}
@@ -522,7 +423,7 @@ void checkOutOfRange(std::vector<float>& dst, int bufSize)
 	for (int y = 0; y < bufSize; ++y) {
 		for (int x = 0; x < bufSize; ++x) {
 			if (dst[(bufSize - 1)*bufSize*bufSize + y * bufSize + x] > 0) {
-				logOutOfRange2();
+				log("Out of range the whole!\n");
 				return;
 			}
 		}
@@ -531,7 +432,7 @@ void checkOutOfRange(std::vector<float>& dst, int bufSize)
 	for (int z = 0; z < bufSize; ++z) {
 		for (int x = 0; x < bufSize; ++x) {
 			if (dst[z*bufSize*bufSize + x] > 0) {
-				logOutOfRange2();
+				log("Out of range the whole!\n");
 				return;
 			}
 		}
@@ -540,7 +441,7 @@ void checkOutOfRange(std::vector<float>& dst, int bufSize)
 	for (int z = 0; z < bufSize; ++z) {
 		for (int x = 0; x < bufSize; ++x) {
 			if (dst[z*bufSize*bufSize + (bufSize - 1) * bufSize + x] > 0) {
-				logOutOfRange2();
+				log("Out of range the whole!\n");
 				return;
 			}
 		}
@@ -549,7 +450,7 @@ void checkOutOfRange(std::vector<float>& dst, int bufSize)
 	for (int y = 0; y < bufSize; ++y) {
 		for (int z = 0; z < bufSize; ++z) {
 			if (dst[z*bufSize*bufSize + y * bufSize] > 0) {
-				logOutOfRange2();
+				log("Out of range the whole!\n");
 				return;
 			}
 		}
@@ -558,7 +459,7 @@ void checkOutOfRange(std::vector<float>& dst, int bufSize)
 	for (int y = 0; y < bufSize; ++y) {
 		for (int z = 0; z < bufSize; ++z) {
 			if (dst[z*bufSize*bufSize + y * bufSize + (bufSize - 1)] > 0) {
-				logOutOfRange2();
+				log("Out of range the whole!\n");
 				return;
 			}
 		}
@@ -616,6 +517,7 @@ void generate3dCloudImpl(NodeBranch& object, std::vector<float>& dst, int bufSiz
 	float densities[FractalStepNum+1] = {0.4f, 0.75f, 1.4f};                                   // const !!!  {0.4f, 0.7f, 1.4f} хорошо, но надо чуть шершавее
 
 	for (int fractalStep = 0; fractalStep < FractalStepNum; ++fractalStep) {
+		log("fractalStep: " + std::to_string(fractalStep) + "\n");
 		// Расчитаем параметры и отрендерим большие объекты из маленьких
 		for (int bufIndex = 0; bufIndex < BuffersNum; ++bufIndex) {
 			printf("bufIndex=%d, fractalStep=%d\n", bufIndex, fractalStep);
@@ -687,11 +589,11 @@ void generate3dCloudImpl(NodeBranch& object, std::vector<float>& dst, int bufSiz
 			calc3dPosForNewObject(newX, newY, newZ, innerRadiusOfNewObject, densities[FractalStepNum], fullSize);
 			objects.emplace_back(Object3dToPlace(newX, newY, newZ, srcBuferIndex, newOuterRadius));
 		}
-		renderLast3dObjectToDstBufer(dst, fullSize);
+//		renderLast3dObjectToDstBufer(dst, fullSize);
 		object.childNodes.emplace_back((float)objects.back().x, (float)objects.back().y, (float)objects.back().z, newOuterRadius / srcBuffers[srcBuferIndex].outerRadius, srcBuffers[srcBuferIndex].node);
 	}
 	printf("Final rendering of the cloud...\n");
-//	object.generate3dCloud(dst, bufSize, xPos, yPos, zPos, scale, isHardBrush);
+	object.generate3dCloud(dst, bufSize, xPos, yPos, zPos, scale, isHardBrush);
 	checkOutOfRange(dst, bufSize);
 }
 
@@ -704,24 +606,15 @@ void renderAndASaveSlices()
 
 //--------------------------------------------------------------------------------------------
 
-void generate3dCloud(int randSeed, bool isHardBrush, int bufSize, float xPos, float yPos, float zPos, float scale, int frqRadius, int maxRadius)
+void generate3dCloud(int randSeed, bool isHardBrush, int bufSize, float xPos, float yPos, float zPos, float scale)
 {
-	FILE* f = fopen("Error.txt", "at");
-	fprintf(f, "Start generating with seed: %d\n", randSeed);
-	fclose(f);
-
+	log("Start generating\n");
 	srand(randSeed);
 
 	std::vector<float> dst;
 	NodeBranch object;
 	generate3dCloudImpl(object, dst, bufSize, isHardBrush, xPos, yPos, zPos, scale);
 	object.serializeAll(std::string("ObjectsVector/Object") + digit5intFormat(randSeed) + ".ove");
-
-	// Блурим сгенерённое облако в соответствии с параметрами блура
-	if (maxRadius > 0) {
-		initBlurBuffer(frqRadius, maxRadius);
-		blurGeneratedCloud(dst, bufSize, maxRadius);
-	}
 
 	int sliceY = 3 * bufSize / 10;
 	saveToBmp("Slices/3dCloudSlice_0.bmp", bufSize, bufSize, [dst, sliceY, bufSize](int x, int y) { return (uint8_t)(std::min(dst[(bufSize - 1 - y) * bufSize * bufSize + sliceY * bufSize + x] * 255.f, 255.f)); });
@@ -735,10 +628,6 @@ void generate3dCloud(int randSeed, bool isHardBrush, int bufSize, float xPos, fl
 	saveToBmp("Slices/3dCloudSlice_4.bmp", bufSize, bufSize, [dst, sliceY, bufSize](int x, int y) { return (uint8_t)(std::min(dst[(bufSize - 1 - y) * bufSize * bufSize + sliceY * bufSize + x] * 255.f, 255.f)); });
 
 	saveCloud(std::string("Objects/") + digit5intFormat(randSeed) + ".bin", dst, bufSize);
+	saveCloud("Cloud.bin", dst, bufSize);
 }
 
-/*
-- добавить в generate3dCloud параметры блура (делается постэффектом. сначала куб 50х50 заполняется шумом, блурится с неким радиусом (параметр), нормируется и умножается на амплитуду (параметр) затем значения в нём используются, как радиус блура готового облака)
-
-
-*/

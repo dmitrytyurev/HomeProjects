@@ -9,7 +9,7 @@
 #include <time.h>
 
 //--------------------------------------------------------------------------------------------
-void generate3dCloud(int randSeed, bool isHardBrush, int size, float xPos, float yPos, float zPos, float scale, int frqRadius, int maxRadius);
+void generate3dCloud(int randSeed, bool isHardBrush, int size, float xPos, float yPos, float zPos, float scale);
 void load3dCloud(const std::string& fname, std::vector<float>& dst, int size);
 
 //--------------------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ const int ScreenSize = 400; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -200; // Позиция камеры по z в системе координат сетки
 const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана  0.00002;
-const int SceneDrawNum = 600; // Сколько раз рендерим сцену
+const int SceneDrawNum = 500; // Сколько раз рендерим сцену
 
 
 
@@ -615,7 +615,7 @@ void render3dScene(int randSeedForLog)
 void RenderRandom(bool isHardBrush)
 {
 	for (int i = 0; i < 1000; ++i) {
-		generate3dCloud(i, isHardBrush, SceneSize, SceneSize/2, SceneSize/2, SceneSize/2, 1.f, 0, 0);
+		generate3dCloud(i, isHardBrush, SceneSize, SceneSize/2, SceneSize/2, SceneSize/2, 1.f);
 		render3dScene(i);
 	}
 }
@@ -625,15 +625,15 @@ void RenderRandom(bool isHardBrush)
 
 int main()
 {
-	RenderRandom(true);
+	RenderRandom(false);
 
-	//generate3dCloud(1, true, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f, 0, 0);
+	//generate3dCloud(0, false, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f);
 	//render3dScene(1);
 
-	//generate3dCloud(7, true, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f, 0, 0);
+	//generate3dCloud(7, true, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f);
 	//render3dScene(7);
 
-	//generate3dCloud(9, true, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f, 0, 0);
+	//generate3dCloud(9, true, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f);
 	//render3dScene(9);
 }
 
