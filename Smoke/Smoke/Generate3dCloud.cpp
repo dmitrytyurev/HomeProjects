@@ -468,7 +468,7 @@ void checkOutOfRange(std::vector<float>& dst, int bufSize)
 
 //--------------------------------------------------------------------------------------------
 
-void generate3dCloudImpl(NodeBranch& object, std::vector<float>& dst, int bufSize, bool isHardBrush, float xPos, float yPos, float zPos, float scale)
+void generate3dCloudImpl(NodeBranch& object, int bufSize, bool isHardBrush, float xPos, float yPos, float zPos, float scale)
 {
 	fullSize = bufSize;
 	halfSize = bufSize / 2;
@@ -511,10 +511,10 @@ void generate3dCloudImpl(NodeBranch& object, std::vector<float>& dst, int bufSiz
 	}
 
 	const int FractalStepNum = 2;                                                              // const !!!   
-	int SmallObjectsInBig[FractalStepNum+1] = {50, 50, 20};                                    // const !!!
-	float newOuterRadiusesMin[FractalStepNum+1] = {8.f, 8.f, 25.f};                            // const !!!
-	float newOuterRadiusesMax[FractalStepNum+1] = { 15.f, 15.f, 35.f };                        // const !!!
-	float densities[FractalStepNum+1] = {0.4f, 0.75f, 1.4f};                                   // const !!!  {0.4f, 0.7f, 1.4f} хорошо, но надо чуть шершавее
+	int SmallObjectsInBig[FractalStepNum + 1] = { 50, 50, 20 };                                    // const !!!
+	float newOuterRadiusesMin[FractalStepNum + 1] = { 8.f, 8.f, 25.f };                            // const !!!
+	float newOuterRadiusesMax[FractalStepNum + 1] = { 15.f, 15.f, 35.f };                        // const !!!
+	float densities[FractalStepNum + 1] = { 0.4f, 0.75f, 1.4f };                                   // const !!!  {0.4f, 0.7f, 1.4f} хорошо, но надо чуть шершавее
 
 	for (int fractalStep = 0; fractalStep < FractalStepNum; ++fractalStep) {
 		log("fractalStep: " + std::to_string(fractalStep) + "\n");
@@ -572,7 +572,6 @@ void generate3dCloudImpl(NodeBranch& object, std::vector<float>& dst, int bufSiz
 	// Расчитаем параметры и отрендерим большие объекты из маленьких
 	printf("Final pass\n");
 	objects.clear();
-	dst.resize(fullSize*fullSize*fullSize);
 	int SmallObjectInBig = SmallObjectsInBig[FractalStepNum];
 	for (int i = 0; i < SmallObjectInBig; ++i) {
 		printf("i = %d\n", i);
@@ -592,9 +591,6 @@ void generate3dCloudImpl(NodeBranch& object, std::vector<float>& dst, int bufSiz
 //		renderLast3dObjectToDstBufer(dst, fullSize);
 		object.childNodes.emplace_back((float)objects.back().x, (float)objects.back().y, (float)objects.back().z, newOuterRadius / srcBuffers[srcBuferIndex].outerRadius, srcBuffers[srcBuferIndex].node);
 	}
-	printf("Final rendering of the cloud...\n");
-	object.generate3dCloud(dst, bufSize, xPos, yPos, zPos, scale, isHardBrush);
-	checkOutOfRange(dst, bufSize);
 }
 
 //--------------------------------------------------------------------------------------------
@@ -603,7 +599,6 @@ void renderAndASaveSlices()
 
 }
 
-
 //--------------------------------------------------------------------------------------------
 
 void generate3dCloud(int randSeed, bool isHardBrush, int bufSize, float xPos, float yPos, float zPos, float scale)
@@ -611,10 +606,18 @@ void generate3dCloud(int randSeed, bool isHardBrush, int bufSize, float xPos, fl
 	log("Start generating\n");
 	srand(randSeed);
 
-	std::vector<float> dst;
 	NodeBranch object;
-	generate3dCloudImpl(object, dst, bufSize, isHardBrush, xPos, yPos, zPos, scale);
-	object.serializeAll(std::string("ObjectsVector/Object") + digit5intFormat(randSeed) + ".ove");
+
+generate3dCloudImpl(object, bufSize, isHardBrush, xPos, yPos, zPos, scale);
+object.serializeAll(std::string("ObjectsVector/Object") + digit5intFormat(randSeed) + ".ove");
+
+//object.deserializeAll(std::string("ObjectsVector/Object") + digit5intFormat(randSeed) + ".ove");
+
+	printf("Rasterizing the cloud...\n");
+	std::vector<float> dst;
+	dst.resize(fullSize*fullSize*fullSize);
+	object.generate3dCloud(dst, bufSize, xPos, yPos, zPos, scale, isHardBrush);
+	checkOutOfRange(dst, bufSize);
 
 	int sliceY = 3 * bufSize / 10;
 	saveToBmp("Slices/3dCloudSlice_0.bmp", bufSize, bufSize, [dst, sliceY, bufSize](int x, int y) { return (uint8_t)(std::min(dst[(bufSize - 1 - y) * bufSize * bufSize + sliceY * bufSize + x] * 255.f, 255.f)); });

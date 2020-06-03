@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "functional"
 #include <time.h>
+#include "Nodes.h"
 
 //--------------------------------------------------------------------------------------------
 void generate3dCloud(int randSeed, bool isHardBrush, int size, float xPos, float yPos, float zPos, float scale);
@@ -21,7 +22,7 @@ const int ScreenSize = 400; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -200; // Позиция камеры по z в системе координат сетки
 const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана  0.00002;
-const int SceneDrawNum = 500; // Сколько раз рендерим сцену
+const int SceneDrawNum = 400; // Сколько раз рендерим сцену
 
 
 
@@ -592,17 +593,10 @@ void render3dScene(int randSeedForLog)
 		printf("Rendernig frame %d of %d\n", n, SceneDrawNum);
 		renderScene(0, 0, ScreenSize, ScreenSize, n, ScreenSize);
 
-		//if ((n % 50) == 0 || n == SceneDrawNum-1) {
-		//	char number[6];
-		//	number[0] = (n % 100000) / 10000 + '0';
-		//	number[1] = (n % 10000) / 1000 + '0';
-		//	number[2] = (n % 1000) / 100 + '0';
-		//	number[3] = (n % 100) / 10 + '0';
-		//	number[4] = (n % 10) + '0';
-		//	number[5] = 0;
-		//	std::string fname = std::string("Scenes/3dScene_Cloud") + (const char*)number + ".bmp";
-		//	saveToBmp(fname, ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
-		//}
+		if ((n % 50) == 0 || n == SceneDrawNum-1) {
+			std::string fname = std::string("Scenes/3dScene_Cloud") + digit5intFormat(n) + ".bmp";
+			saveToBmp(fname, ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
+		}
 	}
 
 	std::string fname = std::string("Scenes/3dScene_Cloud_Rand") + digit5intFormat(randSeedForLog) + ".bmp";
@@ -622,10 +616,9 @@ void RenderRandom(bool isHardBrush)
 
 //--------------------------------------------------------------------------------------------
 
-
 int main()
 {
-	RenderRandom(false);
+	RenderRandom(false);                                                                                        // !!! const
 
 	//generate3dCloud(0, false, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f);
 	//render3dScene(1);

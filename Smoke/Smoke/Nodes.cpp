@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <map>
 #include "Nodes.h"
 #include "utils.h"
 //--------------------------------------------------------------------------------------------
@@ -72,13 +73,86 @@ void NodeBranch::serializeAll(const std::string& fileName)
 {
 	std::vector<NodeBase*> serialized;
 
-	FILE* f = fopen(fileName.c_str(), "wt");
+	FILE* f = fopen(fileName.c_str(), "wb");
+	if (f == nullptr) {
+		exit_msg("Error creating file: %s", fileName.c_str());
+	}
 	serializeNode(f, [&serialized](NodeBase* pNodeBase) {  
 		bool isSerialized = std::find(serialized.begin(), serialized.end(), pNodeBase) != serialized.end(); 
 		serialized.push_back(pNodeBase);  
 		return isSerialized;  
 	});
 	fclose(f);
+}
+
+//--------------------------------------------------------------------------------------------
+
+void NodeBranch::deserializeAll(const std::string& fileName)
+{
+	MapRef nodeMap;  // Соответствие между id ноды и её shared_ptr
+
+	FILE* f = fopen(fileName.c_str(), "rb");
+	if (f == nullptr) {
+		exit_msg("Error openinging file: %s", fileName.c_str());
+	}
+	uint64_t id = 0;
+	fread(&id, sizeof(uint64_t), 1, f);
+	int type = 0;
+	fread(&type, sizeof(int), 1, f);
+	deserializeNode(f, nodeMap);
+	fclose(f);
+}
+
+//--------------------------------------------------------------------------------------------
+
+void NodeBranch::deserializeNode(FILE* f, MapRef& mapRef)
+{
+	deserializeBase(f);
+	int childNodesNum = 0;
+	fread(&childNodesNum, sizeof(int), 1, f);
+	for (int i=0; i< childNodesNum; ++i) {
+		childNodes.push_back(NodeRef());
+		childNodes.back().deserialize(f);
+	}
+
+	while (true)
+	{
+		bool isUnfilled = false;
+		for (auto& childRef : childNodes) {
+			if (!childRef.childNode) {
+				if (mapRef.find(childRef.tmpNodeId) == mapRef.end()) {
+					isUnfilled = true;
+				}
+				else {
+					childRef.childNode = mapRef[childRef.tmpNodeId];
+				}
+			}
+		}
+		if (!isUnfilled) {
+			return;
+		}
+		uint64_t id = 0;
+		fread(&id, sizeof(uint64_t), 1, f);
+		int type = 0;
+		fread(&type, sizeof(int), 1, f);
+		if (type == 0) {
+			std::shared_ptr<NodeBranch> nb = std::make_shared<NodeBranch>();
+			mapRef.insert(std::pair<uint64_t, std::shared_ptr<NodeBase>>(id, nb));
+			nb->deserializeNode(f, mapRef);
+		}
+		else {
+			std::shared_ptr<NodeLeaf> nl = std::make_shared<NodeLeaf>();
+			mapRef.insert(std::pair<uint64_t, std::shared_ptr<NodeBase>>(id, nl));
+			nl->deserializeNode(f);
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+void NodeLeaf::deserializeNode(FILE* f)
+{
+	deserializeBase(f);
 }
 
 //--------------------------------------------------------------------------------------------
@@ -99,6 +173,21 @@ void NodeBase::serializeBase(FILE* f)
 
 //--------------------------------------------------------------------------------------------
 
+void NodeBase::deserializeBase(FILE* f)
+{
+	fread(&xCenter, sizeof(float), 1, f);
+	fread(&yCenter, sizeof(float), 1, f);
+	fread(&zCenter, sizeof(float), 1, f);
+	fread(&bboxX1, sizeof(float), 1, f);
+	fread(&bboxY1, sizeof(float), 1, f);
+	fread(&bboxZ1, sizeof(float), 1, f);
+	fread(&bboxX2, sizeof(float), 1, f);
+	fread(&bboxY2, sizeof(float), 1, f);
+	fread(&bboxZ2, sizeof(float), 1, f);
+}
+
+//--------------------------------------------------------------------------------------------
+
 void NodeRef::serialize(FILE* f) const
 {
 	fwrite(&xPos, sizeof(float), 1, f);
@@ -112,7 +201,20 @@ void NodeRef::serialize(FILE* f) const
 	uint64_t nodeId = (uint64_t)childNode.get();
 	fwrite(&nodeId, sizeof(uint64_t), 1, f);
 }
+//--------------------------------------------------------------------------------------------
 
+void NodeRef::deserialize(FILE* f)
+{
+	fread(&xPos, sizeof(float), 1, f);
+	fread(&yPos, sizeof(float), 1, f);
+	fread(&zPos, sizeof(float), 1, f);
+	fread(&scale, sizeof(float), 1, f);
+	fread(&r, sizeof(int), 1, f);
+	fread(&g, sizeof(int), 1, f);
+	fread(&b, sizeof(int), 1, f);
+	fread(&a, sizeof(int), 1, f);
+	fread(&tmpNodeId, sizeof(uint64_t), 1, f);
+}
 
 //--------------------------------------------------------------------------------------------
 
@@ -123,6 +225,8 @@ void NodeBranch::serializeNode(FILE* f, const std::function<bool(NodeBase*)>& is
 	}
 	uint64_t nodeId = (uint64_t)this;
 	fwrite(&nodeId, sizeof(uint64_t), 1, f);
+	int type = 0;
+	fwrite(&type, sizeof(int), 1, f);
 	serializeBase(f);
 	int childNodesNum = (int)childNodes.size();
 	fwrite(&childNodesNum, sizeof(int), 1, f);
@@ -143,8 +247,8 @@ void NodeLeaf::serializeNode(FILE* f, const std::function<bool(NodeBase*)>& isSe
 	}
 	uint64_t nodeId = (uint64_t)this;
 	fwrite(&nodeId, sizeof(uint64_t), 1, f);
+	int type = 1;
+	fwrite(&type, sizeof(int), 1, f);
 	serializeBase(f);
-	int childNodesNum = 0;
-	fwrite(&childNodesNum, sizeof(int), 1, f);
 }
 

@@ -529,6 +529,72 @@ void blurGeneratedCloud(std::vector<float>& dst, int bufSize, int maxRadius)
 
 
 
+//--------------------------------------------------------------------------------------------
+void testSer1()
+{
+	std::shared_ptr<NodeBranch> p101 = std::make_shared<NodeBranch>(NodeBranch());
+	std::shared_ptr<NodeBranch> p102 = std::make_shared<NodeBranch>(NodeBranch());
+	std::shared_ptr<NodeBranch> p103 = std::make_shared<NodeBranch>(NodeBranch());
+	std::shared_ptr<NodeLeaf> p100 = std::make_shared<NodeLeaf>(NodeLeaf());
+	
+	p101->childNodes.push_back(NodeRef());
+	p101->childNodes.back().childNode = std::shared_ptr<NodeBase>(p100);
+	
+	p102->childNodes.push_back(NodeRef());
+	p102->childNodes.back().childNode = std::shared_ptr<NodeBase>(p100);
+
+	p103->childNodes.push_back(NodeRef());
+	p103->childNodes.back().childNode = std::shared_ptr<NodeBase>(p101);
+	p103->childNodes.push_back(NodeRef());
+	p103->childNodes.back().childNode = std::shared_ptr<NodeBase>(p102);
+
+	p103->serializeAll("test.ove");
+}
+
+//--------------------------------------------------------------------------------------------
+void testSer2()
+{
+	std::shared_ptr<NodeLeaf> p105 = std::make_shared<NodeLeaf>(NodeLeaf());
+
+	std::shared_ptr<NodeBranch> p100 = std::make_shared<NodeBranch>(NodeBranch());
+	std::shared_ptr<NodeBranch> p101 = std::make_shared<NodeBranch>(NodeBranch());
+	std::shared_ptr<NodeBranch> p102 = std::make_shared<NodeBranch>(NodeBranch());
+	std::shared_ptr<NodeBranch> p103 = std::make_shared<NodeBranch>(NodeBranch());
+	std::shared_ptr<NodeBranch> p104 = std::make_shared<NodeBranch>(NodeBranch());
+
+	p103->childNodes.push_back(NodeRef());
+	p103->childNodes.back().childNode = std::shared_ptr<NodeBase>(p105);
+
+	p104->childNodes.push_back(NodeRef());
+	p104->childNodes.back().childNode = std::shared_ptr<NodeBase>(p105);
+
+	p101->childNodes.push_back(NodeRef());
+	p101->childNodes.back().childNode = std::shared_ptr<NodeBase>(p103);
+	p100->childNodes.push_back(NodeRef());
+	p101->childNodes.back().childNode = std::shared_ptr<NodeBase>(p104);
+
+	p102->childNodes.push_back(NodeRef());
+	p102->childNodes.back().childNode = std::shared_ptr<NodeBase>(p103);
+	p100->childNodes.push_back(NodeRef());
+	p102->childNodes.back().childNode = std::shared_ptr<NodeBase>(p104);
+
+	p100->childNodes.push_back(NodeRef());
+	p100->childNodes.back().childNode = std::shared_ptr<NodeBase>(p101);
+	p100->childNodes.push_back(NodeRef());
+	p100->childNodes.back().childNode = std::shared_ptr<NodeBase>(p102);
+
+	p100->serializeAll("test.ove");
+}
+
+//--------------------------------------------------------------------------------------------
+void testDeser()
+{
+	NodeBranch object;
+	object.deserializeAll("test.ove");
+}
+
+//--------------------------------------------------------------------------------------------
+
 
 
 
