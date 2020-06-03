@@ -468,7 +468,7 @@ void checkOutOfRange(std::vector<float>& dst, int bufSize)
 
 //--------------------------------------------------------------------------------------------
 
-void generate3dCloudImpl(NodeBranch& object, int bufSize, bool isHardBrush, float xPos, float yPos, float zPos, float scale)
+void generate3dCloudImpl(std::vector<float>& dst, NodeBranch& object, int bufSize, bool isHardBrush, float brushCoeff, float xPos, float yPos, float zPos, float scale)
 {
 	fullSize = bufSize;
 	halfSize = bufSize / 2;
@@ -494,7 +494,7 @@ void generate3dCloudImpl(NodeBranch& object, int bufSize, bool isHardBrush, floa
 						srcBuffers[0].cells[z*halfSize*halfSize + y * halfSize + x] = 1.f;
 					}
 					else {
-						srcBuffers[0].cells[z*halfSize*halfSize + y * halfSize + x] = (cos(ratio * PI) + 1) * 0.5f*0.04f;                                // const !!!
+						srcBuffers[0].cells[z*halfSize*halfSize + y * halfSize + x] = (cos(ratio * PI) + 1) * 0.5f * brushCoeff;
 					}
 				}
 			}
@@ -588,37 +588,16 @@ void generate3dCloudImpl(NodeBranch& object, int bufSize, bool isHardBrush, floa
 			calc3dPosForNewObject(newX, newY, newZ, innerRadiusOfNewObject, densities[FractalStepNum], fullSize);
 			objects.emplace_back(Object3dToPlace(newX, newY, newZ, srcBuferIndex, newOuterRadius));
 		}
-//		renderLast3dObjectToDstBufer(dst, fullSize);
+#if OLD_CLOUD_RENDER
+		renderLast3dObjectToDstBufer(dst, fullSize);
+#endif
 		object.childNodes.emplace_back((float)objects.back().x, (float)objects.back().y, (float)objects.back().z, newOuterRadius / srcBuffers[srcBuferIndex].outerRadius, srcBuffers[srcBuferIndex].node);
 	}
 }
 
 //--------------------------------------------------------------------------------------------
-void renderAndASaveSlices()
+void saveSlices(std::vector<float>& dst, int bufSize)
 {
-
-}
-
-//--------------------------------------------------------------------------------------------
-
-void generate3dCloud(int randSeed, bool isHardBrush, int bufSize, float xPos, float yPos, float zPos, float scale)
-{
-	log("Start generating\n");
-	srand(randSeed);
-
-	NodeBranch object;
-
-generate3dCloudImpl(object, bufSize, isHardBrush, xPos, yPos, zPos, scale);
-object.serializeAll(std::string("ObjectsVector/Object") + digit5intFormat(randSeed) + ".ove");
-
-//object.deserializeAll(std::string("ObjectsVector/Object") + digit5intFormat(randSeed) + ".ove");
-
-	printf("Rasterizing the cloud...\n");
-	std::vector<float> dst;
-	dst.resize(fullSize*fullSize*fullSize);
-	object.generate3dCloud(dst, bufSize, xPos, yPos, zPos, scale, isHardBrush);
-	checkOutOfRange(dst, bufSize);
-
 	int sliceY = 3 * bufSize / 10;
 	saveToBmp("Slices/3dCloudSlice_0.bmp", bufSize, bufSize, [dst, sliceY, bufSize](int x, int y) { return (uint8_t)(std::min(dst[(bufSize - 1 - y) * bufSize * bufSize + sliceY * bufSize + x] * 255.f, 255.f)); });
 	sliceY = 4 * bufSize / 10;
@@ -629,7 +608,33 @@ object.serializeAll(std::string("ObjectsVector/Object") + digit5intFormat(randSe
 	saveToBmp("Slices/3dCloudSlice_3.bmp", bufSize, bufSize, [dst, sliceY, bufSize](int x, int y) { return (uint8_t)(std::min(dst[(bufSize - 1 - y) * bufSize * bufSize + sliceY * bufSize + x] * 255.f, 255.f)); });
 	sliceY = 7 * bufSize / 10;
 	saveToBmp("Slices/3dCloudSlice_4.bmp", bufSize, bufSize, [dst, sliceY, bufSize](int x, int y) { return (uint8_t)(std::min(dst[(bufSize - 1 - y) * bufSize * bufSize + sliceY * bufSize + x] * 255.f, 255.f)); });
+}
 
+//--------------------------------------------------------------------------------------------
+
+void rasterizeCloud(int randSeed, bool isHardBrush, float brushCoeff, int bufSize, float xPos, float yPos, float zPos, float scale, bool generateOrLoad)
+{
+	log("Start generating\n");
+	srand(randSeed);
+
+	std::vector<float> dst;
+	dst.resize(bufSize*bufSize*bufSize);
+
+	NodeBranch object;
+	if (generateOrLoad) {
+		generate3dCloudImpl(dst, object, bufSize, isHardBrush, brushCoeff, xPos, yPos, zPos, scale);
+		object.serializeAll(std::string("ObjectsVector/Object") + digit5intFormat(randSeed) + ".ove");
+	}
+	else {
+		object.deserializeAll(std::string("ObjectsVector/Object") + digit5intFormat(randSeed) + ".ove");
+	}
+
+#if !OLD_CLOUD_RENDER
+	printf("Rasterizing the cloud...\n");
+	object.generate3dCloud(dst, bufSize, xPos, yPos, zPos, scale, isHardBrush, brushCoeff);
+#endif
+	checkOutOfRange(dst, bufSize);
+	saveSlices(dst, bufSize);
 	saveCloud(std::string("Objects/") + digit5intFormat(randSeed) + ".bin", dst, bufSize);
 	saveCloud("Cloud.bin", dst, bufSize);
 }

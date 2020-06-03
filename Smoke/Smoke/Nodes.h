@@ -29,7 +29,7 @@ struct NodeRef
 
 struct NodeBase
 {
-	virtual double GetDensity(float x, float y, float z, bool isSmoke) = 0;  // Дать плотность в точке (в системе координат глифа)
+	virtual double GetDensity(float x, float y, float z, bool isHardBrush, float brushCoeff) = 0;  // Дать плотность в точке (в системе координат глифа)
 	virtual void serializeNode(FILE* f, const std::function<bool (NodeBase*)>& isSerializedAlready) = 0;
 	void serializeBase(FILE* f);
 	void deserializeBase(FILE* f);
@@ -51,15 +51,15 @@ struct NodeBranch: public NodeBase
 
 	void serializeNode(FILE* f, const std::function<bool(NodeBase*)>& isSerializedAlready) override;
 	void deserializeNode(FILE* f, MapRef& mapRef);
-	double GetDensity(float x, float y, float z, bool isSmoke) override; // Дать плотность в точке (в системе координат глифа)
-	void generate3dCloud(std::vector<float>& dst, int bufSize, float xPos, float yPos, float zPos, float scale, bool isSmoke);
+	double GetDensity(float x, float y, float z, bool isHardBrush, float brushCoeff) override; // Дать плотность в точке (в системе координат глифа)
+	void generate3dCloud(std::vector<float>& dst, int bufSize, float xPos, float yPos, float zPos, float scale, bool isHardBrush, float brushCoeff);
 	void serializeAll(const std::string& fileName);
 	void deserializeAll(const std::string& fileName);
 };
 
 struct NodeLeaf : public NodeBase
 {
-	double GetDensity(float x, float y, float z, bool isSmoke);  // Дать плотность в точке (в системе координат глифа)
+	double GetDensity(float x, float y, float z, bool isHardBrush, float brushCoeff) override;  // Дать плотность в точке (в системе координат глифа)
 	void serializeNode(FILE* f, const std::function<bool(NodeBase*)>& isSerializedAlready) override;
 	void deserializeNode(FILE* f);
 };

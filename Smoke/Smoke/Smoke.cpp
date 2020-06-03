@@ -10,7 +10,7 @@
 #include "Nodes.h"
 
 //--------------------------------------------------------------------------------------------
-void generate3dCloud(int randSeed, bool isHardBrush, int size, float xPos, float yPos, float zPos, float scale);
+void rasterizeCloud(int randSeed, bool isHardBrush, float brushCoeff, int size, float xPos, float yPos, float zPos, float scale, bool generateOrLoad);
 void load3dCloud(const std::string& fname, std::vector<float>& dst, int size);
 
 //--------------------------------------------------------------------------------------------
@@ -606,10 +606,10 @@ void render3dScene(int randSeedForLog)
 
 //--------------------------------------------------------------------------------------------
 
-void RenderRandom(bool isHardBrush)
+void RenderRandom()
 {
 	for (int i = 0; i < 1000; ++i) {
-		generate3dCloud(i, isHardBrush, SceneSize, SceneSize/2, SceneSize/2, SceneSize/2, 1.f);
+		rasterizeCloud(i, true, 0.04f, SceneSize, SceneSize/2, SceneSize/2, SceneSize/2, 1.f, true);
 		render3dScene(i);
 	}
 }
@@ -618,7 +618,7 @@ void RenderRandom(bool isHardBrush)
 
 int main()
 {
-	RenderRandom(false);                                                                                        // !!! const
+	RenderRandom();                                                                                        // !!! const
 
 	//generate3dCloud(0, false, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f);
 	//render3dScene(1);
