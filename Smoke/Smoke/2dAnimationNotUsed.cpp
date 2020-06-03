@@ -595,6 +595,53 @@ void testDeser()
 
 //--------------------------------------------------------------------------------------------
 
+//--------------------------------------------------------------------------------------------
 
+void loadObjects()
+{
+	std::vector<float> cloudBuf;
+
+	load3dCloud("Cloud.bin", cloudBuf, SceneSize);
+	for (int z = 0; z < SceneSize; ++z) {
+		for (int y = 0; y < SceneSize; ++y) {
+			for (int x = 0; x < SceneSize; ++x) {
+				scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
+			}
+		}
+	}
+
+	//load3dCloud("Objects/Smoke.bin", cloudBuf, SceneSize);
+	//for (int z = 0; z < SceneSize; ++z) {
+	//	for (int y = 0; y < SceneSize; ++y) {
+	//		for (int x = 0; x < 65; ++x) {
+	//			scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
+	//		}
+	//	}
+	//}
+	//load3dCloud("Objects/CloudHard.bin", cloudBuf, SceneSize);
+	//for (int z = 0; z < SceneSize; ++z) {
+	//	for (int y = 0; y < SceneSize; ++y) {
+	//		for (int x = 65; x < 100; ++x) {
+	//			scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
+	//		}
+	//	}
+	//}
+	//load3dCloud("Objects/CloudSoft.bin", cloudBuf, SceneSize);
+	//for (int z = 0; z < SceneSize; ++z) {
+	//	for (int y = 0; y < SceneSize; ++y) {
+	//		for (int x = 100; x < 150; ++x) {
+	//			scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
+	//		}
+	//	}
+	//}
+	//load3dCloud("Objects/CloudExtraSoft.bin", cloudBuf, SceneSize);
+	//for (int z = 0; z < SceneSize; ++z) {
+	//	for (int y = 0; y < SceneSize; ++y) {
+	//		for (int x = 150; x < SceneSize; ++x) {
+	//			scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
+	//		}
+	//	}
+	//}
+}
 
 

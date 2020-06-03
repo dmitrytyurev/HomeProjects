@@ -612,20 +612,20 @@ void saveSlices(std::vector<float>& dst, int bufSize)
 
 //--------------------------------------------------------------------------------------------
 
-void rasterizeCloud(int randSeed, bool isHardBrush, float brushCoeff, int bufSize, float xPos, float yPos, float zPos, float scale, bool generateOrLoad)
+void rasterizeCloud(std::vector<float>& dst, int bufSize, int randSeed, bool isHardBrush, float brushCoeff, float xPos, float yPos, float zPos, float scale, bool generateOrLoad)
 {
-	log("Start generating\n");
-	srand(randSeed);
-
-	std::vector<float> dst;
+	dst.clear();
 	dst.resize(bufSize*bufSize*bufSize);
+	srand(randSeed);
 
 	NodeBranch object;
 	if (generateOrLoad) {
+		log("Generating vector cloud...\n");
 		generate3dCloudImpl(dst, object, bufSize, isHardBrush, brushCoeff, xPos, yPos, zPos, scale);
 		object.serializeAll(std::string("ObjectsVector/Object") + digit5intFormat(randSeed) + ".ove");
 	}
 	else {
+		log("Loading vector cloud...\n");
 		object.deserializeAll(std::string("ObjectsVector/Object") + digit5intFormat(randSeed) + ".ove");
 	}
 
@@ -634,8 +634,10 @@ void rasterizeCloud(int randSeed, bool isHardBrush, float brushCoeff, int bufSiz
 	object.generate3dCloud(dst, bufSize, xPos, yPos, zPos, scale, isHardBrush, brushCoeff);
 #endif
 	checkOutOfRange(dst, bufSize);
-	saveSlices(dst, bufSize);
-	saveCloud(std::string("Objects/") + digit5intFormat(randSeed) + ".bin", dst, bufSize);
-	saveCloud("Cloud.bin", dst, bufSize);
+	printf("  Done\n");
+
+	//saveSlices(dst, bufSize);
+	//saveCloud(std::string("Objects/") + digit5intFormat(randSeed) + ".bin", dst, bufSize);
+	//saveCloud("Cloud.bin", dst, bufSize);
 }
 

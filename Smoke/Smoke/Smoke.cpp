@@ -10,7 +10,7 @@
 #include "Nodes.h"
 
 //--------------------------------------------------------------------------------------------
-void rasterizeCloud(int randSeed, bool isHardBrush, float brushCoeff, int size, float xPos, float yPos, float zPos, float scale, bool generateOrLoad);
+void rasterizeCloud(std::vector<float>& dst, int bufSize, int randSeed, bool isHardBrush, float brushCoeff, float xPos, float yPos, float zPos, float scale, bool generateOrLoad);
 void load3dCloud(const std::string& fname, std::vector<float>& dst, int size);
 
 //--------------------------------------------------------------------------------------------
@@ -20,9 +20,9 @@ void load3dCloud(const std::string& fname, std::vector<float>& dst, int size);
 const float FarAway = 100000.f;
 const int ScreenSize = 400; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
-const float cameraZinit = -200; // Позиция камеры по z в системе координат сетки
+const float cameraZinit = -500; // Позиция камеры по z в системе координат сетки
 const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана  0.00002;
-const int SceneDrawNum = 400; // Сколько раз рендерим сцену
+const int SceneDrawNum = 500; // Сколько раз рендерим сцену
 
 
 
@@ -288,6 +288,7 @@ void intersect(float x, float y, float z, float dirX, float dirY, float dirZ, fl
 
 void calcNormalsAndSurfInterp()
 {
+	printf("calcNormalsAndSurfInterp...\n");
 	const int radius = 5;                                                                      // !!!const
 	for (int z = radius; z < SceneSize-radius; ++z)	{
 		for (int y = radius; y < SceneSize - radius; ++y) {
@@ -361,6 +362,7 @@ void calcNormalsAndSurfInterp()
 			}
 		}
 	}
+	printf("  Done\n");
 }
 
 //--------------------------------------------------------------------------------------------
@@ -509,51 +511,32 @@ void fillSceneBbox()
 
 //--------------------------------------------------------------------------------------------
 
-void loadObjects()
-{
-	std::vector<float> cloudBuf;
 
-	load3dCloud("Cloud.bin", cloudBuf, SceneSize);
+void copyToScene(std::vector<float>& src)
+{
 	for (int z = 0; z < SceneSize; ++z) {
 		for (int y = 0; y < SceneSize; ++y) {
 			for (int x = 0; x < SceneSize; ++x) {
-				scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
+				scene[x][y][z].smokeDens = src[z*SceneSize*SceneSize + y * SceneSize + x];
 			}
 		}
 	}
+}
 
-	//load3dCloud("Objects/Smoke.bin", cloudBuf, SceneSize);
-	//for (int z = 0; z < SceneSize; ++z) {
-	//	for (int y = 0; y < SceneSize; ++y) {
-	//		for (int x = 0; x < 65; ++x) {
-	//			scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
-	//		}
-	//	}
-	//}
-	//load3dCloud("Objects/CloudHard.bin", cloudBuf, SceneSize);
-	//for (int z = 0; z < SceneSize; ++z) {
-	//	for (int y = 0; y < SceneSize; ++y) {
-	//		for (int x = 65; x < 100; ++x) {
-	//			scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
-	//		}
-	//	}
-	//}
-	//load3dCloud("Objects/CloudSoft.bin", cloudBuf, SceneSize);
-	//for (int z = 0; z < SceneSize; ++z) {
-	//	for (int y = 0; y < SceneSize; ++y) {
-	//		for (int x = 100; x < 150; ++x) {
-	//			scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
-	//		}
-	//	}
-	//}
-	//load3dCloud("Objects/CloudExtraSoft.bin", cloudBuf, SceneSize);
-	//for (int z = 0; z < SceneSize; ++z) {
-	//	for (int y = 0; y < SceneSize; ++y) {
-	//		for (int x = 150; x < SceneSize; ++x) {
-	//			scene[x][y][z].smokeDens = cloudBuf[z*SceneSize*SceneSize + y * SceneSize + x];
-	//		}
-	//	}
-	//}
+//--------------------------------------------------------------------------------------------
+
+void addToScene(std::vector<float>& src)
+{
+	for (int z = 0; z < SceneSize; ++z) {
+		for (int y = 0; y < SceneSize; ++y) {
+			for (int x = 0; x < SceneSize; ++x) {
+
+				float srcVal = src[z*SceneSize*SceneSize + y * SceneSize + x];
+				float dstVal = scene[x][y][z].smokeDens;
+				scene[x][y][z].smokeDens = 1.f - (1.f - srcVal) * (1.f - dstVal);
+			}
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------
@@ -582,12 +565,6 @@ void render3dScene(int randSeedForLog)
 	// Заполнить BBOX сцены по лампочкам
 	fillSceneBbox();
 
-	// Загрузить объекты
-	loadObjects();
-
-	// Заполняем нормали и коэффициенты поверхности
-	calcNormalsAndSurfInterp();
-
 	// Рендерим все кадры сцены
 	for (int n=0; n < SceneDrawNum; ++n) {
 		printf("Rendernig frame %d of %d\n", n, SceneDrawNum);
@@ -608,8 +585,11 @@ void render3dScene(int randSeedForLog)
 
 void RenderRandom()
 {
+	std::vector<float> rasterizeBuf;
+
 	for (int i = 0; i < 1000; ++i) {
-		rasterizeCloud(i, true, 0.04f, SceneSize, SceneSize/2, SceneSize/2, SceneSize/2, 1.f, true);
+		rasterizeCloud(rasterizeBuf, SceneSize, i, true, 0.04f, SceneSize/2, SceneSize/2, SceneSize/2, 1.f, true);
+		copyToScene(rasterizeBuf);
 		render3dScene(i);
 	}
 }
@@ -618,15 +598,25 @@ void RenderRandom()
 
 int main()
 {
-	RenderRandom();                                                                                        // !!! const
+	//RenderRandom();
 
-	//generate3dCloud(0, false, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f);
-	//render3dScene(1);
+	std::vector<float> rasterizeBuf;
+	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 265/2, 112/2, 100, 0.75f, false);
+	copyToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 102/2, 252/2, 100, 0.75f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 313/2, 198/2, 100, 0.75f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 201/2, 215/2, 100, 0.75f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 143/2, 125/2, 100, 0.75f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 206/2, 326/2, 100, 0.75f, false);
+	addToScene(rasterizeBuf);
 
-	//generate3dCloud(7, true, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f);
-	//render3dScene(7);
+	// Заполняем нормали и коэффициенты поверхности
+	calcNormalsAndSurfInterp();
 
-	//generate3dCloud(9, true, SceneSize, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f);
-	//render3dScene(9);
+	render3dScene(10);
 }
 
