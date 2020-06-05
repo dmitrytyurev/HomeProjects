@@ -58,7 +58,7 @@ void NodeBranch::generate3dCloud(std::vector<float>& dst, int bufSize, float xPo
 	dst.resize(bufSize*bufSize*bufSize);
 
 	for (int z = 0; z < bufSize; ++z) {
-		printf("z: %d of %d\n", z, bufSize);
+		//printf("z: %d of %d\n", z, bufSize);
 		for (int y = 0; y < bufSize; ++y) {
 			for (int x = 0; x < bufSize; ++x) {
 				dst[z*bufSize*bufSize + y * bufSize + x] = (float)GetDensity((x - xPos)/scale, (y - yPos)/scale, (z - zPos)/scale, isHardBrush, brushCoeff);

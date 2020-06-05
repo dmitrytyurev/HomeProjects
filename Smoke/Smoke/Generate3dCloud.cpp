@@ -414,52 +414,52 @@ void checkOutOfRange(std::vector<float>& dst, int bufSize)
 	for (int y = 0; y < bufSize; ++y) {
 		for (int x = 0; x < bufSize; ++x) {
 			if (dst[y * bufSize + x] > 0) {
-				log("Out of range the whole!\n");
-				return;
+				log("Out of range the whole z1!\n");
+				goto m1;
 			}
 		}
 	}
 
-	for (int y = 0; y < bufSize; ++y) {
+m1:	for (int y = 0; y < bufSize; ++y) {
 		for (int x = 0; x < bufSize; ++x) {
 			if (dst[(bufSize - 1)*bufSize*bufSize + y * bufSize + x] > 0) {
-				log("Out of range the whole!\n");
-				return;
+				log("Out of range the whole z2!\n");
+				goto m2;
 			}
 		}
 	}
 
-	for (int z = 0; z < bufSize; ++z) {
+m2:	for (int z = 0; z < bufSize; ++z) {
 		for (int x = 0; x < bufSize; ++x) {
 			if (dst[z*bufSize*bufSize + x] > 0) {
-				log("Out of range the whole!\n");
-				return;
+				log("Out of range the whole y1!\n");
+				goto m3;
 			}
 		}
 	}
 
-	for (int z = 0; z < bufSize; ++z) {
+m3:	for (int z = 0; z < bufSize; ++z) {
 		for (int x = 0; x < bufSize; ++x) {
 			if (dst[z*bufSize*bufSize + (bufSize - 1) * bufSize + x] > 0) {
-				log("Out of range the whole!\n");
-				return;
+				log("Out of range the whole y2!\n");
+				goto m4;
 			}
 		}
 	}
 
-	for (int y = 0; y < bufSize; ++y) {
+m4:	for (int y = 0; y < bufSize; ++y) {
 		for (int z = 0; z < bufSize; ++z) {
 			if (dst[z*bufSize*bufSize + y * bufSize] > 0) {
-				log("Out of range the whole!\n");
-				return;
+				log("Out of range the whole x1!\n");
+				goto m5;
 			}
 		}
 	}
 
-	for (int y = 0; y < bufSize; ++y) {
+m5:	for (int y = 0; y < bufSize; ++y) {
 		for (int z = 0; z < bufSize; ++z) {
 			if (dst[z*bufSize*bufSize + y * bufSize + (bufSize - 1)] > 0) {
-				log("Out of range the whole!\n");
+				log("Out of range the whole x2!\n");
 				return;
 			}
 		}
@@ -625,7 +625,7 @@ void rasterizeCloud(std::vector<float>& dst, int bufSize, int randSeed, bool isH
 		object.serializeAll(std::string("ObjectsVector/Object") + digit5intFormat(randSeed) + ".ove");
 	}
 	else {
-		log("Loading vector cloud...\n");
+		log("Loading vector cloud: " + std::to_string(randSeed) + "\n");
 		object.deserializeAll(std::string("ObjectsVector/Object") + digit5intFormat(randSeed) + ".ove");
 	}
 

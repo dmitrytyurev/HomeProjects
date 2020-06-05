@@ -84,3 +84,25 @@ inline std::string digit5intFormat(int n)
 
 void log(const std::string& str);
 
+//--------------------------------------------------------------------------------------------
+
+inline void turnPoint(float x, float y, double angle, float& newX, float& newY)
+{
+	double s = sin(angle);
+	double c = cos(angle);
+	newX = (float)(x * c - y * s);
+	newY = (float)(x * s + y * c);
+}
+
+//--------------------------------------------------------------------------------------------
+
+inline void turnPointCenter(float x, float y, double angle, float xCenter, float yCenter, float& newX, float& newY)
+{
+	float xM = x - xCenter;
+	float yM = y - yCenter;
+	float xRes = 0;
+	float yRes = 0;
+	turnPoint(xM, yM, angle, xRes, yRes);
+	newX = xRes + xCenter;
+	newY = yRes + yCenter;
+}

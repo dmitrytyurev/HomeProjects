@@ -22,7 +22,7 @@ const int ScreenSize = 400; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -500; // Позиция камеры по z в системе координат сетки
 const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана  0.00002;
-const int SceneDrawNum = 500; // Сколько раз рендерим сцену
+const int SceneDrawNum = 700; // Сколько раз рендерим сцену
 
 
 
@@ -371,7 +371,7 @@ void calcNormalsAndSurfInterp()
 
 
 
-void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float dirY, float dirZ)
+void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float dirY, float dirZ, bool draftRender)
 {
 	double lightDropAbs = 0;
 	double lightDropMul = 1;
@@ -411,8 +411,13 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 		needScatter = randf(0.f, 1.f) < curScatterProb;
 
 		if (needScatter) {
-//screen[xi][yi] += cell.surfaceCoeff * 255;
-//return;
+			if (draftRender) {
+				bool succ = false;
+				normalize(dirX, dirY, dirZ, succ);
+				float cosin = cell.normalX*(-dirX) + cell.normalY*(-dirY) + cell.normalZ*(-dirZ);
+				screen[xi][yi] += fabs(cosin * 255);
+				return;
+			}
 
 			dirX = randf(-1.f, 1.f);                // !!! Рандомный угол выбирать в поляной системе координат, иначе плотность вероятности по телесному углу неравномерна!
 			dirY = randf(-1.f, 1.f);
@@ -448,7 +453,7 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 // Рендерить сцену в буфер screen
 //--------------------------------------------------------------------------------------------
 
-void renderScene(int x1, int y1, int x2, int y2, int frame, int screenSize)
+void renderSubFrame(int x1, int y1, int x2, int y2, int frame, int screenSize, float cameraAngle, bool draftRender)
 {
 	float cameraX = SceneSize / 2.f;
 	float cameraY = SceneSize / 2.f;
@@ -472,7 +477,15 @@ void renderScene(int x1, int y1, int x2, int y2, int frame, int screenSize)
 			float dirY = y - cameraY;
 			float dirZ = z - cameraZ;
 
-			renderPixel(xi, yi, x, y, z, dirX, dirY, dirZ);
+			float xTurned = 0;
+			float yTurned = y;
+			float zTurned = 0;
+			float dirXTurned = 0;
+			float dirYTurned = dirY;
+			float dirZTurned = 0;
+			turnPointCenter(x, z, cameraAngle, 100, 100, xTurned, zTurned);
+			turnPoint(dirX, dirZ, cameraAngle, dirXTurned, dirZTurned);
+			renderPixel(xi, yi, xTurned, yTurned, zTurned, dirXTurned, dirYTurned, dirZTurned, draftRender);
 		}
 	}
 }
@@ -525,13 +538,13 @@ void copyToScene(std::vector<float>& src)
 
 //--------------------------------------------------------------------------------------------
 
-void addToScene(std::vector<float>& src)
+void addToScene(std::vector<float>& src, bool flipZ=false)
 {
 	for (int z = 0; z < SceneSize; ++z) {
 		for (int y = 0; y < SceneSize; ++y) {
 			for (int x = 0; x < SceneSize; ++x) {
-
-				float srcVal = src[z*SceneSize*SceneSize + y * SceneSize + x];
+				int curZ = !flipZ ? z : SceneSize - 1 - z;
+				float srcVal = src[curZ*SceneSize*SceneSize + y * SceneSize + x];
 				float dstVal = scene[x][y][z].smokeDens;
 				scene[x][y][z].smokeDens = 1.f - (1.f - srcVal) * (1.f - dstVal);
 			}
@@ -552,7 +565,7 @@ void screenClear()
 
 //--------------------------------------------------------------------------------------------
 
-void render3dScene(int randSeedForLog)
+void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngle, bool draftRender)
 {
 	lights.clear();
 	screenClear();
@@ -560,6 +573,9 @@ void render3dScene(int randSeedForLog)
 	lights.push_back(LIGHT_BOX(6000, 0, 170, 0, 30, 200, 30, false));
 	lights.push_back(LIGHT_BOX(12000, 0, -55, 0, 50, -50, 100, false));
 	lights.push_back(LIGHT_BOX(8400, 250, 40, -35, 255, 160, 10, false));
+	lights.push_back(LIGHT_BOX(8400, 250, 40, 190, 255, 160, 235, false));
+	lights.push_back(LIGHT_BOX(8400, 0, 40, 190, 5, 160, 235, false));
+
 //	lights.push_back(LIGHT_BOX(4000, 55, 100, 70,   150, 103, 73, true));
 
 	// Заполнить BBOX сцены по лампочкам
@@ -567,19 +583,18 @@ void render3dScene(int randSeedForLog)
 
 	// Рендерим все кадры сцены
 	for (int n=0; n < SceneDrawNum; ++n) {
-		printf("Rendernig frame %d of %d\n", n, SceneDrawNum);
-		renderScene(0, 0, ScreenSize, ScreenSize, n, ScreenSize);
+		printf("Rendernig subframe %d/%d of frame %d\n", n, SceneDrawNum, frameN);
+		renderSubFrame(0, 0, ScreenSize, ScreenSize, n, ScreenSize, cameraAngle, draftRender);
 
-		if ((n % 50) == 0 || n == SceneDrawNum-1) {
+		if (!draftRender && (n % 50) == 0) {
 			std::string fname = std::string("Scenes/3dScene_Cloud") + digit5intFormat(n) + ".bmp";
 			saveToBmp(fname, ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
 		}
 	}
 
-	std::string fname = std::string("Scenes/3dScene_Cloud_Rand") + digit5intFormat(randSeedForLog) + ".bmp";
+	std::string fname = fileNamePrefix + digit5intFormat(frameN) + ".bmp";
 	saveToBmp(fname, ScreenSize, ScreenSize, [](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (SceneDrawNum + 1), 255.)); });
 }
-
 
 //--------------------------------------------------------------------------------------------
 
@@ -587,11 +602,78 @@ void RenderRandom()
 {
 	std::vector<float> rasterizeBuf;
 
-	for (int i = 0; i < 1000; ++i) {
-		rasterizeCloud(rasterizeBuf, SceneSize, i, true, 0.04f, SceneSize/2, SceneSize/2, SceneSize/2, 1.f, true);
+	for (int i = 0; i < 100; ++i) {
+		rasterizeCloud(rasterizeBuf, SceneSize, i, true, 0.04f, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f, true);
 		copyToScene(rasterizeBuf);
-		render3dScene(i);
+		calcNormalsAndSurfInterp();
+		renderFrame("Scenes/3dScene_Cloud_Rand", i, 0.f, false);
 	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+void rasterizeScene()
+{
+	std::vector<float> rasterizeBuf;
+	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 265 / 2, 112 / 2, 100, 0.675f, false);
+	copyToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 102 / 2, 252 / 2, 100, 0.54f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 156, 198 / 2, 100, 0.468f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 201 / 2, 215 / 2, 60, 0.75f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 72, 63, 100, 0.75f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 103, 175, 100, 0.54f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 140, 147, 115, 0.6f, false);   // Облако
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 120, 147, 90, 0.6f, false);   // Облако
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 85, 165, 90, 0.6f, false);   // Облако
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 100, 60, 140, 0.6f, false);   // Облако
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 103, 180, 80, 0.3f, false);  // Маленькие у подножия
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 90, 185, 130, 0.3f, false);  // Маленькие у подножия
+	addToScene(rasterizeBuf);
+	// Обратная сторона
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 100, 118, 130, 0.8f, false);
+	addToScene(rasterizeBuf);
+
+	// Заполняем нормали и коэффициенты поверхности
+	calcNormalsAndSurfInterp();
+}
+
+//--------------------------------------------------------------------------------------------
+
+void RenderRotate()
+{
+	std::vector<float> rasterizeBuf;
+	const int framesInTurn = 30;
+
+	rasterizeScene();
+	//for (int i = 0; i < framesInTurn; ++i) {
+	//	renderFrame("Scenes/3dScene_Cloud_Rotate", i, PI / (framesInTurn-1) * i, true);    // !!! const
+	//}
+
+	bool draft = false;
+	renderFrame("Scenes/3dScene_Cloud_Rotate", 0, PI / (framesInTurn - 1) * 0, draft);
+	renderFrame("Scenes/3dScene_Cloud_Rotate", 1, PI / (framesInTurn - 1) * 1, draft);
+	renderFrame("Scenes/3dScene_Cloud_Rotate", 2, PI / (framesInTurn - 1) * 2, draft);
+	renderFrame("Scenes/3dScene_Cloud_Rotate", 3, PI / (framesInTurn - 1) * 3, draft);
+
+	renderFrame("Scenes/3dScene_Cloud_Rotate", 10, PI / (framesInTurn - 1) * 10, draft);
+	renderFrame("Scenes/3dScene_Cloud_Rotate", 11, PI / (framesInTurn - 1) * 11, draft);
+	renderFrame("Scenes/3dScene_Cloud_Rotate", 12, PI / (framesInTurn - 1) * 12, draft);
+	renderFrame("Scenes/3dScene_Cloud_Rotate", 13, PI / (framesInTurn - 1) * 13, draft);
+
+	renderFrame("Scenes/3dScene_Cloud_Rotate", 26, PI / (framesInTurn - 1) * 26, draft);
+	renderFrame("Scenes/3dScene_Cloud_Rotate", 27, PI / (framesInTurn - 1) * 27, draft);
+	renderFrame("Scenes/3dScene_Cloud_Rotate", 28, PI / (framesInTurn - 1) * 28, draft);
+	renderFrame("Scenes/3dScene_Cloud_Rotate", 29, PI / (framesInTurn - 1) * 29, draft);
 }
 
 //--------------------------------------------------------------------------------------------
@@ -599,24 +681,7 @@ void RenderRandom()
 int main()
 {
 	//RenderRandom();
+	RenderRotate();
 
-	std::vector<float> rasterizeBuf;
-	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 265/2, 112/2, 100, 0.75f, false);
-	copyToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 102/2, 252/2, 100, 0.75f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 313/2, 198/2, 100, 0.75f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 201/2, 215/2, 100, 0.75f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 143/2, 125/2, 100, 0.75f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 206/2, 326/2, 100, 0.75f, false);
-	addToScene(rasterizeBuf);
-
-	// Заполняем нормали и коэффициенты поверхности
-	calcNormalsAndSurfInterp();
-
-	render3dScene(10);
 }
 
