@@ -22,7 +22,7 @@ const int ScreenSize = 400; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -500; // Позиция камеры по z в системе координат сетки
 const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана  0.00002;
-const int SceneDrawNum = 700; // Сколько раз рендерим сцену
+const int SceneDrawNum = 550; // Сколько раз рендерим сцену
 
 
 
@@ -538,13 +538,13 @@ void copyToScene(std::vector<float>& src)
 
 //--------------------------------------------------------------------------------------------
 
-void addToScene(std::vector<float>& src, bool flipZ=false)
+void addToScene(std::vector<float>& src, float alpha=1.f, bool flipZ=false)
 {
 	for (int z = 0; z < SceneSize; ++z) {
 		for (int y = 0; y < SceneSize; ++y) {
 			for (int x = 0; x < SceneSize; ++x) {
 				int curZ = !flipZ ? z : SceneSize - 1 - z;
-				float srcVal = src[curZ*SceneSize*SceneSize + y * SceneSize + x];
+				float srcVal = src[curZ*SceneSize*SceneSize + y * SceneSize + x] * alpha;
 				float dstVal = scene[x][y][z].smokeDens;
 				scene[x][y][z].smokeDens = 1.f - (1.f - srcVal) * (1.f - dstVal);
 			}
@@ -574,7 +574,7 @@ void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngl
 	lights.push_back(LIGHT_BOX(12000, 0, -55, 0, 50, -50, 100, false));
 	lights.push_back(LIGHT_BOX(8400, 250, 40, -35, 255, 160, 10, false));
 	lights.push_back(LIGHT_BOX(8400, 250, 40, 190, 255, 160, 235, false));
-	lights.push_back(LIGHT_BOX(8400, 0, 40, 190, 5, 160, 235, false));
+	lights.push_back(LIGHT_BOX(5000, -20, 50, 190, -15, 110, 235, false));
 
 //	lights.push_back(LIGHT_BOX(4000, 55, 100, 70,   150, 103, 73, true));
 
@@ -587,7 +587,7 @@ void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngl
 		renderSubFrame(0, 0, ScreenSize, ScreenSize, n, ScreenSize, cameraAngle, draftRender);
 
 		if (!draftRender && (n % 50) == 0) {
-			std::string fname = std::string("Scenes/3dScene_Cloud") + digit5intFormat(n) + ".bmp";
+			std::string fname = std::string("Scenes/Frame") + digit5intFormat(frameN) + "_" + digit5intFormat(n) + ".bmp";
 			saveToBmp(fname, ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
 		}
 	}
@@ -627,14 +627,17 @@ void rasterizeScene()
 	addToScene(rasterizeBuf);
 	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 103, 175, 100, 0.54f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 140, 147, 115, 0.6f, false);   // Облако
-	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 140, 147, 115, 0.6f*1.2f, false);   // Облако
+	addToScene(rasterizeBuf, 0.05f);
 	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 120, 147, 90, 0.6f, false);   // Облако
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 85, 165, 90, 0.6f, false);   // Облако
-	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 85, 165, 75, 0.6f*1.15f, false);   // Облако
+	addToScene(rasterizeBuf, 0.2f);
 	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 100, 60, 140, 0.6f, false);   // Облако
 	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 95, 100, 75, 0.6f*1.3f, false);   // Облако лево центр
+	addToScene(rasterizeBuf, 0.5f);
+	   
 	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 103, 180, 80, 0.3f, false);  // Маленькие у подножия
 	addToScene(rasterizeBuf);
 	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 90, 185, 130, 0.3f, false);  // Маленькие у подножия
@@ -648,40 +651,33 @@ void rasterizeScene()
 }
 
 //--------------------------------------------------------------------------------------------
+const int framesInTurn = 30;
+const bool draft = false;
 
-void RenderRotate()
+void RenderRotate(int fromFrame, int toFrame)
 {
 	std::vector<float> rasterizeBuf;
-	const int framesInTurn = 30;
 
 	rasterizeScene();
-	//for (int i = 0; i < framesInTurn; ++i) {
-	//	renderFrame("Scenes/3dScene_Cloud_Rotate", i, PI / (framesInTurn-1) * i, true);    // !!! const
-	//}
-
-	bool draft = false;
-	renderFrame("Scenes/3dScene_Cloud_Rotate", 0, PI / (framesInTurn - 1) * 0, draft);
-	renderFrame("Scenes/3dScene_Cloud_Rotate", 1, PI / (framesInTurn - 1) * 1, draft);
-	renderFrame("Scenes/3dScene_Cloud_Rotate", 2, PI / (framesInTurn - 1) * 2, draft);
-	renderFrame("Scenes/3dScene_Cloud_Rotate", 3, PI / (framesInTurn - 1) * 3, draft);
-
-	renderFrame("Scenes/3dScene_Cloud_Rotate", 10, PI / (framesInTurn - 1) * 10, draft);
-	renderFrame("Scenes/3dScene_Cloud_Rotate", 11, PI / (framesInTurn - 1) * 11, draft);
-	renderFrame("Scenes/3dScene_Cloud_Rotate", 12, PI / (framesInTurn - 1) * 12, draft);
-	renderFrame("Scenes/3dScene_Cloud_Rotate", 13, PI / (framesInTurn - 1) * 13, draft);
-
-	renderFrame("Scenes/3dScene_Cloud_Rotate", 26, PI / (framesInTurn - 1) * 26, draft);
-	renderFrame("Scenes/3dScene_Cloud_Rotate", 27, PI / (framesInTurn - 1) * 27, draft);
-	renderFrame("Scenes/3dScene_Cloud_Rotate", 28, PI / (framesInTurn - 1) * 28, draft);
-	renderFrame("Scenes/3dScene_Cloud_Rotate", 29, PI / (framesInTurn - 1) * 29, draft);
+	for (int i = fromFrame; i <= toFrame; ++i) {
+		renderFrame("Scenes/3dScene_Cloud_Rotate", i, PI / (framesInTurn-1) * i, draft);
+	}
 }
 
 //--------------------------------------------------------------------------------------------
 
-int main()
+int main(int argc, char *argv[], char *envp[])
 {
 	//RenderRandom();
-	RenderRotate();
 
+	int fromFrame = 0;
+	int toFrame = framesInTurn-1;
+
+	if (argc == 3) {
+		fromFrame = atoi(argv[1]);
+		toFrame = atoi(argv[2]);
+	}
+
+	RenderRotate(fromFrame, toFrame);
 }
 
