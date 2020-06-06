@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include <iostream>
 #include <vector>
+#include <string>
 #include <stdarg.h>
 #include <algorithm>
 #include "bmp.h"
@@ -369,12 +370,130 @@ void calcNormalsAndSurfInterp()
 // Определить цвет пиксела и записать его в буфер screen
 //--------------------------------------------------------------------------------------------
 
+struct Dir
+{
+	Dir() = default;
+	Dir(float x_, float y_, float z_) : x(x_), y(y_), z(z_) {}
+	bool operator==(const Dir& l) { return l.x == x && l.y==y && l.z==z; }
+	float x;
+	float y;
+	float z;
+};
 
+struct RandomRepeatChecker
+{
+	void check(int xi, int yi, float dirX, float dirY, float dirZ);
+	void onStartNewFrame();
+
+	std::vector<Dir> dirs0;
+	std::vector<Dir> dirs1;
+	std::vector<Dir> dirs2;
+	std::vector<Dir> dirs3;
+	std::vector<Dir> dirs4;
+	std::vector<Dir> dirs5;
+	std::vector<Dir> dirs6;
+	std::vector<Dir> dirs7;
+	std::vector<Dir> dirs8;
+	std::vector<Dir> dirs9;
+	int gotchasNum = 0;
+};
+
+void RandomRepeatChecker::onStartNewFrame()
+{
+	dirs0.clear();
+	dirs1.clear();
+	dirs2.clear();
+	dirs3.clear();
+	dirs4.clear();
+	dirs5.clear();
+	dirs6.clear();
+	dirs7.clear();
+	dirs8.clear();
+	dirs9.clear();
+}
+
+void RandomRepeatChecker::check(int xi, int yi, float dirX, float dirY, float dirZ)
+{
+
+	if (xi == 200 && yi == 200) {
+		if (std::find(dirs0.begin(), dirs0.end(), Dir(dirX, dirY, dirZ)) != dirs0.end()) {
+			++gotchasNum;
+			log("gotcha! " + std::to_string(gotchasNum) + "\n");
+		}
+		dirs0.push_back(Dir(dirX, dirY, dirZ));
+	}
+	if (xi == 200 - 3 && yi == 200 - 20) {
+		if (std::find(dirs1.begin(), dirs1.end(), Dir(dirX, dirY, dirZ)) != dirs1.end()) {
+			++gotchasNum;
+			log("gotcha! " + std::to_string(gotchasNum) + "\n");
+		}
+		dirs1.push_back(Dir(dirX, dirY, dirZ));
+	}
+	if (xi == 200 - 7 && yi == 200 + 16) {
+		if (std::find(dirs2.begin(), dirs2.end(), Dir(dirX, dirY, dirZ)) != dirs2.end()) {
+			++gotchasNum;
+			log("gotcha! " + std::to_string(gotchasNum) + "\n");
+		}
+		dirs2.push_back(Dir(dirX, dirY, dirZ));
+	}
+	if (xi == 200 - 4 && yi == 200 - 5) {
+		if (std::find(dirs3.begin(), dirs3.end(), Dir(dirX, dirY, dirZ)) != dirs3.end()) {
+			++gotchasNum;
+			log("gotcha! " + std::to_string(gotchasNum) + "\n");
+		}
+		dirs3.push_back(Dir(dirX, dirY, dirZ));
+	}
+	if (xi == 200 + 9 && yi == 200 - 8) {
+		if (std::find(dirs4.begin(), dirs4.end(), Dir(dirX, dirY, dirZ)) != dirs4.end()) {
+			++gotchasNum;
+			log("gotcha! " + std::to_string(gotchasNum) + "\n");
+		}
+		dirs4.push_back(Dir(dirX, dirY, dirZ));
+	}
+	if (xi == 200 + 7 && yi == 200 - 12) {
+		if (std::find(dirs5.begin(), dirs5.end(), Dir(dirX, dirY, dirZ)) != dirs5.end()) {
+			++gotchasNum;
+			log("gotcha! " + std::to_string(gotchasNum) + "\n");
+		}
+		dirs5.push_back(Dir(dirX, dirY, dirZ));
+	}
+	if (xi == 200 + 5 && yi == 200 + 6) {
+		if (std::find(dirs6.begin(), dirs6.end(), Dir(dirX, dirY, dirZ)) != dirs6.end()) {
+			++gotchasNum;
+			log("gotcha! " + std::to_string(gotchasNum) + "\n");
+		}
+		dirs6.push_back(Dir(dirX, dirY, dirZ));
+	}
+	if (xi == 200 + 3 && yi == 200 + 2) {
+		if (std::find(dirs7.begin(), dirs7.end(), Dir(dirX, dirY, dirZ)) != dirs7.end()) {
+			++gotchasNum;
+			log("gotcha! " + std::to_string(gotchasNum) + "\n");
+		}
+		dirs7.push_back(Dir(dirX, dirY, dirZ));
+	}
+	if (xi == 200 - 15 && yi == 200 + 1) {
+		if (std::find(dirs8.begin(), dirs8.end(), Dir(dirX, dirY, dirZ)) != dirs8.end()) {
+			++gotchasNum;
+			log("gotcha! " + std::to_string(gotchasNum) + "\n");
+		}
+		dirs8.push_back(Dir(dirX, dirY, dirZ));
+	}
+	if (xi == 200 - 2 && yi == 200 - 4) {
+		if (std::find(dirs9.begin(), dirs9.end(), Dir(dirX, dirY, dirZ)) != dirs9.end()) {
+			++gotchasNum;
+			log("gotcha! " + std::to_string(gotchasNum) + "\n");
+		}
+		dirs9.push_back(Dir(dirX, dirY, dirZ));
+	}
+}
+
+RandomRepeatChecker randomRepeatChecker;
 
 void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float dirY, float dirZ, bool draftRender)
 {
 	double lightDropAbs = 0;
 	double lightDropMul = 1;
+	bool firstScatter = true;
 
 	while(true) {
 		if (x < sceneBBoxX1 || x > sceneBBoxX2 || y < sceneBBoxY1 || y > sceneBBoxY2 || z < sceneBBoxZ1 || z > sceneBBoxZ2) {
@@ -422,6 +541,10 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 			dirX = randf(-1.f, 1.f);                // !!! Рандомный угол выбирать в поляной системе координат, иначе плотность вероятности по телесному углу неравномерна!
 			dirY = randf(-1.f, 1.f);
 			dirZ = randf(-1.f, 1.f);
+			if (firstScatter) {
+				firstScatter = false;
+				randomRepeatChecker.check(xi, yi, dirX, dirY, dirZ);
+			}
 			bool succes = false;
 			normalize(dirX, dirY, dirZ, succes);
 			if (!succes) {
@@ -569,6 +692,7 @@ void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngl
 {
 	lights.clear();
 	screenClear();
+	randomRepeatChecker.onStartNewFrame();
 
 	lights.push_back(LIGHT_BOX(6000, 0, 170, 0, 30, 200, 30, false));
 	lights.push_back(LIGHT_BOX(12000, 0, -55, 0, 50, -50, 100, false));
