@@ -574,7 +574,7 @@ void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngl
 	lights.push_back(LIGHT_BOX(12000, 0, -55, 0, 50, -50, 100, false));
 	lights.push_back(LIGHT_BOX(8400, 250, 0, -35, 255, 120, 10, false)); 
 	lights.push_back(LIGHT_BOX(16000, 250, 133, 190, 255, 173, 235, false));
-	lights.push_back(LIGHT_BOX(16000, -20, 50, 190, -15, 80, 235, false));
+	lights.push_back(LIGHT_BOX(14000, -20, 50, 190, -15, 80, 235, false));
 
 //	lights.push_back(LIGHT_BOX(4000, 55, 100, 70,   150, 103, 73, true));
 
