@@ -16,7 +16,11 @@ double NodeBranch::GetDensity(float x, float y, float z, bool isHardBrush, float
 
 	double result = 1.;
 	for (const auto& nodeRef: childNodes) {
-		result *= 1. - nodeRef.childNode->GetDensity((x - nodeRef.xPos)/nodeRef.scale, (y - nodeRef.yPos) / nodeRef.scale, (z - nodeRef.zPos) / nodeRef.scale, isHardBrush, brushCoeff);
+		float childScale = nodeRef.scale;
+		if (nodeRef.childNode->isLeaf()) {
+			childScale *= 1.3f;                      // !!! const
+		}
+		result *= 1. - nodeRef.childNode->GetDensity((x - nodeRef.xPos)/ childScale, (y - nodeRef.yPos) / childScale, (z - nodeRef.zPos) / childScale, isHardBrush, brushCoeff);
 	}
 	return 1. - result;
 }

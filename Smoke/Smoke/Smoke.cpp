@@ -696,7 +696,7 @@ void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngl
 	screenClear();
 	randomRepeatChecker.onStartNewFrame();
 
-	lights.push_back(LIGHT_BOX(6000, 0, 170, 0, 30, 200, 30, false));
+	lights.push_back(LIGHT_BOX(5000, 0, 170, 0, 30, 200, 30, false));
 	lights.push_back(LIGHT_BOX(12000, 0, -55, 0, 50, -50, 100, false));
 	lights.push_back(LIGHT_BOX(8400, 250, 0, -35, 255, 120, 10, false)); 
 	lights.push_back(LIGHT_BOX(16000, 250, 133, 190, 255, 173, 235, false));
