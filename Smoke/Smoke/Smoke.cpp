@@ -628,14 +628,14 @@ void rasterizeScene()
 	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 103, 175, 100, 0.54f, false);
 	addToScene(rasterizeBuf);
 	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 140, 147, 115, 0.6f*1.2f, false);   // Облако
-	addToScene(rasterizeBuf, 0.05f);
+	addToScene(rasterizeBuf, 0.12f);
 	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 120, 147, 90, 0.6f, false);   // Облако
 	addToScene(rasterizeBuf);
 	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 85, 165, 75, 0.6f*1.15f, false);   // Облако
 	addToScene(rasterizeBuf, 0.2f);
 	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 100, 60, 140, 0.6f, false);   // Облако
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 95, 100, 75, 0.6f*1.3f, false);   // Облако лево центр
+	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 85, 100, 50, 0.6f*1.1f, false);   // Облако лево центр
 	addToScene(rasterizeBuf, 0.5f);
 	   
 	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 103, 180, 80, 0.3f, false);  // Маленькие у подножия
