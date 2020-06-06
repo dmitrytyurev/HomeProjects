@@ -22,7 +22,7 @@ const int ScreenSize = 400; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -500; // Позиция камеры по z в системе координат сетки
 const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана  0.00002;
-const int SceneDrawNum = 550; // Сколько раз рендерим сцену
+const int SceneDrawNum = 500; // Сколько раз рендерим сцену
 
 
 
@@ -574,7 +574,7 @@ void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngl
 	lights.push_back(LIGHT_BOX(12000, 0, -55, 0, 50, -50, 100, false));
 	lights.push_back(LIGHT_BOX(8400, 250, 40, -35, 255, 160, 10, false));
 	lights.push_back(LIGHT_BOX(8400, 250, 40, 190, 255, 160, 235, false));
-	lights.push_back(LIGHT_BOX(5000, -20, 50, 190, -15, 110, 235, false));
+	lights.push_back(LIGHT_BOX(12000, -20, 50, 190, -15, 80, 235, false));
 
 //	lights.push_back(LIGHT_BOX(4000, 55, 100, 70,   150, 103, 73, true));
 
@@ -628,7 +628,7 @@ void rasterizeScene()
 	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 103, 175, 100, 0.54f, false);
 	addToScene(rasterizeBuf);
 	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 140, 147, 115, 0.6f*1.2f, false);   // Облако
-	addToScene(rasterizeBuf, 0.12f);
+	addToScene(rasterizeBuf, 0.09f);
 	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 120, 147, 90, 0.6f, false);   // Облако
 	addToScene(rasterizeBuf);
 	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 85, 165, 75, 0.6f*1.15f, false);   // Облако
