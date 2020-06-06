@@ -23,7 +23,7 @@ const int ScreenSize = 400; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -500; // Позиция камеры по z в системе координат сетки
 const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана  0.00002;
-const int SceneDrawNum = 500; // Сколько раз рендерим сцену
+const int SceneDrawNum = 1000; // Сколько раз рендерим сцену
 
 
 
@@ -499,15 +499,17 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 		if (x < sceneBBoxX1 || x > sceneBBoxX2 || y < sceneBBoxY1 || y > sceneBBoxY2 || z < sceneBBoxZ1 || z > sceneBBoxZ2) {
 			return;
 		}
-		for (const auto& light : lights) {
-			if (x > light.x1 && x < light.x2 && y > light.y1 && y < light.y2 && z > light.z1 && z < light.z2) {
-				if (!light.inner) {
-					screen[xi][yi] += std::max(light.bright - lightDropAbs, 0.) * lightDropMul;
+		if (!firstScatter || draftRender) {                             // Влёт в лампочку проверяем только после первого рассеивания, чтобы сами лампочки не отображались
+			for (const auto& light : lights) {
+				if (x > light.x1 && x < light.x2 && y > light.y1 && y < light.y2 && z > light.z1 && z < light.z2) {
+					if (!light.inner) {
+						screen[xi][yi] += std::max(light.bright - lightDropAbs, 0.) * lightDropMul;
+					}
+					else {
+						screen[xi][yi] += std::max(light.bright - lightDropAbs, 0.);
+					}
+					return;
 				}
-				else {
-					screen[xi][yi] += std::max(light.bright - lightDropAbs, 0.);
-				}
-				return;
 			}
 		}
 
