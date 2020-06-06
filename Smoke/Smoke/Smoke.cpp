@@ -583,6 +583,7 @@ void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngl
 
 	// Рендерим все кадры сцены
 	for (int n=0; n < SceneDrawNum; ++n) {
+		srand(n);
 		printf("Rendernig subframe %d/%d of frame %d\n", n, SceneDrawNum, frameN);
 		renderSubFrame(0, 0, ScreenSize, ScreenSize, n, ScreenSize, cameraAngle, draftRender);
 
