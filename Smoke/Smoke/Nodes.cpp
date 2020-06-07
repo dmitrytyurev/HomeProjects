@@ -2,6 +2,9 @@
 #include <map>
 #include "Nodes.h"
 #include "utils.h"
+
+float leafScale = 1.f;
+
 //--------------------------------------------------------------------------------------------
 
 double NodeBranch::GetDensity(float x, float y, float z, bool isHardBrush, float brushCoeff)
@@ -18,7 +21,9 @@ double NodeBranch::GetDensity(float x, float y, float z, bool isHardBrush, float
 	for (const auto& nodeRef: childNodes) {
 		float childScale = nodeRef.scale;
 		if (nodeRef.childNode->isLeaf()) {
-			childScale *= 1.3f;                      // !!! const
+			//printf("leafScale=%f\n", leafScale);
+			float scale = (leafScale - 1.f) * nodeRef.animateCoeff + 1.f;
+			childScale *= scale;
 		}
 		result *= 1. - nodeRef.childNode->GetDensity((x - nodeRef.xPos)/ childScale, (y - nodeRef.yPos) / childScale, (z - nodeRef.zPos) / childScale, isHardBrush, brushCoeff);
 	}
@@ -188,6 +193,19 @@ void NodeBase::deserializeBase(FILE* f)
 	fread(&bboxX2, sizeof(float), 1, f);
 	fread(&bboxY2, sizeof(float), 1, f);
 	fread(&bboxZ2, sizeof(float), 1, f);
+
+	const float mul = 0.3f;                   // !!! const
+	float size = bboxX2 - bboxX1;
+	bboxX1 -= size * mul * 0.5f;
+	bboxX2 += size * mul * 0.5f;
+
+	size = bboxY2 - bboxY1;
+	bboxY1 -= size * mul * 0.5f;
+	bboxY2 += size * mul * 0.5f;
+
+	size = bboxZ2 - bboxZ1;
+	bboxZ1 -= size * mul * 0.5f;
+	bboxZ2 += size * mul * 0.5f;
 }
 
 //--------------------------------------------------------------------------------------------
@@ -209,6 +227,7 @@ void NodeRef::serialize(FILE* f) const
 
 void NodeRef::deserialize(FILE* f)
 {
+	animateCoeff = randf(0.f, 1.f) < 0.5f ? 0.25f : 1.f;             // !!! coeff
 	fread(&xPos, sizeof(float), 1, f);
 	fread(&yPos, sizeof(float), 1, f);
 	fread(&zPos, sizeof(float), 1, f);

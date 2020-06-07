@@ -6,6 +6,9 @@ const float PI = 3.14159f;
 //--------------------------------------------------------------------------------------------
 
 void _cdecl exit_msg(const char *text, ...);
+//int rand(int min, int max);
+//float randf(float min, float max);
+//void setRandSeed(unsigned int seed);
 
 //--------------------------------------------------------------------------------------------
 

@@ -14,6 +14,7 @@
 void rasterizeCloud(std::vector<float>& dst, int bufSize, int randSeed, bool isHardBrush, float brushCoeff, float xPos, float yPos, float zPos, float scale, bool generateOrLoad);
 void load3dCloud(const std::string& fname, std::vector<float>& dst, int size);
 
+extern float leafScale;
 //--------------------------------------------------------------------------------------------
 // Ренедер
 //--------------------------------------------------------------------------------------------
@@ -23,7 +24,7 @@ const int ScreenSize = 400; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -500; // Позиция камеры по z в системе координат сетки
 const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана  0.00002;
-const int SceneDrawNum = 1000; // Сколько раз рендерим сцену
+const int SceneDrawNum = 500; // Сколько раз рендерим сцену
 
 
 
@@ -696,7 +697,7 @@ void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngl
 	screenClear();
 	randomRepeatChecker.onStartNewFrame();
 
-	lights.push_back(LIGHT_BOX(5000, 0, 170, 0, 30, 200, 30, false));
+	lights.push_back(LIGHT_BOX(4500, 0, 170, 0, 30, 200, 30, false));
 	lights.push_back(LIGHT_BOX(12000, 0, -55, 0, 50, -50, 100, false));
 	lights.push_back(LIGHT_BOX(8400, 250, 0, -35, 255, 120, 10, false)); 
 	lights.push_back(LIGHT_BOX(16000, 250, 133, 190, 255, 173, 235, false));
@@ -783,8 +784,6 @@ const bool draft = false;
 
 void RenderRotate(int fromFrame, int toFrame)
 {
-	std::vector<float> rasterizeBuf;
-
 	rasterizeScene();
 	for (int i = fromFrame; i <= toFrame; ++i) {
 		renderFrame("Scenes/3dScene_Cloud_Rotate", i, PI / (framesInTurn-1) * i, draft);
@@ -793,10 +792,18 @@ void RenderRotate(int fromFrame, int toFrame)
 
 //--------------------------------------------------------------------------------------------
 
+void RenderAnimate(int fromFrame, int toFrame)
+{
+	for (int i = fromFrame; i <= toFrame; ++i) {
+		leafScale = 1.f + i * 0.5f;
+		rasterizeScene();
+		renderFrame("Scenes/3dScene_Cloud_Rotate", i, 0, draft);
+	}
+}
+//--------------------------------------------------------------------------------------------
+
 int main(int argc, char *argv[], char *envp[])
 {
-	//RenderRandom();
-
 	int fromFrame = 0;
 	int toFrame = framesInTurn-1;
 
@@ -805,6 +812,7 @@ int main(int argc, char *argv[], char *envp[])
 		toFrame = atoi(argv[2]);
 	}
 
-	RenderRotate(fromFrame, toFrame);
+	//RenderRotate(fromFrame, toFrame);
+	RenderAnimate(fromFrame, toFrame);
 }
 

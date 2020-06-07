@@ -2,6 +2,13 @@
 #include <stdarg.h>
 #include <string>
 #include <algorithm>
+#include <random>
+
+//--------------------------------------------------------------------------------------------
+
+//std::mt19937 gen;
+//std::default_random_engine gen;
+//std::uniform_real_distribution<double> distrib(0, 1);
 
 //--------------------------------------------------------------------------------------------
 
@@ -25,4 +32,26 @@ void log(const std::string& str)
 	fprintf(f, str.c_str());
 	fclose(f);
 }
+
+//--------------------------------------------------------------------------------------------
+
+//int rand(int min, int max)
+//{
+//	int val = (int)(distrib(gen) * (max - min + 1)) + min;
+//	return std::min(val, max);
+//}
+//
+////--------------------------------------------------------------------------------------------
+//
+//float randf(float min, float max)
+//{
+//	return (float)(distrib(gen) * (max - min) + min);
+//}
+//
+////--------------------------------------------------------------------------------------------
+//
+//void setRandSeed(unsigned int seed)
+//{
+//	gen.seed(seed);
+//}
 

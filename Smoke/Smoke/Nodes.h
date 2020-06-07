@@ -24,6 +24,7 @@ struct NodeRef
 	int a = 255;
 	uint64_t tmpNodeId = 0;    // јйдшиник ноды, используетс€ только на врем€ десериализации
 	std::shared_ptr<NodeBase> childNode;
+	float animateCoeff = 0;
 };
 
 
