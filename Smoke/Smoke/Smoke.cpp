@@ -24,9 +24,9 @@ const int ScreenSize = 400; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -500; // Позиция камеры по z в системе координат сетки
 const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана  0.00002;
-const int SceneDrawNum = 500; // Сколько раз рендерим сцену
-
-
+const int SubframesInOneFrame = 400; // Сколько раз рендерим сцену
+const int framesInTurn = 125;
+const bool draft = true;
 
 //--------------------------------------------------------------------------------------------
 
@@ -579,7 +579,7 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 // Рендерить сцену в буфер screen
 //--------------------------------------------------------------------------------------------
 
-void renderSubFrame(int x1, int y1, int x2, int y2, int frame, int screenSize, float cameraAngle, bool draftRender)
+void renderSubFrame(int x1, int y1, int x2, int y2, int frame, int screenSize, float cameraAngleA, float cameraAngleB, bool draftRender)
 {
 	float cameraX = SceneSize / 2.f;
 	float cameraY = SceneSize / 2.f;
@@ -603,15 +603,29 @@ void renderSubFrame(int x1, int y1, int x2, int y2, int frame, int screenSize, f
 			float dirY = y - cameraY;
 			float dirZ = z - cameraZ;
 
-			float xTurned = 0;
-			float yTurned = y;
+			float xTurned = x;
+			float yTurned = 0;
 			float zTurned = 0;
-			float dirXTurned = 0;
-			float dirYTurned = dirY;
+			float dirXTurned = dirX;
+			float dirYTurned = 0;
 			float dirZTurned = 0;
-			turnPointCenter(x, z, cameraAngle, 100, 100, xTurned, zTurned);
-			turnPoint(dirX, dirZ, cameraAngle, dirXTurned, dirZTurned);
-			renderPixel(xi, yi, xTurned, yTurned, zTurned, dirXTurned, dirYTurned, dirZTurned, draftRender);
+
+			// Наклон камеры
+			turnPointCenter(z, y, cameraAngleB, 100, 100, zTurned, yTurned);
+			turnPoint(dirZ, dirY, cameraAngleB, dirZTurned, dirYTurned);
+
+			float xTurned2 = 0;
+			float yTurned2 = yTurned;
+			float zTurned2 = 0;
+			float dirXTurned2 = 0;
+			float dirYTurned2 = dirYTurned;
+			float dirZTurned2 = 0;
+
+			// Вращение камеры в горизонтальной плоскости
+			turnPointCenter(xTurned, zTurned, cameraAngleA, 100, 100, xTurned2, zTurned2);
+			turnPoint(dirXTurned, dirZTurned, cameraAngleA, dirXTurned2, dirZTurned2);
+			// Рендер пиксела
+			renderPixel(xi, yi, xTurned2, yTurned2, zTurned2, dirXTurned2, dirYTurned2, dirZTurned2, draftRender);
 		}
 	}
 }
@@ -691,7 +705,7 @@ void screenClear()
 
 //--------------------------------------------------------------------------------------------
 
-void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngle, bool draftRender)
+void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngleA, float cameraAngleB, bool draftRender)
 {
 	lights.clear();
 	screenClear();
@@ -709,10 +723,10 @@ void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngl
 	fillSceneBbox();
 
 	// Рендерим все кадры сцены
-	for (int n=0; n < SceneDrawNum; ++n) {
+	for (int n=0; n < SubframesInOneFrame; ++n) {
 		srand(n);
-		printf("Rendernig subframe %d/%d of frame %d\n", n, SceneDrawNum, frameN);
-		renderSubFrame(0, 0, ScreenSize, ScreenSize, n, ScreenSize, cameraAngle, draftRender);
+		printf("Rendernig subframe %d/%d of frame %d\n", n, SubframesInOneFrame, frameN);
+		renderSubFrame(0, 0, ScreenSize, ScreenSize, n, ScreenSize, cameraAngleA, cameraAngleB, draftRender);
 
 		if (!draftRender && (n % 50) == 0) {
 			std::string fname = std::string("Scenes/Frame") + digit5intFormat(frameN) + "_" + digit5intFormat(n) + ".bmp";
@@ -721,7 +735,7 @@ void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngl
 	}
 
 	std::string fname = fileNamePrefix + digit5intFormat(frameN) + ".bmp";
-	saveToBmp(fname, ScreenSize, ScreenSize, [](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (SceneDrawNum + 1), 255.)); });
+	saveToBmp(fname, ScreenSize, ScreenSize, [](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (SubframesInOneFrame + 1), 255.)); });
 }
 
 //--------------------------------------------------------------------------------------------
@@ -734,13 +748,13 @@ void RenderRandom()
 		rasterizeCloud(rasterizeBuf, SceneSize, i, true, 0.04f, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f, true);
 		copyToScene(rasterizeBuf);
 		calcNormalsAndSurfInterp();
-		renderFrame("Scenes/3dScene_Cloud_Rand", i, 0.f, false);
+		renderFrame("Scenes/3dScene_Cloud_Rand", i, 0.f, 0.f, false);
 	}
 }
 
 //--------------------------------------------------------------------------------------------
 
-void rasterizeScene()
+void rasterizeSceneVulcano()
 {
 	std::vector<float> rasterizeBuf;
 	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 265 / 2, 112 / 2, 100, 0.675f, false);
@@ -779,14 +793,127 @@ void rasterizeScene()
 }
 
 //--------------------------------------------------------------------------------------------
-const int framesInTurn = 30;
-const bool draft = false;
+
+void rasterizeSceneHeaven()
+{
+	std::vector<float> rasterizeBuf;
+	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 10, 160, 10, 0.475f, false);
+	copyToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 40, 160, 10, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 70, 160, 10, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 100, 160, 10, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 130, 160, 10, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 160, 160, 10, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 190, 190, 10, 0.475f, false);
+	addToScene(rasterizeBuf);
+
+	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 10, 160, 40, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 40, 160, 40, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 70, 160, 40, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 100, 160, 40, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 130, 160, 40, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 160, 160, 40, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 190, 190, 40, 0.475f, false);
+	addToScene(rasterizeBuf);
+
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 10, 160, 70, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 40, 160, 70, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 70, 160, 70, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 100, 160, 70, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 130, 160, 70, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 160, 160, 70, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 190, 190, 70, 0.475f, false);
+	addToScene(rasterizeBuf);
+
+	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 10, 160, 100, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 40, 160, 100, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 70, 160, 100, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 100, 160, 100, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 130, 160, 100, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 160, 160, 100, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 190, 190, 100, 0.475f, false);
+	addToScene(rasterizeBuf);
+
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 10, 160, 130, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 40, 160, 130, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 70, 160, 130, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 100, 160, 130, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 130, 160, 130, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 160, 160, 130, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 190, 190, 130, 0.475f, false);
+	addToScene(rasterizeBuf);
+
+	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 10, 160, 160, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 40, 160, 160, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 70, 160, 160, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 100, 160, 160, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 130, 160, 160, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 160, 160, 160, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 190, 190, 160, 0.475f, false);
+	addToScene(rasterizeBuf);
+
+	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 10, 160, 190, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 40, 160, 190, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 70, 160, 190, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 100, 160, 190, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 130, 160, 190, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 160, 160, 190, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 190, 190, 190, 0.475f, false);
+	addToScene(rasterizeBuf);
+
+	// Заполняем нормали и коэффициенты поверхности
+	calcNormalsAndSurfInterp();
+}
+
+
+//--------------------------------------------------------------------------------------------
 
 void RenderRotate(int fromFrame, int toFrame)
 {
-	rasterizeScene();
+	rasterizeSceneVulcano();
 	for (int i = fromFrame; i <= toFrame; ++i) {
-		renderFrame("Scenes/3dScene_Cloud_Rotate", i, PI / (framesInTurn-1) * i, draft);
+		renderFrame("Scenes/3dScene_Cloud_Rotate", i, PI / (framesInTurn-1) * i, 0, draft);
 	}
 }
 
@@ -795,11 +922,20 @@ void RenderRotate(int fromFrame, int toFrame)
 void RenderAnimate(int fromFrame, int toFrame)
 {
 	for (int i = fromFrame; i <= toFrame; ++i) {
-		leafScale = 1.f + i * 0.5f;
-		rasterizeScene();
-		renderFrame("Scenes/3dScene_Cloud_Rotate", i, 0, draft);
+		leafScale = 0.5f + i * ((2.f - 0.5f) / framesInTurn);
+		rasterizeSceneVulcano();
+		renderFrame("Scenes/3dScene_Cloud_Rotate", i, PI*0.05f / (framesInTurn - 1) * i, 0, draft);
 	}
 }
+
+//--------------------------------------------------------------------------------------------
+
+void RenderHeaven()
+{
+	rasterizeSceneHeaven();
+	renderFrame("Scenes/3dScene_Heaven", 0, 0, PI/4, false);
+}
+
 //--------------------------------------------------------------------------------------------
 
 int main(int argc, char *argv[], char *envp[])
@@ -807,12 +943,13 @@ int main(int argc, char *argv[], char *envp[])
 	int fromFrame = 0;
 	int toFrame = framesInTurn-1;
 
-	if (argc == 3) {
+	if (argc >= 3) {
 		fromFrame = atoi(argv[1]);
 		toFrame = atoi(argv[2]);
 	}
 
 	//RenderRotate(fromFrame, toFrame);
-	RenderAnimate(fromFrame, toFrame);
+	//RenderAnimate(fromFrame, toFrame);
+	RenderHeaven();
 }
 
