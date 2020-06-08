@@ -21,7 +21,6 @@ double NodeBranch::GetDensity(float x, float y, float z, bool isHardBrush, float
 	for (const auto& nodeRef: childNodes) {
 		float childScale = nodeRef.scale;
 		if (nodeRef.childNode->isLeaf()) {
-			//printf("leafScale=%f\n", leafScale);
 			float scale = (leafScale - 1.f) * nodeRef.animateCoeff + 1.f;
 			childScale *= scale;
 		}
@@ -227,7 +226,7 @@ void NodeRef::serialize(FILE* f) const
 
 void NodeRef::deserialize(FILE* f)
 {
-	animateCoeff = randf(0.f, 1.f) < 0.5f ? 0.25f : 1.f;             // !!! coeff
+	animateCoeff = randf(0.f, 1.f) < 0.45f ? 0.25f : 1.f;             // !!! coeff
 	fread(&xPos, sizeof(float), 1, f);
 	fread(&yPos, sizeof(float), 1, f);
 	fread(&zPos, sizeof(float), 1, f);
