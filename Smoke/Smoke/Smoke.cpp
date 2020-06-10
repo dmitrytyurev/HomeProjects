@@ -24,9 +24,9 @@ const int ScreenSize = 400; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -500; // Позиция камеры по z в системе координат сетки
 const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана  0.00002;
-const int SubframesInOneFrame = 10; // Сколько раз рендерим сцену
+int SubframesInOneFrame = 700; // Сколько раз рендерим сцену
 const int framesInTurn = 669;
-const bool draft = true;
+bool draft = true;
 bool useCosineMul = true;
 float zoom = 1.f;
 
@@ -295,7 +295,7 @@ void intersect(float x, float y, float z, float dirX, float dirY, float dirZ, fl
 void calcNormalsAndSurfInterp()
 {
 	printf("calcNormalsAndSurfInterp...\n");
-	const int radius = 1;                                                                      // !!!const
+	const int radius = draft ? 2: 5;                                                                      // !!!const
 	for (int z = radius; z < SceneSize-radius; ++z)	{
 		for (int y = radius; y < SceneSize - radius; ++y) {
 			for (int x = radius; x < SceneSize - radius; ++x) {
@@ -494,7 +494,7 @@ void RandomRepeatChecker::check(int xi, int yi, float dirX, float dirY, float di
 
 RandomRepeatChecker randomRepeatChecker;
 
-void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float dirY, float dirZ, bool draftRender)
+void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float dirY, float dirZ)
 {
 	double lightDropAbs = 0;
 	double lightDropMul = 1;
@@ -504,7 +504,7 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 		if (x < sceneBBoxX1 || x > sceneBBoxX2 || y < sceneBBoxY1 || y > sceneBBoxY2 || z < sceneBBoxZ1 || z > sceneBBoxZ2) {
 			return;
 		}
-		if (!firstScatter || draftRender) {                             // Влёт в лампочку проверяем только после первого рассеивания, чтобы сами лампочки не отображались
+		if (!firstScatter || draft) {                             // Влёт в лампочку проверяем только после первого рассеивания, чтобы сами лампочки не отображались
 			for (const auto& light : lights) {
 				if (x > light.x1 && x < light.x2 && y > light.y1 && y < light.y2 && z > light.z1 && z < light.z2) {
 					if (!light.inner) {
@@ -537,7 +537,7 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 		needScatter = randf(0.f, 1.f) < curScatterProb;
 
 		if (needScatter) {
-			if (draftRender) {
+			if (draft) {
 				bool succ = false;
 				normalize(dirX, dirY, dirZ, succ);
 				float cosin = cell.normalX*(-dirX) + cell.normalY*(-dirY) + cell.normalZ*(-dirZ);
@@ -585,7 +585,7 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 // Рендерить сцену в буфер screen
 //--------------------------------------------------------------------------------------------
 
-void renderSubFrame(int x1, int y1, int x2, int y2, int frame, int screenSize, float cameraAngleA, float cameraAngleB, bool draftRender)
+void renderSubFrame(int x1, int y1, int x2, int y2, int frame, int screenSize, float cameraAngleA, float cameraAngleB)
 {
 	float cameraX = SceneSize / 2.f;
 	float cameraY = SceneSize / 2.f;
@@ -633,7 +633,7 @@ void renderSubFrame(int x1, int y1, int x2, int y2, int frame, int screenSize, f
 			turnPointCenter(xTurned, zTurned, cameraAngleA, 100, 100, xTurned2, zTurned2);
 			turnPoint(dirXTurned, dirZTurned, cameraAngleA, dirXTurned2, dirZTurned2);
 			// Рендер пиксела
-			renderPixel(xi, yi, xTurned2, yTurned2, zTurned2, dirXTurned2, dirYTurned2, dirZTurned2, draftRender);
+			renderPixel(xi, yi, xTurned2, yTurned2, zTurned2, dirXTurned2, dirYTurned2, dirZTurned2);
 		}
 	}
 }
@@ -713,7 +713,7 @@ void screenClear()
 
 //--------------------------------------------------------------------------------------------
 
-void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngleA, float cameraAngleB, bool draftRender)
+void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngleA, float cameraAngleB)
 {
 	screenClear();
 	randomRepeatChecker.onStartNewFrame();
@@ -722,9 +722,9 @@ void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngl
 	for (int n=0; n < SubframesInOneFrame; ++n) {
 		srand(n);
 		printf("Rendernig subframe %d/%d of frame %d\n", n, SubframesInOneFrame, frameN);
-		renderSubFrame(0, 0, ScreenSize, ScreenSize, n, ScreenSize, cameraAngleA, cameraAngleB, draftRender);
+		renderSubFrame(0, 0, ScreenSize, ScreenSize, n, ScreenSize, cameraAngleA, cameraAngleB);
 
-		if (!draftRender && (n % 50) == 0) {
+		if (!draft && (n % 50) == 0) {
 			std::string fname = std::string("Scenes/Frame") + digit5intFormat(frameN) + "_" + digit5intFormat(n) + ".bmp";
 			saveToBmp(fname, ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
 		}
@@ -744,7 +744,7 @@ void RenderRandom()
 		rasterizeCloud(rasterizeBuf, SceneSize, i, true, 0.04f, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f, true);
 		copyToScene(rasterizeBuf);
 		calcNormalsAndSurfInterp();
-		renderFrame("Scenes/3dScene_Cloud_Rand", i, 0.f, 0.f, false);
+		renderFrame("Scenes/3dScene_Cloud_Rand", i, 0.f, 0.f);
 	}
 }
 
@@ -944,7 +944,7 @@ void RenderRotate(int fromFrame, int toFrame)
 {
 	setupSceneVulcano();
 	for (int i = fromFrame; i <= toFrame; ++i) {
-		renderFrame("Scenes/3dScene_Cloud_Rotate", i, PI / (framesInTurn-1) * i, 0, draft);
+		renderFrame("Scenes/3dScene_Cloud_Rotate", i, PI / (framesInTurn-1) * i, 0);
 	}
 }
 
@@ -958,7 +958,7 @@ void RenderHeaven()
 	for (int i = 3; i <= 42; ++i) {
 		addY = -i * 25.f;
 		setupSceneHeaven();
-		renderFrame("Scenes/3dScene_Heaven", i, 0, PI / 4, false);   // PI / 4
+		renderFrame("Scenes/3dScene_Heaven", i, 0, PI / 4);   // PI / 4
 	}
 
 }
@@ -991,11 +991,14 @@ void RenderAnimate(int fromFrame, int toFrame)
 {
 	float cameraAl = PI;
 
-	for (int i = fromFrame; i <= toFrame; ++i) {
+	for (int i = 0; i <= toFrame; ++i) {
 		//leafScale = 0.5f + i * ((2.f - 0.5f) / framesInTurn);
 		//leafScale = 1;
-		setupSceneVulcano();
-		renderFrame("Scenes/3dScene_Cloud_Rotate", i, cameraAl, 0, draft);
+
+		if (i >= fromFrame) {
+			setupSceneVulcano();
+			renderFrame("Scenes/3dScene_Cloud_Rotate", i, cameraAl, 0);
+		}
 		float curTime = i / 25.f;
 		float cameraAlSpeed = getInterp(cameraAlSpeedTrack, curTime);
 		cameraAl += cameraAlSpeed;
@@ -1007,6 +1010,10 @@ void RenderAnimate(int fromFrame, int toFrame)
 
 int main(int argc, char *argv[], char *envp[])
 {
+	if (draft) {
+		SubframesInOneFrame = 5;
+	}
+
 	int fromFrame = 0;
 	int toFrame = framesInTurn-1;
 

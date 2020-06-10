@@ -4,6 +4,7 @@
 #include "utils.h"
 
 float leafScale = 1.f;
+extern bool draft;
 
 //--------------------------------------------------------------------------------------------
 
@@ -65,11 +66,29 @@ void NodeBranch::generate3dCloud(std::vector<float>& dst, int bufSize, float xPo
 
 	dst.resize(bufSize*bufSize*bufSize);
 
-	for (int z = 0; z < bufSize; ++z) {
-		//printf("z: %d of %d\n", z, bufSize);
-		for (int y = 0; y < bufSize; ++y) {
-			for (int x = 0; x < bufSize; ++x) {
-				dst[z*bufSize*bufSize + y * bufSize + x] = (float)GetDensity((x - xPos)/scale, (y - yPos)/scale, (z - zPos)/scale, isHardBrush, brushCoeff);
+	if (!draft) {
+		for (int z = 0; z < bufSize; ++z) {
+			for (int y = 0; y < bufSize; ++y) {
+				for (int x = 0; x < bufSize; ++x) {
+					dst[z*bufSize*bufSize + y * bufSize + x] = (float)GetDensity((x - xPos) / scale, (y - yPos) / scale, (z - zPos) / scale, isHardBrush, brushCoeff);
+				}
+			}
+		}
+	}
+	else {
+		for (int z = 0; z < bufSize; z+=2) {
+			for (int y = 0; y < bufSize; y+=2) {
+				for (int x = 0; x < bufSize; x+=2) {
+					float dens = (float)GetDensity((x - xPos) / scale, (y - yPos) / scale, (z - zPos) / scale, isHardBrush, brushCoeff);
+					dst[z*bufSize*bufSize + y * bufSize + x] = dens;
+					dst[z*bufSize*bufSize + y * bufSize + x+1] = dens;
+					dst[z*bufSize*bufSize + (y+1) * bufSize + x] = dens;
+					dst[z*bufSize*bufSize + (y + 1) * bufSize + x + 1] = dens;
+					dst[(z + 1)*bufSize*bufSize + y * bufSize + x] = dens;
+					dst[(z + 1)*bufSize*bufSize + y * bufSize + x + 1] = dens;
+					dst[(z + 1)*bufSize*bufSize + (y + 1) * bufSize + x] = dens;
+					dst[(z + 1)*bufSize*bufSize + (y + 1) * bufSize + x + 1] = dens;
+				}
 			}
 		}
 	}
