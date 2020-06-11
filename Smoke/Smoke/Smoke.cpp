@@ -25,10 +25,10 @@ const int SceneSize = 200;  // Размер сцены в единичных к�
 const float cameraZinit = -500; // Позиция камеры по z в системе координат сетки
 const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана  0.00002;
 int SubframesInOneFrame = 700; // Сколько раз рендерим сцену
-const int framesInTurn = 669;
 bool draft = true;
 bool useCosineMul = true;
-float zoom = 1.f;
+float zoom = 1.f;       // Увеличение камеры
+float scenesInterp = 0; // 0 - сцена с вулканом, 1 - сцена с облаками
 
 float addY = 0;
 float draftLightning = 0;
@@ -953,16 +953,6 @@ void setupSceneHeaven()
 
 //--------------------------------------------------------------------------------------------
 
-void RenderRotate(int fromFrame, int toFrame)
-{
-	setupSceneVulcano();
-	for (int i = fromFrame; i <= toFrame; ++i) {
-		renderFrame("Scenes/3dScene_Cloud_Rotate", i, PI / (framesInTurn-1) * i, 0);
-	}
-}
-
-//--------------------------------------------------------------------------------------------
-
 void RenderHeaven()
 {
 	//setupSceneHeaven();
@@ -1043,14 +1033,13 @@ int main(int argc, char *argv[], char *envp[])
 	}
 
 	int fromFrame = 0;
-	int toFrame = framesInTurn-1;
+	int toFrame = 0;
 
 	if (argc >= 3) {
 		fromFrame = atoi(argv[1]);
 		toFrame = atoi(argv[2]);
 	}
 
-	//RenderRotate(fromFrame, toFrame);
 	RenderAnimate(fromFrame, toFrame);
 	//RenderHeaven();
 }
