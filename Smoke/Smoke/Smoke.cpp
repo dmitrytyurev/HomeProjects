@@ -31,6 +31,7 @@ bool useCosineMul = true;
 float zoom = 1.f;
 
 float addY = 0;
+float draftLightning = 0;
 
 //--------------------------------------------------------------------------------------------
 
@@ -504,7 +505,7 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 		if (x < sceneBBoxX1 || x > sceneBBoxX2 || y < sceneBBoxY1 || y > sceneBBoxY2 || z < sceneBBoxZ1 || z > sceneBBoxZ2) {
 			return;
 		}
-		if (!firstScatter || draft) {                             // Влёт в лампочку проверяем только после первого рассеивания, чтобы сами лампочки не отображались
+		if (!firstScatter /*|| draft*/) {                             // Влёт в лампочку проверяем только после первого рассеивания, чтобы сами лампочки не отображались
 			for (const auto& light : lights) {
 				if (x > light.x1 && x < light.x2 && y > light.y1 && y < light.y2 && z > light.z1 && z < light.z2) {
 					if (!light.inner) {
@@ -541,7 +542,9 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 				bool succ = false;
 				normalize(dirX, dirY, dirZ, succ);
 				float cosin = cell.normalX*(-dirX) + cell.normalY*(-dirY) + cell.normalZ*(-dirZ);
-				screen[xi][yi] += fabs(cosin * 255);
+				float br = fabs(cosin * 255);
+				br = (255.f - br) * draftLightning + br;
+				screen[xi][yi] += br;
 				return;
 			}
 
@@ -715,6 +718,17 @@ void screenClear()
 
 void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngleA, float cameraAngleB)
 {
+	draftLightning = 0.f;
+	if (draft) {
+		for (auto& light : lights) {
+			if (light.inner) {
+				draftLightning = std::min(light.bright / 4000.f, 1.f);                              // !!! const
+				break;
+			}
+		}
+	}
+	printf("                                          %f\n", draftLightning);
+
 	screenClear();
 	randomRepeatChecker.onStartNewFrame();
 
@@ -753,7 +767,6 @@ void RenderRandom()
 void setupSceneVulcano()
 {
 	useCosineMul = true;
-	zoom = 1.f;
 
 	std::vector<float> rasterizeBuf;
 	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 265 / 2, 112 / 2, 100, 0.675f, false);
@@ -797,7 +810,7 @@ void setupSceneVulcano()
 	lights.push_back(LIGHT_BOX(16000, 250, 133, 190, 255, 173, 235, false));
 	lights.push_back(LIGHT_BOX(14000, -20, 50, 190, -15, 80, 235, false));
 
-	//lights.push_back(LIGHT_BOX(4000, 90, 90, 90, 110, 110, 110, true));   // Внутренний свет (молния)
+	lights.push_back(LIGHT_BOX(0, 90, 90, 90, 110, 110, 110, true));   // Внутренний свет (молния) 4000
 
 	// Заполнить BBOX сцены по лампочкам
 	fillSceneBbox();
@@ -983,7 +996,22 @@ float getInterp(std::vector<std::pair<float, float>>& v, float time)
 
 //--------------------------------------------------------------------------------------------
 
-std::vector<std::pair<float, float>> cameraAlSpeedTrack = { {2.7f, 0.f}, {3.2f, -0.01f}, {7.8f, -0.01f}, {8.f, -0.0445f}, {9.5f, -0.0445f}, {9.7f, 0.f} };
+void setLightning(float bright)
+{
+	for (auto& light : lights) {
+		if (light.inner) {
+			light.bright = bright;
+		}
+	}
+}
+// Быстрый сброс скейла анимации
+//std::vector<std::pair<float, float>> smokeAnimTrack = { {0.f, 0.5f}, {3.f, 2.f}, {3.01f, 0.5f}, {3.4f, 0.5f}, {6.42f, 2.f}, {6.43f, 0.5f}, {6.8f, 0.5f}, {9.8f, 2.f}, {9.81f, 0.5f}, {10.25f, 0.5f}, {13.25f, 2.f}, {13.26f, 0.5f}, {13.7f, 0.5f}, {16.7f, 2.f} };
+//--------------------------------------------------------------------------------------------
+
+std::vector<std::pair<float, float>> cameraAlSpeedTrack = { {2.99f, 0.f}, {3.f, -0.142f}, {3.4f, -0.142f}, {3.41f, -0.004f}, {6.41f, -0.004f}, {6.42f, -0.142f}, {6.79f, -0.142f}, {6.8f, 0.f} };
+std::vector<std::pair<float, float>> smokeAnimTrack = { {0.f, 0.5f}, {3.f, 2.f},{3.4f, 0.5f}, {6.42f, 2.f}, {6.8f, 0.5f}, {9.8f, 2.f}, {10.25f, 0.5f}, {13.25f, 2.f}, {13.7f, 0.5f}, {16.7f, 2.f} };
+std::vector<std::pair<float, float>> lightningAnimTrack = { {8.8f, 0.f}, {8.81f, 4000.f}, {8.85f, 4000.f}, {8.97f, 0.f},   {9.1f, 0.f}, {9.11f, 4000.f}, {9.15f, 4000.f}, {9.27f, 0.f},    {12.f, 0.f}, {12.01f, 4000.f}, {12.04f, 4000.f}, {12.16f, 0.f} };
+std::vector<std::pair<float, float>> zoomAnimTrack = { {9.8f, 1.f}, {10.25f, 1.8f}, {11.25f, 1.8f}, {11.55f, 1.6f},  {13.25f, 1.6f}, {13.6f, 1.f} };
 
 //--------------------------------------------------------------------------------------------
 
@@ -992,14 +1020,14 @@ void RenderAnimate(int fromFrame, int toFrame)
 	float cameraAl = PI;
 
 	for (int i = 0; i <= toFrame; ++i) {
-		//leafScale = 0.5f + i * ((2.f - 0.5f) / framesInTurn);
-		//leafScale = 1;
-
+		float curTime = i / 25.f;
 		if (i >= fromFrame) {
+			leafScale = getInterp(smokeAnimTrack, curTime);
+			zoom = getInterp(zoomAnimTrack, curTime);
 			setupSceneVulcano();
+			setLightning(getInterp(lightningAnimTrack, curTime));
 			renderFrame("Scenes/3dScene_Cloud_Rotate", i, cameraAl, 0);
 		}
-		float curTime = i / 25.f;
 		float cameraAlSpeed = getInterp(cameraAlSpeedTrack, curTime);
 		cameraAl += cameraAlSpeed;
 		printf("%f\n", cameraAl);
