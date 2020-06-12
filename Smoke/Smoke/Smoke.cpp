@@ -23,14 +23,14 @@ const float FarAway = 100000.f;
 const int ScreenSize = 400; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -500; // Позиция камеры по z в системе координат сетки
-const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана  0.00002;
-int SubframesInOneFrame = 700; // Сколько раз рендерим сцену
-bool draft = true;
+const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана
+int SubframesInOneFrame = 500; // Сколько раз рендерим сцену
+bool draft = false;
 bool useCosineMul = true;
 float zoom = 1.f;       // Увеличение камеры
 float scenesInterp = 0; // 0 - сцена с вулканом, 1 - сцена с облаками
+float cloudsFlow = 0;   // Лёгкие облака бегут над полем из облаков
 
-float addY = 0;
 float draftLightning = 0;
 
 //--------------------------------------------------------------------------------------------
@@ -767,50 +767,51 @@ void RenderRandom()
 void setupSceneVulcano()
 {
 	useCosineMul = true;
+	float yOff = scenesInterp / 0.5f * SceneSize;
 
 	std::vector<float> rasterizeBuf;
-	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 265 / 2, 112 / 2, 100, 0.675f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 265 / 2, 112 / 2 + yOff, 100, 0.675f, false);
 	copyToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 102 / 2, 252 / 2, 100, 0.54f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 102 / 2, 252 / 2 + yOff, 100, 0.54f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 156, 198 / 2, 100, 0.468f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 156, 198 / 2 + yOff, 100, 0.468f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 201 / 2, 215 / 2, 60, 0.75f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 201 / 2, 215 / 2 + yOff, 60, 0.75f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 72, 63, 100, 0.75f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 72, 63 + yOff, 100, 0.75f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 103, 175, 100, 0.54f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 103, 175 + yOff, 100, 0.54f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 140, 147, 115, 0.6f*1.2f, false);   // Облако
+	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 140, 147 + yOff, 115, 0.6f*1.2f, false);   // Облако
 	addToScene(rasterizeBuf, 0.09f);
-	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 120, 147, 90, 0.6f, false);   // Облако
+	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 120, 147 + yOff, 90, 0.6f, false);   // Облако
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 85, 165, 75, 0.6f*1.15f, false);   // Облако
+	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 85, 165 + yOff, 75, 0.6f*1.15f, false);   // Облако
 	addToScene(rasterizeBuf, 0.2f);
-	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 100, 60, 140, 0.6f, false);   // Облако
+	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 100, 60 + yOff, 140, 0.6f, false);   // Облако
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 85, 100, 50, 0.6f*1.1f, false);   // Облако лево центр
+	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 85, 100 + yOff, 50, 0.6f*1.1f, false);   // Облако лево центр
 	addToScene(rasterizeBuf, 0.5f);
 	   
-	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 103, 180, 80, 0.3f, false);  // Маленькие у подножия
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 103, 180 + yOff, 80, 0.3f, false);  // Маленькие у подножия
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 90, 185, 130, 0.3f, false);  // Маленькие у подножия
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 90, 185 + yOff, 130, 0.3f, false);  // Маленькие у подножия
 	addToScene(rasterizeBuf);
 	// Обратная сторона
-	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 100, 118, 130, 0.8f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 100, 118 + yOff, 130, 0.8f, false);
 	addToScene(rasterizeBuf);
 
 	// Заполняем нормали и коэффициенты поверхности
 	calcNormalsAndSurfInterp();
 
 	lights.clear();
-	lights.push_back(LIGHT_BOX(4500, 0, 170, 0, 30, 200, 30, false));
-	lights.push_back(LIGHT_BOX(12000, 0, -55, 0, 50, -50, 100, false));
-	lights.push_back(LIGHT_BOX(8400, 250, 0, -35, 255, 120, 10, false));
-	lights.push_back(LIGHT_BOX(16000, 250, 133, 190, 255, 173, 235, false));
-	lights.push_back(LIGHT_BOX(14000, -20, 50, 190, -15, 80, 235, false));
+	lights.push_back(LIGHT_BOX(4500, 0, 170 + yOff, 0, 30, 200 + yOff, 30, false));
+	lights.push_back(LIGHT_BOX(12000, 0, -55 + yOff, 0, 50, -50 + yOff, 100, false));
+	lights.push_back(LIGHT_BOX(8400, 250, 0 + yOff, -35, 255, 120 + yOff, 10, false));
+	lights.push_back(LIGHT_BOX(16000, 250, 133 + yOff, 190, 255, 173 + yOff, 235, false));
+	lights.push_back(LIGHT_BOX(14000, -20, 50 + yOff, 190, -15, 80 + yOff, 235, false));
 
-	lights.push_back(LIGHT_BOX(0, 90, 90, 90, 110, 110, 110, true));   // Внутренний свет (молния) 4000
+	lights.push_back(LIGHT_BOX(0, 90, 90, 90, 110, 110 + yOff, 110, true));   // Внутренний свет (молния) 4000
 
 	// Заполнить BBOX сцены по лампочкам
 	fillSceneBbox();
@@ -820,150 +821,132 @@ void setupSceneVulcano()
 
 void setupSceneHeaven()
 {
+	float yOff = (scenesInterp - 0.5f) / 0.5f * SceneSize - SceneSize;
 	useCosineMul = false;
-	zoom = 1.25f * 1.15f;
 
 	std::vector<float> rasterizeBuf;
-	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 10, 160+ addY, 10, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 10, 160+ yOff, 10, 0.475f, false);
 	copyToScene(rasterizeBuf);
 
-	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 40, 160 + addY, 10, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 40, 160 + yOff, 10, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 70, 160 + addY, 10, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 70, 160 + yOff, 10, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 100, 160 + addY, 10, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 100, 160 + yOff, 10, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 130, 160 + addY, 10, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 130, 160 + yOff, 10, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 160, 160 + addY, 10, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 160, 160 + yOff, 10, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 190, 190 + addY, 10, 0.475f, false);
-	addToScene(rasterizeBuf);
-
-	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 10, 160 + addY, 40, 0.475f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 40, 160 + addY, 40, 0.475f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 70, 160 + addY, 40, 0.475f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 100, 160 + addY, 40, 0.475f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 130, 160+ addY, 40, 0.475f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 160, 160+ addY, 40, 0.475f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 190, 190 + addY, 40, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 190, 190 + yOff, 10, 0.475f, false);
 	addToScene(rasterizeBuf);
 
-	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 10, 160+ addY, 70, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 10, 160 + yOff, 40, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 40, 160+ addY, 70, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 40, 160 + yOff, 40, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 70, 160+ addY, 70, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 70, 160 + yOff, 40, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 100, 160+ addY, 70, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 100, 160 + yOff, 40, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 130, 160+ addY, 70, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 130, 160+ yOff, 40, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 160, 160+ addY, 70, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 160, 160+ yOff, 40, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 190, 190 + addY, 70, 0.475f, false);
-	addToScene(rasterizeBuf);
-
-	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 10, 160+ addY, 100, 0.475f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 40, 160+ addY, 100, 0.475f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 70, 160+ addY, 100, 0.475f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 100, 160+ addY, 100, 0.475f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 130, 160+ addY, 100, 0.475f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 160, 160+ addY, 100, 0.475f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 190, 190 + addY, 100, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 190, 190 + yOff, 40, 0.475f, false);
 	addToScene(rasterizeBuf);
 
-	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 10, 160+ addY, 130, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 10, 160+ yOff, 70, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 40, 160+ addY, 130, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 40, 160+ yOff, 70, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 70, 160+ addY, 130, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 70, 160+ yOff, 70, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 100, 160+ addY, 130, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 100, 160+ yOff, 70, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 130, 160+ addY, 130, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 130, 160+ yOff, 70, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 160, 160+ addY, 130, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 160, 160+ yOff, 70, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 190, 190 + addY, 130, 0.475f, false);
-	addToScene(rasterizeBuf);
-
-	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 10, 160 + addY, 160, 0.475f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 40, 160 + addY, 160, 0.475f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 70, 160 + addY, 160, 0.475f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 100, 160 + addY, 160, 0.475f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 130, 160 + addY, 160, 0.475f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 160, 160 + addY, 160, 0.475f, false);
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 190, 190 + addY, 160, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 190, 190 + yOff, 70, 0.475f, false);
 	addToScene(rasterizeBuf);
 
-	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 10, 160+ addY, 190, 0.875f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 10, 160+ yOff, 100, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 40, 160+ addY, 190, 0.5f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 40, 160+ yOff, 100, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 70, 160+ addY, 190, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 70, 160+ yOff, 100, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 100, 160+ addY, 190, 0.6f, false);  // 1.
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 100, 160+ yOff, 100, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 130, 160+ addY, 190, 0.475f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 130, 160+ yOff, 100, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 160, 160+ addY, 190, 1.f, false);
+	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 160, 160+ yOff, 100, 0.475f, false);
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 190, 190 + addY, 190, 0.675f, false);
-	addToScene(rasterizeBuf);
-
-	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 95, 120 + addY, 165, 0.6f*0.7f*0.5f, false);   // Облако
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 50, 120 + addY, 140, 0.6f*0.7f*0.6f, false);   // Облако
-	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 150, 120 + addY, 80, 0.6f*0.9f*0.65f, false);   // Облако
+	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 190, 190 + yOff, 100, 0.475f, false);
 	addToScene(rasterizeBuf);
 
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 10, 160+ yOff, 130, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 40, 160+ yOff, 130, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 70, 160+ yOff, 130, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 100, 160+ yOff, 130, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 130, 160+ yOff, 130, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 160, 160+ yOff, 130, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 190, 190 + yOff, 130, 0.475f, false);
+	addToScene(rasterizeBuf);
 
+	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 10, 160 + yOff, 160, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 40, 160 + yOff, 160, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 70, 160 + yOff, 160, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 100, 160 + yOff, 160, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 130, 160 + yOff, 160, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 160, 160 + yOff, 160, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 190, 190 + yOff, 160, 0.475f, false);
+	addToScene(rasterizeBuf);
+
+	rasterizeCloud(rasterizeBuf, SceneSize, 12, true, 0.04f, 10, 160+ yOff, 190, 0.875f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 11, true, 0.04f, 40, 160+ yOff, 190, 0.5f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 4, true, 0.04f, 70, 160+ yOff, 190, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 100, 160+ yOff, 190, 0.6f, false);  // 1.
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 5, true, 0.04f, 130, 160+ yOff, 190, 0.475f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 7, true, 0.04f, 160, 160+ yOff, 190, 1.f, false);
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 190, 190 + yOff, 190, 0.675f, false);
+	addToScene(rasterizeBuf);
+
+	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 110 - cloudsFlow * 10, 120 + yOff, 165, 0.6f*0.7f*0.5f, false);   // Облако
+	addToScene(rasterizeBuf, 0.45f);
+	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 50 - cloudsFlow * 15, 120 + yOff, 140, 0.6f*0.7f*0.6f, false);   // Облако
+	addToScene(rasterizeBuf, 0.6f);
+	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 150 - cloudsFlow * 60, 120 + yOff, 80, 0.6f*0.9f*0.65f, false);   // Облако
+	addToScene(rasterizeBuf);
 
 	// Заполняем нормали и коэффициенты поверхности
 	calcNormalsAndSurfInterp();
 
 	lights.clear();
-	lights.push_back(LIGHT_BOX(6400*0.5f, 800, -400, -100, 805, 0, 300, false));
-	lights.push_back(LIGHT_BOX(1400*0.6f, 200, -400, -100, 800, -395, 300, false));
+	lights.push_back(LIGHT_BOX(6400*0.5f, 800, -400 + yOff, -100, 805, 0 + yOff, 300, false));
+	lights.push_back(LIGHT_BOX(1400*0.6f, 200, -400 + yOff, -100, 800, -395 + yOff, 300, false));
 
 	// Заполнить BBOX сцены по лампочкам
 	fillSceneBbox();
-}
-
-
-//--------------------------------------------------------------------------------------------
-
-void RenderHeaven()
-{
-	//setupSceneHeaven();
-	//renderFrame("Scenes/3dScene_Heaven", 0, 0, PI/4, draft);
-
-	for (int i = 3; i <= 42; ++i) {
-		addY = -i * 25.f;
-		setupSceneHeaven();
-		renderFrame("Scenes/3dScene_Heaven", i, 0, PI / 4);   // PI / 4
-	}
-
 }
 
 //--------------------------------------------------------------------------------------------
@@ -999,9 +982,12 @@ void setLightning(float bright)
 //--------------------------------------------------------------------------------------------
 
 std::vector<std::pair<float, float>> cameraAlSpeedTrack = { {2.99f, 0.f}, {3.f, -0.142f}, {3.4f, -0.142f}, {3.41f, -0.004f}, {6.41f, -0.004f}, {6.42f, -0.142f}, {6.79f, -0.142f}, {6.8f, 0.f} };
-std::vector<std::pair<float, float>> smokeAnimTrack = { {0.f, 0.5f}, {3.f, 2.f},{3.4f, 0.5f}, {6.42f, 2.f}, {6.8f, 0.5f}, {9.8f, 2.f}, {10.25f, 0.5f}, {13.25f, 2.f}, {13.7f, 0.5f}, {16.7f, 2.f} };
 std::vector<std::pair<float, float>> lightningAnimTrack = { {8.8f, 0.f}, {8.81f, 4000.f}, {8.85f, 4000.f}, {8.97f, 0.f},   {9.1f, 0.f}, {9.11f, 4000.f}, {9.15f, 4000.f}, {9.27f, 0.f},    {12.f, 0.f}, {12.01f, 4000.f}, {12.04f, 4000.f}, {12.16f, 0.f} };
-std::vector<std::pair<float, float>> zoomAnimTrack = { {9.8f, 1.f}, {10.25f, 1.8f}, {11.25f, 1.8f}, {11.55f, 1.6f},  {13.25f, 1.6f}, {13.6f, 1.f} };
+std::vector<std::pair<float, float>> zoomAnimTrack = { {9.8f, 1.f}, {10.25f, 1.8f}, {11.25f, 1.8f}, {11.55f, 1.6f},  {13.25f, 1.6f}, {13.6f, 1.f}, {17.5f, 1.f}, {17.51f, 1.4375f} };
+std::vector<std::pair<float, float>> smokeAnimTrack = { {0.f, 0.5f}, {3.f, 2.f},{3.4f, 0.5f}, {6.42f, 2.f}, {6.8f, 0.5f}, {9.8f, 2.f}, {10.25f, 0.5f}, {13.25f, 2.f}, {13.7f, 0.5f}, {16.7f, 2.f} };
+std::vector<std::pair<float, float>> scenesInterpTrack = { {16.f, 0.f}, {19.f, 1.f} };
+std::vector<std::pair<float, float>> cameraBeTrack = { {18.5f, 0.f}, {20.5f, 1.f} };
+std::vector<std::pair<float, float>> cloudsFlowTrack = { {20.0f, 0.f}, {25.f, 1.f} };
 
 //--------------------------------------------------------------------------------------------
 
@@ -1014,9 +1000,17 @@ void RenderAnimate(int fromFrame, int toFrame)
 		if (i >= fromFrame) {
 			leafScale = getInterp(smokeAnimTrack, curTime);
 			zoom = getInterp(zoomAnimTrack, curTime);
-			setupSceneVulcano();
+			cloudsFlow = getInterp(cloudsFlowTrack, curTime);
+			float cameraBe = PI/4 * (0.5f - 0.5f*cos(PI * getInterp(cameraBeTrack, curTime)));
+			scenesInterp = 0.5f - 0.5f*cos(PI * getInterp(scenesInterpTrack, curTime));
+			if (scenesInterp <= 0.5f) {
+				setupSceneVulcano();
+			}
+			else {
+				setupSceneHeaven();
+			}
 			setLightning(getInterp(lightningAnimTrack, curTime));
-			renderFrame("Scenes/3dScene_Cloud_Rotate", i, cameraAl, 0);
+			renderFrame("Scenes/3dScene_Cloud_Rotate", i, cameraAl, cameraBe);
 		}
 		float cameraAlSpeed = getInterp(cameraAlSpeedTrack, curTime);
 		cameraAl += cameraAlSpeed;
@@ -1029,7 +1023,7 @@ void RenderAnimate(int fromFrame, int toFrame)
 int main(int argc, char *argv[], char *envp[])
 {
 	if (draft) {
-		SubframesInOneFrame = 5;
+		SubframesInOneFrame = 5;  
 	}
 
 	int fromFrame = 0;
@@ -1041,6 +1035,5 @@ int main(int argc, char *argv[], char *envp[])
 	}
 
 	RenderAnimate(fromFrame, toFrame);
-	//RenderHeaven();
 }
 

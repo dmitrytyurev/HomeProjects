@@ -645,3 +645,17 @@ void loadObjects()
 }
 
 
+//--------------------------------------------------------------------------------------------
+
+void RenderHeaven()
+{
+	//setupSceneHeaven();
+	//renderFrame("Scenes/3dScene_Heaven", 0, 0, PI/4, draft);
+
+	for (int i = 3; i <= 42; ++i) {
+		addY = -i * 25.f;
+		setupSceneHeaven();
+		renderFrame("Scenes/3dScene_Heaven", i, 0, PI / 4);   // PI / 4
+	}
+
+}
