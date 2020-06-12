@@ -26,7 +26,7 @@ const int SceneSize = 200;  // Размер сцены в единичных к�
 const float cameraZinit = -500; // Позиция камеры по z в системе координат сетки
 const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана
 int SubframesInOneFrame = 500; // Сколько раз рендерим сцену
-bool draft = false;
+bool draft = true;
 bool useCosineMul = true;
 float zoom = 1.f;       // Увеличение камеры
 float scenesInterp = 0; // 0 - сцена с вулканом, 1 - сцена с облаками
@@ -932,11 +932,11 @@ void setupSceneHeaven()
 	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 190, 190 + yOff, 190, 0.675f, false);
 	addToScene(rasterizeBuf);
 
-	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 110 - cloudsFlow * 20, 120 + yOff, 165, 0.6f*0.7f*0.5f, false);   // Облако
+	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 110 - cloudsFlow * 20, 110 + yOff, 165, 0.6f*0.7f*0.5f, false);   // Облако
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 50 - cloudsFlow * 25, 120 + yOff, 140, 0.6f*0.7f*0.6f, false);   // Облако
+	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 50 - cloudsFlow * 25, 110 + yOff, 140, 0.6f*0.7f*0.6f, false);   // Облако
 	addToScene(rasterizeBuf);
-	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 150 - cloudsFlow * 60, 120 + yOff, 80, 0.6f*0.9f*0.65f, false);   // Облако
+	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 150 - cloudsFlow * 60, 110 + yOff, 80, 0.6f*0.9f*0.65f, false);   // Облако
 	addToScene(rasterizeBuf);
 
 	// Заполняем нормали и коэффициенты поверхности
@@ -988,7 +988,7 @@ std::vector<std::pair<float, float>> zoomAnimTrack = { {9.8f, 1.f}, {10.25f, 1.8
 std::vector<std::pair<float, float>> smokeAnimTrack = { {0.f, 0.5f}, {3.f, 2.f},{3.4f, 0.5f}, {6.42f, 2.f}, {6.8f, 0.5f}, {9.8f, 2.f}, {10.25f, 0.5f}, {13.25f, 2.f}, {13.7f, 0.5f}, {16.7f, 2.f} };
 std::vector<std::pair<float, float>> scenesInterpTrack = { {16.f, 0.f}, {19.f, 1.f} };
 std::vector<std::pair<float, float>> cameraBeTrack = { {18.5f, 0.f}, {20.5f, 1.f} };
-std::vector<std::pair<float, float>> cloudsFlowTrack = { {20.0f, 0.f}, {25.f, 1.f} };
+std::vector<std::pair<float, float>> cloudsFlowTrack = { {18.0f, 0.f}, {25.f, 1.f} };
 
 //--------------------------------------------------------------------------------------------
 
