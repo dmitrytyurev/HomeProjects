@@ -19,6 +19,7 @@ extern float leafScale;
 // Ренедер
 //--------------------------------------------------------------------------------------------
 
+const float lightBright = 7000.f;
 const float FarAway = 100000.f;
 const int ScreenSize = 400; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
@@ -722,7 +723,7 @@ void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngl
 	if (draft) {
 		for (auto& light : lights) {
 			if (light.inner) {
-				draftLightning = std::min(light.bright / 4000.f, 1.f);                              // !!! const
+				draftLightning = std::min(light.bright / lightBright, 1.f);
 				break;
 			}
 		}
@@ -811,7 +812,7 @@ void setupSceneVulcano()
 	lights.push_back(LIGHT_BOX(16000, 250, 133 + yOff, 190, 255, 173 + yOff, 235, false));
 	lights.push_back(LIGHT_BOX(14000, -20, 50 + yOff, 190, -15, 80 + yOff, 235, false));
 
-	lights.push_back(LIGHT_BOX(0, 90, 90, 90, 110, 110 + yOff, 110, true));   // Внутренний свет (молния) 4000
+	lights.push_back(LIGHT_BOX(0, 90, 90, 90, 110, 110 + yOff, 110, true));   // Внутренний свет (молния) 
 
 	// Заполнить BBOX сцены по лампочкам
 	fillSceneBbox();
@@ -931,10 +932,10 @@ void setupSceneHeaven()
 	rasterizeCloud(rasterizeBuf, SceneSize, 10, true, 0.04f, 190, 190 + yOff, 190, 0.675f, false);
 	addToScene(rasterizeBuf);
 
-	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 110 - cloudsFlow * 10, 120 + yOff, 165, 0.6f*0.7f*0.5f, false);   // Облако
-	addToScene(rasterizeBuf, 0.45f);
-	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 50 - cloudsFlow * 15, 120 + yOff, 140, 0.6f*0.7f*0.6f, false);   // Облако
-	addToScene(rasterizeBuf, 0.6f);
+	rasterizeCloud(rasterizeBuf, SceneSize, 0, false, 0.04f, 110 - cloudsFlow * 20, 120 + yOff, 165, 0.6f*0.7f*0.5f, false);   // Облако
+	addToScene(rasterizeBuf);
+	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 50 - cloudsFlow * 25, 120 + yOff, 140, 0.6f*0.7f*0.6f, false);   // Облако
+	addToScene(rasterizeBuf);
 	rasterizeCloud(rasterizeBuf, SceneSize, 17, false, 0.04f, 150 - cloudsFlow * 60, 120 + yOff, 80, 0.6f*0.9f*0.65f, false);   // Облако
 	addToScene(rasterizeBuf);
 
@@ -982,7 +983,7 @@ void setLightning(float bright)
 //--------------------------------------------------------------------------------------------
 
 std::vector<std::pair<float, float>> cameraAlSpeedTrack = { {2.99f, 0.f}, {3.f, -0.142f}, {3.4f, -0.142f}, {3.41f, -0.004f}, {6.41f, -0.004f}, {6.42f, -0.142f}, {6.79f, -0.142f}, {6.8f, 0.f} };
-std::vector<std::pair<float, float>> lightningAnimTrack = { {8.8f, 0.f}, {8.81f, 4000.f}, {8.85f, 4000.f}, {8.97f, 0.f},   {9.1f, 0.f}, {9.11f, 4000.f}, {9.15f, 4000.f}, {9.27f, 0.f},    {12.f, 0.f}, {12.01f, 4000.f}, {12.04f, 4000.f}, {12.16f, 0.f} };
+std::vector<std::pair<float, float>> lightningAnimTrack = { {8.8f, 0.f}, {8.81f, lightBright}, {8.85f, lightBright}, {8.97f, 0.f},   {9.1f, 0.f}, {9.11f, lightBright}, {9.15f, lightBright}, {9.27f, 0.f},    {12.f, 0.f}, {12.01f, lightBright}, {12.04f, lightBright}, {12.16f, 0.f} };
 std::vector<std::pair<float, float>> zoomAnimTrack = { {9.8f, 1.f}, {10.25f, 1.8f}, {11.25f, 1.8f}, {11.55f, 1.6f},  {13.25f, 1.6f}, {13.6f, 1.f}, {17.5f, 1.f}, {17.51f, 1.4375f} };
 std::vector<std::pair<float, float>> smokeAnimTrack = { {0.f, 0.5f}, {3.f, 2.f},{3.4f, 0.5f}, {6.42f, 2.f}, {6.8f, 0.5f}, {9.8f, 2.f}, {10.25f, 0.5f}, {13.25f, 2.f}, {13.7f, 0.5f}, {16.7f, 2.f} };
 std::vector<std::pair<float, float>> scenesInterpTrack = { {16.f, 0.f}, {19.f, 1.f} };
