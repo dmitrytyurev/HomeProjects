@@ -589,7 +589,7 @@ void renderPixel(int xi, int yi, float x, float y, float z, float dirX, float di
 // Рендерить сцену в буфер screen
 //--------------------------------------------------------------------------------------------
 
-void renderSubFrame(int x1, int y1, int x2, int y2, int frame, int screenSize, float cameraAngleA, float cameraAngleB)
+void renderSubFrame(int x1, int y1, int x2, int y2, int frame, int screenSize, float cameraAngleA, float cameraAngleB, float cameraYOffs)
 {
 	float cameraX = SceneSize / 2.f;
 	float cameraY = SceneSize / 2.f;
@@ -607,7 +607,7 @@ void renderSubFrame(int x1, int y1, int x2, int y2, int frame, int screenSize, f
 			}
 
 			float x = (float)((((double)xi) + 0.5f) * ratio);
-			float y = (float)((((double)yi) + 0.5f) * ratio);
+			float y = (float)((((double)yi) + 0.5f) * ratio) + cameraYOffs;
 			x = (float)((x - SceneSize *0.5) / zoom + SceneSize *0.5);
 			y = (float)((y - SceneSize *0.5) / zoom + SceneSize *0.5);
 			float z = 0;
@@ -717,7 +717,7 @@ void screenClear()
 
 //--------------------------------------------------------------------------------------------
 
-void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngleA, float cameraAngleB)
+void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngleA, float cameraAngleB, float cameraYOffs)
 {
 	draftLightning = 0.f;
 	if (draft) {
@@ -737,7 +737,7 @@ void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngl
 	for (int n=0; n < SubframesInOneFrame; ++n) {
 		srand(n);
 		printf("Rendernig subframe %d/%d of frame %d\n", n, SubframesInOneFrame, frameN);
-		renderSubFrame(0, 0, ScreenSize, ScreenSize, n, ScreenSize, cameraAngleA, cameraAngleB);
+		renderSubFrame(0, 0, ScreenSize, ScreenSize, n, ScreenSize, cameraAngleA, cameraAngleB, cameraYOffs);
 
 		if (!draft && (n % 50) == 0) {
 			std::string fname = std::string("Scenes/Frame") + digit5intFormat(frameN) + "_" + digit5intFormat(n) + ".bmp";
@@ -759,7 +759,7 @@ void RenderRandom()
 		rasterizeCloud(rasterizeBuf, SceneSize, i, true, 0.04f, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f, true);
 		copyToScene(rasterizeBuf);
 		calcNormalsAndSurfInterp();
-		renderFrame("Scenes/3dScene_Cloud_Rand", i, 0.f, 0.f);
+		renderFrame("Scenes/3dScene_Cloud_Rand", i, 0.f, 0.f, 0.f);
 	}
 }
 
@@ -768,7 +768,7 @@ void RenderRandom()
 void setupSceneVulcano()
 {
 	useCosineMul = true;
-	float yOff = scenesInterp / 0.5f * SceneSize;
+	float yOff = 0; // scenesInterp / 0.5f * SceneSize;
 
 	std::vector<float> rasterizeBuf;
 	rasterizeCloud(rasterizeBuf, SceneSize, 14, true, 0.04f, 265 / 2, 112 / 2 + yOff, 100, 0.675f, false);
@@ -822,7 +822,8 @@ void setupSceneVulcano()
 
 void setupSceneHeaven()
 {
-	float yOff = (scenesInterp - 0.5f) / 0.5f * SceneSize - SceneSize;
+	int maxOffs = SceneSize + 20;
+	float yOff = (scenesInterp - 0.5f) / 0.5f * maxOffs - maxOffs;
 	useCosineMul = false;
 
 	std::vector<float> rasterizeBuf;
@@ -1004,14 +1005,16 @@ void RenderAnimate(int fromFrame, int toFrame)
 			cloudsFlow = getInterp(cloudsFlowTrack, curTime);
 			float cameraBe = PI/4 * (0.5f - 0.5f*cos(PI * getInterp(cameraBeTrack, curTime)));
 			scenesInterp = 0.5f - 0.5f*cos(PI * getInterp(scenesInterpTrack, curTime));
+			float cameraYOffs = 0;
 			if (scenesInterp <= 0.5f) {
 				setupSceneVulcano();
+				cameraYOffs = -scenesInterp / 0.5f * SceneSize;
 			}
 			else {
 				setupSceneHeaven();
 			}
 			setLightning(getInterp(lightningAnimTrack, curTime));
-			renderFrame("Scenes/3dScene_Cloud_Rotate", i, cameraAl, cameraBe);
+			renderFrame("Scenes/3dScene_Cloud_Rotate", i, cameraAl, cameraBe, cameraYOffs);
 		}
 		float cameraAlSpeed = getInterp(cameraAlSpeedTrack, curTime);
 		cameraAl += cameraAlSpeed;
