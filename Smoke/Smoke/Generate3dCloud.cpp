@@ -630,7 +630,7 @@ void rasterizeCloud(std::vector<float>& dst, int bufSize, int randSeed, bool isH
 	}
 
 #if !OLD_CLOUD_RENDER
-	printf("Rasterizing the cloud...\n");
+	printf("Rasterizing the cloud... ");
 	object.generate3dCloud(dst, bufSize, xPos, yPos, zPos, scale, isHardBrush, brushCoeff);
 #endif
 	checkOutOfRange(dst, bufSize);

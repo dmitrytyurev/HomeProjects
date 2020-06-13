@@ -659,3 +659,14 @@ void RenderHeaven()
 	}
 
 }
+void RenderRandom()
+{
+	std::vector<float> rasterizeBuf;
+
+	for (int i = 0; i < 100; ++i) {
+		rasterizeCloud(rasterizeBuf, SceneSize, i, true, 0.04f, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f, true);
+		copyToScene(rasterizeBuf);
+		calcNormalsAndSurfInterp();
+		renderFrame("Scenes/3dScene_Cloud_Rand", i, 0.f, 0.f, 0.f);
+	}
+}

@@ -26,7 +26,7 @@ const int SceneSize = 200;  // Размер сцены в единичных к�
 const float cameraZinit = -500; // Позиция камеры по z в системе координат сетки
 const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана
 int SubframesInOneFrame = 500; // Сколько раз рендерим сцену
-bool draft = true;
+bool draft = false;
 bool useCosineMul = true;
 float zoom = 1.f;       // Увеличение камеры
 float scenesInterp = 0; // 0 - сцена с вулканом, 1 - сцена с облаками
@@ -39,10 +39,8 @@ float draftLightning = 0;
 void saveToBmp(const std::string& fileName, int sizeX, int sizeY, std::function<uint8_t (int x, int y)> getPixel)
 {
 	uint8_t* bmpData = new uint8_t[sizeX * sizeY * 3];
-	for (int y = 0; y < sizeY; ++y)
-	{
-		for (int x = 0; x < sizeX; ++x)
-		{
+	for (int y = 0; y < sizeY; ++y)	{
+		for (int x = 0; x < sizeX; ++x)	{
 			uint8_t bright = getPixel(x, y);
 			int pixelOffs = (y * sizeX + x) * 3;
 			bmpData[pixelOffs++] = bright;
@@ -54,6 +52,55 @@ void saveToBmp(const std::string& fileName, int sizeX, int sizeY, std::function<
 	save_bmp24(fileName.c_str(), sizeX, sizeY, (const char *)bmpData);
 	delete[] bmpData;
 }
+
+//--------------------------------------------------------------------------------------------
+
+void saveToFlt(const std::string& fileName, int sizeX, int sizeY, int subframeLast, std::function<double (int x, int y)> getPixel)
+{
+	FILE* f = fopen(fileName.c_str(), "wb");
+	if (!f) {
+		return;
+	}
+	std::vector<double> data;
+	data.resize(sizeX * sizeY);;
+	for (int y = 0; y < sizeY; ++y) {
+		for (int x = 0; x < sizeX; ++x) {
+			data[y*sizeX + x] = getPixel(x, y);
+		}
+	}
+
+	fwrite(&subframeLast, sizeof(int), 1, f);
+	fwrite(&data[0], data.size() * sizeof(double), 1, f);
+	fclose(f);
+}
+
+//--------------------------------------------------------------------------------------------
+
+void loadFromFlt(const std::string& fileName, int sizeX, int sizeY, int subframeFirst, std::function<double&(int x, int y)> getPixel)
+{
+	FILE* f = fopen(fileName.c_str(), "rb");
+	if (!f) {
+		exit_msg("Can't open file %s", fileName.c_str());
+	}
+	std::vector<double> data;
+	data.resize(sizeX * sizeY);;
+
+	int subframeLast = 0;
+	fread(&subframeLast, sizeof(int), 1, f);
+	if (subframeFirst != subframeLast + 1) {
+		exit_msg("subframeFirst: %d, subframeLast: %d", subframeFirst, subframeLast);
+	}
+
+	fread(&data[0], data.size() * sizeof(double), 1, f);
+	for (int y = 0; y < sizeY; ++y) {
+		for (int x = 0; x < sizeX; ++x) {
+			getPixel(x, y) = data[y*sizeX + x];
+		}
+	}
+	fclose(f);
+}
+
+//--------------------------------------------------------------------------------------------
 
 struct LIGHT_BOX
 {
@@ -296,7 +343,7 @@ void intersect(float x, float y, float z, float dirX, float dirY, float dirZ, fl
 
 void calcNormalsAndSurfInterp()
 {
-	printf("calcNormalsAndSurfInterp...\n");
+	printf("calcNormalsAndSurfInterp... ");
 	const int radius = draft ? 2: 5;                                                                      // !!!const
 	for (int z = radius; z < SceneSize-radius; ++z)	{
 		for (int y = radius; y < SceneSize - radius; ++y) {
@@ -717,7 +764,7 @@ void screenClear()
 
 //--------------------------------------------------------------------------------------------
 
-void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngleA, float cameraAngleB, float cameraYOffs)
+void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngleA, float cameraAngleB, float cameraYOffs, int subframeFirst, int subframeLast)
 {
 	draftLightning = 0.f;
 	if (draft) {
@@ -728,15 +775,18 @@ void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngl
 			}
 		}
 	}
-	printf("                                          %f\n", draftLightning);
 
-	screenClear();
 	randomRepeatChecker.onStartNewFrame();
+	screenClear();
+	if (subframeFirst) {
+		std::string fname = fileNamePrefix + digit5intFormat(frameN) + ".flt";
+		loadFromFlt(fname, ScreenSize, ScreenSize, subframeFirst, [](int x, int y)->double& { return screen[x][y]; });
+	}
 
 	// Рендерим все кадры сцены
-	for (int n=0; n < SubframesInOneFrame; ++n) {
+	for (int n=subframeFirst; n <= subframeLast; ++n) {
 		srand(n);
-		printf("Rendernig subframe %d/%d of frame %d\n", n, SubframesInOneFrame, frameN);
+		printf("Rendering frame %d, subframe %d (up to %d)\n", frameN, n, subframeLast);
 		renderSubFrame(0, 0, ScreenSize, ScreenSize, n, ScreenSize, cameraAngleA, cameraAngleB, cameraYOffs);
 
 		if (!draft && (n % 50) == 0) {
@@ -744,23 +794,11 @@ void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngl
 			saveToBmp(fname, ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
 		}
 	}
+	std::string fname = fileNamePrefix + digit5intFormat(frameN) + ".flt";
+	saveToFlt(fname, ScreenSize, ScreenSize, subframeLast, [](int x, int y) { return screen[x][y]; });
 
-	std::string fname = fileNamePrefix + digit5intFormat(frameN) + ".bmp";
-	saveToBmp(fname, ScreenSize, ScreenSize, [](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (SubframesInOneFrame + 1), 255.)); });
-}
-
-//--------------------------------------------------------------------------------------------
-
-void RenderRandom()
-{
-	std::vector<float> rasterizeBuf;
-
-	for (int i = 0; i < 100; ++i) {
-		rasterizeCloud(rasterizeBuf, SceneSize, i, true, 0.04f, SceneSize / 2, SceneSize / 2, SceneSize / 2, 1.f, true);
-		copyToScene(rasterizeBuf);
-		calcNormalsAndSurfInterp();
-		renderFrame("Scenes/3dScene_Cloud_Rand", i, 0.f, 0.f, 0.f);
-	}
+	fname = fileNamePrefix + digit5intFormat(frameN) + ".bmp";
+	saveToBmp(fname, ScreenSize, ScreenSize, [subframeLast](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (subframeLast + 1), 255.)); });
 }
 
 //--------------------------------------------------------------------------------------------
@@ -993,7 +1031,7 @@ std::vector<std::pair<float, float>> cloudsFlowTrack = { {18.0f, 0.f}, {25.f, 1.
 
 //--------------------------------------------------------------------------------------------
 
-void RenderAnimate(int fromFrame, int toFrame)
+void RenderAnimate(int fromFrame, int toFrame, int subframeFirst, int subframeLast)
 {
 	float cameraAl = PI;
 
@@ -1014,7 +1052,7 @@ void RenderAnimate(int fromFrame, int toFrame)
 				setupSceneHeaven();
 			}
 			setLightning(getInterp(lightningAnimTrack, curTime));
-			renderFrame("Scenes/3dScene_Cloud_Rotate", i, cameraAl, cameraBe, cameraYOffs);
+			renderFrame("Scenes/Scene", i, cameraAl, cameraBe, cameraYOffs, subframeFirst, subframeLast);
 		}
 		float cameraAlSpeed = getInterp(cameraAlSpeedTrack, curTime);
 		cameraAl += cameraAlSpeed;
@@ -1032,12 +1070,18 @@ int main(int argc, char *argv[], char *envp[])
 
 	int fromFrame = 0;
 	int toFrame = 0;
+	int subframeFirst = 0;
+	int subframeLast = SubframesInOneFrame - 1;
 
 	if (argc >= 3) {
 		fromFrame = atoi(argv[1]);
 		toFrame = atoi(argv[2]);
 	}
+	if (argc >= 5) {
+		subframeFirst = atoi(argv[3]);
+		subframeLast = atoi(argv[4]);
+	}
 
-	RenderAnimate(fromFrame, toFrame);
+	RenderAnimate(fromFrame, toFrame, subframeFirst, subframeLast);
 }
 
