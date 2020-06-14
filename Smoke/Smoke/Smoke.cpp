@@ -49,7 +49,7 @@ void saveToBmp(const std::string& fileName, int sizeX, int sizeY, std::function<
 		}
 	}
 
-	save_bmp24(fileName.c_str(), sizeX, sizeY, (const char *)bmpData);
+	save_bmp24(fileName.c_str(), sizeX, sizeY, (const unsigned char *)bmpData);
 	delete[] bmpData;
 }
 
@@ -1062,8 +1062,165 @@ void RenderAnimate(int fromFrame, int toFrame, int subframeFirst, int subframeLa
 
 //--------------------------------------------------------------------------------------------
 
+struct Color
+{
+	int r = 0;
+	int g = 0;
+	int b = 0;
+	int n = 0;
+};
+
+Color colorTab[256];
+
+void initTableByBmp(const std::string& fname)
+{
+	Color tmpTab[256];
+
+	int xSize = 0;
+	int ySize = 0;
+	give_bmp_size(fname.c_str(), &xSize, &ySize);
+	std::vector<uint8_t> data;
+	data.resize(xSize * ySize * 3);
+	read_bmp24(fname.c_str(), &data[0]);
+
+	for (int y = 0; y < ySize; ++y) {
+		for (int x = 0; x < xSize; ++x) {
+			int r = data[(y*xSize + x) * 3 + 2];
+			int g = data[(y*xSize + x) * 3 + 1];
+			int b = data[(y*xSize + x) * 3];
+			//int bright = (r * 30 + g * 59 + b * 11) / 100;
+			int bright = (r + g + b) / 3;
+			//int bright = 
+			tmpTab[bright].r += r;
+			tmpTab[bright].g += g;
+			tmpTab[bright].b += b;
+			tmpTab[bright].n++;
+		}
+	}
+	for (int i = 0; i < 256; ++i) {
+		if (tmpTab[i].n > 0) {
+			tmpTab[i].r /= tmpTab[i].n;
+			tmpTab[i].g /= tmpTab[i].n;
+			tmpTab[i].b /= tmpTab[i].n;
+		}
+	}
+	tmpTab[0].r = 0;
+	tmpTab[0].g = 0;
+	tmpTab[0].b = 0;
+	tmpTab[0].n = 1;
+	for (int i = 255; i >= 0; --i) {
+		if (tmpTab[i].n) {
+			int maxComponent = tmpTab[i].r;
+			if (tmpTab[i].g > maxComponent) {
+				maxComponent = tmpTab[i].g;
+			}
+			if (tmpTab[i].b > maxComponent) {
+				maxComponent = tmpTab[i].b;
+			}
+			tmpTab[255].r = tmpTab[i].r * 255 / maxComponent;
+			tmpTab[255].g = tmpTab[i].g * 255 / maxComponent;
+			tmpTab[255].b = tmpTab[i].b * 255 / maxComponent;
+			tmpTab[255].n = 1;
+			break;
+		}
+	}
+	printf("%d %d %d\n", tmpTab[255].r, tmpTab[255].g, tmpTab[255].b);
+	for (int i = 0; i < 256; ++i) {
+		if (tmpTab[i].n) {
+			colorTab[i] = tmpTab[i];
+		}
+		else {
+			int n1 = i;
+			while (tmpTab[n1].n == 0 && n1 > 0)	{
+				--n1;
+			}
+			int n2 = i;
+			while (tmpTab[n2].n == 0 && n2 < 255) {
+				++n2;
+			}
+			if (tmpTab[n1].n == 0 && tmpTab[n2].n == 0) {
+				exit_msg("color table build error");
+			}
+			if (tmpTab[n1].n == 0) {
+				colorTab[i] = tmpTab[n2];
+			}
+			else {
+				if (tmpTab[n2].n == 0) {
+					colorTab[i] = tmpTab[n1];
+				}
+				else {
+					colorTab[i].r = (tmpTab[n2].r - tmpTab[n1].r) * (i - n1) / (n2 - n1) + tmpTab[n1].r;
+					colorTab[i].g = (tmpTab[n2].g - tmpTab[n1].g) * (i - n1) / (n2 - n1) + tmpTab[n1].g;
+					colorTab[i].b = (tmpTab[n2].b - tmpTab[n1].b) * (i - n1) / (n2 - n1) + tmpTab[n1].b;
+				}
+			}
+		}
+	}
+	for (int i = 0; i < 256; ++i) {
+		char buf[256];
+		sprintf(buf, "%d: %d %d %d\n", i, colorTab[i].r, colorTab[i].g, colorTab[i].b);
+		log(buf);
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+void colorGradeByTable(const std::string& fname)
+{
+	int xSize = 0;
+	int ySize = 0;
+	give_bmp_size(fname.c_str(), &xSize, &ySize);
+	std::vector<uint8_t> dataIn;
+	dataIn.resize(xSize * ySize * 3);
+	read_bmp24(fname.c_str(), &dataIn[0]);
+
+	std::vector<uint8_t> dataOut;
+	dataOut.resize(xSize * ySize * 3);
+	for (int y = 0; y < ySize; ++y) {
+		for (int x = 0; x < xSize; ++x) {
+			int bright = dataIn[(y*xSize + x) * 3];
+			if (x > 0 && x < xSize - 1 && y > 0 && y < ySize - 1) {
+
+				bright = dataIn[(y*xSize + x) * 3];
+				//bright = dataIn[(y*xSize + x) * 3] +
+				//		 dataIn[(y*xSize + x + 1) * 3] +
+				//		 dataIn[(y*xSize + x - 1) * 3] +
+				//		 dataIn[((y + 1)*xSize + x) * 3] +
+				//		 dataIn[((y - 1)*xSize + x) * 3];
+				//bright /= 5;
+			}
+			dataOut[(y*xSize + x) * 3 + 2] = colorTab[bright].r;
+			dataOut[(y*xSize + x) * 3 + 1] = colorTab[bright].g;
+			dataOut[(y*xSize + x) * 3] = colorTab[bright].b;
+
+			if (x == 130 && y == 68) {
+				printf("bright(130,68):%d\n", bright);
+			}
+			if (x == 133 && y == 66) {
+				printf("bright(133,66):%d\n", bright);
+			}
+
+
+		}
+	}
+	save_bmp24(fname.c_str(), xSize, ySize, &dataOut[0]);
+}
+
+//--------------------------------------------------------------------------------------------
+
+void colorGrade()
+{
+	initTableByBmp("ColorSamples//Ready//colorSample21.bmp");
+	colorGradeByTable("ColorSamples//Ready//test.bmp");
+}
+
+//--------------------------------------------------------------------------------------------
+
 int main(int argc, char *argv[], char *envp[])
 {
+	colorGrade();
+	return 0;
+
 	if (draft) {
 		SubframesInOneFrame = 5;  
 	}

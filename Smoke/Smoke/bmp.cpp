@@ -243,7 +243,7 @@ void read_bmp24(const char* fileName, unsigned char* pixels)
 // «аписывает переданный массив DWORD'ов, как BMP24
 //--------------------------------------------------------------------------------------------
 
-  void save_bmp24(const char *name, int sizeX, int sizeY, const char *data)
+  void save_bmp24(const char *name, int sizeX, int sizeY, const unsigned char *data)
   {
 	  FILE* f = nullptr;
 	  fopen_s(&f, name, "wb");
