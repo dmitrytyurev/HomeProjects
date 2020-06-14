@@ -35,6 +35,15 @@ float cloudsFlow = 0;   // Лёгкие облака бегут над поле�
 float draftLightning = 0;
 
 //--------------------------------------------------------------------------------------------
+struct Circle
+{
+	int xCenter = 0;
+	int yCenter = 0;
+	int diametr = 0;
+};
+std::vector<Circle> smokeOfcircles = { { 177, 333, 54 }, { 171, 292, 70 }, {185, 248, 86 }, {215, 191, 100 }, {225, 116, 133 }, { 215, 14, 185 } };
+//--------------------------------------------------------------------------------------------
+
 
 void saveToBmp(const std::string& fileName, int sizeX, int sizeY, std::function<uint8_t (int x, int y)> getPixel)
 {
@@ -1216,10 +1225,72 @@ void colorGrade()
 
 //--------------------------------------------------------------------------------------------
 
+void fillScreenBufMaxValue(std::vector<uint8_t>& scrBuffer, uint8_t val)
+{
+	for (int i = 0; i < (int)scrBuffer.size(); ++i) {
+		scrBuffer[i] = std::max(scrBuffer[i], val);
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+void renderAnimateSmokeOfCircles()
+{
+	std::vector<uint8_t> srcBuffer;
+	srcBuffer.resize(ScreenSize * ScreenSize * 3);
+	int frameN = 0;
+
+	for (int i=0; i<(int)smokeOfcircles.size(); ++i)	{
+		const auto& circl = smokeOfcircles[i];
+		int sqRadius = (circl.diametr / 2) * (circl.diametr / 2);
+
+		for (int fr = 0; fr < 8; ++fr) {            // !!! const 
+			for (int i2 = 0; i2 < 62; ++i2) {       // !!! const 
+				int x = rand(0, circl.diametr);
+				int y = rand(0, circl.diametr);
+				int dx = x - circl.diametr / 2;
+				int dy = y - circl.diametr / 2;
+				if (dx*dx + dy * dy > sqRadius) {
+					--i2;
+					continue;
+				}
+				int scrX = x - circl.diametr / 2 + circl.xCenter;
+				int scrY = y - circl.diametr / 2 + circl.yCenter;
+				if (scrX >= 0 && scrX < ScreenSize && scrY >= 0 && scrY < ScreenSize) {
+					int pixelOffs = (scrY * ScreenSize + scrX) * 3;
+					srcBuffer[pixelOffs + 0] = 255;
+					srcBuffer[pixelOffs + 1] = 255;
+					srcBuffer[pixelOffs + 2] = 255;
+				}
+			}
+			std::string fname = "SmokeOfCircles/" + digit5intFormat(frameN) + ".bmp";
+			save_bmp24(fname.c_str() , ScreenSize, ScreenSize, &srcBuffer[0]);
+			++frameN;
+		}
+	}
+	for (int i = 0; i < 44; ++i) { // !!! const 
+		std::string fname = "SmokeOfCircles/" + digit5intFormat(frameN) + ".bmp";
+		save_bmp24(fname.c_str(), ScreenSize, ScreenSize, &srcBuffer[0]);
+		++frameN;
+	}
+	fillScreenBufMaxValue(srcBuffer, 170);
+	std::string fname = "SmokeOfCircles/" + digit5intFormat(frameN) + ".bmp";
+	save_bmp24(fname.c_str(), ScreenSize, ScreenSize, &srcBuffer[0]);
+	++frameN;
+	fillScreenBufMaxValue(srcBuffer, 255);
+	fname = "SmokeOfCircles/" + digit5intFormat(frameN) + ".bmp";
+	save_bmp24(fname.c_str(), ScreenSize, ScreenSize, &srcBuffer[0]);
+	++frameN;
+}
+
+//--------------------------------------------------------------------------------------------
+
+
 int main(int argc, char *argv[], char *envp[])
 {
-	colorGrade();
-	return 0;
+	//colorGrade();
+	//renderAnimateSmokeOfCircles();
+	//return 0;
 
 	if (draft) {
 		SubframesInOneFrame = 5;  
