@@ -1210,7 +1210,7 @@ void colorGradeByTable(const std::string& fname)
 
 void colorGrade()
 {
-	initTableByBmp("ColorSamples//Ready//colorSample21.bmp");
+	initTableByBmp("ColorSamples//Ready//colorSample106.bmp");
 	colorGradeByTable("ColorSamples//Ready//test.bmp");
 }
 
