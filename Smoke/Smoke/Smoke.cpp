@@ -1233,42 +1233,44 @@ void fillScreenBufMaxValue(std::vector<uint8_t>& scrBuffer, uint8_t val)
 }
 
 //--------------------------------------------------------------------------------------------
-
 void renderAnimateSmokeOfCircles()
 {
+	int frameN = 0;
+	int count = 0;
 	std::vector<uint8_t> srcBuffer;
 	srcBuffer.resize(ScreenSize * ScreenSize * 3);
-	int frameN = 0;
+	for (int yc=380; yc>30; yc-=2) {
+		int r = (int)((420 - yc) / randf(2.7f, 3.2f));
+		int xc = rand(200 - r, 200 + r);
 
-	for (int i=0; i<(int)smokeOfcircles.size(); ++i)	{
-		const auto& circl = smokeOfcircles[i];
-		int sqRadius = (circl.diametr / 2) * (circl.diametr / 2);
-
+		int diametr = (580 - yc) / 10;
+		int sqRadius = (diametr / 2) * (diametr / 2);
 		for (int fr = 0; fr < 8; ++fr) {            // !!! const 
-			for (int i2 = 0; i2 < 62; ++i2) {       // !!! const 
-				int x = rand(0, circl.diametr);
-				int y = rand(0, circl.diametr);
-				int dx = x - circl.diametr / 2;
-				int dy = y - circl.diametr / 2;
+			for (int i = 0; i < 12; ++i) {       // !!! const 
+				int x = rand(0, diametr);
+				int y = rand(0, diametr);
+				int dx = x - diametr / 2;
+				int dy = y - diametr / 2;
 				if (dx*dx + dy * dy > sqRadius) {
-					--i2;
+					--i;
 					continue;
 				}
-				int scrX = x - circl.diametr / 2 + circl.xCenter;
-				int scrY = y - circl.diametr / 2 + circl.yCenter;
+				int scrX = x - diametr / 2 + xc;
+				int scrY = y - diametr / 2 + yc;
 				if (scrX >= 0 && scrX < ScreenSize && scrY >= 0 && scrY < ScreenSize) {
 					int pixelOffs = (scrY * ScreenSize + scrX) * 3;
-					srcBuffer[pixelOffs + 0] = 255;
-					srcBuffer[pixelOffs + 1] = 255;
-					srcBuffer[pixelOffs + 2] = 255;
+					srcBuffer[pixelOffs + 0] = 215;
+					srcBuffer[pixelOffs + 1] = 215;
+					srcBuffer[pixelOffs + 2] = 215;
 				}
 			}
-			std::string fname = "SmokeOfCircles/" + digit5intFormat(frameN) + ".bmp";
-			save_bmp24(fname.c_str() , ScreenSize, ScreenSize, &srcBuffer[0]);
-			++frameN;
+		}
+		if ((++count) % 4 == 0) {
+			std::string fname = "SmokeOfCircles/" + digit5intFormat(frameN++) + ".bmp";
+			save_bmp24(fname.c_str(), ScreenSize, ScreenSize, &srcBuffer[0]);
 		}
 	}
-	for (int i = 0; i < 44; ++i) { // !!! const 
+	for (int i = 0; i < 55; ++i) { // !!! const 
 		std::string fname = "SmokeOfCircles/" + digit5intFormat(frameN) + ".bmp";
 		save_bmp24(fname.c_str(), ScreenSize, ScreenSize, &srcBuffer[0]);
 		++frameN;
@@ -1284,7 +1286,6 @@ void renderAnimateSmokeOfCircles()
 }
 
 //--------------------------------------------------------------------------------------------
-
 
 int main(int argc, char *argv[], char *envp[])
 {
