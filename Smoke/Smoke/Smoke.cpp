@@ -798,10 +798,10 @@ void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngl
 		printf("Rendering frame %d, subframe %d (up to %d)\n", frameN, n, subframeLast);
 		renderSubFrame(0, 0, ScreenSize, ScreenSize, n, ScreenSize, cameraAngleA, cameraAngleB, cameraYOffs);
 
-		if (!draft && (n % 50) == 0) {
-			std::string fname = std::string("Scenes/Frame") + digit5intFormat(frameN) + "_" + digit5intFormat(n) + ".bmp";
-			saveToBmp(fname, ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
-		}
+		//if (!draft && (n % 50) == 0) {
+		//	std::string fname = std::string("Scenes/Frame") + digit5intFormat(frameN) + "_" + digit5intFormat(n) + ".bmp";
+		//	saveToBmp(fname, ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
+		//}
 	}
 	std::string fname = fileNamePrefix + digit5intFormat(frameN) + ".flt";
 	saveToFlt(fname, ScreenSize, ScreenSize, subframeLast, [](int x, int y) { return screen[x][y]; });
