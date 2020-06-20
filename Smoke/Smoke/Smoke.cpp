@@ -4,10 +4,13 @@
 #include <string>
 #include <stdarg.h>
 #include <algorithm>
+#include <functional>
+#include <fstream>
+#include <set>
+#include <time.h>
+
 #include "bmp.h"
 #include "utils.h"
-#include "functional"
-#include <time.h>
 #include "Nodes.h"
 
 //--------------------------------------------------------------------------------------------
@@ -33,6 +36,7 @@ float scenesInterp = 0; // 0 - сцена с вулканом, 1 - сцена с
 float cloudsFlow = 0;   // Лёгкие облака бегут над полем из облаков
 
 float draftLightning = 0;
+std::set<int> renderedFrames;  // Список уже отрендеренных кадров
 
 //--------------------------------------------------------------------------------------------
 struct Circle
@@ -772,8 +776,49 @@ void screenClear()
 }
 
 //--------------------------------------------------------------------------------------------
+// Время в секундах, которое ренедрится один субфрейм каждого кадра 
+std::vector<int> durationOfSceneSetup = { 67,67,68,67,67,67,68,69,69,67,68,68,69,68,68,69,69,67,67,68,68,68,68,69,69,68,67,67,68,68,68,68,69,70,68,68,67,67,67,73,75,74,72,42,93,93,94,95,93,90,89,90,89,90,89,90,89,90,89,89,89,89};
 
-void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngleA, float cameraAngleB, float cameraYOffs, int subframeFirst, int subframeLast)
+// Время в секундах, которое ренедрится один субфрейм каждого кадра 
+std::vector<int> durationOfOneSubfarme = { 5,4,4,5,5,5,5,4,4,5,4,4,4,5,5,5,5,4,4,4,4,5,4,4,4,6,7,7,7,7,7,7,6,6,4,4,4,5,5,7,5,5,4,2,4,5,6,6,7,10,12,13,13,12,12,12,12,12,12,12,12,13,12};
+
+void estimateFinish(int frameN, int subframeN)
+{
+	int subframeFirst = -1;
+	int subframeLast = -1;
+	int estmatedTimeLeft = 0;
+
+	std::ifstream infile("config.txt");
+	int val1 = 0;
+	int val2 = 0;
+	while (infile >> val1 >> val2)
+	{
+		if (subframeFirst == -1) {
+			subframeFirst = val1;
+			subframeLast = val2;
+		}
+		else {
+			for (int frame = val1; frame <= val2; ++frame) {
+				if (renderedFrames.find(frame) == renderedFrames.end()) {
+					int index = (frame + 5) / 10;
+					index = std::min(index, (int)durationOfOneSubfarme.size() - 1);
+					index = std::min(index, (int)durationOfSceneSetup.size() - 1);
+					if (frame == frameN) {
+						estmatedTimeLeft += (subframeLast - subframeN + 1) * durationOfOneSubfarme[index];
+					}
+					else {
+						estmatedTimeLeft += (subframeLast - subframeFirst + 1) * durationOfOneSubfarme[index] + durationOfSceneSetup[index];
+					}
+				}
+			}
+		}
+	}
+	printf("estimated time left: %d minutes\n", estmatedTimeLeft / 60);
+}
+
+//--------------------------------------------------------------------------------------------
+
+void renderFrameImpl(const std::string& fileNamePrefix, int frameN, float cameraAngleA, float cameraAngleB, float cameraYOffs, int subframeFirst, int subframeLast)
 {
 	draftLightning = 0.f;
 	if (draft) {
@@ -792,16 +837,18 @@ void renderFrame(const std::string& fileNamePrefix, int frameN, float cameraAngl
 		loadFromFlt(fname, ScreenSize, ScreenSize, subframeFirst, [](int x, int y)->double& { return screen[x][y]; });
 	}
 
-	// Рендерим все кадры сцены
+	// Рендерим все суб-кадры текущего кадра
 	for (int n=subframeFirst; n <= subframeLast; ++n) {
 		srand(n);
 		printf("Rendering frame %d, subframe %d (up to %d)\n", frameN, n, subframeLast);
 		renderSubFrame(0, 0, ScreenSize, ScreenSize, n, ScreenSize, cameraAngleA, cameraAngleB, cameraYOffs);
 
-		//if (!draft && (n % 50) == 0) {
-		//	std::string fname = std::string("Scenes/Frame") + digit5intFormat(frameN) + "_" + digit5intFormat(n) + ".bmp";
-		//	saveToBmp(fname, ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
-		//}
+		estimateFinish(frameN, n);
+
+		if (!draft && (n % 50) == 0) {
+			std::string fname = std::string("Scenes/Frame") + digit5intFormat(frameN) + "_" + digit5intFormat(n) + ".bmp";
+			saveToBmp(fname, ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
+		}
 	}
 	std::string fname = fileNamePrefix + digit5intFormat(frameN) + ".flt";
 	saveToFlt(fname, ScreenSize, ScreenSize, subframeLast, [](int x, int y) { return screen[x][y]; });
@@ -856,7 +903,7 @@ void setupSceneVulcano()
 	lights.push_back(LIGHT_BOX(4500, 0, 170 + yOff, 0, 30, 200 + yOff, 30, false));
 	lights.push_back(LIGHT_BOX(12000, 0, -55 + yOff, 0, 50, -50 + yOff, 100, false));
 	lights.push_back(LIGHT_BOX(8400, 250, 0 + yOff, -35, 255, 120 + yOff, 10, false));
-	lights.push_back(LIGHT_BOX(16000, 250, 133 + yOff, 190, 255, 173 + yOff, 235, false));
+	lights.push_back(LIGHT_BOX(20000, 250, 133 + yOff, 190, 255, 173 + yOff, 235, false));
 	lights.push_back(LIGHT_BOX(14000, -20, 50 + yOff, 190, -15, 80 + yOff, 235, false));
 
 	lights.push_back(LIGHT_BOX(0, 90, 90, 90, 110, 110 + yOff, 110, true));   // Внутренний свет (молния) 
@@ -1033,39 +1080,75 @@ void setLightning(float bright)
 std::vector<std::pair<float, float>> cameraAlSpeedTrack = { {2.99f, 0.f}, {3.f, -0.142f}, {3.4f, -0.142f}, {3.41f, -0.004f}, {6.41f, -0.004f}, {6.42f, -0.142f}, {6.79f, -0.142f}, {6.8f, 0.f} };
 std::vector<std::pair<float, float>> lightningAnimTrack = { {8.8f, 0.f}, {8.81f, lightBright}, {8.85f, lightBright}, {8.97f, 0.f},   {9.1f, 0.f}, {9.11f, lightBright}, {9.15f, lightBright}, {9.27f, 0.f},    {12.f, 0.f}, {12.01f, lightBright}, {12.04f, lightBright}, {12.16f, 0.f} };
 std::vector<std::pair<float, float>> zoomAnimTrack = { {9.8f, 1.f}, {10.25f, 1.8f}, {11.25f, 1.8f}, {11.55f, 1.6f},  {13.25f, 1.6f}, {13.6f, 1.f}, {17.5f, 1.f}, {17.51f, 1.4375f} };
-std::vector<std::pair<float, float>> smokeAnimTrack = { {0.f, 0.5f}, {3.f, 1.6f},{3.4f, 0.9f}, {6.42f, 1.6f}, {6.8f, 0.9f}, {9.8f, 1.6f}, {10.25f, 0.9f}, {13.25f, 1.6f}, {13.7f, 0.75f}, {16.7f, 1.8f} };
-std::vector<std::pair<float, float>> scenesInterpTrack = { {16.f, 0.f}, {19.f, 1.f} };
+std::vector<std::pair<float, float>> smokeAnimTrack = { {0.f, 0.5f}, {3.f, 2.f},{3.4f, 0.5f}, {6.42f, 2.f}, {6.8f, 0.5f}, {9.8f, 2.f}, {10.25f, 0.5f}, {13.25f, 2.f}, {13.7f, 0.5f}, {16.7f, 2.f} };
+std::vector<std::pair<float, float>> scenesInterpTrack = { {16.f, 0.f}, {19.f, 0.f} };
 std::vector<std::pair<float, float>> cameraBeTrack = { {18.5f, 0.f}, {20.5f, 1.f} };
 std::vector<std::pair<float, float>> cloudsFlowTrack = { {18.0f, 0.f}, {25.f, 1.f} };
 
 //--------------------------------------------------------------------------------------------
 
-void RenderAnimate(int fromFrame, int toFrame, int subframeFirst, int subframeLast)
+void renderFrame(int frameN, int subframeFirst, int subframeLast)
 {
 	float cameraAl = PI;
+	float curTime = 0;
 
-	for (int i = 0; i <= toFrame; ++i) {
-		float curTime = i / 25.f;
-		if (i >= fromFrame) {
-			leafScale = getInterp(smokeAnimTrack, curTime);
-			zoom = getInterp(zoomAnimTrack, curTime);
-			cloudsFlow = getInterp(cloudsFlowTrack, curTime);
-			float cameraBe = PI/4 * (0.5f - 0.5f*cos(PI * getInterp(cameraBeTrack, curTime)));
-			scenesInterp = 0.5f - 0.5f*cos(PI * getInterp(scenesInterpTrack, curTime));
-			float cameraYOffs = 0;
-			if (scenesInterp <= 0.5f) {
-				setupSceneVulcano();
-				cameraYOffs = -scenesInterp / 0.5f * SceneSize;
-			}
-			else {
-				setupSceneHeaven();
-			}
-			setLightning(getInterp(lightningAnimTrack, curTime));
-			renderFrame("Scenes/Scene", i, cameraAl, cameraBe, cameraYOffs, subframeFirst, subframeLast);
-		}
+	for (int i = 0; i < frameN; ++i) {
+		curTime = i / 25.f;
 		float cameraAlSpeed = getInterp(cameraAlSpeedTrack, curTime);
 		cameraAl += cameraAlSpeed;
-		printf("%f\n", cameraAl);
+	}
+	curTime = frameN / 25.f;
+	leafScale = getInterp(smokeAnimTrack, curTime);
+	zoom = getInterp(zoomAnimTrack, curTime);
+	cloudsFlow = getInterp(cloudsFlowTrack, curTime);
+	float cameraBe = PI / 4 * (0.5f - 0.5f*cos(PI * getInterp(cameraBeTrack, curTime)));
+	scenesInterp = 0.5f - 0.5f*cos(PI * getInterp(scenesInterpTrack, curTime));
+	float cameraYOffs = 0;
+	time_t timeStart = time(NULL);
+	if (scenesInterp <= 0.5f) {
+		setupSceneVulcano();
+		cameraYOffs = -scenesInterp / 0.5f * SceneSize;
+	}
+	else {
+		setupSceneHeaven();
+	}
+	setLightning(getInterp(lightningAnimTrack, curTime));
+	log1("%d,\n", time(NULL) - timeStart);
+	timeStart = time(NULL);
+	renderFrameImpl("Scenes/Scene", frameN, cameraAl, cameraBe, cameraYOffs, subframeFirst, subframeLast);
+	log2("%d,\n", time(NULL) - timeStart);
+}
+
+//--------------------------------------------------------------------------------------------
+
+void renderAnimate()
+{
+	while (true) {
+		int subframeFirst = -1;
+		int subframeLast = -1;
+		int frameN = 0;
+		{
+			std::ifstream infile("config.txt");
+			int a, b;
+			while (infile >> a >> b)
+			{
+				if (subframeFirst == -1) {
+					subframeFirst = a;
+					subframeLast = b;
+				}
+				else {
+					for (int i = a; i <= b; ++i) {
+						if (renderedFrames.find(i) == renderedFrames.end()) {
+							frameN = i;
+							goto m1;
+						}
+					}
+				}
+			}
+		}
+		break;
+	m1:	renderFrame(frameN, subframeFirst, subframeLast);
+		renderedFrames.insert(frameN);
 	}
 }
 
@@ -1287,6 +1370,7 @@ void renderAnimateSmokeOfCircles()
 
 //--------------------------------------------------------------------------------------------
 
+
 int main(int argc, char *argv[], char *envp[])
 {
 	//colorGrade();
@@ -1297,20 +1381,6 @@ int main(int argc, char *argv[], char *envp[])
 		SubframesInOneFrame = 5;  
 	}
 
-	int fromFrame = 0;
-	int toFrame = 0;
-	int subframeFirst = 0;
-	int subframeLast = SubframesInOneFrame - 1;
-
-	if (argc >= 3) {
-		fromFrame = atoi(argv[1]);
-		toFrame = atoi(argv[2]);
-	}
-	if (argc >= 5) {
-		subframeFirst = atoi(argv[3]);
-		subframeLast = atoi(argv[4]);
-	}
-
-	RenderAnimate(fromFrame, toFrame, subframeFirst, subframeLast);
+	renderAnimate();
 }
 

@@ -32,6 +32,35 @@ void log(const std::string& str)
 	fprintf(f, str.c_str());
 	fclose(f);
 }
+//--------------------------------------------------------------------------------------------
+
+void _cdecl log1(const char *text, ...)
+{
+	static char tmpStr[1024];
+	va_list args;
+	va_start(args, text);
+	vsprintf_s(tmpStr, sizeof(tmpStr), text, args);
+	va_end(args);
+
+	FILE* f = fopen("Error1.txt", "at");
+	fprintf(f, tmpStr);
+	fclose(f);
+}
+
+//--------------------------------------------------------------------------------------------
+
+void _cdecl log2(const char *text, ...)
+{
+	static char tmpStr[1024];
+	va_list args;
+	va_start(args, text);
+	vsprintf_s(tmpStr, sizeof(tmpStr), text, args);
+	va_end(args);
+
+	FILE* f = fopen("Error2.txt", "at");
+	fprintf(f, tmpStr);
+	fclose(f);
+}
 
 //--------------------------------------------------------------------------------------------
 
