@@ -1257,7 +1257,7 @@ void initTableByBmp(const std::string& fname)
 
 //--------------------------------------------------------------------------------------------
 
-void colorGradeByTable(const std::string& fname)
+void colorGradeByTable(const std::string& fname, const std::string& fnameOut)
 {
 	int xSize = 0;
 	int ySize = 0;
@@ -1284,26 +1284,23 @@ void colorGradeByTable(const std::string& fname)
 			dataOut[(y*xSize + x) * 3 + 2] = colorTab[bright].r;
 			dataOut[(y*xSize + x) * 3 + 1] = colorTab[bright].g;
 			dataOut[(y*xSize + x) * 3] = colorTab[bright].b;
-
-			if (x == 130 && y == 68) {
-				printf("bright(130,68):%d\n", bright);
-			}
-			if (x == 133 && y == 66) {
-				printf("bright(133,66):%d\n", bright);
-			}
-
-
+			//if (x == 130 && y == 68) {
+			//	printf("bright(130,68):%d\n", bright);
+			//}
+			//if (x == 133 && y == 66) {
+			//	printf("bright(133,66):%d\n", bright);
+			//}
 		}
 	}
-	save_bmp24(fname.c_str(), xSize, ySize, &dataOut[0]);
+	save_bmp24(fnameOut.c_str(), xSize, ySize, &dataOut[0]);
 }
 
 //--------------------------------------------------------------------------------------------
 
-void colorGrade()
+void colorGrade(const std::string& fname, const std::string& fnameOut)
 {
-	initTableByBmp("ColorSamples//Ready//colorSample106.bmp");
-	colorGradeByTable("ColorSamples//Ready//test.bmp");
+	initTableByBmp("ColorSamples//Ready//colorSample25.bmp");
+	colorGradeByTable(fname, fnameOut);
 }
 
 //--------------------------------------------------------------------------------------------
@@ -1342,9 +1339,10 @@ void renderAnimateSmokeOfCircles()
 				int scrY = y - diametr / 2 + yc;
 				if (scrX >= 0 && scrX < ScreenSize && scrY >= 0 && scrY < ScreenSize) {
 					int pixelOffs = (scrY * ScreenSize + scrX) * 3;
-					srcBuffer[pixelOffs + 0] = 215;
-					srcBuffer[pixelOffs + 1] = 215;
-					srcBuffer[pixelOffs + 2] = 215;
+					int bright = rand(50, 170);
+					srcBuffer[pixelOffs + 0] = bright;
+					srcBuffer[pixelOffs + 1] = bright;
+					srcBuffer[pixelOffs + 2] = bright;
 				}
 			}
 		}
@@ -1370,11 +1368,91 @@ void renderAnimateSmokeOfCircles()
 
 //--------------------------------------------------------------------------------------------
 
+void noiseReduction(const std::string& fname, const std::string& fnameOut)
+{
+	int xSize = 0;
+	int ySize = 0;
+	give_bmp_size(fname.c_str(), &xSize, &ySize);
+	std::vector<uint8_t> dataIn;
+	dataIn.resize(xSize * ySize * 3);
+	read_bmp24(fname.c_str(), &dataIn[0]);
+
+	std::vector<uint8_t> dataOut;
+	dataOut.resize(xSize * ySize * 3);
+	for (int y = 0; y < ySize; ++y) {
+		for (int x = 0; x < xSize; ++x) {
+			int bright = dataIn[(y*xSize + x) * 3];
+			if (x > 0 && x < xSize - 1 && y > 0 && y < ySize - 1) {
+				float brightF = dataIn[(y*xSize + x) * 3] * 4 +
+								dataIn[(y*xSize + x + 1) * 3] +
+								dataIn[(y*xSize + x - 1) * 3] +
+								dataIn[((y + 1)*xSize + x) * 3] +
+								dataIn[((y - 1)*xSize + x) * 3] +
+								dataIn[((y + 1)*xSize + x + 1) * 3] * 0.5f +
+								dataIn[((y + 1)*xSize + x - 1) * 3] * 0.5f +
+								dataIn[((y - 1)*xSize + x + 1) * 3] * 0.5f +
+								dataIn[((y - 1)*xSize + x - 1) * 3] * 0.5f;
+				brightF /= (4 + 1*4 + 0.5f*4);
+				bright = (int)brightF;
+			}
+			bright = (dataIn[(y*xSize + x) * 3] * 10 + bright * 90) / 100;
+			dataOut[(y*xSize + x) * 3 + 2] = bright;
+			dataOut[(y*xSize + x) * 3 + 1] = bright;
+			dataOut[(y*xSize + x) * 3] = bright;
+		}
+	}
+	save_bmp24(fnameOut.c_str(), xSize, ySize, &dataOut[0]);
+}
+
+//--------------------------------------------------------------------------------------------
+
+void correctGamma(const std::string& fname, const std::string& fnameOut)
+{
+	const double gamma = 0.75f;
+	int xSize = 0;
+	int ySize = 0;
+	give_bmp_size(fname.c_str(), &xSize, &ySize);
+	std::vector<uint8_t> dataIn;
+	dataIn.resize(xSize * ySize * 3);
+	read_bmp24(fname.c_str(), &dataIn[0]);
+
+	std::vector<uint8_t> dataOut;
+	dataOut.resize(xSize * ySize * 3);
+	for (int y = 0; y < ySize; ++y) {
+		for (int x = 0; x < xSize; ++x) {
+			int bright = dataIn[(y*xSize + x) * 3];
+			bright = (int)(pow(bright / 255., gamma) * 255.);
+			dataOut[(y*xSize + x) * 3 + 2] = bright;
+			dataOut[(y*xSize + x) * 3 + 1] = bright;
+			dataOut[(y*xSize + x) * 3] = bright;
+		}
+	}
+	save_bmp24(fnameOut.c_str(), xSize, ySize, &dataOut[0]);
+}
+
+//--------------------------------------------------------------------------------------------
+
+/*
+	Ray tracing subframe 997/1000 (frame 417)
+	Ray tracing subframe 998/1000 (frame 417)
+	Ray tracing subframe 999/1000 (frame 417)
+	Ray tracing subframe 1000/1000 (frame 417)
+    Noise reduction...  Done
+	Gamma correcting...  Done
+	Applying color grade...  Done
+	All Done!
+*/
+
+//--------------------------------------------------------------------------------------------
 
 int main(int argc, char *argv[], char *envp[])
 {
-	//colorGrade();
 	//renderAnimateSmokeOfCircles();
+
+	//noiseReduction("StartFrame/Scene00000.bmp", "StartFrame/SceneDenoise.bmp");
+	//correctGamma("StartFrame/SceneDenoise.bmp", "StartFrame/SceneGamma.bmp");
+	//colorGrade("StartFrame/SceneGamma.bmp", "StartFrame/SceneColor.bmp");
+
 	//return 0;
 
 	if (draft) {
