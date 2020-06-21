@@ -1081,9 +1081,9 @@ std::vector<std::pair<float, float>> cameraAlSpeedTrack = { {2.99f, 0.f}, {3.f, 
 std::vector<std::pair<float, float>> lightningAnimTrack = { {8.8f, 0.f}, {8.81f, lightBright}, {8.85f, lightBright}, {8.97f, 0.f},   {9.1f, 0.f}, {9.11f, lightBright}, {9.15f, lightBright}, {9.27f, 0.f},    {12.f, 0.f}, {12.01f, lightBright}, {12.04f, lightBright}, {12.16f, 0.f} };
 std::vector<std::pair<float, float>> zoomAnimTrack = { {9.8f, 1.f}, {10.25f, 1.8f}, {11.25f, 1.8f}, {11.55f, 1.6f},  {13.25f, 1.6f}, {13.6f, 1.f}, {17.5f, 1.f}, {17.51f, 1.4375f} };
 std::vector<std::pair<float, float>> smokeAnimTrack = { {0.f, 0.5f}, {3.f, 2.f},{3.4f, 0.5f}, {6.42f, 2.f}, {6.8f, 0.5f}, {9.8f, 2.f}, {10.25f, 0.5f}, {13.25f, 2.f}, {13.7f, 0.5f}, {16.7f, 2.f} };
-std::vector<std::pair<float, float>> scenesInterpTrack = { {16.f, 0.f}, {19.f, 0.f} };
+std::vector<std::pair<float, float>> scenesInterpTrack = { {16.7f, 0.f}, {19.f, 1.f} };
 std::vector<std::pair<float, float>> cameraBeTrack = { {18.5f, 0.f}, {20.5f, 1.f} };
-std::vector<std::pair<float, float>> cloudsFlowTrack = { {18.0f, 0.f}, {25.f, 1.f} };
+std::vector<std::pair<float, float>> cloudsFlowTrack = { {18.0f, 1.f}, {25.f, 1.f} };
 
 //--------------------------------------------------------------------------------------------
 
@@ -1216,7 +1216,7 @@ void initTableByBmp(const std::string& fname)
 			break;
 		}
 	}
-	printf("%d %d %d\n", tmpTab[255].r, tmpTab[255].g, tmpTab[255].b);
+	//printf("%d %d %d\n", tmpTab[255].r, tmpTab[255].g, tmpTab[255].b);
 	for (int i = 0; i < 256; ++i) {
 		if (tmpTab[i].n) {
 			colorTab[i] = tmpTab[i];
@@ -1297,9 +1297,9 @@ void colorGradeByTable(const std::string& fname, const std::string& fnameOut)
 
 //--------------------------------------------------------------------------------------------
 
-void colorGrade(const std::string& fname, const std::string& fnameOut)
+void colorGrade(const std::string& fname, const std::string& fnameOut, const std::string& fnameColorSample)
 {
-	initTableByBmp("ColorSamples//Ready//colorSample25.bmp");
+	initTableByBmp(fnameColorSample);
 	colorGradeByTable(fname, fnameOut);
 }
 
@@ -1447,13 +1447,18 @@ void correctGamma(const std::string& fname, const std::string& fnameOut)
 
 int main(int argc, char *argv[], char *envp[])
 {
-	//renderAnimateSmokeOfCircles();
+	//{
+	//	//renderAnimateSmokeOfCircles();
 
-	//noiseReduction("StartFrame/Scene00000.bmp", "StartFrame/SceneDenoise.bmp");
-	//correctGamma("StartFrame/SceneDenoise.bmp", "StartFrame/SceneGamma.bmp");
-	//colorGrade("StartFrame/SceneGamma.bmp", "StartFrame/SceneColor.bmp");
+	//	noiseReduction("PostPorcess/Scene00000.bmp", "PostPorcess/Scene00000_Denoise.bmp");
+	//	correctGamma("PostPorcess/Scene00000_Denoise.bmp", "PostPorcess/Scene00000_Gamma.bmp");
+	//	colorGrade("PostPorcess/Scene00000_Gamma.bmp", "PostPorcess/Scene00000_Color.bmp", "ColorSamples//Ready//colorSample25.bmp");
 
-	//return 0;
+	//	noiseReduction("PostPorcess/Scene00625.bmp", "PostPorcess/Scene00625_Denoise.bmp");
+	//	colorGrade("PostPorcess/Scene00625_Denoise.bmp", "PostPorcess/Scene00625_Color.bmp", "ColorSamples//Ready//colorSample106.bmp");
+
+	//	return 0;
+	//}
 
 	if (draft) {
 		SubframesInOneFrame = 5;  
