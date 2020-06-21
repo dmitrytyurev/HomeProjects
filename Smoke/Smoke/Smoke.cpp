@@ -1082,7 +1082,7 @@ std::vector<std::pair<float, float>> lightningAnimTrack = { {8.8f, 0.f}, {8.81f,
 std::vector<std::pair<float, float>> zoomAnimTrack = { {9.8f, 1.f}, {10.25f, 1.8f}, {11.25f, 1.8f}, {11.55f, 1.6f},  {13.25f, 1.6f}, {13.6f, 1.f}, {17.5f, 1.f}, {17.51f, 1.4375f} };
 std::vector<std::pair<float, float>> smokeAnimTrack = { {0.f, 0.5f}, {3.f, 2.f},{3.4f, 0.5f}, {6.42f, 2.f}, {6.8f, 0.5f}, {9.8f, 2.f}, {10.25f, 0.5f}, {13.25f, 2.f}, {13.7f, 0.5f}, {16.7f, 2.f} };
 std::vector<std::pair<float, float>> scenesInterpTrack = { {16.7f, 0.f}, {19.f, 1.f} };
-std::vector<std::pair<float, float>> cameraBeTrack = { {18.5f, 0.f}, {20.5f, 1.f} };
+std::vector<std::pair<float, float>> cameraBeTrack = { {19.f, 0.f}, {20.5f, 1.f} };
 std::vector<std::pair<float, float>> cloudsFlowTrack = { {18.0f, 1.f}, {25.f, 1.f} };
 
 //--------------------------------------------------------------------------------------------
