@@ -779,14 +779,17 @@ void screenClear()
 // Время в секундах, которое ренедрится один субфрейм каждого кадра 
 std::vector<int> durationOfSceneSetup = { 67,67,68,67,67,67,68,69,69,67,68,68,69,68,68,69,69,67,67,68,68,68,68,69,69,68,67,67,68,68,68,68,69,70,68,68,67,67,67,73,75,74,72,42,93,93,94,95,93,90,89,90,89,90,89,90,89,90,89,89,89,89};
 
-// Время в секундах, которое ренедрится один субфрейм каждого кадра 
-std::vector<int> durationOfOneSubfarme = { 5,4,4,5,5,5,5,4,4,5,4,4,4,5,5,5,5,4,4,4,4,5,4,4,4,6,7,7,7,7,7,7,6,6,4,4,4,5,5,7,5,5,4,2,4,5,6,6,7,10,12,13,13,12,12,12,12,12,12,12,12,13,12};
+// Время в десятых долях секунды, которое ренедрится один субфрейм каждого кадра 
+// До 200 кадра (оптимизация)
+//std::vector<int> durationOfOneSubfarme = { 50,40,40,50,50,50,50,40,40,50,40,40,40,50,50,50,50,40,40,40,40,50,40,40,40,60,70,70,70,70,70,70,60,60,40,40,40,50,50,70,50,50,40,20,40,50,60,60,70,100,120,130,130,120,120,120,120,120,120,120,120,130,120};
+// После 200 кадра (нет оптимизации)
+std::vector<int> durationOfOneSubfarme = { 27,27,27,28,29,29,29,30,30,29,29,31,31,32,32,33,33,28,28,29,29,30,31,32,31,53,66,67,67,64,65,66,66,67,28,29,29,29,30,30,31,29,18,7,1,32,37,40,45,70,103,119,120,120,119,119,119,119,119,119,120,119,120 };
 
 void estimateFinish(int frameN, int subframeN)
 {
 	int subframeFirst = -1;
 	int subframeLast = -1;
-	int estmatedTimeLeft = 0;
+	float estmatedTimeLeft = 0;
 
 	std::ifstream infile("config.txt");
 	int val1 = 0;
@@ -804,16 +807,18 @@ void estimateFinish(int frameN, int subframeN)
 					index = std::min(index, (int)durationOfOneSubfarme.size() - 1);
 					index = std::min(index, (int)durationOfSceneSetup.size() - 1);
 					if (frame == frameN) {
-						estmatedTimeLeft += (subframeLast - subframeN + 1) * durationOfOneSubfarme[index];
+						estmatedTimeLeft += (subframeLast - subframeN + 1) * durationOfOneSubfarme[index] * 0.1f;
 					}
 					else {
-						estmatedTimeLeft += (subframeLast - subframeFirst + 1) * durationOfOneSubfarme[index] + durationOfSceneSetup[index];
+						estmatedTimeLeft += (subframeLast - subframeFirst + 1) * durationOfOneSubfarme[index] * 0.1f + durationOfSceneSetup[index];
 					}
 				}
 			}
 		}
 	}
-	printf("estimated time left: %d minutes\n", estmatedTimeLeft / 60);
+	int hoursLeft = ((int)estmatedTimeLeft / 3600);
+	int minutesLeft = ((int)estmatedTimeLeft / 60) % 60;
+	printf("estimated time left: %d hours %d minutes\n", hoursLeft, minutesLeft);
 }
 
 //--------------------------------------------------------------------------------------------
@@ -1073,8 +1078,6 @@ void setLightning(float bright)
 		}
 	}
 }
-// Быстрый сброс скейла анимации
-//std::vector<std::pair<float, float>> smokeAnimTrack = { {0.f, 0.5f}, {3.f, 2.f}, {3.01f, 0.5f}, {3.4f, 0.5f}, {6.42f, 2.f}, {6.43f, 0.5f}, {6.8f, 0.5f}, {9.8f, 2.f}, {9.81f, 0.5f}, {10.25f, 0.5f}, {13.25f, 2.f}, {13.26f, 0.5f}, {13.7f, 0.5f}, {16.7f, 2.f} };
 //--------------------------------------------------------------------------------------------
 
 std::vector<std::pair<float, float>> cameraAlSpeedTrack = { {2.99f, 0.f}, {3.f, -0.142f}, {3.4f, -0.142f}, {3.41f, -0.004f}, {6.41f, -0.004f}, {6.42f, -0.142f}, {6.79f, -0.142f}, {6.8f, 0.f} };
@@ -1135,6 +1138,10 @@ void renderAnimate()
 				if (subframeFirst == -1) {
 					subframeFirst = a;
 					subframeLast = b;
+					if (draft) {
+						subframeFirst = 0;
+						subframeLast = 4;
+					}
 				}
 				else {
 					for (int i = a; i <= b; ++i) {
@@ -1460,10 +1467,7 @@ int main(int argc, char *argv[], char *envp[])
 	//	return 0;
 	//}
 
-	if (draft) {
-		SubframesInOneFrame = 5;  
-	}
-
 	renderAnimate();
 }
+
 
