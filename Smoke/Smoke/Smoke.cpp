@@ -823,7 +823,7 @@ void estimateFinish(int frameN, int subframeN)
 
 //--------------------------------------------------------------------------------------------
 
-void renderFrameImpl(const std::string& fileNamePrefix, int frameN, float cameraAngleA, float cameraAngleB, float cameraYOffs, int subframeFirst, int subframeLast)
+void renderFrameImpl(const std::string& inPath, const std::string& outPath, const std::string& intermediatePath, int frameN, float cameraAngleA, float cameraAngleB, float cameraYOffs, int subframeFirst, int subframeLast)
 {
 	draftLightning = 0.f;
 	if (draft) {
@@ -838,7 +838,7 @@ void renderFrameImpl(const std::string& fileNamePrefix, int frameN, float camera
 	randomRepeatChecker.onStartNewFrame();
 	screenClear();
 	if (subframeFirst) {
-		std::string fname = fileNamePrefix + digit5intFormat(frameN) + ".flt";
+		std::string fname = inPath + "Scene" + digit5intFormat(frameN) + ".flt";
 		loadFromFlt(fname, ScreenSize, ScreenSize, subframeFirst, [](int x, int y)->double& { return screen[x][y]; });
 	}
 
@@ -851,14 +851,14 @@ void renderFrameImpl(const std::string& fileNamePrefix, int frameN, float camera
 		estimateFinish(frameN, n);
 
 		if (!draft && (n % 50) == 0) {
-			std::string fname = std::string("Scenes/Frame") + digit5intFormat(frameN) + "_" + digit5intFormat(n) + ".bmp";
+			std::string fname = intermediatePath + "Frame" + digit5intFormat(frameN) + "_" + digit5intFormat(n) + ".bmp";
 			saveToBmp(fname, ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
 		}
 	}
-	std::string fname = fileNamePrefix + digit5intFormat(frameN) + ".flt";
+	std::string fname = outPath + "Scene" + digit5intFormat(frameN) + ".flt";
 	saveToFlt(fname, ScreenSize, ScreenSize, subframeLast, [](int x, int y) { return screen[x][y]; });
 
-	fname = fileNamePrefix + digit5intFormat(frameN) + ".bmp";
+	fname = outPath + "Scene" + digit5intFormat(frameN) + ".bmp";
 	saveToBmp(fname, ScreenSize, ScreenSize, [subframeLast](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (subframeLast + 1), 255.)); });
 }
 
@@ -1118,7 +1118,7 @@ void renderFrame(int frameN, int subframeFirst, int subframeLast)
 	setLightning(getInterp(lightningAnimTrack, curTime));
 	log1("%d,\n", time(NULL) - timeStart);
 	timeStart = time(NULL);
-	renderFrameImpl("Scenes/Scene", frameN, cameraAl, cameraBe, cameraYOffs, subframeFirst, subframeLast);
+	renderFrameImpl("Source/", "ToSend/", "Tmp/", frameN, cameraAl, cameraBe, cameraYOffs, subframeFirst, subframeLast);
 	log2("%d,\n", time(NULL) - timeStart);
 }
 
