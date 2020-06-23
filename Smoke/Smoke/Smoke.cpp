@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include <iostream>
 #include <vector>
+#include <filesystem>
 #include <string>
 #include <stdarg.h>
 #include <algorithm>
@@ -22,12 +23,17 @@ extern float leafScale;
 // Ренедер
 //--------------------------------------------------------------------------------------------
 
+const std::string FileNamePrefix = "Scene";
+const std::string inPath = "../Source/";
+const std::string outPath = "../ToSend/";
+const std::string intermediatePath = "../Tmp/";
 const float lightBright = 7000.f;
 const float FarAway = 100000.f;
 const int ScreenSize = 400; // Размер экрана в пикселах
 const int SceneSize = 200;  // Размер сцены в единичных кубах
 const float cameraZinit = -500; // Позиция камеры по z в системе координат сетки
 const double ScatterCoeff = 0.4f; // Коэффициент рассеивания тумана
+
 int SubframesInOneFrame = 500; // Сколько раз рендерим сцену
 bool draft = false;
 bool useCosineMul = true;
@@ -36,7 +42,6 @@ float scenesInterp = 0; // 0 - сцена с вулканом, 1 - сцена с
 float cloudsFlow = 0;   // Лёгкие облака бегут над полем из облаков
 
 float draftLightning = 0;
-std::set<int> renderedFrames;  // Список уже отрендеренных кадров
 
 //--------------------------------------------------------------------------------------------
 struct Circle
@@ -802,7 +807,8 @@ void estimateFinish(int frameN, int subframeN)
 		}
 		else {
 			for (int frame = val1; frame <= val2; ++frame) {
-				if (renderedFrames.find(frame) == renderedFrames.end()) {
+				std::string fname = outPath + FileNamePrefix + digit5intFormat(frame) + ".bmp";
+				if (!std::experimental::filesystem::exists(fname)) {
 					int index = (frame + 5) / 10;
 					index = std::min(index, (int)durationOfOneSubfarme.size() - 1);
 					index = std::min(index, (int)durationOfSceneSetup.size() - 1);
@@ -823,7 +829,7 @@ void estimateFinish(int frameN, int subframeN)
 
 //--------------------------------------------------------------------------------------------
 
-void renderFrameImpl(const std::string& inPath, const std::string& outPath, const std::string& intermediatePath, int frameN, float cameraAngleA, float cameraAngleB, float cameraYOffs, int subframeFirst, int subframeLast)
+void renderFrameImpl(int frameN, float cameraAngleA, float cameraAngleB, float cameraYOffs, int subframeFirst, int subframeLast)
 {
 	draftLightning = 0.f;
 	if (draft) {
@@ -838,7 +844,7 @@ void renderFrameImpl(const std::string& inPath, const std::string& outPath, cons
 	randomRepeatChecker.onStartNewFrame();
 	screenClear();
 	if (subframeFirst) {
-		std::string fname = inPath + "Scene" + digit5intFormat(frameN) + ".flt";
+		std::string fname = inPath + FileNamePrefix + digit5intFormat(frameN) + ".flt";
 		loadFromFlt(fname, ScreenSize, ScreenSize, subframeFirst, [](int x, int y)->double& { return screen[x][y]; });
 	}
 
@@ -855,10 +861,10 @@ void renderFrameImpl(const std::string& inPath, const std::string& outPath, cons
 			saveToBmp(fname, ScreenSize, ScreenSize, [n](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (n + 1), 255.)); });
 		}
 	}
-	std::string fname = outPath + "Scene" + digit5intFormat(frameN) + ".flt";
+	std::string fname = outPath + FileNamePrefix + digit5intFormat(frameN) + ".flt";
 	saveToFlt(fname, ScreenSize, ScreenSize, subframeLast, [](int x, int y) { return screen[x][y]; });
 
-	fname = outPath + "Scene" + digit5intFormat(frameN) + ".bmp";
+	fname = outPath + FileNamePrefix + digit5intFormat(frameN) + ".bmp";
 	saveToBmp(fname, ScreenSize, ScreenSize, [subframeLast](int x, int y) { return (uint8_t)(std::min(screen[x][y] / (subframeLast + 1), 255.)); });
 }
 
@@ -1118,7 +1124,7 @@ void renderFrame(int frameN, int subframeFirst, int subframeLast)
 	setLightning(getInterp(lightningAnimTrack, curTime));
 	log1("%d,\n", time(NULL) - timeStart);
 	timeStart = time(NULL);
-	renderFrameImpl("Source/", "ToSend/", "Tmp/", frameN, cameraAl, cameraBe, cameraYOffs, subframeFirst, subframeLast);
+	renderFrameImpl(frameN, cameraAl, cameraBe, cameraYOffs, subframeFirst, subframeLast);
 	log2("%d,\n", time(NULL) - timeStart);
 }
 
@@ -1145,7 +1151,8 @@ void renderAnimate()
 				}
 				else {
 					for (int i = a; i <= b; ++i) {
-						if (renderedFrames.find(i) == renderedFrames.end()) {
+						std::string fname = outPath + FileNamePrefix + digit5intFormat(i) + ".bmp";
+						if (!std::experimental::filesystem::exists(fname)) {
 							frameN = i;
 							goto m1;
 						}
@@ -1155,7 +1162,6 @@ void renderAnimate()
 		}
 		break;
 	m1:	renderFrame(frameN, subframeFirst, subframeLast);
-		renderedFrames.insert(frameN);
 	}
 }
 
@@ -1440,10 +1446,10 @@ void correctGamma(const std::string& fname, const std::string& fnameOut)
 //--------------------------------------------------------------------------------------------
 
 /*
-	Ray tracing subframe 997/1000 (frame 417)
-	Ray tracing subframe 998/1000 (frame 417)
-	Ray tracing subframe 999/1000 (frame 417)
-	Ray tracing subframe 1000/1000 (frame 417)
+	Ray tracing frame 417 subframe 997/1000
+	Ray tracing frame 417 subframe 998/1000
+	Ray tracing frame 417 subframe 999/1000
+	Ray tracing frame 417 subframe 1000/1000
     Noise reduction...  Done
 	Gamma correcting...  Done
 	Applying color grade...  Done
@@ -1466,7 +1472,7 @@ int main(int argc, char *argv[], char *envp[])
 
 	//	return 0;
 	//}
-
+	
 	renderAnimate();
 }
 
