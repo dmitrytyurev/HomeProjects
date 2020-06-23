@@ -1460,18 +1460,19 @@ void correctGamma(const std::string& fname, const std::string& fnameOut)
 
 int main(int argc, char *argv[], char *envp[])
 {
-	//{
-	//	//renderAnimateSmokeOfCircles();
-
-	//	noiseReduction("PostPorcess/Scene00000.bmp", "PostPorcess/Scene00000_Denoise.bmp");
-	//	correctGamma("PostPorcess/Scene00000_Denoise.bmp", "PostPorcess/Scene00000_Gamma.bmp");
-	//	colorGrade("PostPorcess/Scene00000_Gamma.bmp", "PostPorcess/Scene00000_Color.bmp", "ColorSamples//Ready//colorSample25.bmp");
-
-	//	noiseReduction("PostPorcess/Scene00625.bmp", "PostPorcess/Scene00625_Denoise.bmp");
-	//	colorGrade("PostPorcess/Scene00625_Denoise.bmp", "PostPorcess/Scene00625_Color.bmp", "ColorSamples//Ready//colorSample106.bmp");
-
-	//	return 0;
-	//}
+//	{
+//	//renderAnimateSmokeOfCircles();
+//
+//		noiseReduction("PostPorcess/Scene00000.bmp", "PostPorcess/Scene00000_Denoise.bmp");
+//		correctGamma("PostPorcess/Scene00000_Denoise.bmp", "PostPorcess/Scene00000_Gamma.bmp");
+//		colorGrade("PostPorcess/Scene00000_Gamma.bmp", "PostPorcess/Scene00000_Color.bmp", "ColorSamples//Ready//colorSample25.bmp");
+//
+//		noiseReduction("PostPorcess/Scene00625.bmp", "PostPorcess/Scene00625_Denoise.bmp");
+//		correctGamma("PostPorcess/Scene00625_Denoise.bmp", "PostPorcess/Scene00625_Gamma.bmp");
+//		colorGrade("PostPorcess/Scene00625_Gamma.bmp", "PostPorcess/Scene00625_Color.bmp", "ColorSamples//Ready//colorSample106.bmp");
+//
+//		return 0;
+//	}
 	
 	renderAnimate();
 }
