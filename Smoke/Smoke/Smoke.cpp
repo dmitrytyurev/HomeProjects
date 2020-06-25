@@ -1458,21 +1458,37 @@ void correctGamma(const std::string& fname, const std::string& fnameOut)
 
 //--------------------------------------------------------------------------------------------
 
+void postProcessSmoke()
+{
+	for (int i = 0; i < 418; ++i) {
+//		noiseReduction("PostPorcess/Scene" + digit5intFormat(i) + ".bmp", "tmp.bmp");
+//		correctGamma("tmp.bmp", "tmp2.bmp");
+correctGamma("PostPorcess/Scene" + digit5intFormat(i) + ".bmp", "tmp2.bmp");
+		colorGrade("tmp2.bmp", "PostPorcess/ScenePost" + digit5intFormat(i) + ".bmp", "ColorSamples//Ready//colorSample25.bmp");
+	}
+	_unlink("tmp.bmp");
+	_unlink("tmp2.bmp");
+}
+
+//--------------------------------------------------------------------------------------------
+
+void postProcessCloud()
+{
+	noiseReduction("PostPorcess/Scene00625.bmp", "PostPorcess/Scene00625_Denoise.bmp");
+	correctGamma("PostPorcess/Scene00625_Denoise.bmp", "PostPorcess/Scene00625_Gamma.bmp");
+	colorGrade("PostPorcess/Scene00625_Gamma.bmp", "PostPorcess/Scene00625_Color.bmp", "ColorSamples//Ready//colorSample106.bmp");
+	_unlink("tmp.bmp");
+	_unlink("tmp2.bmp");
+}
+
+//--------------------------------------------------------------------------------------------
+
 int main(int argc, char *argv[], char *envp[])
 {
-//	{
-//	//renderAnimateSmokeOfCircles();
-//
-//		noiseReduction("PostPorcess/Scene00000.bmp", "PostPorcess/Scene00000_Denoise.bmp");
-//		correctGamma("PostPorcess/Scene00000_Denoise.bmp", "PostPorcess/Scene00000_Gamma.bmp");
-//		colorGrade("PostPorcess/Scene00000_Gamma.bmp", "PostPorcess/Scene00000_Color.bmp", "ColorSamples//Ready//colorSample25.bmp");
-//
-//		noiseReduction("PostPorcess/Scene00625.bmp", "PostPorcess/Scene00625_Denoise.bmp");
-//		correctGamma("PostPorcess/Scene00625_Denoise.bmp", "PostPorcess/Scene00625_Gamma.bmp");
-//		colorGrade("PostPorcess/Scene00625_Gamma.bmp", "PostPorcess/Scene00625_Color.bmp", "ColorSamples//Ready//colorSample106.bmp");
-//
-//		return 0;
-//	}
+	//renderAnimateSmokeOfCircles();
+	//postProcessSmoke();
+	//postProcessCloud();
+	//return 0;
 	
 	renderAnimate();
 }
