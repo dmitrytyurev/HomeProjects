@@ -45,3 +45,11 @@
 *.iobj
 *.ipdb
 *.opendb
+FluidSimulation-master
+Threads
+Tmp
+ToSend
+Debug
+Release
+Source
+SpecialThread
