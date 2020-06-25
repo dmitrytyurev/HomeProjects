@@ -125,12 +125,12 @@ static struct SystemConfig
 void setConfig(
 	float vDiffusion = 0.8f,
 	float pressure = 1.5f,
-	float vorticity = 50.0f,
-	float cDiffuion = 0.8f,
+	float vorticity = 50.0f*0.55f,   // 0.7 много, 0.5 мало, 0.6 много
+	float cDiffuion = 1.f,   //0.8f,
 	float dDiffuion = 1.2f,
 	float force = 5000.0f,
 	float bloomIntense = 0.1f,
-	int radius = 400,
+	int radius = 100,  // !!! 400
 	bool bloom = true
 )
 {
@@ -334,14 +334,15 @@ float curl(Particle* field, size_t xSize, size_t ySize, int x, int y)
  void advect(int x, int y, Particle* newField, Particle* oldField, size_t xSize, size_t ySize, float dDiffusion, float dt)
 {
 	float decay = 1.0f / (1.0f + dDiffusion * dt);
+decay = 1;
 	Vec2 pos = { x * 1.0f, y * 1.0f };
 	Particle& Pold = oldField[y * xSize + x];
 	// find new particle tracing where it came from
 	Particle p = interpolate(pos - Pold.u * dt, oldField, xSize, ySize);
 	p.u = p.u * decay;
-	p.color.R = std::min(1.0f, pow(p.color.R, 1.005f) * decay);
-	p.color.G = std::min(1.0f, pow(p.color.G, 1.005f) * decay);
-	p.color.B = std::min(1.0f, pow(p.color.B, 1.005f) * decay);
+	p.color.R = std::min(1.0f, pow(p.color.R, 1.0f) * decay);
+	p.color.G = std::min(1.0f, pow(p.color.G, 1.0f) * decay);
+	p.color.B = std::min(1.0f, pow(p.color.B, 1.0f) * decay);
 	newField[y * xSize + x] = p;
 }
 
@@ -521,6 +522,8 @@ void computeField(uint8_t* result, float dt, int x1pos, int y1pos, int x2pos, in
 		float scale = config.forceScale;
 		F.x = (x2pos - x1pos) * scale;
 		F.y = (y2pos - y1pos) * scale;
+//		F.x = (y1pos - y2pos) * scale;
+//		F.y = -(x1pos - x2pos) * scale;
 		Vec2 pos = { x2pos * 1.0f, y2pos * 1.0f };
 
 		for (int y = 0; y < ySize; ++y) {
@@ -604,20 +607,38 @@ int main()
 	int frame = 0;
 
 	bool isPressed = true;
-	int xMouse = 0;
-	int yMouse = 0;
+	int xMouse1 = 100;
+	int yMouse1 = 100;
+	int xMouse2 = 100;
+	int yMouse2 = 100;
 	while (true)
 	{
 		end = std::chrono::system_clock::now();
 		std::chrono::duration<float> diff = end - start;
 		start = end;
 
+		isPressed = frame < 50;
 		float dt = 0.02f;
-		computeField(pixelBuffer.data(), dt, xMouse, yMouse, 0, 0, isPressed);
+		computeField(pixelBuffer.data(), dt, xMouse1, yMouse1, xMouse2, yMouse2, isPressed);
 		std::string fname = "test" + digit5intFormat(frame) + ".bmp";
 		save_bmp32(fname.c_str(), FIELD_WIDTH, FIELD_HEIGHT, (const char*)pixelBuffer.data());
-		yMouse = (++yMouse)%200;
-		printf("frame done\n");
+		xMouse1 = xMouse2;
+		yMouse1 = yMouse2;
+		if (frame < 50)
+			++yMouse2;
+		else
+			if (frame == 50) {
+				xMouse2 = 150;
+				yMouse2 = 210;
+			}
+			else {
+				--xMouse2;
+			}
+
+
+
+
+		printf("frame %d done\n", frame);
 		++frame;
 	}
 	cudaExit();
