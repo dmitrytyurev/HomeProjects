@@ -788,7 +788,7 @@ std::vector<int> durationOfSceneSetup = { 67,67,68,67,67,67,68,69,69,67,68,68,69
 // До 200 кадра (оптимизация)
 //std::vector<int> durationOfOneSubfarme = { 50,40,40,50,50,50,50,40,40,50,40,40,40,50,50,50,50,40,40,40,40,50,40,40,40,60,70,70,70,70,70,70,60,60,40,40,40,50,50,70,50,50,40,20,40,50,60,60,70,100,120,130,130,120,120,120,120,120,120,120,120,130,120};
 // После 200 кадра (нет оптимизации)
-std::vector<int> durationOfOneSubfarme = { 27,27,27,28,29,29,29,30,30,29,29,31,31,32,32,33,33,28,28,29,29,30,31,32,31,53,66,67,67,64,65,66,66,67,28,29,29,29,30,30,31,29,18,7,1,32,37,40,45,70,103,119,120,120,119,119,119,119,119,119,120,119,120 };
+std::vector<int> durationOfOneSubfarme = { 28,29,29,29,30,31,29,29,30,30,30,31,31,32,32,33,33,28,28,29,29,30,31,32,31,53,66,67,67,64,65,66,66,67,28,29,29,29,30,30,31,29,18,7,1,32,37,40,45,70,103,119,120,120,119,119,119,119,119,119,120,119,120 };
 
 void estimateFinish(int frameN, int subframeN)
 {
@@ -1085,33 +1085,31 @@ void setLightning(float bright)
 	}
 }
 //--------------------------------------------------------------------------------------------
+//std::vector<std::pair<float, float>> cameraAlSpeedTrack = { {2.99f, 0.f}, {3.f, -0.142f}, {3.4f, -0.142f}, {3.41f, -0.004f}, {6.41f, -0.004f}, {6.42f, -0.142f}, {6.79f, -0.142f}, {6.8f, 0.f} };
+//std::vector<std::pair<float, float>> lightningAnimTrack = { {8.8f, 0.f}, {8.81f, lightBright}, {8.85f, lightBright}, {8.97f, 0.f},   {9.1f, 0.f}, {9.11f, lightBright}, {9.15f, lightBright}, {9.27f, 0.f},    {12.f, 0.f}, {12.01f, lightBright}, {12.04f, lightBright}, {12.16f, 0.f} };
 
-std::vector<std::pair<float, float>> cameraAlSpeedTrack = { {2.99f, 0.f}, {3.f, -0.142f}, {3.4f, -0.142f}, {3.41f, -0.004f}, {6.41f, -0.004f}, {6.42f, -0.142f}, {6.79f, -0.142f}, {6.8f, 0.f} };
-std::vector<std::pair<float, float>> lightningAnimTrack = { {8.8f, 0.f}, {8.81f, lightBright}, {8.85f, lightBright}, {8.97f, 0.f},   {9.1f, 0.f}, {9.11f, lightBright}, {9.15f, lightBright}, {9.27f, 0.f},    {12.f, 0.f}, {12.01f, lightBright}, {12.04f, lightBright}, {12.16f, 0.f} };
-std::vector<std::pair<float, float>> zoomAnimTrack = { {9.8f, 1.f}, {10.25f, 1.8f}, {11.25f, 1.8f}, {11.55f, 1.6f},  {13.25f, 1.6f}, {13.6f, 1.f}, {17.5f, 1.f}, {17.51f, 1.4375f} };
-std::vector<std::pair<float, float>> smokeAnimTrack = { {0.f, 0.5f}, {3.f, 2.f},{3.4f, 0.5f}, {6.42f, 2.f}, {6.8f, 0.5f}, {9.8f, 2.f}, {10.25f, 0.5f}, {13.25f, 2.f}, {13.7f, 0.5f}, {16.7f, 2.f} };
-std::vector<std::pair<float, float>> scenesInterpTrack = { {16.7f, 0.f}, {19.f, 1.f} };
-std::vector<std::pair<float, float>> cameraBeTrack = { {19.f, 0.f}, {20.5f, 1.f} };
-std::vector<std::pair<float, float>> cloudsFlowTrack = { {18.0f, 1.f}, {25.f, 1.f} };
+//std::vector<std::pair<float, float>> zoomAnimTrack = { {9.8f, 1.f}, {10.25f, 1.8f}, {11.25f, 1.8f}, {11.55f, 1.6f},  {13.25f, 1.6f}, {13.6f, 1.f}, {17.5f, 1.f}, {17.51f, 1.4375f} };
+//std::vector<std::pair<float, float>> smokeAnimTrack = { {0.f, 0.5f}, {3.f, 2.f},{3.4f, 0.5f}, {6.42f, 2.f}, {6.8f, 0.5f}, {9.8f, 2.f}, {10.25f, 0.5f}, {13.25f, 2.f}, {13.7f, 0.5f}, {16.7f, 2.f} };
+//std::vector<std::pair<float, float>> scenesInterpTrack = { {16.7f, 0.f}, {19.f, 1.f} };
+//std::vector<std::pair<float, float>> cameraBeTrack = { {19.f, 0.f}, {20.5f, 1.f} };
+//std::vector<std::pair<float, float>> cloudsFlowTrack = { {18.0f, 1.f}, {25.f, 1.f} };
+//--------------------------------------------------------------------------------------------
+
+std::vector<std::pair<float, float>> cameraAlTrack = { {0.f, PI}, {2.f, PI},  {2.4f, 0.f} };
+std::vector<std::pair<float, float>> smokeAnimTrack = { {0.f, 0.5f}, {2.f, 1.5f}, {2.4f, 0.5f}, {4.4f, 1.5f} };
+std::vector<std::pair<float, float>> lightningAnimTrack = { {3.9f, 0.f}, {3.91f, lightBright}, {3.95f, lightBright}, {4.07f, 0.f},   {4.2f, 0.f}, {4.21f, lightBright}, {4.25f, lightBright}, {4.37f, 0.f}};
 
 //--------------------------------------------------------------------------------------------
 
 void renderFrame(int frameN, int subframeFirst, int subframeLast)
 {
-	float cameraAl = PI;
-	float curTime = 0;
-
-	for (int i = 0; i < frameN; ++i) {
-		curTime = i / 25.f;
-		float cameraAlSpeed = getInterp(cameraAlSpeedTrack, curTime);
-		cameraAl += cameraAlSpeed;
-	}
-	curTime = frameN / 25.f;
+	float curTime = frameN / 25.f;
+	float cameraAl = getInterp(cameraAlTrack, curTime);
 	leafScale = getInterp(smokeAnimTrack, curTime);
-	zoom = getInterp(zoomAnimTrack, curTime);
-	cloudsFlow = getInterp(cloudsFlowTrack, curTime);
-	float cameraBe = PI / 4 * (0.5f - 0.5f*cos(PI * getInterp(cameraBeTrack, curTime)));
-	scenesInterp = 0.5f - 0.5f*cos(PI * getInterp(scenesInterpTrack, curTime));
+	zoom = 1.f;
+	cloudsFlow = 1.f;
+	float cameraBe = 0.f;
+	scenesInterp = 0.f;
 	float cameraYOffs = 0;
 	time_t timeStart = time(NULL);
 	if (scenesInterp <= 0.5f) {
@@ -1445,22 +1443,9 @@ void correctGamma(const std::string& fname, const std::string& fnameOut)
 
 //--------------------------------------------------------------------------------------------
 
-/*
-	Ray tracing frame 417 subframe 997/1000
-	Ray tracing frame 417 subframe 998/1000
-	Ray tracing frame 417 subframe 999/1000
-	Ray tracing frame 417 subframe 1000/1000
-    Noise reduction...  Done
-	Gamma correcting...  Done
-	Applying color grade...  Done
-	All Done!
-*/
-
-//--------------------------------------------------------------------------------------------
-
 void postProcessSmoke()
 {
-	for (int i = 0; i < 418; ++i) {
+	for (int i = 420; i < 428; ++i) {
 //		noiseReduction("PostPorcess/Scene" + digit5intFormat(i) + ".bmp", "tmp.bmp");
 //		correctGamma("tmp.bmp", "tmp2.bmp");
 correctGamma("PostPorcess/Scene" + digit5intFormat(i) + ".bmp", "tmp2.bmp");
@@ -1474,21 +1459,109 @@ correctGamma("PostPorcess/Scene" + digit5intFormat(i) + ".bmp", "tmp2.bmp");
 
 void postProcessCloud()
 {
-	noiseReduction("PostPorcess/Scene00625.bmp", "PostPorcess/Scene00625_Denoise.bmp");
-	correctGamma("PostPorcess/Scene00625_Denoise.bmp", "PostPorcess/Scene00625_Gamma.bmp");
-	colorGrade("PostPorcess/Scene00625_Gamma.bmp", "PostPorcess/Scene00625_Color.bmp", "ColorSamples//Ready//colorSample106.bmp");
+	int frame = 503;
+	noiseReduction("PostPorcess/Scene" + digit5intFormat(frame) + ".bmp", "tmp.bmp");
+	correctGamma("tmp.bmp", "tmp2.bmp");
+	colorGrade("tmp2.bmp", "PostPorcess/Scene" + digit5intFormat(frame) + "_Color.bmp", "ColorSamples//Ready//colorSample106.bmp");
 	_unlink("tmp.bmp");
 	_unlink("tmp2.bmp");
 }
 
 //--------------------------------------------------------------------------------------------
 
+void noiseReductionMovie()
+{
+	for (int i=1; i<416; ++i) {
+		std::string fname1 = "D:/tmp/111/Scene" + digit5intFormat(i - 1) + ".bmp";
+		std::string fname2 = "D:/tmp/111/Scene" + digit5intFormat(i) + ".bmp";
+		std::string fname3 = "D:/tmp/111/Scene" + digit5intFormat(i + 1) + ".bmp";
+
+		int xSize = 0;
+		int ySize = 0;
+		give_bmp_size(fname1.c_str(), &xSize, &ySize);
+
+		std::vector<uint8_t> dataIn1;
+		std::vector<uint8_t> dataIn2;
+		std::vector<uint8_t> dataIn3;
+
+		dataIn1.resize(xSize * ySize * 3);
+		dataIn2.resize(xSize * ySize * 3);
+		dataIn3.resize(xSize * ySize * 3);
+
+		read_bmp24(fname1.c_str(), &dataIn1[0]);
+		read_bmp24(fname2.c_str(), &dataIn2[0]);
+		read_bmp24(fname3.c_str(), &dataIn3[0]);
+
+		std::vector<uint8_t> dataOut;
+		dataOut.resize(xSize * ySize * 3);
+		for (int y = 0; y < ySize; ++y) {
+			for (int x = 0; x < xSize; ++x) {
+				int bright1 = dataIn1[(y*xSize + x) * 3];
+				int bright2 = dataIn2[(y*xSize + x) * 3];
+				int bright3 = dataIn3[(y*xSize + x) * 3];
+
+				int bright = (bright1 + bright2 + bright3) / 3;
+				dataOut[(y*xSize + x) * 3 + 2] = bright;
+				dataOut[(y*xSize + x) * 3 + 1] = bright;
+				dataOut[(y*xSize + x) * 3] = bright;
+			}
+		}
+		std::string fnameOut = "D:/tmp/111/Denoise/Scene" + digit5intFormat(i) + ".bmp";
+		save_bmp24(fnameOut.c_str(), xSize, ySize, &dataOut[0]);
+
+	}
+}
+
+//--------------------------------------------------------------------------------------------
+
+void printText()
+{
+	puts("Ray tracing frame 110 subframe 9971/10000");
+	puts("Ray tracing frame 110 subframe 9972/10000");
+	puts("Ray tracing frame 110 subframe 9973/10000");
+	puts("Ray tracing frame 110 subframe 9974/10000");
+	puts("Ray tracing frame 110 subframe 9975/10000");
+	puts("Ray tracing frame 110 subframe 9976/10000");
+	puts("Ray tracing frame 110 subframe 9977/10000");
+	puts("Ray tracing frame 110 subframe 9978/10000");
+	puts("Ray tracing frame 110 subframe 9979/10000");
+	puts("Ray tracing frame 110 subframe 9980/10000");
+	puts("Ray tracing frame 110 subframe 9981/10000");
+	puts("Ray tracing frame 110 subframe 9982/10000");
+	puts("Ray tracing frame 110 subframe 9983/10000");
+	puts("Ray tracing frame 110 subframe 9984/10000");
+	puts("Ray tracing frame 110 subframe 9985/10000");
+	puts("Ray tracing frame 110 subframe 9986/10000");
+	puts("Ray tracing frame 110 subframe 9987/10000");
+	puts("Ray tracing frame 110 subframe 9988/10000");
+	puts("Ray tracing frame 110 subframe 9989/10000");
+	puts("Ray tracing frame 110 subframe 9990/10000");
+	puts("Ray tracing frame 110 subframe 9991/10000");
+	puts("Ray tracing frame 110 subframe 9992/10000");
+	puts("Ray tracing frame 110 subframe 9993/10000");
+	puts("Ray tracing frame 110 subframe 9994/10000");
+	puts("Ray tracing frame 110 subframe 9995/10000");
+	puts("Ray tracing frame 110 subframe 9996/10000");
+	puts("Ray tracing frame 110 subframe 9997/10000");
+	puts("Ray tracing frame 110 subframe 9998/10000");
+	puts("Ray tracing frame 110 subframe 9999/10000");
+	puts("Ray tracing frame 110 subframe 10000/10000");
+	puts("Noise reduction...  Done");
+	puts("Gamma correction...  Done");
+	puts("Applying color grade...  Done");
+	puts("All Done!");
+}
+
+//--------------------------------------------------------------------------------------------
+
 int main(int argc, char *argv[], char *envp[])
 {
+	//noiseReductionMovie();
 	//renderAnimateSmokeOfCircles();
 	//postProcessSmoke();
 	//postProcessCloud();
-	//return 0;
+	printText();
+	return 0;
 	
 	renderAnimate();
 }
