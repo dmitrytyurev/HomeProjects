@@ -53,3 +53,13 @@ Debug
 Release
 Source
 SpecialThread
+*.vsidx
+/Smoke/Smoke/Cuts/1
+/Smoke/**/*.bmp
+/Smoke/**/*.flt
+/Smoke/**/*.bin
+/Smoke/**/*.jpeg
+/Smoke/**/*.psd
+/Smoke/**/*.jpg
+/Smoke/**/*.zip
+/Smoke/**/*.txt
