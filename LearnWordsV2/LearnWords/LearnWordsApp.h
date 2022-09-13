@@ -33,28 +33,12 @@ struct LearnWordsApp
 	LearnWordsApp();
 
 	void process(int argc, char* argv[]);
-
-	// Вызываются классами более низкого уровня
-	void clear_forgotten();
-	void add_forgotten(int forgottenWordIndex);
-	void get_forgotten(std::vector<int>& forgottenWordsIndices);
-	bool is_in_forgotten(int wordIndex);
-	void erase_from_remembered_long(int wordIndex);
-	void update_time_remembered_long(int wordIndex, double durationOfRemember);
-
 	bool is_quick_answer(double milliSec, const char* translation, bool* ifTooLongAnswer = nullptr, double* extraDurationForAnswer = nullptr);
 	void print_buttons_hints(const std::string& str, bool needRightKeyHint);
 	void save();
-	void set_word_as_just_learned(WordsData::WordInfo& w);
-	void fill_dates_and_save(WordsData::WordInfo& w, time_t currentTime, bool needAdvance_RightAnswersNum, bool isQuickAnswer);
-	void set_as_forgotten(WordsData::WordInfo& w);
-	void set_as_barely_known(WordsData::WordInfo& w);
 	
 	// Вызываются функциями данного класса
-	void fill_dates(float randDays, WordsData::WordInfo &w, time_t currentTime);
-	void reset_all_words_to_repeated(int rightAnswersToSet, float minDaysRepeat, float maxDaysRepeat, time_t currentTime);
 	int main_menu_choose_mode(time_t freezedTime);
-	void recalc_stats(time_t curTime, int* wordsTimeToRepeatNum, int wordsByLevel[]);
 	time_t get_time();
 	int get_translations_num(const char* translation);
 

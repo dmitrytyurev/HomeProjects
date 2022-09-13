@@ -12,18 +12,6 @@ enum class FromWhatSource
 {
 	NOT_INITIALIZED,
 	FROM_LEANRING_QUEUE,     // Слово из очереди подучиваемых слов
-	FROM_REMEMBERED_LONG,    // Это слово из тех, что проверяли в этой сессии программы, ответили хорошо, но очень долго
-	FROM_MANDATORY,          // Это слово из готовых обязательной проверке (включая небольшое опережение)
-	FROM_ADDITIONAL          // Это слово получено из AdditionalCheck
-};
-
-struct DistractWord
-{
-
-	DistractWord(int wordIndex, FromWhatSource wordFromWhatSource) : index(wordIndex), fromWhatSource(wordFromWhatSource) {}
-
-	int index = 0;                                                   // Индекс слова в _wordsOnDisk
-	FromWhatSource fromWhatSource = FromWhatSource::NOT_INITIALIZED; // Источник слова
 };
 
 // Класс для выучивания новых слов и подучивания забытых 
@@ -42,7 +30,6 @@ struct LearnNew
 
 	LearnNew(LearnWordsApp* learnWordsApp, WordsData* pWordsData) : _learnWordsApp(learnWordsApp), _pWordsData(pWordsData) {}
 	void learn_new(time_t freezedTime);
-	void learn_forgotten(time_t freezedTime, AdditionalCheck* pAdditionalCheck);
 	
 	void print_masked_translation(const char* _str, int symbolsToShowNum);
 	void put_to_queue(std::vector<WordToLearn>& queue, const WordToLearn& wordToPut, bool needRandomInsert);

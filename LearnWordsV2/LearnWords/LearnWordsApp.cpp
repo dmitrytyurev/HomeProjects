@@ -101,115 +101,16 @@ bool LearnWordsApp::is_quick_answer(double milliSec, const char* translation, bo
 }
 
 //===============================================================================================
-//
-//===============================================================================================
-
-void LearnWordsApp::clear_forgotten()
-{
-	_forgottenWordsIndices.clear();
-}
-
-//===============================================================================================
-//
-//===============================================================================================
-
-void LearnWordsApp::add_forgotten(int forgottenWordIndex)
-{
-	if (!is_in_forgotten(forgottenWordIndex))
-		_forgottenWordsIndices.push_back(forgottenWordIndex);
-}
-
-//===============================================================================================
-//
-//===============================================================================================
-
-void LearnWordsApp::get_forgotten(std::vector<int>& forgottenWordsIndices)
-{
-	forgottenWordsIndices = _forgottenWordsIndices;
-}
-
-//===============================================================================================
-//
-//===============================================================================================
-
-bool LearnWordsApp::is_in_forgotten(int wordIndex)
-{
-	auto result = std::find(_forgottenWordsIndices.begin(), _forgottenWordsIndices.end(), wordIndex);
-	return result != _forgottenWordsIndices.end();
-}
-
-//===============================================================================================
-//
-//===============================================================================================
-
-void LearnWordsApp::erase_from_remembered_long(int wordIndex)
-{
-	WordRememberedLong w(wordIndex, 0);
-
-	auto result = std::find(_wordRememberedLong.begin(), _wordRememberedLong.end(), w);
-	if (result != _wordRememberedLong.end())
-		_wordRememberedLong.erase(result);
-}
-
-//===============================================================================================
-//
-//===============================================================================================
-
-void LearnWordsApp::update_time_remembered_long(int wordIndex, double durationOfRemember)
-{
-	WordRememberedLong w(wordIndex, durationOfRemember);
-
-	auto result = std::find(_wordRememberedLong.begin(), _wordRememberedLong.end(), w);
-	if (result != _wordRememberedLong.end())
-	{
-		_wordRememberedLong.erase(result);
-		_wordRememberedLong.insert(w);
-	}
-}
-
-//===============================================================================================
 // 
 //===============================================================================================
 
 int LearnWordsApp::main_menu_choose_mode(time_t freezedTime)
 {
-//	_additionalCheck.log_random_test_words(_freezedTime);
-
-	int wordsTimeToRepeatNum = 0;
-	int wordsByLevel[MAX_RIGHT_REPEATS_GLOBAL_N + 1];
-	recalc_stats(_freezedTime, &wordsTimeToRepeatNum, wordsByLevel);
-
-	int wordsLearnGoodIndex = 0;   // Найти индекс, больше которого имеют хорошо изученные слова
-	for (int i = 1; i < MAX_RIGHT_REPEATS_GLOBAL_N + 1; ++i)
-		if (addDaysMin[i] >= WORDS_LEARNED_GOOD_THRESHOLD)
-		{
-			wordsLearnGoodIndex = i;
-			break;
-		}
-	int wordsLearnedTotal = 0;
-	int wordsLearnedGood = 0;
-	for (int i = 1; i < MAX_RIGHT_REPEATS_GLOBAL_N + 1; ++i)
-	{
-		wordsLearnedTotal += wordsByLevel[i];
-		if (i >= wordsLearnGoodIndex)
-			wordsLearnedGood += wordsByLevel[i];
-	}
-	static int prevWordsLearnedGood;
-	int deltaWordsLearnedGood = 0;
-	if (prevWordsLearnedGood > 0)
-		deltaWordsLearnedGood = wordsLearnedGood - prevWordsLearnedGood;
-	prevWordsLearnedGood = wordsLearnedGood;
-
 	printf("\n");
 	printf("\n");
 	printf("1. Learn new words\n");
-	printf("2. Everyday words repeat  [%d]\n", wordsTimeToRepeatNum);
+	printf("2. Words repeat\n");
 	printf("\n\n");
-
-	printf("Words learned num: %d, good learned: %d (%d)\n", wordsLearnedTotal, wordsLearnedGood, deltaWordsLearnedGood);
-	logger("Learned and good: %d, %d, time = %s", wordsLearnedTotal, wordsLearnedGood, get_time_in_text(time(nullptr)));
-
-//	printf("  Рандомный повтор: Основн=%d (из них skip=%d (%d)), Быстрая=%d ", mainQueueLen, mainQueueSkipLoopCount, deltaSkipLoopCount, fastQueueLen);
 
 	if (!_forgottenWordsIndices.empty())
 	{
@@ -218,17 +119,6 @@ int LearnWordsApp::main_menu_choose_mode(time_t freezedTime)
 			WordsData::WordInfo& w = _wordsOnDisk._words[index];
 			printf("==============================================\n%s\n   %s\n", w.word.c_str(), w.translation.c_str());
 		}
-	}
-	else
-	{
-		auto print_upcoming_words_info = [this, wordsLearnGoodIndex, freezedTime](int stagesBehind)
-		{
-			for (const auto& w : _wordsOnDisk._words)
-			{
-				if (w.rightAnswersNum == wordsLearnGoodIndex - stagesBehind)
-					printf("%d ", int((w.dateOfRepeat - freezedTime) / 3600 / 24.f));
-			}
-		};
 	}
 	
 	while (true)
@@ -240,80 +130,6 @@ int LearnWordsApp::main_menu_choose_mode(time_t freezedTime)
 	}
 
 	return 0;
-}
-
-
-//===============================================================================================
-// 
-//===============================================================================================
-
-void LearnWordsApp::recalc_stats(time_t curTime, int* wordsTimeToRepeatNum, int wordsByLevel[])
-{
-	*wordsTimeToRepeatNum = 0;
-
-	for (int i = 0; i < MAX_RIGHT_REPEATS_GLOBAL_N + 1; ++i)
-		wordsByLevel[i] = 0;
-
-	for (const auto& w : _wordsOnDisk._words)
-	{
-		++(wordsByLevel[w.rightAnswersNum]);
-
-		if (w.dateOfRepeat != 0)
-		{
-			if (w.rightAnswersNum == 0)
-				exit_msg("Semantic error\n");
-
-			if (w.dateOfRepeat < curTime)
-				++(*wordsTimeToRepeatNum);
-		}
-	}
-
-	//	printf("\n%d  - Words that is time to repeat\n\n", wordsTimeToRepeatNum);
-}
-
-
-//===============================================================================================
-// 
-//===============================================================================================
-
-void LearnWordsApp::fill_dates(float randDays, WordsData::WordInfo &w, time_t currentTime)
-{
-	int secondsPlusCurTime = int(randDays * SECONDS_IN_DAY);
-	w.dateOfRepeat = (int)currentTime + secondsPlusCurTime;
-	w.cantRandomTestedAfter = (int)currentTime + secondsPlusCurTime / 2;
-}
-
-//===============================================================================================
-// 
-//===============================================================================================
-
-void LearnWordsApp::fill_dates_and_save(WordsData::WordInfo& w, time_t currentTime, bool needAdvance_RightAnswersNum, bool isQuickAnswer)
-{
-	if (needAdvance_RightAnswersNum)
-	{
-		++w.rightAnswersNum;
-		clamp_max(&w.rightAnswersNum, MAX_RIGHT_REPEATS_GLOBAL_N);
-	}
-
-	float min = addDaysMin[w.rightAnswersNum];
-	float max = addDaysMax[w.rightAnswersNum];
-
-	if (isQuickAnswer)
-		min = (min + max) * 0.5f;
-	else
-		max = (min + max) * 0.5f;
-
-	float randDays = rand_float(min, max);
-
-	if (isQuickAnswer && randDays < MIN_DAYS_IF_QUICK_ANSWER)
-	{
-		while (w.rightAnswersNum < MAX_RIGHT_REPEATS_GLOBAL_N && addDaysMax[w.rightAnswersNum] < MIN_DAYS_IF_QUICK_ANSWER)
-			++w.rightAnswersNum;
-		randDays = MIN_DAYS_IF_QUICK_ANSWER;
-	}
-
-	fill_dates(randDays, w, currentTime);
-	save();
 }
 
 //===============================================================================================
@@ -378,17 +194,6 @@ void LearnWordsApp::print_buttons_hints(const std::string& str, bool needRightKe
 		printf("  Arrow right - I remember but it takes time\n");
 }
 
-
-//===============================================================================================
-// 
-//===============================================================================================
-
-void LearnWordsApp::set_word_as_just_learned(WordsData::WordInfo& w)
-{
-	w.clear_all();
-	w.rightAnswersNum = 1;
-}
-
 //===============================================================================================
 // 
 //===============================================================================================
@@ -423,10 +228,6 @@ void LearnWordsApp::process(int argc, char* argv[])
 		_fullRimPath = argv[2];
 	}
 	FileOperate::load_from_file(_fullFileName.c_str(), &_wordsOnDisk);
-	//	wordsOnDisk.export_for_google_doc();
-
-	//FileOperate::save_to_file(_fullFileName.c_str(), &_wordsOnDisk);
-	//return;
 
 	while (true)
 	{
@@ -449,23 +250,5 @@ void LearnWordsApp::process(int argc, char* argv[])
 			break;
 		}
 	}
-}
-
-//===============================================================================================
-// 
-//===============================================================================================
-
-void LearnWordsApp::set_as_forgotten(WordsData::WordInfo& w)
-{
-	w.rightAnswersNum = std::min(w.rightAnswersNum, DOWN_ANSWERS_FALLBACK);
-}
-
-//===============================================================================================
-// 
-//===============================================================================================
-
-void LearnWordsApp::set_as_barely_known(WordsData::WordInfo& w)
-{
-	w.rightAnswersNum = std::min(w.rightAnswersNum, RIGHT_ANSWERS_FALLBACK);
 }
 

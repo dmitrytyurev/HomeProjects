@@ -77,40 +77,25 @@ bool LearnNew::are_all_words_learned(std::vector<WordToLearn>& queue)
 
 void LearnNew::learn_new(time_t freezedTime)
 {
-	_learnWordsApp->clear_forgotten();
-	std::vector<int> wordsToLearnIndices;
+	std::vector<int> wordsToLearnIds;
 
 	// Составим список индексов слов, которые будем учить
 
 	clear_console_screen();
-	printf("\nHow many word to learn: ");
-	int additionalWordsToLearn = enter_number_from_console();
-
-	if (additionalWordsToLearn > 0)
-	{
-		for (int i = 0; i < (int)_pWordsData->_words.size(); ++i)
-		{
-			const WordsData::WordInfo& w = _pWordsData->_words[i];
-			if (w.rightAnswersNum == 0)
-			{
-				wordsToLearnIndices.push_back(i);
-				if (--additionalWordsToLearn == 0)
-					break;
-			}
-		}
-	}
-
-	if (wordsToLearnIndices.empty())
+	printf("\nHow many words to learn: ");
+	int wordsToLearn = enter_number_from_console();
+	if (wordsToLearn > 0)
+		wordsToLearnIds = _pWordsData->GetUnlearnedTextsId(wordsToLearn);
+	if (wordsToLearnIds.empty())
 		return;
 
 	// Первичное изучение (показываем все слова по одному разу)
 
-	for (const auto& index : wordsToLearnIndices)
+	for (const auto& id : wordsToLearnIds)
 	{
-		const WordsData::WordInfo& w = _pWordsData->_words[index];
 		clear_console_screen();
-		printf("\n%s\n\n", w.word.c_str());
-		printf("%s", w.translation.c_str());
+		printf("\n%s\n\n", _pWordsData->GetWord(id).c_str());
+		printf("%s", _pWordsData->GetTranslation(id).c_str());
 		printf("\n");
 		char c = 0;
 		do
@@ -121,20 +106,19 @@ void LearnNew::learn_new(time_t freezedTime)
 		} while (c != ' ');
 	}
 
-	// Первичное изучение (показываем неколько раз, сначала перевод скрыт, но постепенно открывается)
+	// Первичное изучение (показываем неколько раз, сначала перевод скрыт, но можно открыть целиком или по буквам)
 
 	for (int i2 = 0; i2 < TIMES_TO_REPEAT_TO_LEARN; ++i2)
 	{
-		for (const auto& index : wordsToLearnIndices)
+		for (const auto& id : wordsToLearnIds)
 		{
-			const WordsData::WordInfo& w = _pWordsData->_words[index];
 			for (int i3 = 0; i3 < TIMES_TO_SHOW_A_WORD; ++i3)
 			{
 				int symbolsToShowNum = (i3 != TIMES_TO_SHOW_A_WORD -1 ? i3 : 100);
 
 				clear_console_screen();
-				printf("\n%s\n\n", w.word.c_str());
-				print_masked_translation(w.translation.c_str(), symbolsToShowNum);
+				printf("\n%s\n\n", _pWordsData->GetWord(id).c_str());
+				print_masked_translation(_pWordsData->GetTranslation(id).c_str(), symbolsToShowNum);
 				printf("\n\n  Arrow right - Open by one letter\n  Space -         Open the whole word");
 
 				char c = 0;
@@ -157,12 +141,12 @@ void LearnNew::learn_new(time_t freezedTime)
 	// Второй этап - слова показываются без перевода. Если пользователь угадает значение более TIMES_TO_GUESS_TO_LEARNED раз,
 	// то слово считается изученным. Цикл изучения заканчивается, когда все слова изучены.
 
-	std::vector<WordToLearn> learnCycleQueue;  // Циклическая очередь слов в процессе изучения (добавляем в конец, берём из начала)
+	std::vector<WordToLearn> learnCycleQueue;  // Циклическая очередь слов в процессе изучения (берём из начала, добавляем в последнюю или предпоследнюю позицию)
 
 											   // Занести слова, которые будем изучать в очередь
-	for (const auto& index : wordsToLearnIndices)
+	for (const auto& id : wordsToLearnIds)
 	{
-		WordToLearn word(index, FromWhatSource::FROM_LEANRING_QUEUE);
+		WordToLearn word(id, FromWhatSource::FROM_LEANRING_QUEUE);
 		learnCycleQueue.push_back(word);
 	}
 																									 // Главный цикл обучения
@@ -177,8 +161,8 @@ void LearnNew::learn_new(time_t freezedTime)
 		learnCycleQueue.erase(learnCycleQueue.begin());
 
 		// Показываем слово
-		WordsData::WordInfo& w = _pWordsData->_words[wordToLearn._index];
-		printf("\n%s\n", w.word.c_str());
+		int id = wordToLearn._index;
+		printf("\n%s\n", _pWordsData->GetWord(id).c_str());
 		char c = 0;
 		do
 		{
@@ -186,7 +170,7 @@ void LearnNew::learn_new(time_t freezedTime)
 			if (c == 27)
 				return;
 		} while (c != ' ');
-		_learnWordsApp->print_buttons_hints(w.translation, false);
+		_learnWordsApp->print_buttons_hints(_pWordsData->GetTranslation(id), false);
 
 		// Обрабатываем ответ - знает ли пользователь слово
 		while (true)
@@ -201,8 +185,8 @@ void LearnNew::learn_new(time_t freezedTime)
 				case FromWhatSource::FROM_LEANRING_QUEUE:
 					if (++(wordToLearn._localRightAnswersNum) == TIMES_TO_GUESS_TO_LEARNED)
 					{
-						_learnWordsApp->set_word_as_just_learned(w);
-						_learnWordsApp->fill_dates_and_save(w, freezedTime, false, false);
+						_pWordsData->SetTextAsJustLearned(id);
+						_learnWordsApp->save();
 						if (are_all_words_learned(learnCycleQueue))
 							return;
 					}
@@ -219,7 +203,7 @@ void LearnNew::learn_new(time_t freezedTime)
 					case FromWhatSource::FROM_LEANRING_QUEUE:
 						wordToLearn._localRightAnswersNum = 0;
 						put_to_queue(learnCycleQueue, wordToLearn, true);
-						w.clear_all();
+						_pWordsData->SetTextAsUnlearned(id);
 						_learnWordsApp->save();
 						break;
 					}
