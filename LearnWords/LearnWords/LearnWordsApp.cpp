@@ -9,17 +9,17 @@ struct
 {
 	int min;
 	int max;
-} quickAnswerTime[] = {{2100, 3500}, {2600, 4000}, {3100, 4500}, {3600, 5000}, {4100, 5500}}; // Время быстрого и долгого ответа в зависимости от числа переводов данного слова
+} quickAnswerTime[] = {{2100, 3500}, {2600, 4000}, {3100, 4500}, {3600, 5000}, {4100, 5500}}; // Р’СЂРµРјСЏ Р±С‹СЃС‚СЂРѕРіРѕ Рё РґРѕР»РіРѕРіРѕ РѕС‚РІРµС‚Р° РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‡РёСЃР»Р° РїРµСЂРµРІРѕРґРѕРІ РґР°РЅРЅРѕРіРѕ СЃР»РѕРІР°
 
 const int MAX_RIGHT_REPEATS_GLOBAL_N = 81;
-const int WORDS_LEARNED_GOOD_THRESHOLD = 22; // Число дней в addDaysMin, по которому выбирается индекс, чтобы считать слова хорошо изученными
-const int DOWN_ANSWERS_FALLBACK = 20;             // Номер шага, на который откатывается слово при check_by_time, если забыли слово
-const int RIGHT_ANSWERS_FALLBACK = 29;            // Номер шага, на который откатывается слово при check_by_time, если помним неуверенно
-const float MIN_DAYS_IF_QUICK_ANSWER = 3;         // Если быстрый ответ, то слово не должно появиться быстрее, чем через это количество дней
-const int LAST_HOURS_REPEAT_NUM = 7;  // Если на повтор слов мало, то добавим слова из повторённых за столько последних часов
-const int MAX_WORDS_TO_CHECK = 60;  // Если слов на обязательную проверку больше, чем это число, то урезаем
-const int MAX_WORDS_TO_CHECK2 = 30; // Если слов на обязательную проверку меньше, чем это число, то добавляем до этого числа
-const int PRELIMINARY_CHECK_HOURS = 24;  // Слова, которые надо будет проверять через столько часов добавим в Mandatory проверку сейчас, если слов не хватает
+const int WORDS_LEARNED_GOOD_THRESHOLD = 22; // Р§РёСЃР»Рѕ РґРЅРµР№ РІ addDaysMin, РїРѕ РєРѕС‚РѕСЂРѕРјСѓ РІС‹Р±РёСЂР°РµС‚СЃСЏ РёРЅРґРµРєСЃ, С‡С‚РѕР±С‹ СЃС‡РёС‚Р°С‚СЊ СЃР»РѕРІР° С…РѕСЂРѕС€Рѕ РёР·СѓС‡РµРЅРЅС‹РјРё
+const int DOWN_ANSWERS_FALLBACK = 20;             // РќРѕРјРµСЂ С€Р°РіР°, РЅР° РєРѕС‚РѕСЂС‹Р№ РѕС‚РєР°С‚С‹РІР°РµС‚СЃСЏ СЃР»РѕРІРѕ РїСЂРё check_by_time, РµСЃР»Рё Р·Р°Р±С‹Р»Рё СЃР»РѕРІРѕ
+const int RIGHT_ANSWERS_FALLBACK = 29;            // РќРѕРјРµСЂ С€Р°РіР°, РЅР° РєРѕС‚РѕСЂС‹Р№ РѕС‚РєР°С‚С‹РІР°РµС‚СЃСЏ СЃР»РѕРІРѕ РїСЂРё check_by_time, РµСЃР»Рё РїРѕРјРЅРёРј РЅРµСѓРІРµСЂРµРЅРЅРѕ
+const float MIN_DAYS_IF_QUICK_ANSWER = 3;         // Р•СЃР»Рё Р±С‹СЃС‚СЂС‹Р№ РѕС‚РІРµС‚, С‚Рѕ СЃР»РѕРІРѕ РЅРµ РґРѕР»Р¶РЅРѕ РїРѕСЏРІРёС‚СЊСЃСЏ Р±С‹СЃС‚СЂРµРµ, С‡РµРј С‡РµСЂРµР· СЌС‚Рѕ РєРѕР»РёС‡РµСЃС‚РІРѕ РґРЅРµР№
+const int LAST_HOURS_REPEAT_NUM = 7;  // Р•СЃР»Рё РЅР° РїРѕРІС‚РѕСЂ СЃР»РѕРІ РјР°Р»Рѕ, С‚Рѕ РґРѕР±Р°РІРёРј СЃР»РѕРІР° РёР· РїРѕРІС‚РѕСЂС‘РЅРЅС‹С… Р·Р° СЃС‚РѕР»СЊРєРѕ РїРѕСЃР»РµРґРЅРёС… С‡Р°СЃРѕРІ
+const int MAX_WORDS_TO_CHECK = 60;  // Р•СЃР»Рё СЃР»РѕРІ РЅР° РѕР±СЏР·Р°С‚РµР»СЊРЅСѓСЋ РїСЂРѕРІРµСЂРєСѓ Р±РѕР»СЊС€Рµ, С‡РµРј СЌС‚Рѕ С‡РёСЃР»Рѕ, С‚Рѕ СѓСЂРµР·Р°РµРј
+const int MAX_WORDS_TO_CHECK2 = 30; // Р•СЃР»Рё СЃР»РѕРІ РЅР° РѕР±СЏР·Р°С‚РµР»СЊРЅСѓСЋ РїСЂРѕРІРµСЂРєСѓ РјРµРЅСЊС€Рµ, С‡РµРј СЌС‚Рѕ С‡РёСЃР»Рѕ, С‚Рѕ РґРѕР±Р°РІР»СЏРµРј РґРѕ СЌС‚РѕРіРѕ С‡РёСЃР»Р°
+const int PRELIMINARY_CHECK_HOURS = 24;  // РЎР»РѕРІР°, РєРѕС‚РѕСЂС‹Рµ РЅР°РґРѕ Р±СѓРґРµС‚ РїСЂРѕРІРµСЂСЏС‚СЊ С‡РµСЂРµР· СЃС‚РѕР»СЊРєРѕ С‡Р°СЃРѕРІ РґРѕР±Р°РІРёРј РІ Mandatory РїСЂРѕРІРµСЂРєСѓ СЃРµР№С‡Р°СЃ, РµСЃР»Рё СЃР»РѕРІ РЅРµ С…РІР°С‚Р°РµС‚
 
 float addDaysMin[MAX_RIGHT_REPEATS_GLOBAL_N + 1];
 float addDaysMax[MAX_RIGHT_REPEATS_GLOBAL_N + 1];
@@ -56,7 +56,7 @@ void LearnWordsApp::save()
 
 
 //===============================================================================================
-// Вернуть число переводов в данном слове
+// Р’РµСЂРЅСѓС‚СЊ С‡РёСЃР»Рѕ РїРµСЂРµРІРѕРґРѕРІ РІ РґР°РЅРЅРѕРј СЃР»РѕРІРµ
 //===============================================================================================
 
 int LearnWordsApp::get_translations_num(const char* translation)
@@ -173,8 +173,8 @@ void LearnWordsApp::update_time_remembered_long(int wordIndex, double durationOf
 
 bool LearnWordsApp::isWordJustLearnedOrForgotten(const WordsData::WordInfo& w, time_t curTime) const
 {
-	return (w.rightAnswersNum == 1) &&   // Это условие не даёт попасть в выборку словам высоких уровней, до повторения которых осталось несколько часов
-		((w.dateOfRepeat >= curTime) && (w.dateOfRepeat <= curTime + addDaysMax[1] * SECONDS_IN_DAY));  // А это условие не даёт попасть выборку только что изученным словам на следующий день
+	return (w.rightAnswersNum == 1) &&   // Р­С‚Рѕ СѓСЃР»РѕРІРёРµ РЅРµ РґР°С‘С‚ РїРѕРїР°СЃС‚СЊ РІ РІС‹Р±РѕСЂРєСѓ СЃР»РѕРІР°Рј РІС‹СЃРѕРєРёС… СѓСЂРѕРІРЅРµР№, РґРѕ РїРѕРІС‚РѕСЂРµРЅРёСЏ РєРѕС‚РѕСЂС‹С… РѕСЃС‚Р°Р»РѕСЃСЊ РЅРµСЃРєРѕР»СЊРєРѕ С‡Р°СЃРѕРІ
+		((w.dateOfRepeat >= curTime) && (w.dateOfRepeat <= curTime + addDaysMax[1] * SECONDS_IN_DAY));  // Рђ СЌС‚Рѕ СѓСЃР»РѕРІРёРµ РЅРµ РґР°С‘С‚ РїРѕРїР°СЃС‚СЊ РІС‹Р±РѕСЂРєСѓ С‚РѕР»СЊРєРѕ С‡С‚Рѕ РёР·СѓС‡РµРЅРЅС‹Рј СЃР»РѕРІР°Рј РЅР° СЃР»РµРґСѓСЋС‰РёР№ РґРµРЅСЊ
 }
 
 //===============================================================================================
@@ -207,7 +207,7 @@ int LearnWordsApp::main_menu_choose_mode(time_t freezedTime)
 	int wordsByLevel[MAX_RIGHT_REPEATS_GLOBAL_N + 1];
 	recalc_stats(_freezedTime, &wordsTimeToRepeatNum, wordsByLevel);
 
-	int wordsLearnGoodIndex = 0;   // Найти индекс, больше которого имеют хорошо изученные слова
+	int wordsLearnGoodIndex = 0;   // РќР°Р№С‚Рё РёРЅРґРµРєСЃ, Р±РѕР»СЊС€Рµ РєРѕС‚РѕСЂРѕРіРѕ РёРјРµСЋС‚ С…РѕСЂРѕС€Рѕ РёР·СѓС‡РµРЅРЅС‹Рµ СЃР»РѕРІР°
 	for (int i = 1; i < MAX_RIGHT_REPEATS_GLOBAL_N + 1; ++i)
 		if (addDaysMin[i] >= WORDS_LEARNED_GOOD_THRESHOLD)
 		{
@@ -230,14 +230,14 @@ int LearnWordsApp::main_menu_choose_mode(time_t freezedTime)
 
 	printf("\n");
 	printf("\n");
-	printf("1. Выучить новые слова\n");
-	printf("2. Ежедневный повтор  [%d]\n", wordsTimeToRepeatNum);
+	printf("1. Learn new words\n");
+	printf("2. Everyday words repeat  [%d]\n", wordsTimeToRepeatNum);
 	printf("\n\n");
 
-	printf("Выучено слов: %d, из них хорошо: %d (%d)\n", wordsLearnedTotal, wordsLearnedGood, deltaWordsLearnedGood);
+	printf("Words learned num: %d, good learned: %d (%d)\n", wordsLearnedTotal, wordsLearnedGood, deltaWordsLearnedGood);
 	logger("Learned and good: %d, %d, time = %s", wordsLearnedTotal, wordsLearnedGood, get_time_in_text(time(nullptr)));
 
-//	printf("  Рандомный повтор: Основн=%d (из них skip=%d (%d)), Быстрая=%d ", mainQueueLen, mainQueueSkipLoopCount, deltaSkipLoopCount, fastQueueLen);
+//	printf("  Р Р°РЅРґРѕРјРЅС‹Р№ РїРѕРІС‚РѕСЂ: РћСЃРЅРѕРІРЅ=%d (РёР· РЅРёС… skip=%d (%d)), Р‘С‹СЃС‚СЂР°СЏ=%d ", mainQueueLen, mainQueueSkipLoopCount, deltaSkipLoopCount, fastQueueLen);
 
 	if (!_forgottenWordsIndices.empty())
 	{
@@ -257,22 +257,6 @@ int LearnWordsApp::main_menu_choose_mode(time_t freezedTime)
 					printf("%d ", int((w.dateOfRepeat - freezedTime) / 3600 / 24.f));
 			}
 		};
-
-		printf("\nСколько дней до проверки кандидатов на хорошо выученные слова");
-		printf("\n-7 этапа: ");
-		print_upcoming_words_info(7);
-		printf("\n-6 этапа: ");
-		print_upcoming_words_info(6);
-		printf("\n-5 этапа: ");
-		print_upcoming_words_info(5);
-		printf("\n-4 этапа: ");
-		print_upcoming_words_info(4);
-		printf("\n-3 этапа: ");
-		print_upcoming_words_info(3);
-		printf("\n-2 этапа: ");
-		print_upcoming_words_info(2);
-		printf("\n-1 этап: ");
-		print_upcoming_words_info(1);
 	}
 	
 	while (true)
@@ -417,9 +401,9 @@ void LearnWordsApp::print_buttons_hints(const std::string& str, bool needRightKe
 	if (hConsole != INVALID_HANDLE_VALUE && isColorReadSucsess)
 		SetConsoleTextAttribute(hConsole, csbi.wAttributes);
 
-	printf("\n\n  Стрелка вверх  - помню хорошо!\n  Стрелка вниз   - забыл/перепутал хотя бы одно значение\n");
+	printf("\n\n  Arrow up  - I remember!\n  Arrow down   - I am not sure\n");
 	if (needRightKeyHint)
-		printf("  Стрелка вправо - вспомнил все значения, но с трудом\n");
+		printf("  Arrow right - I remember but it takes time\n");
 }
 
 
@@ -439,7 +423,7 @@ void LearnWordsApp::set_word_as_just_learned(WordsData::WordInfo& w)
 
 time_t LearnWordsApp::get_time()
 {
-//return 1505167116;  // Отладочный режим со стабильным временем и рандомом. При тесте отвечать на вопросы надо быстро для одинакового результата
+//return 1505167116;  // РћС‚Р»Р°РґРѕС‡РЅС‹Р№ СЂРµР¶РёРј СЃРѕ СЃС‚Р°Р±РёР»СЊРЅС‹Рј РІСЂРµРјРµРЅРµРј Рё СЂР°РЅРґРѕРјРѕРј. РџСЂРё С‚РµСЃС‚Рµ РѕС‚РІРµС‡Р°С‚СЊ РЅР° РІРѕРїСЂРѕСЃС‹ РЅР°РґРѕ Р±С‹СЃС‚СЂРѕ РґР»СЏ РѕРґРёРЅР°РєРѕРІРѕРіРѕ СЂРµР·СѓР»СЊС‚Р°С‚Р°
 	return std::time(nullptr);
 }
 
@@ -457,8 +441,9 @@ void LearnWordsApp::process(int argc, char* argv[])
 		//puts("Ussage:");
 		//puts("LearnWords.exe [path to base file]\n");
 		//return 0;
-		_fullFileName = "C:\\Dimka\\yadisk\\LearnWords\\dima_to_learn.txt";
+		_fullFileName = "D:\\HomeProjects\\LearnWords\\x64\\Debug\\olya_words.txt";
 		_fullRimPath = "C:\\Dimka\\MyLims\\40\\CNN\\CBSBenghaziProblem\\";
+	
 	}
 	else
 	{
@@ -475,8 +460,8 @@ void LearnWordsApp::process(int argc, char* argv[])
 	{
 		clear_console_screen();
 
-		_freezedTime = get_time();   // Текущее время обновляется один раз перед показом главного меню, чтобы число слов для повтора в меню 
-								   // и последующем запуске режима повтора (в нём используется запомненный здесь curTime) было одинаковым .
+		_freezedTime = get_time();   // РўРµРєСѓС‰РµРµ РІСЂРµРјСЏ РѕР±РЅРѕРІР»СЏРµС‚СЃСЏ РѕРґРёРЅ СЂР°Р· РїРµСЂРµРґ РїРѕРєР°Р·РѕРј РіР»Р°РІРЅРѕРіРѕ РјРµРЅСЋ, С‡С‚РѕР±С‹ С‡РёСЃР»Рѕ СЃР»РѕРІ РґР»СЏ РїРѕРІС‚РѕСЂР° РІ РјРµРЅСЋ 
+								   // Рё РїРѕСЃР»РµРґСѓСЋС‰РµРј Р·Р°РїСѓСЃРєРµ СЂРµР¶РёРјР° РїРѕРІС‚РѕСЂР° (РІ РЅС‘Рј РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ Р·Р°РїРѕРјРЅРµРЅРЅС‹Р№ Р·РґРµСЃСЊ curTime) Р±С‹Р»Рѕ РѕРґРёРЅР°РєРѕРІС‹Рј .
 		int keyPressed = main_menu_choose_mode(_freezedTime);
 		switch (keyPressed)
 		{
@@ -534,22 +519,22 @@ void LearnWordsApp::collect_words_to_mandatory_check(std::vector<WordToCheck>& w
 			wordsToRepeat.emplace_back(WordToCheck(i));
 	}
 
-	// Если этих слов больше, чем нужно, то урезать число слов до необходимого
+	// Р•СЃР»Рё СЌС‚РёС… СЃР»РѕРІ Р±РѕР»СЊС€Рµ, С‡РµРј РЅСѓР¶РЅРѕ, С‚Рѕ СѓСЂРµР·Р°С‚СЊ С‡РёСЃР»Рѕ СЃР»РѕРІ РґРѕ РЅРµРѕР±С…РѕРґРёРјРѕРіРѕ
 
 	if (wordsToRepeat.size() > MAX_WORDS_TO_CHECK)
 	{
 		for (int i = 0; i < (int)wordsToRepeat.size(); ++i)
 		{
 			WordsData::WordInfo& w = _wordsOnDisk._words[wordsToRepeat[i]._index];
-			int plannedRepeatInterval = (w.dateOfRepeat - w.cantRandomTestedAfter) * 2;;  // Запланированный интервал повтора
-			int lateRepeatInterval = int(freezedTime) - w.dateOfRepeat;  // На сколько просрочен повтор от запланированного времени
-			wordsToRepeat[i]._sortCoeff = lateRepeatInterval / (plannedRepeatInterval * 0.2f + 1);  // Чем больше коэффициент, тем раньше надо повторять слова
+			int plannedRepeatInterval = (w.dateOfRepeat - w.cantRandomTestedAfter) * 2;;  // Р—Р°РїР»Р°РЅРёСЂРѕРІР°РЅРЅС‹Р№ РёРЅС‚РµСЂРІР°Р» РїРѕРІС‚РѕСЂР°
+			int lateRepeatInterval = int(freezedTime) - w.dateOfRepeat;  // РќР° СЃРєРѕР»СЊРєРѕ РїСЂРѕСЃСЂРѕС‡РµРЅ РїРѕРІС‚РѕСЂ РѕС‚ Р·Р°РїР»Р°РЅРёСЂРѕРІР°РЅРЅРѕРіРѕ РІСЂРµРјРµРЅРё
+			wordsToRepeat[i]._sortCoeff = lateRepeatInterval / (plannedRepeatInterval * 0.2f + 1);  // Р§РµРј Р±РѕР»СЊС€Рµ РєРѕСЌС„С„РёС†РёРµРЅС‚, С‚РµРј СЂР°РЅСЊС€Рµ РЅР°РґРѕ РїРѕРІС‚РѕСЂСЏС‚СЊ СЃР»РѕРІР°
 		}
 		std::sort(wordsToRepeat.begin(), wordsToRepeat.end(), [](const WordToCheck& l, const WordToCheck& r) { return l._sortCoeff > r._sortCoeff; });
 		wordsToRepeat.resize(MAX_WORDS_TO_CHECK);
 	}
 	else
-		if (wordsToRepeat.size() < MAX_WORDS_TO_CHECK2)  // Если слов наоборот меньше, то добавить слова, которые надо будет проверять через PRELIMINARY_CHECK_HOURS часов
+		if (wordsToRepeat.size() < MAX_WORDS_TO_CHECK2)  // Р•СЃР»Рё СЃР»РѕРІ РЅР°РѕР±РѕСЂРѕС‚ РјРµРЅСЊС€Рµ, С‚Рѕ РґРѕР±Р°РІРёС‚СЊ СЃР»РѕРІР°, РєРѕС‚РѕСЂС‹Рµ РЅР°РґРѕ Р±СѓРґРµС‚ РїСЂРѕРІРµСЂСЏС‚СЊ С‡РµСЂРµР· PRELIMINARY_CHECK_HOURS С‡Р°СЃРѕРІ
 		{
 			auto ifRepeatedRecently = [](WordsData::WordInfo& w, time_t freezedTime) { return freezedTime - w.calcPrevRepeatTime() < 3600 * LAST_HOURS_REPEAT_NUM; };
 

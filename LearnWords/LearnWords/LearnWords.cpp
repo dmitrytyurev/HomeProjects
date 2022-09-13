@@ -1,4 +1,7 @@
 #include "stdafx.h"
+
+#include <clocale>
+
 #include "CommonUtility.h"
 #include "LearnWordsApp.h"
 

@@ -9,7 +9,7 @@
 #include "FileOperate.h"
 
 
-const int REPEAT_AFTER_N_DAYS = 2;    // После попадения в быструю очередь рандомного повтора, слово станет доступным через это число суток
+const int REPEAT_AFTER_N_DAYS = 2;    // РџРѕСЃР»Рµ РїРѕРїР°РґРµРЅРёСЏ РІ Р±С‹СЃС‚СЂСѓСЋ РѕС‡РµСЂРµРґСЊ СЂР°РЅРґРѕРјРЅРѕРіРѕ РїРѕРІС‚РѕСЂР°, СЃР»РѕРІРѕ СЃС‚Р°РЅРµС‚ РґРѕСЃС‚СѓРїРЅС‹Рј С‡РµСЂРµР· СЌС‚Рѕ С‡РёСЃР»Рѕ СЃСѓС‚РѕРє
 extern Log logger;
 
 
@@ -60,7 +60,7 @@ void AdditionalCheck::calc_words_for_random_repeat(int* mainQueueLen, int* mainQ
 {
 	std::vector<int> indicesOfWords;
 	fill_indices_of_random_repeat_words(indicesOfWords, false, freezedTime);
-	*mainQueueLen = indicesOfWords.size();
+	*mainQueueLen = int(indicesOfWords.size());
 
 	*mainQueueSkipLoopCount = 0;
 	for (const auto& index : indicesOfWords)
@@ -71,7 +71,7 @@ void AdditionalCheck::calc_words_for_random_repeat(int* mainQueueLen, int* mainQ
 	}
 
 	fill_indices_of_random_repeat_words(indicesOfWords, true, freezedTime);
-	*fastQueueLen = indicesOfWords.size();
+	*fastQueueLen = int(indicesOfWords.size());
 }
 
 //===============================================================================================
@@ -80,8 +80,8 @@ void AdditionalCheck::calc_words_for_random_repeat(int* mainQueueLen, int* mainQ
 
 void AdditionalCheck::log_random_test_words(time_t freezedTime)
 {
-	std::vector<int> indicesOfWords;   // Индексы подходящих для проверки слов
-	fill_indices_of_random_repeat_words(indicesOfWords, false, freezedTime); // Заполним indicesOfWords
+	std::vector<int> indicesOfWords;   // РРЅРґРµРєСЃС‹ РїРѕРґС…РѕРґСЏС‰РёС… РґР»СЏ РїСЂРѕРІРµСЂРєРё СЃР»РѕРІ
+	fill_indices_of_random_repeat_words(indicesOfWords, false, freezedTime); // Р—Р°РїРѕР»РЅРёРј indicesOfWords
 	logger("=== Words to random repeat = %d\n", indicesOfWords.size());
 	for (const auto& index : indicesOfWords)
 	{
@@ -105,13 +105,13 @@ void AdditionalCheck::log_random_test_words(time_t freezedTime)
 
 int AdditionalCheck::get_word_to_repeat_inner(time_t freezedTime)
 {
-	std::vector<int> indicesOfWordsCommon;   // Индексы подходящих для проверки слов из общей очереди
-	std::vector<int> indicesOfWordsFast;     // Индексы подходящих для проверки слов из быстрой очереди
+	std::vector<int> indicesOfWordsCommon;   // РРЅРґРµРєСЃС‹ РїРѕРґС…РѕРґСЏС‰РёС… РґР»СЏ РїСЂРѕРІРµСЂРєРё СЃР»РѕРІ РёР· РѕР±С‰РµР№ РѕС‡РµСЂРµРґРё
+	std::vector<int> indicesOfWordsFast;     // РРЅРґРµРєСЃС‹ РїРѕРґС…РѕРґСЏС‰РёС… РґР»СЏ РїСЂРѕРІРµСЂРєРё СЃР»РѕРІ РёР· Р±С‹СЃС‚СЂРѕР№ РѕС‡РµСЂРµРґРё
 
-	fill_indices_of_random_repeat_words(indicesOfWordsCommon, false, freezedTime);  // Заполним indicesOfWordsCommon
-	fill_indices_of_random_repeat_words(indicesOfWordsFast, true, freezedTime);   // Заполним indicesOfWordsTrue
+	fill_indices_of_random_repeat_words(indicesOfWordsCommon, false, freezedTime);  // Р—Р°РїРѕР»РЅРёРј indicesOfWordsCommon
+	fill_indices_of_random_repeat_words(indicesOfWordsFast, true, freezedTime);   // Р—Р°РїРѕР»РЅРёРј indicesOfWordsTrue
 logger("indicesOfWordsCommon.size() = %d\n", indicesOfWordsCommon.size());
-int toShow = std::min(10u, indicesOfWordsCommon.size());
+int toShow = std::min(int(10), int(indicesOfWordsCommon.size()));
 for (int i=0; i<toShow; ++i)
 {
 WordsData::WordInfo& w = _pWordsData->_words[indicesOfWordsCommon[i]];
@@ -128,7 +128,7 @@ logger("indicesOfWordsFast.size() = %d\n", indicesOfWordsFast.size());
 		if (indicesOfWordsCommon.empty())
 			return -1;
 		else
-			return indicesOfWordsCommon[rand_int(0, std::min(0u, indicesOfWordsCommon.size() - 1))];  // FIXME!!! 4u
+			return indicesOfWordsCommon[rand_int(0, std::min(0, int(indicesOfWordsCommon.size()) - 1))];  // FIXME!!! 4u
 	}
 }
 
@@ -193,16 +193,16 @@ void AdditionalCheck::put_word_to_end_of_random_repeat_queue_fast(WordsData::Wor
 bool AdditionalCheck::can_random_tested(WordsData::WordInfo& w, time_t freezedTime) const
 {
 	if (w.rightAnswersNum == 0)
-		return false;  // Слово нельзя использовать в случайном повторе потому, что его ещё не учили
+		return false;  // РЎР»РѕРІРѕ РЅРµР»СЊР·СЏ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РІ СЃР»СѓС‡Р°Р№РЅРѕРј РїРѕРІС‚РѕСЂРµ РїРѕС‚РѕРјСѓ, С‡С‚Рѕ РµРіРѕ РµС‰С‘ РЅРµ СѓС‡РёР»Рё
 
 	if (w.cantRandomTestedAfter != 0 && freezedTime >= w.cantRandomTestedAfter)
-		return false;  // Слово нельзя использовать в случайном повторе потому, что осталось меньше половины времени до проверки его знания
+		return false;  // РЎР»РѕРІРѕ РЅРµР»СЊР·СЏ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РІ СЃР»СѓС‡Р°Р№РЅРѕРј РїРѕРІС‚РѕСЂРµ РїРѕС‚РѕРјСѓ, С‡С‚Рѕ РѕСЃС‚Р°Р»РѕСЃСЊ РјРµРЅСЊС€Рµ РїРѕР»РѕРІРёРЅС‹ РІСЂРµРјРµРЅРё РґРѕ РїСЂРѕРІРµСЂРєРё РµРіРѕ Р·РЅР°РЅРёСЏ
 
 	if (w.cantRandomTestedBefore != 0 && freezedTime <= w.cantRandomTestedBefore)
-		return false;  // Слово нельзя использовать в случайном повторе поскольку мы недавно его повторяли и нужно выждать немного перед ещё одним повтором
+		return false;  // РЎР»РѕРІРѕ РЅРµР»СЊР·СЏ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РІ СЃР»СѓС‡Р°Р№РЅРѕРј РїРѕРІС‚РѕСЂРµ РїРѕСЃРєРѕР»СЊРєСѓ РјС‹ РЅРµРґР°РІРЅРѕ РµРіРѕ РїРѕРІС‚РѕСЂСЏР»Рё Рё РЅСѓР¶РЅРѕ РІС‹Р¶РґР°С‚СЊ РЅРµРјРЅРѕРіРѕ РїРµСЂРµРґ РµС‰С‘ РѕРґРЅРёРј РїРѕРІС‚РѕСЂРѕРј
 
 	if (_learnWordsApp->isWordJustLearnedOrForgotten(w, freezedTime))
-		return false; // Слово нельзя использовать в случайном повторе потому, что оно сейчас выводится в списке только что изученных или забытых слов. 
+		return false; // РЎР»РѕРІРѕ РЅРµР»СЊР·СЏ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РІ СЃР»СѓС‡Р°Р№РЅРѕРј РїРѕРІС‚РѕСЂРµ РїРѕС‚РѕРјСѓ, С‡С‚Рѕ РѕРЅРѕ СЃРµР№С‡Р°СЃ РІС‹РІРѕРґРёС‚СЃСЏ РІ СЃРїРёСЃРєРµ С‚РѕР»СЊРєРѕ С‡С‚Рѕ РёР·СѓС‡РµРЅРЅС‹С… РёР»Рё Р·Р°Р±С‹С‚С‹С… СЃР»РѕРІ. 
 
 	return true;
 }
@@ -215,12 +215,12 @@ void AdditionalCheck::additional_check(time_t freezedTime, const std::string& fu
 {
 	_learnWordsApp->clear_forgotten();
 	clear_console_screen();
-	printf("\nСколько случайных слов хотите повторить: ");
+	printf("\nРЎРєРѕР»СЊРєРѕ СЃР»СѓС‡Р°Р№РЅС‹С… СЃР»РѕРІ С…РѕС‚РёС‚Рµ РїРѕРІС‚РѕСЂРёС‚СЊ: ");
 	int wordsToRepeatNum = enter_number_from_console();
 	if (wordsToRepeatNum == 0)
 		return;
 
-	// Главный цикл проверки слов
+	// Р“Р»Р°РІРЅС‹Р№ С†РёРєР» РїСЂРѕРІРµСЂРєРё СЃР»РѕРІ
 
 	for (int i = 0; i < wordsToRepeatNum; ++i)
 	{
@@ -249,7 +249,7 @@ void AdditionalCheck::additional_check(time_t freezedTime, const std::string& fu
 			clear_console_screen();
 			printf("\n\n===============================\n %s\n===============================\n", w.word.c_str());
 			_learnWordsApp->print_buttons_hints(w.translation, true);
-			printf("\n  Осталось: %d, Быстрый ответ = %d\n", wordsToRepeatNum - i - 1, int(isQuickAnswer));
+			printf("\n  РћСЃС‚Р°Р»РѕСЃСЊ: %d, Р‘С‹СЃС‚СЂС‹Р№ РѕС‚РІРµС‚ = %d\n", wordsToRepeatNum - i - 1, int(isQuickAnswer));
 			CloseTranslationWordsManager ctwm(_learnWordsApp, _pWordsData, wordToRepeatIndex);
 			ctwm.print_close_words_by_translation();
 
@@ -257,7 +257,7 @@ void AdditionalCheck::additional_check(time_t freezedTime, const std::string& fu
 			ctwm.process_user_input(c);
 			if (c == 27)
 				return;
-			if (c == 72)  // Стрелка вверх (помним слово уверенно)
+			if (c == 72)  // РЎС‚СЂРµР»РєР° РІРІРµСЂС… (РїРѕРјРЅРёРј СЃР»РѕРІРѕ СѓРІРµСЂРµРЅРЅРѕ)
 			{
 				put_word_to_end_of_random_repeat_queue_common(w);
 				if (isQuickAnswer)
@@ -266,7 +266,7 @@ void AdditionalCheck::additional_check(time_t freezedTime, const std::string& fu
 				break;
 			}
 			else
-				if (c == 80) // Стрелка вниз (забыли слово)
+				if (c == 80) // РЎС‚СЂРµР»РєР° РІРЅРёР· (Р·Р°Р±С‹Р»Рё СЃР»РѕРІРѕ)
 				{
 					_learnWordsApp->add_forgotten(wordToRepeatIndex);
 					_learnWordsApp->set_as_forgotten(w);
@@ -274,7 +274,7 @@ void AdditionalCheck::additional_check(time_t freezedTime, const std::string& fu
 					break;
 				}
 				else
-					if (c == 77) // Стрелка вправо (помним слово не очень уверенно)
+					if (c == 77) // РЎС‚СЂРµР»РєР° РІРїСЂР°РІРѕ (РїРѕРјРЅРёРј СЃР»РѕРІРѕ РЅРµ РѕС‡РµРЅСЊ СѓРІРµСЂРµРЅРЅРѕ)
 					{
 						_learnWordsApp->add_forgotten(wordToRepeatIndex);
 						_learnWordsApp->set_as_barely_known(w);

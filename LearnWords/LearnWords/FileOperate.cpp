@@ -71,77 +71,77 @@ void FileOperate::load_from_file(const char* fullFileName, WordsData* pWordsData
 
 	int parseIndex = 0;
 
-	// ×èòàåì ñîõðàí¸ííûé ïîçèöèè â àóäèðîâàíèè
-	while (true)
-	{
-		WordsData::ListeningTextToKeep lttk;
+	// Ð§Ð¸Ñ‚Ð°ÐµÐ¼ ÑÐ¾Ñ…Ñ€Ð°Ð½Ñ‘Ð½Ð½Ñ‹Ð¹ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð² Ð°ÑƒÐ´Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ð¸
+	//while (true)
+	//{
+	//	WordsData::ListeningTextToKeep lttk;
 
-		lttk.rimFolder = load_string_from_array(buffer, &parseIndex);
-		if (lttk.rimFolder.length() == 0)         // Ïðè ïîèñêå íà÷àëà ñòðîêè áûë âñòðå÷åí êîíåö ôàéëà (íàïðèìåð, ôàéë çàêàí÷èâàåòñÿ ïóñòîé ñòðîêîé)
-			exit_msg("Sintax error in word %s", lttk.rimFolder.c_str());
+	//	lttk.rimFolder = load_string_from_array(buffer, &parseIndex);
+	//	if (lttk.rimFolder.length() == 0)         // ÐŸÑ€Ð¸ Ð¿Ð¾Ð¸ÑÐºÐµ Ð½Ð°Ñ‡Ð°Ð»Ð° ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð±Ñ‹Ð» Ð²ÑÑ‚Ñ€ÐµÑ‡ÐµÐ½ ÐºÐ¾Ð½ÐµÑ† Ñ„Ð°Ð¹Ð»Ð° (Ð½Ð°Ð¿Ñ€Ð¸Ð¼ÐµÑ€, Ñ„Ð°Ð¹Ð» Ð·Ð°ÐºÐ°Ð½Ñ‡Ð¸Ð²Ð°ÐµÑ‚ÑÑ Ð¿ÑƒÑÑ‚Ð¾Ð¹ ÑÑ‚Ñ€Ð¾ÐºÐ¾Ð¹)
+	//		exit_msg("Sintax error in word %s", lttk.rimFolder.c_str());
 
-		if (lttk.rimFolder == "Compare exclude pairs")
-			break;
+	//	if (lttk.rimFolder == "Compare exclude pairs")
+	//		break;
 
-		while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd && !is_digit(buffer[parseIndex]))
-			++parseIndex;
-		if (buffer[parseIndex] == 0 || buffer[parseIndex] == 0xd)
-			exit_msg("Sintax error in parameter %s", lttk.rimFolder.c_str());
-		lttk.volumeN = load_int_from_array(buffer, &parseIndex);
+	//	while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd && !is_digit(buffer[parseIndex]))
+	//		++parseIndex;
+	//	if (buffer[parseIndex] == 0 || buffer[parseIndex] == 0xd)
+	//		exit_msg("Sintax error in parameter %s", lttk.rimFolder.c_str());
+	//	lttk.volumeN = load_int_from_array(buffer, &parseIndex);
 
-		while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd && !is_digit(buffer[parseIndex]))
-			++parseIndex;
-		if (buffer[parseIndex] == 0 || buffer[parseIndex] == 0xd)
-			exit_msg("Sintax error in parameter %s", lttk.rimFolder.c_str());		lttk.phraseN = load_int_from_array(buffer, &parseIndex);
+	//	while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd && !is_digit(buffer[parseIndex]))
+	//		++parseIndex;
+	//	if (buffer[parseIndex] == 0 || buffer[parseIndex] == 0xd)
+	//		exit_msg("Sintax error in parameter %s", lttk.rimFolder.c_str());		lttk.phraseN = load_int_from_array(buffer, &parseIndex);
 
-		// Çàíåñòè ListeningTextToKeep â âåêòîð
-		pWordsData->_listeningTextsToKeep.push_back(lttk);
+	//	// Ð—Ð°Ð½ÐµÑÑ‚Ð¸ ListeningTextToKeep Ð² Ð²ÐµÐºÑ‚Ð¾Ñ€
+	//	pWordsData->_listeningTextsToKeep.push_back(lttk);
 
-		while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd)
-			++parseIndex;
+	//	while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd)
+	//		++parseIndex;
 
-		if (buffer[parseIndex] == 0)
-			exit_msg("Sintax error N96309892");
-	}
+	//	if (buffer[parseIndex] == 0)
+	//		exit_msg("Sintax error N96309892");
+	//}
 
-	// ×èòàåì ïàðû èñêëþ÷åíèé
-	while (true)
-	{
-		WordsData::CompareExcludePair cep;
+	//// Ð§Ð¸Ñ‚Ð°ÐµÐ¼ Ð¿Ð°Ñ€Ñ‹ Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ð¹
+	//while (true)
+	//{
+	//	WordsData::CompareExcludePair cep;
 
-		cep.word1 = load_string_from_array(buffer, &parseIndex);
-		if (cep.word1.length() == 0)         // Ïðè ïîèñêå íà÷àëà ñòðîêè áûë âñòðå÷åí êîíåö ôàéëà (íàïðèìåð, ôàéë çàêàí÷èâàåòñÿ ïóñòîé ñòðîêîé)
-			exit_msg("Sintax error in parameter %s", cep.word1.c_str());
+	//	cep.word1 = load_string_from_array(buffer, &parseIndex);
+	//	if (cep.word1.length() == 0)         // ÐŸÑ€Ð¸ Ð¿Ð¾Ð¸ÑÐºÐµ Ð½Ð°Ñ‡Ð°Ð»Ð° ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð±Ñ‹Ð» Ð²ÑÑ‚Ñ€ÐµÑ‡ÐµÐ½ ÐºÐ¾Ð½ÐµÑ† Ñ„Ð°Ð¹Ð»Ð° (Ð½Ð°Ð¿Ñ€Ð¸Ð¼ÐµÑ€, Ñ„Ð°Ð¹Ð» Ð·Ð°ÐºÐ°Ð½Ñ‡Ð¸Ð²Ð°ÐµÑ‚ÑÑ Ð¿ÑƒÑÑ‚Ð¾Ð¹ ÑÑ‚Ñ€Ð¾ÐºÐ¾Ð¹)
+	//		exit_msg("Sintax error in parameter %s", cep.word1.c_str());
 
-		if (cep.word1 == "Main block")
-			break;
+	//	if (cep.word1 == "Main block")
+	//		break;
 
-		cep.word2 = load_string_from_array(buffer, &parseIndex);
+	//	cep.word2 = load_string_from_array(buffer, &parseIndex);
 
-		// Çàíåñòè CompareExcludePair â âåêòîð
-		pWordsData->_compareExcludePairs.push_back(cep);
+	//	// Ð—Ð°Ð½ÐµÑÑ‚Ð¸ CompareExcludePair Ð² Ð²ÐµÐºÑ‚Ð¾Ñ€
+	//	pWordsData->_compareExcludePairs.push_back(cep);
 
-		while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd)
-			++parseIndex;
+	//	while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd)
+	//		++parseIndex;
 
-		if (buffer[parseIndex] == 0)
-			exit_msg("Sintax error N86093486");
-	}
+	//	if (buffer[parseIndex] == 0)
+	//		exit_msg("Sintax error N86093486");
+	//}
 
-	// ×èòàåì îñíîâíîé áëîê ñëîâ
+	// Ð§Ð¸Ñ‚Ð°ÐµÐ¼ Ð¾ÑÐ½Ð¾Ð²Ð½Ð¾Ð¹ Ð±Ð»Ð¾Ðº ÑÐ»Ð¾Ð²
 	while (true)
 	{
 		WordsData::WordInfo wi;
 
 		wi.word = load_string_from_array(buffer, &parseIndex);
-		if (wi.word.length() == 0)         // Ïðè ïîèñêå íà÷àëà ñòðîêè áûë âñòðå÷åí êîíåö ôàéëà (íàïðèìåð, ôàéë çàêàí÷èâàåòñÿ ïóñòîé ñòðîêîé)
+		if (wi.word.length() == 0)         // ÐŸÑ€Ð¸ Ð¿Ð¾Ð¸ÑÐºÐµ Ð½Ð°Ñ‡Ð°Ð»Ð° ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð±Ñ‹Ð» Ð²ÑÑ‚Ñ€ÐµÑ‡ÐµÐ½ ÐºÐ¾Ð½ÐµÑ† Ñ„Ð°Ð¹Ð»Ð° (Ð½Ð°Ð¿Ñ€Ð¸Ð¼ÐµÑ€, Ñ„Ð°Ð¹Ð» Ð·Ð°ÐºÐ°Ð½Ñ‡Ð¸Ð²Ð°ÐµÑ‚ÑÑ Ð¿ÑƒÑÑ‚Ð¾Ð¹ ÑÑ‚Ñ€Ð¾ÐºÐ¾Ð¹)
 			return;
 		wi.translation = load_string_from_array(buffer, &parseIndex);
 
 		while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd && !is_digit(buffer[parseIndex]))
 			++parseIndex;
 
-		if (is_digit(buffer[parseIndex]))  // ×èòàåì ïàðàìåòðû
+		if (is_digit(buffer[parseIndex]))  // Ð§Ð¸Ñ‚Ð°ÐµÐ¼ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹
 		{
 			wi.rightAnswersNum = load_int_from_array(buffer, &parseIndex);
 			while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd && !is_digit(buffer[parseIndex]))
@@ -193,7 +193,7 @@ void FileOperate::load_from_file(const char* fullFileName, WordsData* pWordsData
 //		wi.cantRandomTestedAfter += n;
 //		wi.cantRandomTestedBefore += n;
 
-		// Çàíåñòè WordInfo â âåêòîð
+		// Ð—Ð°Ð½ÐµÑÑ‚Ð¸ WordInfo Ð² Ð²ÐµÐºÑ‚Ð¾Ñ€
 		pWordsData->_words.push_back(wi);
 
 		if (buffer[parseIndex] == 0)
@@ -222,24 +222,24 @@ void FileOperate::save_to_file(const char* fullFileName, WordsData* pWordsData)
 	if (i == NUM_TRIES)
 		exit_msg("Can't create file %s\n", fullFileName);
 
-	for (const auto& e : pWordsData->_listeningTextsToKeep)
-	{
-		fprintf(f, "\"%s\" %d %d\n",
-			e.rimFolder.c_str(),
-			e.volumeN,
-			e.phraseN);
-	}
+	//for (const auto& e : pWordsData->_listeningTextsToKeep)
+	//{
+	//	fprintf(f, "\"%s\" %d %d\n",
+	//		e.rimFolder.c_str(),
+	//		e.volumeN,
+	//		e.phraseN);
+	//}
 
-	fprintf(f, "\"Compare exclude pairs\"\n");
+	//fprintf(f, "\"Compare exclude pairs\"\n");
 
-	for (const auto& e : pWordsData->_compareExcludePairs)
-	{
-		fprintf(f, "\"%s\" \"%s\"\n",
-			e.word1.c_str(),
-			e.word2.c_str());
-	}
+	//for (const auto& e : pWordsData->_compareExcludePairs)
+	//{
+	//	fprintf(f, "\"%s\" \"%s\"\n",
+	//		e.word1.c_str(),
+	//		e.word2.c_str());
+	//}
 
-	fprintf(f, "\"Main block\"\n");
+	//fprintf(f, "\"Main block\"\n");
 
 	for (const auto& e : pWordsData->_words)
 	{
