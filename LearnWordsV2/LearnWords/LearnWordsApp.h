@@ -3,8 +3,6 @@
 #include <set>
 #include <ctime>
 #include "WordsData.h"
-#include "AdditionalCheck.h"
-#include "MandatoryCheck.h"
 #include "LearnNew.h"
 
 struct WordToCheck
@@ -12,11 +10,11 @@ struct WordToCheck
 	WordToCheck() : _index(0), _sortCoeff(0) {}
 	WordToCheck(int index) : _index(index), _sortCoeff(0) {}
 
-	int   _index;       // Индекс повторяемого слова в WordsOnDisk::_words
-	float _sortCoeff;   // Сортировочный коэффициент, если пора повторять больше слов, чем мы хотим сейчас повторять
+	int   _index;       // РРЅРґРµРєСЃ РїРѕРІС‚РѕСЂСЏРµРјРѕРіРѕ СЃР»РѕРІР° РІ WordsOnDisk::_words
+	float _sortCoeff;   // РЎРѕСЂС‚РёСЂРѕРІРѕС‡РЅС‹Р№ РєРѕСЌС„С„РёС†РёРµРЅС‚, РµСЃР»Рё РїРѕСЂР° РїРѕРІС‚РѕСЂСЏС‚СЊ Р±РѕР»СЊС€Рµ СЃР»РѕРІ, С‡РµРј РјС‹ С…РѕС‚РёРј СЃРµР№С‡Р°СЃ РїРѕРІС‚РѕСЂСЏС‚СЊ
 };
 
-struct WordRememberedLong  // Слово, которое человек вспомнил правильно, но вспоминал долго
+struct WordRememberedLong  // РЎР»РѕРІРѕ, РєРѕС‚РѕСЂРѕРµ С‡РµР»РѕРІРµРє РІСЃРїРѕРјРЅРёР» РїСЂР°РІРёР»СЊРЅРѕ, РЅРѕ РІСЃРїРѕРјРёРЅР°Р» РґРѕР»РіРѕ
 {
 	WordRememberedLong(int wordIndex, double wordDuration) : index(wordIndex), durationOfRemember(wordDuration) {}
 	bool operator<(const WordRememberedLong& r) const {
@@ -26,8 +24,8 @@ struct WordRememberedLong  // Слово, которое человек вспомнил правильно, но вспо
 		return index == r.index;
 	}
 
-	int index = 0;                 // Индекс слова в _wordsOnDisk
-	double durationOfRemember = 0; // Длительность вспоминания слова
+	int index = 0;                 // РРЅРґРµРєСЃ СЃР»РѕРІР° РІ _wordsOnDisk
+	double durationOfRemember = 0; // Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ РІСЃРїРѕРјРёРЅР°РЅРёСЏ СЃР»РѕРІР°
 };
 
 struct LearnWordsApp
@@ -36,7 +34,7 @@ struct LearnWordsApp
 
 	void process(int argc, char* argv[]);
 
-	// Вызываются классами более низкого уровня
+	// Р’С‹Р·С‹РІР°СЋС‚СЃСЏ РєР»Р°СЃСЃР°РјРё Р±РѕР»РµРµ РЅРёР·РєРѕРіРѕ СѓСЂРѕРІРЅСЏ
 	void clear_forgotten();
 	void add_forgotten(int forgottenWordIndex);
 	void get_forgotten(std::vector<int>& forgottenWordsIndices);
@@ -47,14 +45,12 @@ struct LearnWordsApp
 	bool is_quick_answer(double milliSec, const char* translation, bool* ifTooLongAnswer = nullptr, double* extraDurationForAnswer = nullptr);
 	void print_buttons_hints(const std::string& str, bool needRightKeyHint);
 	void save();
-	bool isWordJustLearnedOrForgotten(const WordsData::WordInfo& w, time_t curTime) const;
 	void set_word_as_just_learned(WordsData::WordInfo& w);
 	void fill_dates_and_save(WordsData::WordInfo& w, time_t currentTime, bool needAdvance_RightAnswersNum, bool isQuickAnswer);
 	void set_as_forgotten(WordsData::WordInfo& w);
 	void set_as_barely_known(WordsData::WordInfo& w);
-	void collect_words_to_mandatory_check(std::vector<WordToCheck>& wordsToRepeat, time_t freezedTime);
 	
-	// Вызываются функциями данного класса
+	// Р’С‹Р·С‹РІР°СЋС‚СЃСЏ С„СѓРЅРєС†РёСЏРјРё РґР°РЅРЅРѕРіРѕ РєР»Р°СЃСЃР°
 	void fill_dates(float randDays, WordsData::WordInfo &w, time_t currentTime);
 	void reset_all_words_to_repeated(int rightAnswersToSet, float minDaysRepeat, float maxDaysRepeat, time_t currentTime);
 	int main_menu_choose_mode(time_t freezedTime);
@@ -62,16 +58,14 @@ struct LearnWordsApp
 	time_t get_time();
 	int get_translations_num(const char* translation);
 
-	// Поля
+	// РџРѕР»СЏ
 	WordsData _wordsOnDisk;
 	std::string _fullFileName;
 	std::string _fullRimPath;
 	time_t _freezedTime;
-	std::vector<int> _forgottenWordsIndices; // Индексы слов, которые были забыты при последней проверке слов
-	std::set<WordRememberedLong> _wordRememberedLong; // Слова которые при проверки были вспомнены, но вспоминалсь долго
+	std::vector<int> _forgottenWordsIndices; // РРЅРґРµРєСЃС‹ СЃР»РѕРІ, РєРѕС‚РѕСЂС‹Рµ Р±С‹Р»Рё Р·Р°Р±С‹С‚С‹ РїСЂРё РїРѕСЃР»РµРґРЅРµР№ РїСЂРѕРІРµСЂРєРµ СЃР»РѕРІ
+	std::set<WordRememberedLong> _wordRememberedLong; // РЎР»РѕРІР° РєРѕС‚РѕСЂС‹Рµ РїСЂРё РїСЂРѕРІРµСЂРєРё Р±С‹Р»Рё РІСЃРїРѕРјРЅРµРЅС‹, РЅРѕ РІСЃРїРѕРјРёРЅР°Р»СЃСЊ РґРѕР»РіРѕ
 
-	AdditionalCheck _additionalCheck;
-	MandatoryCheck  _mandatoryCheck;
 	LearnNew        _learnNew;
 };
 

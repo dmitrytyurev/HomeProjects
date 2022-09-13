@@ -32,7 +32,7 @@ extern Log logger;
 //
 //===============================================================================================
 
-LearnWordsApp::LearnWordsApp(): _additionalCheck(this, &_wordsOnDisk), _mandatoryCheck(this, &_wordsOnDisk), _learnNew(this, &_wordsOnDisk), _freezedTime(0) 
+LearnWordsApp::LearnWordsApp(): _learnNew(this, &_wordsOnDisk), _freezedTime(0) 
 {
 	for (int i = 0; i < MAX_RIGHT_REPEATS_GLOBAL_N + 1; ++i)
 	{
@@ -166,34 +166,6 @@ void LearnWordsApp::update_time_remembered_long(int wordIndex, double durationOf
 		_wordRememberedLong.insert(w);
 	}
 }
-
-//===============================================================================================
-//
-//===============================================================================================
-
-bool LearnWordsApp::isWordJustLearnedOrForgotten(const WordsData::WordInfo& w, time_t curTime) const
-{
-	return (w.rightAnswersNum == 1) &&   // Это условие не даёт попасть в выборку словам высоких уровней, до повторения которых осталось несколько часов
-		((w.dateOfRepeat >= curTime) && (w.dateOfRepeat <= curTime + addDaysMax[1] * SECONDS_IN_DAY));  // А это условие не даёт попасть выборку только что изученным словам на следующий день
-}
-
-//===============================================================================================
-//
-//===============================================================================================
-
-void LearnWordsApp::reset_all_words_to_repeated(int rightAnswersToSet, float minDaysRepeat, float maxDaysRepeat, time_t currentTime)
-{
-	for (auto& w : _wordsOnDisk._words)
-	{
-		if (w.rightAnswersNum)
-		{
-			w.rightAnswersNum = rightAnswersToSet;
-			float randDays = rand_float(minDaysRepeat, maxDaysRepeat);
-			fill_dates(randDays, w, currentTime);
-		}
-	}
-}
-
 
 //===============================================================================================
 // 
@@ -441,7 +413,7 @@ void LearnWordsApp::process(int argc, char* argv[])
 		//puts("Ussage:");
 		//puts("LearnWords.exe [path to base file]\n");
 		//return 0;
-		_fullFileName = "D:\\HomeProjects\\LearnWords\\x64\\Debug\\olya_words.txt";
+		_fullFileName = "D:\\HomeProjects\\LearnWordsV2\\Words.txt";
 		_fullRimPath = "C:\\Dimka\\MyLims\\40\\CNN\\CBSBenghaziProblem\\";
 	
 	}
@@ -470,16 +442,9 @@ void LearnWordsApp::process(int argc, char* argv[])
 			return;
 			break;
 		case '1':
-			_learnNew.learn_new(_freezedTime, &_additionalCheck);
+			_learnNew.learn_new(_freezedTime);
 			break;
 		case '2':
-			_mandatoryCheck.mandatory_check(_freezedTime, &_additionalCheck, _fullFileName);
-			if (!_forgottenWordsIndices.empty())
-				do 
-				{
-					_learnNew.learn_forgotten(_freezedTime, &_additionalCheck);
-				} while (!_forgottenWordsIndices.empty());
-			break;
 		default:
 			break;
 		}
@@ -504,54 +469,3 @@ void LearnWordsApp::set_as_barely_known(WordsData::WordInfo& w)
 	w.rightAnswersNum = std::min(w.rightAnswersNum, RIGHT_ANSWERS_FALLBACK);
 }
 
-//===============================================================================================
-// 
-//===============================================================================================
-
-void LearnWordsApp::collect_words_to_mandatory_check(std::vector<WordToCheck>& wordsToRepeat, time_t freezedTime)
-{
-	auto ifTimeToRepeat = [](WordsData::WordInfo& w, time_t freezedTime) { return w.dateOfRepeat != 0 && w.dateOfRepeat < freezedTime; };
-
-	for (int i = 0; i < (int)_wordsOnDisk._words.size(); ++i)
-	{
-		WordsData::WordInfo& w = _wordsOnDisk._words[i];
-		if (ifTimeToRepeat(w, freezedTime))
-			wordsToRepeat.emplace_back(WordToCheck(i));
-	}
-
-	// Если этих слов больше, чем нужно, то урезать число слов до необходимого
-
-	if (wordsToRepeat.size() > MAX_WORDS_TO_CHECK)
-	{
-		for (int i = 0; i < (int)wordsToRepeat.size(); ++i)
-		{
-			WordsData::WordInfo& w = _wordsOnDisk._words[wordsToRepeat[i]._index];
-			int plannedRepeatInterval = (w.dateOfRepeat - w.cantRandomTestedAfter) * 2;;  // Запланированный интервал повтора
-			int lateRepeatInterval = int(freezedTime) - w.dateOfRepeat;  // На сколько просрочен повтор от запланированного времени
-			wordsToRepeat[i]._sortCoeff = lateRepeatInterval / (plannedRepeatInterval * 0.2f + 1);  // Чем больше коэффициент, тем раньше надо повторять слова
-		}
-		std::sort(wordsToRepeat.begin(), wordsToRepeat.end(), [](const WordToCheck& l, const WordToCheck& r) { return l._sortCoeff > r._sortCoeff; });
-		wordsToRepeat.resize(MAX_WORDS_TO_CHECK);
-	}
-	else
-		if (wordsToRepeat.size() < MAX_WORDS_TO_CHECK2)  // Если слов наоборот меньше, то добавить слова, которые надо будет проверять через PRELIMINARY_CHECK_HOURS часов
-		{
-			auto ifRepeatedRecently = [](WordsData::WordInfo& w, time_t freezedTime) { return freezedTime - w.calcPrevRepeatTime() < 3600 * LAST_HOURS_REPEAT_NUM; };
-
-			for (int i = 0; i < (int)_wordsOnDisk._words.size(); ++i)
-			{
-				WordsData::WordInfo& w = _wordsOnDisk._words[i];
-
-				if (!ifTimeToRepeat(w, freezedTime) && !ifRepeatedRecently(w, freezedTime))
-				{
-					if (w.dateOfRepeat != 0 && w.dateOfRepeat < freezedTime + 3600 * PRELIMINARY_CHECK_HOURS)
-					{
-//						logger("Add from future: %s, time to repeat: %d\n", w.word.c_str(), w.dateOfRepeat - freezedTime);
-						wordsToRepeat.emplace_back(WordToCheck(i));
-						if (wordsToRepeat.size() == MAX_WORDS_TO_CHECK2)
-							break;
-					}
-				}
-			}
-		}
-}

@@ -148,30 +148,22 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AdditionalCheck.h" />
-    <ClInclude Include="CloseTranslationWordsManager.h" />
     <ClInclude Include="CommonUtility.h" />
     <ClInclude Include="FileOperate.h" />
     <ClInclude Include="HightResolutionTimer.h" />
     <ClInclude Include="LearnNew.h" />
     <ClInclude Include="LearnWordsApp.h" />
-    <ClInclude Include="MandatoryCheck.h" />
-    <ClInclude Include="SoundClip.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="WordsData.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AdditionalCheck.cpp" />
-    <ClCompile Include="CloseTranslationWordsManager.cpp" />
     <ClCompile Include="CommonUtility.cpp" />
     <ClCompile Include="FileOperate.cpp" />
     <ClCompile Include="HightResolutionTimer.cpp" />
     <ClCompile Include="LearnNew.cpp" />
     <ClCompile Include="LearnWords.cpp" />
     <ClCompile Include="LearnWordsApp.cpp" />
-    <ClCompile Include="MandatoryCheck.cpp" />
-    <ClCompile Include="SoundClip.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -5,16 +5,16 @@ struct WordsData;
 struct AdditionalCheck;
 
 
-// Поставщик отвлекающих слов, перемежающих подучиваемые забытые слова. Но выбирает для отвлечения слова, которые тоже полезно повторить :
-// Это слова которые пора повторять или скоро будет пора, также это слова, на которые мы недавно ответили правильно, но долго думали
+// РџРѕСЃС‚Р°РІС‰РёРє РѕС‚РІР»РµРєР°СЋС‰РёС… СЃР»РѕРІ, РїРµСЂРµРјРµР¶Р°СЋС‰РёС… РїРѕРґСѓС‡РёРІР°РµРјС‹Рµ Р·Р°Р±С‹С‚С‹Рµ СЃР»РѕРІР°. РќРѕ РІС‹Р±РёСЂР°РµС‚ РґР»СЏ РѕС‚РІР»РµС‡РµРЅРёСЏ СЃР»РѕРІР°, РєРѕС‚РѕСЂС‹Рµ С‚РѕР¶Рµ РїРѕР»РµР·РЅРѕ РїРѕРІС‚РѕСЂРёС‚СЊ :
+// Р­С‚Рѕ СЃР»РѕРІР° РєРѕС‚РѕСЂС‹Рµ РїРѕСЂР° РїРѕРІС‚РѕСЂСЏС‚СЊ РёР»Рё СЃРєРѕСЂРѕ Р±СѓРґРµС‚ РїРѕСЂР°, С‚Р°РєР¶Рµ СЌС‚Рѕ СЃР»РѕРІР°, РЅР° РєРѕС‚РѕСЂС‹Рµ РјС‹ РЅРµРґР°РІРЅРѕ РѕС‚РІРµС‚РёР»Рё РїСЂР°РІРёР»СЊРЅРѕ, РЅРѕ РґРѕР»РіРѕ РґСѓРјР°Р»Рё
 
 enum class FromWhatSource
 {
 	NOT_INITIALIZED,
-	FROM_LEANRING_QUEUE,     // Слово из очереди подучиваемых слов
-	FROM_REMEMBERED_LONG,    // Это слово из тех, что проверяли в этой сессии программы, ответили хорошо, но очень долго
-	FROM_MANDATORY,          // Это слово из готовых обязательной проверке (включая небольшое опережение)
-	FROM_ADDITIONAL          // Это слово получено из AdditionalCheck
+	FROM_LEANRING_QUEUE,     // РЎР»РѕРІРѕ РёР· РѕС‡РµСЂРµРґРё РїРѕРґСѓС‡РёРІР°РµРјС‹С… СЃР»РѕРІ
+	FROM_REMEMBERED_LONG,    // Р­С‚Рѕ СЃР»РѕРІРѕ РёР· С‚РµС…, С‡С‚Рѕ РїСЂРѕРІРµСЂСЏР»Рё РІ СЌС‚РѕР№ СЃРµСЃСЃРёРё РїСЂРѕРіСЂР°РјРјС‹, РѕС‚РІРµС‚РёР»Рё С…РѕСЂРѕС€Рѕ, РЅРѕ РѕС‡РµРЅСЊ РґРѕР»РіРѕ
+	FROM_MANDATORY,          // Р­С‚Рѕ СЃР»РѕРІРѕ РёР· РіРѕС‚РѕРІС‹С… РѕР±СЏР·Р°С‚РµР»СЊРЅРѕР№ РїСЂРѕРІРµСЂРєРµ (РІРєР»СЋС‡Р°СЏ РЅРµР±РѕР»СЊС€РѕРµ РѕРїРµСЂРµР¶РµРЅРёРµ)
+	FROM_ADDITIONAL          // Р­С‚Рѕ СЃР»РѕРІРѕ РїРѕР»СѓС‡РµРЅРѕ РёР· AdditionalCheck
 };
 
 struct DistractWord
@@ -22,27 +22,11 @@ struct DistractWord
 
 	DistractWord(int wordIndex, FromWhatSource wordFromWhatSource) : index(wordIndex), fromWhatSource(wordFromWhatSource) {}
 
-	int index = 0;                                                   // Индекс слова в _wordsOnDisk
-	FromWhatSource fromWhatSource = FromWhatSource::NOT_INITIALIZED; // Источник слова
+	int index = 0;                                                   // РРЅРґРµРєСЃ СЃР»РѕРІР° РІ _wordsOnDisk
+	FromWhatSource fromWhatSource = FromWhatSource::NOT_INITIALIZED; // РСЃС‚РѕС‡РЅРёРє СЃР»РѕРІР°
 };
 
-class DistractWordsSupplier  
-{
-public:
-	DistractWordsSupplier(LearnWordsApp* learnWordsApp, time_t freezedTime);
-	DistractWord get_word(time_t freezedTime, AdditionalCheck* pAdditionalCheck);
-	bool is_first_cycle();
-
-private:
-	LearnWordsApp* _learnWordsApp = nullptr;
-	std::vector<DistractWord> distractWords; // Слова для отвлечения. Если их не хватит, то будем динамически добирать из циклического списка повтора
-	int index = 0;                     // Индекс выдаваемого слова в distractWords
-	int returnWordsFromAdditional = 0; // Сколько слов нужно вернуть из AdditionalCheck. Если здесь 0, то выдаём слова из distractWords.
-	bool isFirstCycle = true;          // Первый ли это круг обхода по массиву distractWords
-};
-
-
-// Класс для выучивания новых слов и подучивания забытых 
+// РљР»Р°СЃСЃ РґР»СЏ РІС‹СѓС‡РёРІР°РЅРёСЏ РЅРѕРІС‹С… СЃР»РѕРІ Рё РїРѕРґСѓС‡РёРІР°РЅРёСЏ Р·Р°Р±С‹С‚С‹С… 
 
 struct LearnNew
 {
@@ -51,13 +35,13 @@ struct LearnNew
 		WordToLearn() {}
 		explicit WordToLearn(int index, FromWhatSource fromWhatSource) : _index(index), _fromWhatSource(fromWhatSource) {}
 
-		int  _index = 0;                 // Индекс изучаемого слова в WordsOnDisk::_words
-		int  _localRightAnswersNum = 0;  // Количество непрерывных правильных ответов
+		int  _index = 0;                 // РРЅРґРµРєСЃ РёР·СѓС‡Р°РµРјРѕРіРѕ СЃР»РѕРІР° РІ WordsOnDisk::_words
+		int  _localRightAnswersNum = 0;  // РљРѕР»РёС‡РµСЃС‚РІРѕ РЅРµРїСЂРµСЂС‹РІРЅС‹С… РїСЂР°РІРёР»СЊРЅС‹С… РѕС‚РІРµС‚РѕРІ
 		FromWhatSource _fromWhatSource = FromWhatSource::NOT_INITIALIZED;
 	};
 
 	LearnNew(LearnWordsApp* learnWordsApp, WordsData* pWordsData) : _learnWordsApp(learnWordsApp), _pWordsData(pWordsData) {}
-	void learn_new(time_t freezedTime, AdditionalCheck* pAdditionalCheck);
+	void learn_new(time_t freezedTime);
 	void learn_forgotten(time_t freezedTime, AdditionalCheck* pAdditionalCheck);
 	
 	void print_masked_translation(const char* _str, int symbolsToShowNum);
