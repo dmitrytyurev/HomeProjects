@@ -82,12 +82,21 @@ void LearnNew::do_learn(bool isLearnForgotten)
 	// Составим список индексов слов, которые будем учить
 
 	clear_console_screen();
-	printf("\nHow many words to learn: ");
-	int wordsToLearn = enter_number_from_console();
-	if (wordsToLearn > 0)
-		wordsToLearnIds = _pWordsData->GetUnlearnedTextsId(wordsToLearn);
-	if (wordsToLearnIds.empty())
-		return;
+
+	if (!isLearnForgotten)  // Учим новые слова
+	{
+		printf("\nHow many words to learn: ");
+		int wordsToLearn = enter_number_from_console();
+		if (wordsToLearn > 0)
+			wordsToLearnIds = _pWordsData->GetUnlearnedTextsId(wordsToLearn);
+		if (wordsToLearnIds.empty())
+			return;
+	}
+	else  // Подучиваем слова забытые при проверке
+	{
+		wordsToLearnIds = _learnWordsApp->_forgottenWordsIndices;
+		_learnWordsApp->_forgottenWordsIndices.clear();
+	}
 
 	// Первичное изучение (показываем все слова по одному разу)
 
