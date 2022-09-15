@@ -104,12 +104,13 @@ bool LearnWordsApp::is_quick_answer(double milliSec, const char* translation, bo
 // 
 //===============================================================================================
 
-int LearnWordsApp::main_menu_choose_mode(time_t freezedTime)
+int LearnWordsApp::main_menu_choose_mode()
 {
 	printf("\n");
 	printf("\n");
 	printf("1. Learn new words\n");
 	printf("2. Words repeat\n");
+	printf("3. Learn forgotten\n");
 	printf("\n\n");
 
 	if (!_forgottenWordsIndices.empty())
@@ -124,7 +125,7 @@ int LearnWordsApp::main_menu_choose_mode(time_t freezedTime)
 	while (true)
 	{
 		char c = getch_filtered();
-		if (c == 27 || c == '1' || c == '2')  // 27 - Esc
+		if (c == 27 || c == '1' || c == '2' || c == '3')  // 27 - Esc
 			return c;
 		//		printf("%d\n", c);
 	}
@@ -210,10 +211,7 @@ time_t LearnWordsApp::get_time()
 
 void LearnWordsApp::process(int argc, char* argv[])
 {
-	std::srand((unsigned)get_time());
-	srand((int)get_time());
-
-	if (argc != 3)
+	if (argc != 2)
 	{
 		//puts("Ussage:");
 		//puts("LearnWords.exe [path to base file]\n");
@@ -230,20 +228,22 @@ void LearnWordsApp::process(int argc, char* argv[])
 	{
 		clear_console_screen();
 
-		_freezedTime = get_time();   // Текущее время обновляется один раз перед показом главного меню, чтобы число слов для повтора в меню 
-								   // и последующем запуске режима повтора (в нём используется запомненный здесь curTime) было одинаковым .
-		int keyPressed = main_menu_choose_mode(_freezedTime);
+		int keyPressed = main_menu_choose_mode();
 		switch (keyPressed)
 		{
 		case 27:  // ESC
-			printf("%ld\n", int(_freezedTime));
+			//printf("%ld\n", int(_freezedTime));
 			return;
 			break;
 		case '1':
-			_learnNew.learn_new(_freezedTime);
+			_learnNew.learn_new();
 			break;
 		case '2':
-			_check.check(_freezedTime);
+			_check.check();
+			break;
+		case '3':
+			//_learnNew.learn_new(_freezedTime);
+			break;
 		default:
 			break;
 		}

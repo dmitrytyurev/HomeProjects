@@ -95,11 +95,10 @@ int Check::get_word_id_to_check(std::vector<int>& lastCheckedIds)
 // 
 //===============================================================================================
 
-void Check::check(time_t freezedTime)
+void Check::check()
 {
-	std::vector<int> lastCheckedIds;   // Айдишники посдених 10-ти проверенных слов
+	std::vector<int> lastCheckedIds;   // Айдишники последних 10-ти проверенных слов
 
-	_learnWordsApp->_forgottenWordsIndices.clear();
 	clear_console_screen();
 
 	printf("\nHow many words to check: ");

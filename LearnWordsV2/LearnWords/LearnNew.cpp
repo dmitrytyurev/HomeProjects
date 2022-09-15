@@ -75,7 +75,7 @@ bool LearnNew::are_all_words_learned(std::vector<WordToLearn>& queue)
 // 
 //===============================================================================================
 
-void LearnNew::learn_new(time_t freezedTime)
+void LearnNew::learn_new()
 {
 	std::vector<int> wordsToLearnIds;
 

@@ -16,7 +16,7 @@ struct LearnWordsApp
 	void save();
 	
 	// Вызываются функциями данного класса
-	int main_menu_choose_mode(time_t freezedTime);
+	int main_menu_choose_mode();
 	time_t get_time();
 	int get_translations_num(const char* translation);
 
