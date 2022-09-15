@@ -196,17 +196,17 @@ void LearnNew::do_learn(bool isLearnForgotten)
 					if (are_all_words_learned(learnCycleQueue))
 						return;
 				}
-				put_to_queue(learnCycleQueue, wordToLearn, true);
+				put_to_queue(learnCycleQueue, wordToLearn, wordsToLearnIds.size()>3);
 				break;
 			}
 			else
 				if (c == 80) // Стрелка вниз
 				{
 					wordToLearn._localRightAnswersNum = 0;
-					put_to_queue(learnCycleQueue, wordToLearn, true);
 					if (!isLearnForgotten)
 						_pWordsData->SetTextAsUnlearned(id);
 					_learnWordsApp->save();
+					put_to_queue(learnCycleQueue, wordToLearn, wordsToLearnIds.size()>3);
 					break;
 				}
 		}

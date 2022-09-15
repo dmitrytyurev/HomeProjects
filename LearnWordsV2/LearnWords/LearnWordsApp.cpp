@@ -109,8 +109,8 @@ int LearnWordsApp::main_menu_choose_mode()
 	printf("\n");
 	printf("\n");
 	printf("1. Learn new words\n");
-	printf("2. Words repeat\n");
-	printf("3. Learn forgotten\n");
+	printf("2. Repeat Words\n");
+	printf("3. Learn forgotten words\n");
 	printf("\n\n");
 
 	if (!_forgottenWordsIndices.empty())
