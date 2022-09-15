@@ -146,7 +146,7 @@ void LearnNew::learn_new()
 											   // Занести слова, которые будем изучать в очередь
 	for (const auto& id : wordsToLearnIds)
 	{
-		WordToLearn word(id, FromWhatSource::FROM_LEANRING_QUEUE);
+		WordToLearn word(id);
 		learnCycleQueue.push_back(word);
 	}
 																									 // Главный цикл обучения
@@ -180,33 +180,23 @@ void LearnNew::learn_new()
 				return;
 			if (c == 72)  // Стрелка вверх
 			{
-				switch (wordToLearn._fromWhatSource)
+				if (++(wordToLearn._localRightAnswersNum) == TIMES_TO_GUESS_TO_LEARNED)
 				{
-				case FromWhatSource::FROM_LEANRING_QUEUE:
-					if (++(wordToLearn._localRightAnswersNum) == TIMES_TO_GUESS_TO_LEARNED)
-					{
-						_pWordsData->SetTextAsJustLearned(id);
-						_learnWordsApp->save();
-						if (are_all_words_learned(learnCycleQueue))
-							return;
-					}
-					put_to_queue(learnCycleQueue, wordToLearn, true);
-					break;
+					_pWordsData->SetTextAsJustLearned(id);
+					_learnWordsApp->save();
+					if (are_all_words_learned(learnCycleQueue))
+						return;
 				}
+				put_to_queue(learnCycleQueue, wordToLearn, true);
 				break;
 			}
 			else
 				if (c == 80) // Стрелка вниз
 				{
-					switch (wordToLearn._fromWhatSource)
-					{
-					case FromWhatSource::FROM_LEANRING_QUEUE:
-						wordToLearn._localRightAnswersNum = 0;
-						put_to_queue(learnCycleQueue, wordToLearn, true);
-						_pWordsData->SetTextAsUnlearned(id);
-						_learnWordsApp->save();
-						break;
-					}
+					wordToLearn._localRightAnswersNum = 0;
+					put_to_queue(learnCycleQueue, wordToLearn, true);
+					_pWordsData->SetTextAsUnlearned(id);
+					_learnWordsApp->save();
 					break;
 				}
 		}
