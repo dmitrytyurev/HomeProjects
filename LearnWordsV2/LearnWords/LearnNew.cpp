@@ -179,7 +179,7 @@ void LearnNew::do_learn(bool isLearnForgotten)
 			if (c == 27)
 				return;
 		} while (c != ' ');
-		_learnWordsApp->print_buttons_hints(_pWordsData->GetTranslation(id), false);
+		_learnWordsApp->print_buttons_hints(_pWordsData->GetTranslation(id));
 
 		// Обрабатываем ответ - знает ли пользователь слово
 		while (true)

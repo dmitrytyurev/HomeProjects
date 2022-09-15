@@ -133,7 +133,7 @@ void Check::do_check()
 		{
 			clear_console_screen();
 			printf("\n\n===============================\n %s\n===============================\n", _pWordsData->GetWord(id).c_str());
-			_learnWordsApp->print_buttons_hints(_pWordsData->GetTranslation(id), true);
+			_learnWordsApp->print_buttons_hints(_pWordsData->GetTranslation(id));
 			printf("\n  Remain: %d, Quick = %d\n", wordsToCheck - i - 1, int(isQuickAnswer));
 
 			c = getch_filtered();

@@ -137,7 +137,7 @@ int LearnWordsApp::main_menu_choose_mode()
 // 
 //===============================================================================================
 
-void LearnWordsApp::print_buttons_hints(const std::string& str, bool needRightKeyHint)
+void LearnWordsApp::print_buttons_hints(const std::string& str)
 {
 	CONSOLE_SCREEN_BUFFER_INFO   csbi;
 	csbi.wAttributes = 0;
@@ -191,8 +191,6 @@ void LearnWordsApp::print_buttons_hints(const std::string& str, bool needRightKe
 		SetConsoleTextAttribute(hConsole, csbi.wAttributes);
 
 	printf("\n\n  Arrow up  - I remember!\n  Arrow down   - I am not sure\n");
-	if (needRightKeyHint)
-		printf("  Arrow right - I remember but it takes time\n");
 }
 
 //===============================================================================================

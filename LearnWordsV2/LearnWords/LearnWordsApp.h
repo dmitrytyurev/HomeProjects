@@ -12,7 +12,7 @@ struct LearnWordsApp
 
 	void process(int argc, char* argv[]);
 	bool is_quick_answer(double milliSec, const char* translation, bool* ifTooLongAnswer = nullptr, double* extraDurationForAnswer = nullptr);
-	void print_buttons_hints(const std::string& str, bool needRightKeyHint);
+	void print_buttons_hints(const std::string& str);
 	void save();
 	
 	// Вызываются функциями данного класса
