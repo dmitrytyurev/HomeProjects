@@ -32,7 +32,7 @@ extern Log logger;
 //
 //===============================================================================================
 
-LearnWordsApp::LearnWordsApp(): _learnNew(this, &_wordsOnDisk), _check(this, &_wordsOnDisk), _freezedTime(0)
+LearnWordsApp::LearnWordsApp(): _learn(this, &_wordsOnDisk), _check(this, &_wordsOnDisk), _freezedTime(0)
 {
 	for (int i = 0; i < MAX_RIGHT_REPEATS_GLOBAL_N + 1; ++i)
 	{
@@ -236,13 +236,14 @@ void LearnWordsApp::process(int argc, char* argv[])
 			return;
 			break;
 		case '1':
-			_learnNew.learn_new();
+			_learn.do_learn(false);
 			break;
 		case '2':
-			_check.check();
+			_check.do_check();
 			break;
 		case '3':
-			//_learnNew.learn_new(_freezedTime);
+			if (!_forgottenWordsIndices.empty())
+				_learn.do_learn(true);
 			break;
 		default:
 			break;

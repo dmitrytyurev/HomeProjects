@@ -95,7 +95,7 @@ int Check::get_word_id_to_check(std::vector<int>& lastCheckedIds)
 // 
 //===============================================================================================
 
-void Check::check()
+void Check::do_check()
 {
 	std::vector<int> lastCheckedIds;   // Айдишники последних 10-ти проверенных слов
 
@@ -154,10 +154,7 @@ void Check::check()
 				if (c == 80) // Стрелка вниз
 				{
 					_learnWordsApp->_forgottenWordsIndices.push_back(id);
-					_pWordsData->PutTextToEndOfQueue(id);
-					w.successCheckDays = 1;
-					w.lastDaySuccCheckTimestamp = (int)std::time(nullptr);
-					w.needSkip = false;
+					_pWordsData->SetTextAsJustLearned(id);
 					_learnWordsApp->save();
 				}
 				else

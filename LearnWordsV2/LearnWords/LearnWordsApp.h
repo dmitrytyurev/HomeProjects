@@ -26,7 +26,7 @@ struct LearnWordsApp
 	time_t _freezedTime;
 	std::vector<int> _forgottenWordsIndices; // Индексы слов, которые были забыты при последней проверке слов
 
-	LearnNew _learnNew;
+	LearnNew _learn;
 	Check    _check;
 };
 

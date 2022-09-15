@@ -75,7 +75,7 @@ bool LearnNew::are_all_words_learned(std::vector<WordToLearn>& queue)
 // 
 //===============================================================================================
 
-void LearnNew::learn_new()
+void LearnNew::do_learn(bool isLearnForgotten)
 {
 	std::vector<int> wordsToLearnIds;
 
@@ -195,7 +195,8 @@ void LearnNew::learn_new()
 				{
 					wordToLearn._localRightAnswersNum = 0;
 					put_to_queue(learnCycleQueue, wordToLearn, true);
-					_pWordsData->SetTextAsUnlearned(id);
+					if (!isLearnForgotten)
+						_pWordsData->SetTextAsUnlearned(id);
 					_learnWordsApp->save();
 					break;
 				}
