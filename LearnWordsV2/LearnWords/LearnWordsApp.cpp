@@ -32,7 +32,7 @@ extern Log logger;
 //
 //===============================================================================================
 
-LearnWordsApp::LearnWordsApp(): _learnNew(this, &_wordsOnDisk), _freezedTime(0) 
+LearnWordsApp::LearnWordsApp(): _learnNew(this, &_wordsOnDisk), _check(this, &_wordsOnDisk), _freezedTime(0)
 {
 	for (int i = 0; i < MAX_RIGHT_REPEATS_GLOBAL_N + 1; ++i)
 	{
@@ -219,13 +219,10 @@ void LearnWordsApp::process(int argc, char* argv[])
 		//puts("LearnWords.exe [path to base file]\n");
 		//return 0;
 		_fullFileName = "D:\\HomeProjects\\LearnWordsV2\\Words.txt";
-		_fullRimPath = "C:\\Dimka\\MyLims\\40\\CNN\\CBSBenghaziProblem\\";
-	
 	}
 	else
 	{
 		_fullFileName = argv[1];
-		_fullRimPath = argv[2];
 	}
 	FileOperate::load_from_file(_fullFileName.c_str(), &_wordsOnDisk);
 
@@ -246,6 +243,7 @@ void LearnWordsApp::process(int argc, char* argv[])
 			_learnNew.learn_new(_freezedTime);
 			break;
 		case '2':
+			_check.check(_freezedTime);
 		default:
 			break;
 		}

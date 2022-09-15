@@ -6,15 +6,6 @@
 
 struct WordsData
 {
-	std::vector<int> GetUnlearnedTextsId(int textsNumNeeded);
-	std::string GetWord(int id);
-	std::string GetTranslation(int id);
-	void SetTextAsJustLearned(int id);
-	void SetTextAsUnlearned(int id);
-	void PutTextToEndOfQueue(int id);
-	void OnRepeatSucceed(int id);
-	void OnRepeatFailed(int id);
-
 	struct WordInfo
 	{
 		std::string word;
@@ -24,6 +15,14 @@ struct WordsData
 		int lastDaySuccCheckTimestamp = 0;  // Таймстемп последней успешной проверки, но обновляется не чаще раза в сутки. Нужен для инкремента successCheckDays
 		bool needSkip = false;    // Ставится при быстрой успешной проверки, служит для пропуска одного круга проверки
 	};
+
+	std::vector<int> GetUnlearnedTextsId(int textsNumNeeded);
+	WordInfo& GetWordInfo(int id);
+	std::string GetWord(int id);
+	std::string GetTranslation(int id);
+	void SetTextAsJustLearned(int id);
+	void SetTextAsUnlearned(int id);
+	void PutTextToEndOfQueue(int id);
 
 	std::vector<WordInfo> _words;
 };

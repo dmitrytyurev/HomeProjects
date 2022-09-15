@@ -148,6 +148,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Check.h" />
     <ClInclude Include="CommonUtility.h" />
     <ClInclude Include="FileOperate.h" />
     <ClInclude Include="HightResolutionTimer.h" />
@@ -158,6 +159,7 @@
     <ClInclude Include="WordsData.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Check.cpp" />
     <ClCompile Include="CommonUtility.cpp" />
     <ClCompile Include="FileOperate.cpp" />
     <ClCompile Include="HightResolutionTimer.cpp" />

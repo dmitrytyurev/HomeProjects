@@ -55,3 +55,7 @@ void WordsData::PutTextToEndOfQueue(int id)
 	_words[id].checkOrderN = maxOrderN + 1;
 }
 
+WordsData::WordInfo& WordsData::GetWordInfo(int id)
+{
+	return _words[id];
+}
