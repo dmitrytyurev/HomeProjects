@@ -32,7 +32,7 @@ extern Log logger;
 //
 //===============================================================================================
 
-LearnWordsApp::LearnWordsApp(): _learn(this, &_wordsOnDisk), _check(this, &_wordsOnDisk), _freezedTime(0)
+LearnWordsApp::LearnWordsApp(): _learn(this, &_wordsOnDisk), _check(this, &_wordsOnDisk)
 {
 	for (int i = 0; i < MAX_RIGHT_REPEATS_GLOBAL_N + 1; ++i)
 	{
@@ -230,7 +230,6 @@ void LearnWordsApp::process(int argc, char* argv[])
 		switch (keyPressed)
 		{
 		case 27:  // ESC
-			//printf("%ld\n", int(_freezedTime));
 			return;
 			break;
 		case '1':

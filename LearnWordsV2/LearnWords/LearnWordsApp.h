@@ -23,7 +23,6 @@ struct LearnWordsApp
 	// Поля
 	WordsData _wordsOnDisk;
 	std::string _fullFileName;
-	time_t _freezedTime;
 	std::vector<int> _forgottenWordsIndices; // Индексы слов, которые были забыты при последней проверке слов
 
 	LearnNew _learn;
