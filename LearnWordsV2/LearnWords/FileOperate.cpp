@@ -5,7 +5,6 @@
 
 #include "FileOperate.h"
 #include "CommonUtility.h"
-#include "WordsData.h"
 
 
 //===============================================================================================
@@ -56,7 +55,7 @@ int FileOperate::load_int_from_array(const std::vector<char>& buffer, int* index
 // 
 //===============================================================================================
 
-void FileOperate::load_from_file(const char* fullFileName, WordsData* pWordsData)
+void FileOperate::load_from_file(const char* fullFileName, std::vector<WordsManager::WordInfo>& wordsInfo)
 {
 	std::ifstream file(fullFileName, std::ios::binary | std::ios::ate);
 	std::streamsize size = file.tellg();
@@ -75,7 +74,7 @@ void FileOperate::load_from_file(const char* fullFileName, WordsData* pWordsData
 	// Читаем основной блок слов
 	while (true)
 	{
-		WordsData::WordInfo wi;
+		WordsManager::WordInfo wi;
 
 		wi.word = load_string_from_array(buffer, &parseIndex);
 		if (wi.word.length() == 0)         // При поиске начала строки был встречен конец файла (например, файл заканчивается пустой строкой)
@@ -112,7 +111,7 @@ void FileOperate::load_from_file(const char* fullFileName, WordsData* pWordsData
 		}
 
 		// Занести WordInfo в вектор
-		pWordsData->_words.push_back(wi);
+		wordsInfo.push_back(wi);
 
 		if (buffer[parseIndex] == 0)
 			return;
@@ -123,7 +122,7 @@ void FileOperate::load_from_file(const char* fullFileName, WordsData* pWordsData
 // 
 //===============================================================================================
 
-void FileOperate::save_to_file(const char* fullFileName, WordsData* pWordsData)
+void FileOperate::save_to_file(const char* fullFileName, const std::vector<WordsManager::WordInfo>& wordsInfo)
 {
 	const int NUM_TRIES = 10;
 	const int DURATION_OF_TRIES = 1000;
@@ -140,7 +139,7 @@ void FileOperate::save_to_file(const char* fullFileName, WordsData* pWordsData)
 	if (i == NUM_TRIES)
 		exit_msg("Can't create file %s\n", fullFileName);
 
-	for (const auto& e : pWordsData->_words)
+	for (const auto& e : wordsInfo)
 	{
 		if (e.successCheckDays == 0)
 			fprintf(f, "\"%s\" \"%s\"\n", e.word.c_str(), e.translation.c_str());

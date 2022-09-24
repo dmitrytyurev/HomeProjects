@@ -1,0 +1,1 @@
+x64\Debug\LearnWords.exe Words.txt

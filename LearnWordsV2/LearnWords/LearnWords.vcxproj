@@ -148,31 +148,31 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Check.h" />
+    <ClInclude Include="CheckManager.h" />
     <ClInclude Include="CommonUtility.h" />
     <ClInclude Include="FileOperate.h" />
     <ClInclude Include="HightResolutionTimer.h" />
-    <ClInclude Include="LearnNew.h" />
-    <ClInclude Include="LearnWordsApp.h" />
+    <ClInclude Include="LearnManager.h" />
+    <ClInclude Include="Application.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="WordsData.h" />
+    <ClInclude Include="WordsManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Check.cpp" />
+    <ClCompile Include="CheckManager.cpp" />
     <ClCompile Include="CommonUtility.cpp" />
     <ClCompile Include="FileOperate.cpp" />
     <ClCompile Include="HightResolutionTimer.cpp" />
-    <ClCompile Include="LearnNew.cpp" />
-    <ClCompile Include="LearnWords.cpp" />
-    <ClCompile Include="LearnWordsApp.cpp" />
+    <ClCompile Include="LearnManager.cpp" />
+    <ClCompile Include="WinMain.cpp" />
+    <ClCompile Include="Application.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="WordsData.cpp" />
+    <ClCompile Include="WordsManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
