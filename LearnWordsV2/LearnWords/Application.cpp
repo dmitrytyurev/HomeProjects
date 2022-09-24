@@ -19,27 +19,27 @@ Application::Application(const std::string& wordsFileName)
 
 //===============================================================================================
 
-void Application::process()
+void Application::Process()
 {
 	while (true)
 	{
-		clear_console_screen();
+		ClearConsoleScreen();
 
-		int keyPressed = main_menu_choose_mode();
+		int keyPressed = MainMenuChooseMode();
 		switch (keyPressed)
 		{
 		case 27:  // ESC
 			return;
 			break;
 		case '1':
-			_learn->do_learn(false);
+			_learn->DoLearn(false);
 			break;
 		case '2':
-			_check->do_check();
+			_check->DoCheck();
 			break;
 		case '3':
 			if (!_wordsManager->isForgottenListEmpty())
-				_learn->do_learn(true);
+				_learn->DoLearn(true);
 			break;
 		default:
 			break;
@@ -49,7 +49,7 @@ void Application::process()
 
 //===============================================================================================
 
-int Application::main_menu_choose_mode()
+int Application::MainMenuChooseMode()
 {
 	printf("\n");
 	printf("\n");
@@ -69,7 +69,7 @@ int Application::main_menu_choose_mode()
 
 	while (true)
 	{
-		char c = getch_filtered();
+		char c = GetchFiltered();
 		if (c == 27 || c == '1' || c == '2' || c == '3')  // 27 - Esc
 			return c;
 		//		printf("%d\n", c);

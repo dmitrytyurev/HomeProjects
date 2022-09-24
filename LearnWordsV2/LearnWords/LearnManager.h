@@ -7,7 +7,7 @@ class LearnManager
 {
 public:
 	LearnManager(std::weak_ptr<WordsManager> pWordsData) : _pWordsData(pWordsData) {}
-	void do_learn(bool isLearnForgotten);
+	void DoLearn(bool isLearnForgotten);
 
 private:
 	struct WordToLearn
@@ -19,9 +19,9 @@ private:
 		int  _localRightAnswersNum = 0;  // Количество непрерывных правильных ответов
 	};
 
-	void print_masked_translation(const char* _str, int symbolsToShowNum);
-	void put_to_queue(std::vector<WordToLearn>& queue, const WordToLearn& wordToPut, bool needRandomInsert);
-	bool are_all_words_learned(std::vector<WordToLearn>& queue);
+	void PrintMaskedTranslation(const char* _str, int symbolsToShowNum);
+	void PutToQueue(std::vector<WordToLearn>& queue, const WordToLearn& wordToPut, bool needRandomInsert);
+	bool AreAllWordsLearned(std::vector<WordToLearn>& queue);
 
 	std::weak_ptr<WordsManager> _pWordsData;
 };

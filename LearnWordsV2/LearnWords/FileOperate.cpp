@@ -11,7 +11,7 @@
 // 
 //===============================================================================================
 
-std::string FileOperate::load_string_from_array(const std::vector<char>& buffer, int* indexToRead)
+std::string FileOperate::LoadStringFromArray(const std::vector<char>& buffer, int* indexToRead)
 {
 	while (buffer[*indexToRead] != '"'  &&  buffer[*indexToRead] != 0)
 		++(*indexToRead);
@@ -36,7 +36,7 @@ std::string FileOperate::load_string_from_array(const std::vector<char>& buffer,
 // 
 //===============================================================================================
 
-int FileOperate::load_int_from_array(const std::vector<char>& buffer, int* indexToRead)
+int FileOperate::LoadIntFromArray(const std::vector<char>& buffer, int* indexToRead)
 {
 	int number = 0;
 
@@ -44,7 +44,7 @@ int FileOperate::load_int_from_array(const std::vector<char>& buffer, int* index
 	{
 		number += buffer[*indexToRead] - '0';
 		++(*indexToRead);
-		if (!is_digit(buffer[*indexToRead]))
+		if (!IsDigit(buffer[*indexToRead]))
 			return number;
 		number *= 10;
 	}
@@ -55,18 +55,18 @@ int FileOperate::load_int_from_array(const std::vector<char>& buffer, int* index
 // 
 //===============================================================================================
 
-void FileOperate::load_from_file(const char* fullFileName, std::vector<WordsManager::WordInfo>& wordsInfo)
+void FileOperate::LoadFromFile(const char* fullFileName, std::vector<WordsManager::WordInfo>& wordsInfo)
 {
 	std::ifstream file(fullFileName, std::ios::binary | std::ios::ate);
 	std::streamsize size = file.tellg();
 	if (size == -1)
-		exit_msg("Error opening file %s\n", fullFileName);
+		ExitMsg("Error opening file %s\n", fullFileName);
 	file.seekg(0, std::ios::beg);
 
 	std::vector<char> buffer((int)size + 1);
 	buffer[(int)size] = 0;
 	if (!file.read(buffer.data(), size))
-		exit_msg("Error reading file %s\n", fullFileName);
+		ExitMsg("Error reading file %s\n", fullFileName);
 
 	int parseIndex = 0;
 
@@ -76,36 +76,36 @@ void FileOperate::load_from_file(const char* fullFileName, std::vector<WordsMana
 	{
 		WordsManager::WordInfo wi;
 
-		wi.word = load_string_from_array(buffer, &parseIndex);
+		wi.word = LoadStringFromArray(buffer, &parseIndex);
 		if (wi.word.length() == 0)         // При поиске начала строки был встречен конец файла (например, файл заканчивается пустой строкой)
 			return;
-		wi.translation = load_string_from_array(buffer, &parseIndex);
+		wi.translation = LoadStringFromArray(buffer, &parseIndex);
 
-		while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd && !is_digit(buffer[parseIndex]))
+		while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd && !IsDigit(buffer[parseIndex]))
 			++parseIndex;
 
-		if (is_digit(buffer[parseIndex]))  // Читаем параметры
+		if (IsDigit(buffer[parseIndex]))  // Читаем параметры
 		{
-			wi.checkOrderN = load_int_from_array(buffer, &parseIndex);
-			while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd && !is_digit(buffer[parseIndex]))
+			wi.checkOrderN = LoadIntFromArray(buffer, &parseIndex);
+			while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd && !IsDigit(buffer[parseIndex]))
 				++parseIndex;
 			if (buffer[parseIndex] == 0 || buffer[parseIndex] == 0xd)
-				exit_msg("Sintax error in word %s", wi.word.c_str());
+				ExitMsg("Sintax error in word %s", wi.word.c_str());
 			// ---------
-			wi.successCheckDays = load_int_from_array(buffer, &parseIndex);
-			while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd && !is_digit(buffer[parseIndex]))
+			wi.successCheckDays = LoadIntFromArray(buffer, &parseIndex);
+			while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd && !IsDigit(buffer[parseIndex]))
 				++parseIndex;
 			if (buffer[parseIndex] == 0 || buffer[parseIndex] == 0xd)
-				exit_msg("Sintax error in word %s", wi.word.c_str());
+				ExitMsg("Sintax error in word %s", wi.word.c_str());
 			// ---------
-			wi.lastDaySuccCheckTimestamp = load_int_from_array(buffer, &parseIndex);
-			while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd && !is_digit(buffer[parseIndex]))
+			wi.lastDaySuccCheckTimestamp = LoadIntFromArray(buffer, &parseIndex);
+			while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd && !IsDigit(buffer[parseIndex]))
 				++parseIndex;
 			if (buffer[parseIndex] == 0 || buffer[parseIndex] == 0xd)
-				exit_msg("Sintax error in word %s", wi.word.c_str());
+				ExitMsg("Sintax error in word %s", wi.word.c_str());
 
 			// ---------
-			wi.needSkip = !!load_int_from_array(buffer, &parseIndex);
+			wi.needSkip = !!LoadIntFromArray(buffer, &parseIndex);
 			while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd)
 				++parseIndex;
 		}
@@ -122,7 +122,7 @@ void FileOperate::load_from_file(const char* fullFileName, std::vector<WordsMana
 // 
 //===============================================================================================
 
-void FileOperate::save_to_file(const char* fullFileName, const std::vector<WordsManager::WordInfo>& wordsInfo)
+void FileOperate::SaveToFile(const char* fullFileName, const std::vector<WordsManager::WordInfo>& wordsInfo)
 {
 	const int NUM_TRIES = 10;
 	const int DURATION_OF_TRIES = 1000;
@@ -137,7 +137,7 @@ void FileOperate::save_to_file(const char* fullFileName, const std::vector<Words
 		Sleep(DURATION_OF_TRIES / NUM_TRIES);
 	}
 	if (i == NUM_TRIES)
-		exit_msg("Can't create file %s\n", fullFileName);
+		ExitMsg("Can't create file %s\n", fullFileName);
 
 	for (const auto& e : wordsInfo)
 	{

@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 	}
 
 	Application app(wordsFileName);
-	app.process();
+	app.Process();
 
     return 0; 
 }

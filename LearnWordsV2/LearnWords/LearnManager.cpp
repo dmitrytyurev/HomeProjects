@@ -17,7 +17,7 @@ extern Log logger;
 // 
 //===============================================================================================
 
-void LearnManager::print_masked_translation(const char* _str, int symbolsToShowNum)
+void LearnManager::PrintMaskedTranslation(const char* _str, int symbolsToShowNum)
 {
 	const unsigned char* str = reinterpret_cast<const unsigned char*>(_str);;
 	bool isInTranscription = false;
@@ -29,7 +29,7 @@ void LearnManager::print_masked_translation(const char* _str, int symbolsToShowN
 		if (*str == ']')
 			isInTranscription = false;
 		bool isInWord = false;
-		if (is_symbol(*str) && isInTranscription == false)
+		if (IsSymbol(*str) && isInTranscription == false)
 		{
 			isInWord = true;
 			++charCounterInWord;
@@ -49,11 +49,11 @@ void LearnManager::print_masked_translation(const char* _str, int symbolsToShowN
 // Вставляем рандомно в последнюю или предпоследнюю позицию 
 //===============================================================================================
 
-void LearnManager::put_to_queue(std::vector<WordToLearn>& queue, const WordToLearn& wordToPut, bool needRandomInsert)
+void LearnManager::PutToQueue(std::vector<WordToLearn>& queue, const WordToLearn& wordToPut, bool needRandomInsert)
 {
 	int pos = (int)queue.size();
 
-	if (needRandomInsert && (pos > 0 && rand_float(0, 1) < 0.2f))
+	if (needRandomInsert && (pos > 0 && RandFloat(0, 1) < 0.2f))
 		--pos;
 
 	queue.insert(queue.begin() + pos, wordToPut);
@@ -63,7 +63,7 @@ void LearnManager::put_to_queue(std::vector<WordToLearn>& queue, const WordToLea
 // 
 //===============================================================================================
 
-bool LearnManager::are_all_words_learned(std::vector<WordToLearn>& queue)
+bool LearnManager::AreAllWordsLearned(std::vector<WordToLearn>& queue)
 {
 	for (const auto& word : queue)
 		if (word._localRightAnswersNum < TIMES_TO_GUESS_TO_LEARNED)
@@ -75,19 +75,19 @@ bool LearnManager::are_all_words_learned(std::vector<WordToLearn>& queue)
 // 
 //===============================================================================================
 
-void LearnManager::do_learn(bool isLearnForgotten)
+void LearnManager::DoLearn(bool isLearnForgotten)
 {
 	auto wordsMgr = _pWordsData.lock();
 	std::vector<int> wordsToLearnIds;
 
 	// Составим список индексов слов, которые будем учить
 
-	clear_console_screen();
+	ClearConsoleScreen();
 
 	if (!isLearnForgotten)  // Учим новые слова
 	{
 		printf("\nHow many words to learn: ");
-		int wordsToLearn = enter_number_from_console();
+		int wordsToLearn = EnterNumberFromConsole();
 		if (wordsToLearn > 0)
 			wordsToLearnIds = wordsMgr->GetUnlearnedTextsId(wordsToLearn);
 		if (wordsToLearnIds.empty())
@@ -103,14 +103,14 @@ void LearnManager::do_learn(bool isLearnForgotten)
 
 	for (const auto& id : wordsToLearnIds)
 	{
-		clear_console_screen();
+		ClearConsoleScreen();
 		printf("\n%s\n\n", wordsMgr->GetWord(id).c_str());
 		printf("%s", wordsMgr->GetTranslation(id).c_str());
 		printf("\n");
 		char c = 0;
 		do
 		{
-			c = getch_filtered();
+			c = GetchFiltered();
 			if (c == 27)
 				return;
 		} while (c != ' ');
@@ -126,15 +126,15 @@ void LearnManager::do_learn(bool isLearnForgotten)
 			{
 				int symbolsToShowNum = (i3 != TIMES_TO_SHOW_A_WORD -1 ? i3 : 100);
 
-				clear_console_screen();
+				ClearConsoleScreen();
 				printf("\n%s\n\n", wordsMgr->GetWord(id).c_str());
-				print_masked_translation(wordsMgr->GetTranslation(id).c_str(), symbolsToShowNum);
+				PrintMaskedTranslation(wordsMgr->GetTranslation(id).c_str(), symbolsToShowNum);
 				printf("\n\n  Arrow right - Open by one letter\n  Space -         Open the whole word");
 
 				char c = 0;
 				do
 				{
-					c = getch_filtered();
+					c = GetchFiltered();
 					if (c == 27)
 						return;
 					if (c == ' ')  // Пробел - показать слово целиком
@@ -162,7 +162,7 @@ void LearnManager::do_learn(bool isLearnForgotten)
 																									 // Главный цикл обучения
 	while (true)
 	{
-		clear_console_screen();
+		ClearConsoleScreen();
 
 		// Выбрать слово, которое будем показывать
 		WordToLearn wordToLearn;
@@ -176,7 +176,7 @@ void LearnManager::do_learn(bool isLearnForgotten)
 		char c = 0;
 		do
 		{
-			c = getch_filtered();
+			c = GetchFiltered();
 			if (c == 27)
 				return;
 		} while (c != ' ');
@@ -186,7 +186,7 @@ void LearnManager::do_learn(bool isLearnForgotten)
 		// Обрабатываем ответ - знает ли пользователь слово
 		while (true)
 		{
-			c = getch_filtered();
+			c = GetchFiltered();
 			if (c == 27)  // ESC
 				return;
 			if (c == 72)  // Стрелка вверх
@@ -195,10 +195,10 @@ void LearnManager::do_learn(bool isLearnForgotten)
 				{
 					wordsMgr->SetWordAsJustLearned(id);
 					wordsMgr->save();
-					if (are_all_words_learned(learnCycleQueue))
+					if (AreAllWordsLearned(learnCycleQueue))
 						return;
 				}
-				put_to_queue(learnCycleQueue, wordToLearn, wordsToLearnIds.size()>3);
+				PutToQueue(learnCycleQueue, wordToLearn, wordsToLearnIds.size()>3);
 				break;
 			}
 			else
@@ -208,7 +208,7 @@ void LearnManager::do_learn(bool isLearnForgotten)
 					if (!isLearnForgotten)
 						wordsMgr->SetWordAsUnlearned(id);
 					wordsMgr->save();
-					put_to_queue(learnCycleQueue, wordToLearn, wordsToLearnIds.size()>3);
+					PutToQueue(learnCycleQueue, wordToLearn, wordsToLearnIds.size()>3);
 					break;
 				}
 		}

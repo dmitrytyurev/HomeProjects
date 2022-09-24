@@ -22,7 +22,7 @@ void _cdecl Log::operator()(char *text, ...)
 	FILE* f = nullptr;
 	fopen_s(&f, _fileName.c_str(), "at");
 	if (f == nullptr)
-		exit_msg("Can't create file %s\n", _fileName.c_str());
+		ExitMsg("Can't create file %s\n", _fileName.c_str());
 	fprintf(f, "%s", tmpStr);
 	fclose(f);
 }
@@ -32,7 +32,7 @@ void _cdecl Log::operator()(char *text, ...)
 // 
 //===============================================================================================
 
-const char* get_time_in_text(time_t curTime)
+const char* GetTimeInText(time_t curTime)
 {
 	static char buf[128];
 	struct tm timeinfo;
@@ -46,7 +46,7 @@ const char* get_time_in_text(time_t curTime)
 // 
 //===============================================================================================
 
-void _cdecl exit_msg(char *text, ...)
+void _cdecl ExitMsg(char *text, ...)
 {
 	static char tmpStr[1024];
 	va_list args;
@@ -62,7 +62,7 @@ void _cdecl exit_msg(char *text, ...)
 // 
 //===============================================================================================
 
-char getch_filtered()  // Игнорирует код -32 (встречается, например, у стрелок)
+char GetchFiltered()  // РРіРЅРѕСЂРёСЂСѓРµС‚ РєРѕРґ -32 (РІСЃС‚СЂРµС‡Р°РµС‚СЃСЏ, РЅР°РїСЂРёРјРµСЂ, Сѓ СЃС‚СЂРµР»РѕРє)
 {
 	char c = 0;
 	do
@@ -76,7 +76,7 @@ char getch_filtered()  // Игнорирует код -32 (встречается, например, у стрелок)
 // 
 //===============================================================================================
 
-void clear_console_screen(char fill)
+void ClearConsoleScreen(char fill)
 {
 	COORD tl = { 0,0 };
 	CONSOLE_SCREEN_BUFFER_INFO s;
@@ -92,7 +92,7 @@ void clear_console_screen(char fill)
 // 
 //===============================================================================================
 
-int enter_number_from_console()
+int EnterNumberFromConsole()
 {
 	char buffer[256] = { 0 };
 	int index = 0;
@@ -100,7 +100,7 @@ int enter_number_from_console()
 
 	while (true)
 	{
-		char c = getch_filtered();
+		char c = GetchFiltered();
 		if (c == 13) // Enter
 			break;
 		if (c >= '0' && c <= '9')
@@ -122,7 +122,7 @@ int enter_number_from_console()
 		for (int i = 0; i < printedSymbolsLastTime; ++i)
 			putchar(8);
 		printf("%s", buffer);
-		printedSymbolsLastTime = strlen(buffer);
+		printedSymbolsLastTime = static_cast<int>(strlen(buffer));
 	}
 
 	int number = 0;
@@ -134,7 +134,7 @@ int enter_number_from_console()
 // 
 //===============================================================================================
 
-bool if_dir_exists(const std::string& dirName)
+bool IfDirExists(const std::string& dirName)
 {
 	DWORD ftyp = GetFileAttributesA(dirName.c_str());
 	if (ftyp == INVALID_FILE_ATTRIBUTES)
@@ -150,7 +150,7 @@ bool if_dir_exists(const std::string& dirName)
 // 
 //===============================================================================================
 
-void copy_to_clipboard(const std::string &s)
+void CopyToClipboard(const std::string &s)
 {
 	OpenClipboard(0);
 	EmptyClipboard();

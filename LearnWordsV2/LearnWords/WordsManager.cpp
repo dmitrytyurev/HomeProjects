@@ -22,7 +22,7 @@ WordsManager::WordsManager(const std::string& wordsFileName): _fullFileName(word
 
 void WordsManager::load(const std::string& wordsFileName)
 {
-	FileOperate::load_from_file(wordsFileName.c_str(), _words);
+	FileOperate::LoadFromFile(wordsFileName.c_str(), _words);
 }
 
 std::vector<int> WordsManager::GetUnlearnedTextsId(int textsNumNeeded)
@@ -88,7 +88,7 @@ WordsManager::WordInfo& WordsManager::GetWordInfo(int id)
 
 
 //===============================================================================================
-// Р’РµСЂРЅСѓС‚СЊ С‡РёСЃР»Рѕ РїРµСЂРµРІРѕРґРѕРІ РІ РґР°РЅРЅРѕРј СЃР»РѕРІРµ
+// Вернуть число переводов в данном слове
 //===============================================================================================
 
 int WordsManager::getTranslationsNum(const char* translation)
@@ -118,11 +118,11 @@ int WordsManager::getTranslationsNum(const char* translation)
 
 void WordsManager::save()
 {
-	FileOperate::save_to_file(_fullFileName.c_str(), _words);
+	FileOperate::SaveToFile(_fullFileName.c_str(), _words);
 }
 
 //===============================================================================================
-// РџРµС‡Р°С‚Р°РµС‚ РїРµСЂРµРІРѕРґ СЃ РїРµСЂРµРЅРѕСЃРѕРј Р·РЅР°С‡РµРЅРёР№ (С‡РµСЂРµР· ,) Рё Р·Р°С‚РµРјРЅСЏСЏ РїСЂРѕРёР·РЅРѕС€РµРЅРёРµ ([])
+// Печатает перевод с переносом значений (через ,) и затемняя произношение ([])
 //===============================================================================================
 
 void WordsManager::printTranslationDecorated(const std::string& str)

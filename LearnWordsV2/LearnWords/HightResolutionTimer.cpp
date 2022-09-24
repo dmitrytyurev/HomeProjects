@@ -14,7 +14,7 @@ HightResolutionTimer::HightResolutionTimer(): _startValue(0), _coeff(0)
 // 
 //--------------------------------------------------------------------------
 
-void HightResolutionTimer::start(int ticsPerSecond)
+void HightResolutionTimer::Start(int ticsPerSecond)
 {
 	LARGE_INTEGER res;
 
@@ -31,14 +31,14 @@ void HightResolutionTimer::start(int ticsPerSecond)
 
 HightResolutionTimer::HightResolutionTimer(int ticsPerSecond)
 {
-	start(ticsPerSecond);
+	Start(ticsPerSecond);
 }
 
 //--------------------------------------------------------------------------
 // 
 //--------------------------------------------------------------------------
 
-__int64 HightResolutionTimer::get() const
+__int64 HightResolutionTimer::Get() const
 {
 	LARGE_INTEGER res;
 	QueryPerformanceCounter(&res);
@@ -52,7 +52,7 @@ __int64 HightResolutionTimer::get() const
 // 
 //--------------------------------------------------------------------------
 
-double HightResolutionTimer::get_dbl() const
+double HightResolutionTimer::GetDbl() const
 {
 	LARGE_INTEGER res;
 	QueryPerformanceCounter(&res);

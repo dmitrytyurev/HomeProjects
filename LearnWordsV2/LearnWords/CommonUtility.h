@@ -3,13 +3,13 @@
 
 const int SECONDS_IN_DAY = 3600 * 24;
 
-const char* get_time_in_text(time_t curTime);
-void _cdecl exit_msg(char *text, ...);
-char getch_filtered();  // Èãíîðèðóåò êîä -32 (âñòðå÷àåòñÿ, íàïðèìåð, ó ñòðåëîê)
-void clear_console_screen(char fill = ' ');
-int enter_number_from_console();
-bool if_dir_exists(const std::string& dirName);
-void copy_to_clipboard(const std::string &s);
+const char* GetTimeInText(time_t curTime);
+void _cdecl ExitMsg(char *text, ...);
+char GetchFiltered();  // Ð˜Ð³Ð½Ð¾Ñ€Ð¸Ñ€ÑƒÐµÑ‚ ÐºÐ¾Ð´ -32 (Ð²ÑÑ‚Ñ€ÐµÑ‡Ð°ÐµÑ‚ÑÑ, Ð½Ð°Ð¿Ñ€Ð¸Ð¼ÐµÑ€, Ñƒ ÑÑ‚Ñ€ÐµÐ»Ð¾Ðº)
+void ClearConsoleScreen(char fill = ' ');
+int EnterNumberFromConsole();
+bool IfDirExists(const std::string& dirName);
+void CopyToClipboard(const std::string &s);
 
 //===============================================================================================
 // 
@@ -28,7 +28,7 @@ struct Log
 // 
 //===============================================================================================
 
-inline bool is_digit(char c)
+inline bool IsDigit(char c)
 {
 	return  c >= '0'  &&  c <= '9';
 }
@@ -37,7 +37,7 @@ inline bool is_digit(char c)
 // 
 //===============================================================================================
 
-inline float interp(float x1, float y1, float x2, float y2, float x)
+inline float Interp(float x1, float y1, float x2, float y2, float x)
 {
 	float k = (y2 - y1) / (x2 - x1);
 	float b = y1 - x1*k;
@@ -48,9 +48,9 @@ inline float interp(float x1, float y1, float x2, float y2, float x)
 // 
 //===============================================================================================
 
-inline float interp_clip(float x1, float y1Min, float x2, float y2Max, float x)
+inline float InterpClip(float x1, float y1Min, float x2, float y2Max, float x)
 {
-	float y = interp(x1, y1Min, x2, y2Max, x);
+	float y = Interp(x1, y1Min, x2, y2Max, x);
 
 	if (y < y1Min)
 		return y1Min;
@@ -65,7 +65,7 @@ inline float interp_clip(float x1, float y1Min, float x2, float y2Max, float x)
 // 
 //===============================================================================================
 
-inline int rand_int(int min, int max)
+inline int RandInt(int min, int max)
 {
 	return   rand() * (max - min + 1) / (RAND_MAX + 1) + min;
 }
@@ -74,7 +74,7 @@ inline int rand_int(int min, int max)
 // 
 //===============================================================================================
 
-inline float rand_float(float min, float max)
+inline float RandFloat(float min, float max)
 {
 	return   rand() * (max - min) / RAND_MAX + min;
 }
@@ -84,7 +84,7 @@ inline float rand_float(float min, float max)
 // 
 //===============================================================================================
 
-inline bool is_russian_symbol(unsigned int c)
+inline bool IsRussianSymbol(unsigned int c)
 {
 	if ((c >= 224 && c <= 255) ||
 		(c >= 192 && c <= 223) ||
@@ -98,9 +98,9 @@ inline bool is_russian_symbol(unsigned int c)
 // 
 //===============================================================================================
 
-inline bool is_symbol(unsigned int c)
+inline bool IsSymbol(unsigned int c)
 {
-	if (is_russian_symbol(c))
+	if (IsRussianSymbol(c))
 		return true;
 
 	return (c >= 'a'  &&  c <= 'z') || (c >= 'A'  &&  c <= 'Z');
@@ -111,7 +111,7 @@ inline bool is_symbol(unsigned int c)
 //===============================================================================================
 
 template<class T>
-void clamp_min(T* v, const T& lo)
+void ClampMin(T* v, const T& lo)
 {
 	if (*v < lo)
 		*v = lo;
@@ -123,7 +123,7 @@ void clamp_min(T* v, const T& lo)
 //===============================================================================================
 
 template<class T>
-void clamp_max(T* v, const T& hi)
+void ClampMax(T* v, const T& hi)
 {
 	if (*v > hi)
 		*v = hi;
@@ -134,7 +134,7 @@ void clamp_max(T* v, const T& hi)
 //===============================================================================================
 
 template<class T>
-void clamp_minmax(T* v, const T& lo, const T& hi)
+void ClampMinmax(T* v, const T& lo, const T& hi)
 {
 	if (*v < lo)
 		*v = lo;

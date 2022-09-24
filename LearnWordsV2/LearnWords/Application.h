@@ -12,10 +12,10 @@ class Application
 {
 public:
 	Application(const std::string& wordsFileName);
-	void process();
+	void Process();
 	
 private:
-	int main_menu_choose_mode();
+	int MainMenuChooseMode();
 
 private:
 	std::shared_ptr<WordsManager> _wordsManager;  // База слов с их состояниями и типичные операции над ними

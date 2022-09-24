@@ -22,7 +22,7 @@ extern Log logger;
 // 
 //===============================================================================================
 
-int CheckManager::get_word_id_to_check_impl(const std::vector<int>& lastCheckedIds)
+int CheckManager::GetWordIdToCheckImpl(const std::vector<int>& lastCheckedIds)
 {
 	auto wordsMgr = _pWordsData.lock();
 	const int TRESHOLD = 4; 
@@ -81,12 +81,12 @@ int CheckManager::get_word_id_to_check_impl(const std::vector<int>& lastCheckedI
 // 
 //===============================================================================================
 
-int CheckManager::get_word_id_to_check(std::vector<int>& lastCheckedIds)
+int CheckManager::GetWordIdToCheck(std::vector<int>& lastCheckedIds)
 {
 	auto wordsMgr = _pWordsData.lock();
 	while(true)
 	{
-		int res = get_word_id_to_check_impl(lastCheckedIds);
+		int res = GetWordIdToCheckImpl(lastCheckedIds);
 		WordsManager::WordInfo& w = wordsMgr->GetWordInfo(res);
 		if (!w.needSkip)
 		{
@@ -105,32 +105,32 @@ int CheckManager::get_word_id_to_check(std::vector<int>& lastCheckedIds)
 // 
 //===============================================================================================
 
-void CheckManager::do_check()
+void CheckManager::DoCheck()
 {
 	auto wordsMgr = _pWordsData.lock();
 	std::vector<int> lastCheckedIds;   // Айдишники последних 10-ти проверенных слов
 
-	clear_console_screen();
+	ClearConsoleScreen();
 
 	printf("\nHow many words to check: ");
-	int wordsToCheck = enter_number_from_console();
+	int wordsToCheck = EnterNumberFromConsole();
 	if (wordsToCheck <= 0 || wordsMgr->GetWordsNum() == 0)
 		return;
 
 	// Главный цикл проверки слов
 	for (int i = 0; i < wordsToCheck; ++i)
 	{
-		int id = get_word_id_to_check(lastCheckedIds);
+		int id = GetWordIdToCheck(lastCheckedIds);
 		WordsManager::WordInfo& w = wordsMgr->GetWordInfo(id);
 
-		clear_console_screen();
+		ClearConsoleScreen();
 		printf("\n\n===============================\n %s\n===============================\n", wordsMgr->GetWord(id).c_str());
 		auto t_start = std::chrono::high_resolution_clock::now();
 
 		char c = 0;
 		do
 		{
-			c = getch_filtered();
+			c = GetchFiltered();
 			if (c == 27)
 				return;
 		} while (c != ' ');
@@ -138,17 +138,17 @@ void CheckManager::do_check()
 		auto t_end = std::chrono::high_resolution_clock::now();
 		double durationForAnswer = std::chrono::duration<double, std::milli>(t_end - t_start).count();
 		bool ifTooLongAnswer = false;
-		bool isQuickAnswer = is_quick_answer(durationForAnswer, wordsMgr->GetTranslation(id).c_str(), &ifTooLongAnswer);
+		bool isQuickAnswer = IsQuickAnswer(durationForAnswer, wordsMgr->GetTranslation(id).c_str(), &ifTooLongAnswer);
 
 		while (true)
 		{
-			clear_console_screen();
+			ClearConsoleScreen();
 			printf("\n\n===============================\n %s\n===============================\n", wordsMgr->GetWord(id).c_str());
 			wordsMgr->printTranslationDecorated(wordsMgr->GetTranslation(id));
 			printf("\n\n  Arrow up  - I remember!\n  Arrow down   - I am not sure\n");
 			printf("\n  Remain: %d, Quick = %d\n", wordsToCheck - i - 1, int(isQuickAnswer));
 
-			c = getch_filtered();
+			c = GetchFiltered();
 			if (c == 27)
 				return;
 			if (c == 72)  // Стрелка вверх
@@ -171,7 +171,7 @@ void CheckManager::do_check()
 				}
 				else
 					continue;
-			logger("Check by time, word = %s, key=%d, time = %s", wordsMgr->GetWord(id).c_str(), c, get_time_in_text(time(nullptr)));
+			logger("Check by time, word = %s, key=%d, time = %s", wordsMgr->GetWord(id).c_str(), c, GetTimeInText(time(nullptr)));
 			break;
 		}
 	}
@@ -180,12 +180,12 @@ void CheckManager::do_check()
 //
 //===============================================================================================
 
-bool CheckManager::is_quick_answer(double milliSec, const char* translation, bool* ifTooLongAnswer, double* extraDurationForAnswer)
+bool CheckManager::IsQuickAnswer(double milliSec, const char* translation, bool* ifTooLongAnswer, double* extraDurationForAnswer)
 {
 	auto wordsMgr = _pWordsData.lock();
 	int index = wordsMgr->getTranslationsNum(translation) - 1;
 	const int timesNum = sizeof(quickAnswerTime) / sizeof(quickAnswerTime[0]);
-	clamp_minmax(&index, 0, timesNum - 1);
+	ClampMinmax(&index, 0, timesNum - 1);
 
 	if (ifTooLongAnswer)
 		*ifTooLongAnswer = milliSec > quickAnswerTime[index].max;
