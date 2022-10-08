@@ -63,3 +63,4 @@ SpecialThread
 /Smoke/**/*.jpg
 /Smoke/**/*.zip
 /Smoke/**/*.txt
+*/.vs/*
