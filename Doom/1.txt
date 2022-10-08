@@ -1,0 +1,33 @@
+
+	OutputDebugStringA("\npalce 1\n");
+//================================================================================
+
+	int bufSizeX = 320;
+	int bufSizeY = 200;
+	double horizontalAngle = 90.0 / 180.0 * 3.14159265359;
+
+	double dz = 1.0 / tan(horizontalAngle / 2.0);
+
+	for (int x = 0; x < bufSizeX; ++x) {
+		double curX = (x - bufSizeX / 2 + 0.5) * 2.0 / bufSizeX;
+		double curAngle = atan(curX / dz);
+		printf("curAngle: %f\n", curAngle / 3.14159265359 * 180.0);
+	}
+
+//================================================================================
+
+	double curAngle = 3.14159;
+	double x1 = 100;
+	double y1 = 200;
+	double co = cos(-curAngle);
+	double si = sin(-curAngle);
+	double x2 = x1 * co + y1 * si;
+	double y2 = -x1 * si + y1 * co;
+
+//================================================================================
+
+Âõ:   y,z
+Âûõ:  yScr =  (-y / z) * bufSizeY / 2 + bufSizeY / 2;
+
+	double kProj = bufSizeX / 2 / tan(horizontalAngle / 2);
+	double yScr = (-y / z) * kProj + bufSizeY / 2;

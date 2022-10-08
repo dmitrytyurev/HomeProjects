@@ -4,6 +4,8 @@
 #include "framework.h"
 #include "Doom.h"
 
+#include <iostream>
+#include <vector>
 #include <xutility>
 
 #define MAX_LOADSTRING 100
@@ -18,6 +20,54 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+
+// -------------------------------------------------------------------
+
+void Update();
+void Draw(HWND hWnd);
+
+// -------------------------------------------------------------------
+
+struct Point2D
+{
+	float x;
+	float z;
+};
+
+struct Edge
+{
+	int firstInd;  // Индекс первой вершины ребра в verts. Индекс второй вершины ребра берём из следующего ребра в edges
+	int adjPolyN;  // Индекс смежного полигона в polies, либо -1, если смежного полигона нет
+	int adjEdgeN;  // Индекс смежного ребра в edges смежного полигона
+};
+
+struct Poly
+{
+	float yFloor;
+	float yCeil;
+	float yRoof;
+	std::vector<Edge> edges;
+};
+// -------------------------------------------------------------------
+
+const int bufSizeX = 320;
+const int bufSizeY = 200;
+
+// -------------------------------------------------------------------
+
+// Описание игрового уровня
+std::vector<Point2D> verts;
+std::vector<Poly> polies;
+
+// Параметры камеры
+double xCam, yCam, zCam;  // Позиция камеры в мире
+double horizontalAngle = 90.0;  // Горизонтальный угол обзора камеры в градусах
+
+// -------------------------------------------------------------------
+
+unsigned char buf[bufSizeY][bufSizeX][3];
+
+// -------------------------------------------------------------------
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -49,9 +99,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     {
         if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
         {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
     }
 
     return (int) msg.wParam;
@@ -123,6 +173,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - отправить сообщение о выходе и вернуться
 //
 //
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -146,43 +197,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_PAINT:
         {
-            //PAINTSTRUCT ps;
+		//PAINTSTRUCT ps;
             //HDC hdc = BeginPaint(hWnd, &ps);
             //// TODO: Добавьте сюда любой код прорисовки, использующий HDC...
             //EndPaint(hWnd, &ps);
 
+		Update();
+		Draw(hWnd);
 
-			const int w = 100;
-			const int h = 100;
-
-			unsigned char buf[w][h][3];
-
-			for (int i=0; i<h; ++i)
-			{
-				for (int i2 = 0; i2 < w; ++i2)
-				{
-					buf[i][i2][0] = 0;
-					buf[i][i2][1] = 0;
-					buf[i][i2][2] = rand();
-				}
-			}
-
-			int size = w * h * 3;
-
-			HDC dc = GetDC(hWnd);
-
-			BITMAPINFO info;
-			ZeroMemory(&info, sizeof(BITMAPINFO));
-			info.bmiHeader.biBitCount = 24;
-			info.bmiHeader.biWidth = w;
-			info.bmiHeader.biHeight = h;
-			info.bmiHeader.biPlanes = 1;
-			info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-			info.bmiHeader.biSizeImage = size;
-			info.bmiHeader.biCompression = BI_RGB;
-
-			StretchDIBits(dc, 0, 0, w*3, h*3, 0, 0, w, h, buf, &info, DIB_RGB_COLORS, SRCCOPY);
-			ReleaseDC(hWnd, dc);
         }
         break;
     case WM_DESTROY:
@@ -212,4 +234,59 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     }
     return (INT_PTR)FALSE;
+}
+
+// -------------------------------------------------------------------
+
+void DrawFrameBuf(HWND hWnd)
+{
+	int size = bufSizeX * bufSizeY * 3;
+
+	HDC dc = GetDC(hWnd);
+
+	BITMAPINFO info;
+	ZeroMemory(&info, sizeof(BITMAPINFO));
+	info.bmiHeader.biBitCount = 24;
+	info.bmiHeader.biWidth = bufSizeX;
+	info.bmiHeader.biHeight = bufSizeY;
+	info.bmiHeader.biPlanes = 1;
+	info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	info.bmiHeader.biSizeImage = size;
+	info.bmiHeader.biCompression = BI_RGB;
+
+	StretchDIBits(dc, 0, 0, bufSizeX * 2, bufSizeY * 2, 0, 0, bufSizeX, bufSizeY, buf, &info, DIB_RGB_COLORS, SRCCOPY);
+	ReleaseDC(hWnd, dc);
+}
+
+
+// -------------------------------------------------------------------
+
+void Update()
+{
+	
+}
+
+// -------------------------------------------------------------------
+
+void Draw(HWND hWnd)
+{
+	double horCamlAngleRad = horizontalAngle / 180.0 * 3.14159265359;
+	double dz = 1.0 / tan(horCamlAngleRad / 2.0);
+	double kProj = bufSizeX / 2 / tan(horCamlAngleRad / 2);
+
+
+
+
+
+	for (int i = 0; i < bufSizeX; ++i)
+	{
+		for (int i2 = 0; i2 < bufSizeY; ++i2)
+		{
+			buf[i2][i][0] = 0;
+			buf[i2][i][1] = 0;
+			buf[i2][i][2] = rand();
+		}
+	}
+
+	DrawFrameBuf(hWnd);
 }
