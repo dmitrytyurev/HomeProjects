@@ -34,6 +34,12 @@ struct Point2D
 	float z;
 };
 
+struct Point2dDbl
+{
+	double x;
+	double z;
+};
+
 struct Edge
 {
 	int firstInd;  // Индекс первой вершины ребра в verts. Индекс второй вершины ребра берём из следующего ребра в edges
@@ -60,12 +66,17 @@ std::vector<Point2D> verts;
 std::vector<Poly> polies;
 
 // Параметры камеры
-double xCam, yCam, zCam;  // Позиция камеры в мире
-double horizontalAngle = 90.0;  // Горизонтальный угол обзора камеры в градусах
+float xCam, yCam, zCam;  // Позиция камеры в мире
+float alCam;  // Угол вращения камеры. Если 0, то смотрит вдоль оси OZ
+float horizontalAngle = 90.0;  // Горизонтальный угол обзора камеры в градусах
 
 // -------------------------------------------------------------------
-
+// Переменные отрисовки текущего кадра
 unsigned char buf[bufSizeY][bufSizeX][3];
+double horCamlAngleRad;
+double dz;
+double kProj;
+int startingPoly;
 
 // -------------------------------------------------------------------
 
@@ -268,15 +279,87 @@ void Update()
 
 // -------------------------------------------------------------------
 
+void DrawOneColumn(double scanAngle)
+{
+	constexpr int MAX_VERTS_IN_POLY = 100;
+	static bool leftFlags[MAX_VERTS_IN_POLY] = {};      // Флаги xn < 0 для вершин текущего полигона
+	static Point2dDbl localVerts[MAX_VERTS_IN_POLY] = {};  // Координаты полигона в системе координат, в которой текущий секущий луч (для текущего столбца пикселов) является осью x=0
+
+	int curPolyN = startingPoly;
+	int edgeNComeFrom = -1;  // Номер ребра в текущем полигоне через которые мы пришли из предыдущего полигона
+
+	while(true)	{
+		Poly& poly = polies[curPolyN];
+		int vertsInPoly = poly.edges.size();
+
+		// Переводим вершины полигона в систему, где секущий луч это x=0
+		for (int i = 0; i < vertsInPoly; ++i) {
+			Point2D& curPoint = verts[poly.edges[i].firstInd];
+			double x = double(curPoint.x) - xCam;
+			double z = double(curPoint.z) - zCam;
+			double co = cos(-scanAngle + alCam);
+			double si = sin(-scanAngle + alCam);
+			localVerts[i].x = x * co + z * si;
+			localVerts[i].z = -x * si + z * co;
+		}
+
+		// Для вершин полигона заполняем флаги xn < 0
+		for (int i = 0; i < vertsInPoly; ++i) {
+			leftFlags[i] = localVerts[i].x < 0;
+		}
+		// Расчитаем пересечения рёбер полигона с осью x=0, пропуская рёбра если они с одной стороны от оси или если мы через это ребро пришли из предыдущего полигона
+		// Выберём ребро с максимальным z-пересечения с осью
+		double maxZ = -100000;
+		int edgeWithMaxZ = -1;
+		for (int i = 0; i < vertsInPoly; ++i) {       // Цикл по рёбрам полигона
+			if (i == edgeNComeFrom) {                 // Через это ребро мы пришли из предыдущего полигона
+				continue;
+			}
+			int nextInd = (i + 1) % vertsInPoly;
+			if (leftFlags[i] == leftFlags[nextInd]) {  // Ребро лежит по одну сторону от секущего луча и значит пересекать его не может
+				continue;
+			}
+			double zIntersect = localVerts[i].z - localVerts[i].x * (localVerts[nextInd].z - localVerts[i].z) / (localVerts[nextInd].x - localVerts[i].x);
+			if (zIntersect > maxZ) {
+				maxZ = zIntersect;
+				edgeWithMaxZ = i;
+			}
+		}
+		if (edgeWithMaxZ == -1)	{
+			OutputDebugStringA("Error: edgeWithMaxZ == -1\n");
+			exit(1);
+		}
+		if (maxZ < 0.001) {
+			curPolyN = poly.edges[edgeWithMaxZ].adjPolyN;
+			if (curPolyN == -1)	{
+				break;                                   // FIXME!!! Сделать заливку чёрным оставшегося интервала пикселей
+			}
+			edgeNComeFrom = poly.edges[edgeWithMaxZ].adjEdgeN;
+			continue;
+		}
+
+
+
+
+
+		// !!!!!!!!!!! При перехода не следующий полигон, заполнить curPolyN, edgeNComeFrom
+	}
+}
+
+// -------------------------------------------------------------------
+
 void Draw(HWND hWnd)
 {
-	double horCamlAngleRad = horizontalAngle / 180.0 * 3.14159265359;
-	double dz = 1.0 / tan(horCamlAngleRad / 2.0);
-	double kProj = bufSizeX / 2 / tan(horCamlAngleRad / 2);
+	horCamlAngleRad = horizontalAngle / 180.0 * 3.14159265359;
+	dz = 1.0 / tan(horCamlAngleRad / 2.0);
+	kProj = bufSizeX / 2 / tan(horCamlAngleRad / 2);
+	startingPoly = 0;
 
-
-
-
+	for (int x = 0; x < bufSizeX; ++x) {
+		double curX = (x - bufSizeX / 2 + 0.5) * 2.0 / bufSizeX;  // Текущая горизонтальная позиция пиксела в системе камеры  -1..1
+		double scanAngle = atan(curX / dz);  // Угол на который нужно повернуть вершины сцены, чтобы привести их в систему координат, где текущий секущий луч (для текущего столбца пикселов) был осью x=0
+		DrawOneColumn(scanAngle);
+	}
 
 	for (int i = 0; i < bufSizeX; ++i)
 	{
