@@ -279,14 +279,23 @@ void Update()
 
 // -------------------------------------------------------------------
 
-void DrawOneColumn(double scanAngle)
+void DrawOneColumn(double scanAngle, int columnN)
 {
 	constexpr int MAX_VERTS_IN_POLY = 100;
 	static bool leftFlags[MAX_VERTS_IN_POLY] = {};      // Флаги xn < 0 для вершин текущего полигона
 	static Point2dDbl localVerts[MAX_VERTS_IN_POLY] = {};  // Координаты полигона в системе координат, в которой текущий секущий луч (для текущего столбца пикселов) является осью x=0
 
+	const float turnAngle = -scanAngle + alCam; // Угол, на который надо повернуть вершины полигонов, чтобы текущий секущий луч (для текущего столбца пикселов) являлся осью x=0
+	const double co = cos(turnAngle);
+	const double si = sin(turnAngle);
+	const double coCam = cos(scanAngle);        // Последующий поворот на этот угол, переведвёт точку из системы секущего луча в систему камеры (в ней нам нужна z-координата точки для проекции Y на экран)
+
 	int curPolyN = startingPoly;
-	int edgeNComeFrom = -1;  // Номер ребра в текущем полигоне через которые мы пришли из предыдущего полигона
+	int edgeNComeFrom = -1;     // Номер ребра в текущем полигоне через которые мы пришли из предыдущего полигона
+	double zSlicePrev = 0.001;  // Z-координата предыдущей точки сечения в системе координат камеры
+
+	int lastDrawedY1 = -1;         // Самый нижний отрисованный пиксел сверху
+	int lastDrawedY2 = bufSizeY;   // Самый верхний отрисованный пиксел снизу
 
 	while(true)	{
 		Poly& poly = polies[curPolyN];
@@ -297,8 +306,6 @@ void DrawOneColumn(double scanAngle)
 			Point2D& curPoint = verts[poly.edges[i].firstInd];
 			double x = double(curPoint.x) - xCam;
 			double z = double(curPoint.z) - zCam;
-			double co = cos(-scanAngle + alCam);
-			double si = sin(-scanAngle + alCam);
 			localVerts[i].x = x * co + z * si;
 			localVerts[i].z = -x * si + z * co;
 		}
@@ -338,11 +345,69 @@ void DrawOneColumn(double scanAngle)
 			continue;
 		}
 
+		// Поворачиваем найденную точку сечения ребра (0, maxZ) обратно, но не полностью - в систему камеры (где ось взгляда камеры - 0Z)
+		// Точнее мы поворачиваем не всею точку, а только её Z-координату. Только она нам нужна дальше - для проекции Y на экран
+		double zSliceCur = maxZ * coCam;     // Z-координата полученной точки сечения в системе координат камеры
 
+		double yScrFloor1 = -(poly.yFloor - yCam) / zSliceCur * kProj + bufSizeY / 2;
+		int    yiScrFloor1 = (int)floor(yScrFloor1 + 0.5);
+		double yScrCeil1  = -(poly.yCeil - yCam) / zSliceCur * kProj + bufSizeY / 2;
+		int    yiScrCeil1 = (int)floor(yScrCeil1 + 0.5);
 
+		double yScrFloor2 = -(poly.yFloor - yCam) / zSlicePrev * kProj + bufSizeY / 2;
+		int    yiScrFloor2 = (int)floor(yScrFloor2 + 0.5);
+		double yScrCeil2  = -(poly.yCeil  - yCam) / zSlicePrev * kProj + bufSizeY / 2;
+		int    yiScrCeil2 = (int)floor(yScrCeil2 + 0.5);
+		double yScrRoof2  = -(poly.yRoof  - yCam) / zSlicePrev * kProj + bufSizeY / 2;
+		int    yiScrRoof2 = (int)floor(yScrRoof2 + 0.5);
 
+		// Рисуем внешнюю стенку полигона над потолком
+		for (int y = yiScrRoof2; y < yiScrCeil2; ++y) {
+			unsigned char (&pixel)[3] = buf[y][columnN];
+			pixel[0] = 255;
+			pixel[1] = 0;
+			pixel[2] = 0;
+		}
 
-		// !!!!!!!!!!! При перехода не следующий полигон, заполнить curPolyN, edgeNComeFrom
+		// Рисуем потолок полигона
+		for (int y = yiScrCeil2; y < yiScrCeil1; ++y) {
+			unsigned char(&pixel)[3] = buf[y][columnN];
+			pixel[0] = 0;
+			pixel[1] = 255;
+			pixel[2] = 0;
+		}
+
+		// Рисуем пол полигона
+		for (int y = yiScrFloor1; y < yiScrFloor2; ++y) {
+			unsigned char(&pixel)[3] = buf[y][columnN];
+			pixel[0] = 0;
+			pixel[1] = 0;
+			pixel[2] = 255;
+		}
+
+		// Рисуем внешнюю стенку полигона под полом
+		for (int y = yiScrFloor2; y < lastDrawedY2; ++y) {
+			unsigned char(&pixel)[3] = buf[y][columnN];
+			pixel[0] = 255;
+			pixel[1] = 255;
+			pixel[2] = 0;
+		}
+
+		lastDrawedY1 = yiScrCeil1 - 1;
+		lastDrawedY2 = yiScrFloor1;
+		zSlicePrev = zSliceCur;
+		edgeNComeFrom = poly.edges[edgeWithMaxZ].adjEdgeN;
+		curPolyN = poly.edges[edgeWithMaxZ].adjPolyN;
+		if (curPolyN == -1) {
+			// Рисуем пустоту (где уже нет лабиринта)
+			for (int y = lastDrawedY1+1; y < lastDrawedY2; ++y) {
+				unsigned char(&pixel)[3] = buf[y][columnN];
+				pixel[0] = 60;
+				pixel[1] = 60;
+				pixel[2] = 60;
+			}
+			break;                                   
+		}
 	}
 }
 
@@ -358,7 +423,7 @@ void Draw(HWND hWnd)
 	for (int x = 0; x < bufSizeX; ++x) {
 		double curX = (x - bufSizeX / 2 + 0.5) * 2.0 / bufSizeX;  // Текущая горизонтальная позиция пиксела в системе камеры  -1..1
 		double scanAngle = atan(curX / dz);  // Угол на который нужно повернуть вершины сцены, чтобы привести их в систему координат, где текущий секущий луч (для текущего столбца пикселов) был осью x=0
-		DrawOneColumn(scanAngle);
+		DrawOneColumn(scanAngle, x);
 	}
 
 	for (int i = 0; i < bufSizeX; ++i)
