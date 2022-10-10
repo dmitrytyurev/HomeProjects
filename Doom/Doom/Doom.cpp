@@ -336,18 +336,13 @@ void DrawOneColumn(double scanAngle, int columnN)
 			OutputDebugStringA("Error: edgeWithMaxZ == -1\n");
 			exit(1);
 		}
-		if (maxZ < 0.001) {
-			curPolyN = poly.edges[edgeWithMaxZ].adjPolyN;
-			if (curPolyN == -1)	{
-				break;                                   // FIXME!!! Сделать заливку чёрным оставшегося интервала пикселей
-			}
-			edgeNComeFrom = poly.edges[edgeWithMaxZ].adjEdgeN;
-			continue;
-		}
 
 		// Поворачиваем найденную точку сечения ребра (0, maxZ) обратно, но не полностью - в систему камеры (где ось взгляда камеры - 0Z)
 		// Точнее мы поворачиваем не всею точку, а только её Z-координату. Только она нам нужна дальше - для проекции Y на экран
 		double zSliceCur = maxZ * coCam;     // Z-координата полученной точки сечения в системе координат камеры
+		if (zSliceCur < 0.001) {
+			zSliceCur = 0.001;               // Ограничиваем значением, на которое можно будет ниже делить. Спроекцированные значения при этом уйдут за вернюю или нижнюю границу экрана - не страшно, отклипаем на общих основаниях
+		}
 
 		double yScrFloor1 = -(poly.yFloor - yCam) / zSliceCur * kProj + bufSizeY / 2;
 		int    yiScrFloor1 = (int)floor(yScrFloor1 + 0.5);
@@ -361,41 +356,108 @@ void DrawOneColumn(double scanAngle, int columnN)
 		double yScrRoof2  = -(poly.yRoof  - yCam) / zSlicePrev * kProj + bufSizeY / 2;
 		int    yiScrRoof2 = (int)floor(yScrRoof2 + 0.5);
 
+		bool otherNotVisible = false;  // Остальные отрезки не видны
+
+		// Рисуем небо над внешней стенкой полигона
+		if (yiScrRoof2 > lastDrawedY2) {
+			yiScrRoof2 = lastDrawedY2;
+			otherNotVisible = true;
+		}
+		int from = lastDrawedY1 + 1;
+		for (int y = from; y < yiScrRoof2; ++y) {
+			unsigned char(&pixel)[3] = buf[y][columnN];
+			pixel[0] = 0;
+			pixel[1] = 255;
+			pixel[2] = 255;
+		}
+		if (yiScrRoof2 > lastDrawedY1 + 1)
+			lastDrawedY1 = yiScrRoof2 - 1;
+		if (lastDrawedY1 >= lastDrawedY2 - 1)
+			break;  
+		if (otherNotVisible) 
+			goto m1;
+
 		// Рисуем внешнюю стенку полигона над потолком
+		if (yiScrRoof2 <= lastDrawedY1)
+			yiScrRoof2 = lastDrawedY1 + 1;
+		if (yiScrCeil2 > lastDrawedY2) {
+			yiScrCeil2 = lastDrawedY2;
+			otherNotVisible = true;
+		}
 		for (int y = yiScrRoof2; y < yiScrCeil2; ++y) {
 			unsigned char (&pixel)[3] = buf[y][columnN];
 			pixel[0] = 255;
 			pixel[1] = 0;
 			pixel[2] = 0;
 		}
+		if (yiScrCeil2 > lastDrawedY1 + 1)
+			lastDrawedY1 = yiScrCeil2 - 1;
+		if (yiScrRoof2 < lastDrawedY2)
+			lastDrawedY2 = yiScrRoof2;
+		if (lastDrawedY1 >= lastDrawedY2 - 1)
+			break;
+		if (otherNotVisible) 
+			goto m1;
 
 		// Рисуем потолок полигона
+		if (yiScrCeil2 <= lastDrawedY1)
+			yiScrCeil2 = lastDrawedY1 + 1;
+		if (yiScrCeil1 > lastDrawedY2) {
+			yiScrCeil1 = lastDrawedY2;
+			otherNotVisible = true;
+		}
 		for (int y = yiScrCeil2; y < yiScrCeil1; ++y) {
 			unsigned char(&pixel)[3] = buf[y][columnN];
 			pixel[0] = 0;
 			pixel[1] = 255;
 			pixel[2] = 0;
 		}
+		if (yiScrCeil1 > lastDrawedY1 + 1)
+			lastDrawedY1 = yiScrCeil1 - 1;
+		if (yiScrCeil2 < lastDrawedY2)
+			lastDrawedY2 = yiScrCeil2;
+		if (lastDrawedY1 >= lastDrawedY2 - 1)
+			break;
+		if (otherNotVisible) 
+			goto m1;
 
 		// Рисуем пол полигона
+		if (yiScrFloor1 <= lastDrawedY1)
+			yiScrFloor1 = lastDrawedY1 + 1;
+		if (yiScrFloor2 > lastDrawedY2) {
+			yiScrFloor2 = lastDrawedY2;
+			otherNotVisible = true;
+		}
 		for (int y = yiScrFloor1; y < yiScrFloor2; ++y) {
 			unsigned char(&pixel)[3] = buf[y][columnN];
 			pixel[0] = 0;
 			pixel[1] = 0;
 			pixel[2] = 255;
 		}
+		if (yiScrFloor2 > lastDrawedY1 + 1)
+			lastDrawedY1 = yiScrFloor2 - 1;
+		if (yiScrFloor1 < lastDrawedY2)
+			lastDrawedY2 = yiScrFloor1;
+		if (lastDrawedY1 >= lastDrawedY2 - 1)
+			break;
+		if (otherNotVisible) 
+			goto m1;
 
 		// Рисуем внешнюю стенку полигона под полом
+		if (yiScrFloor2 <= lastDrawedY1)
+			yiScrFloor2 = lastDrawedY1 + 1;
 		for (int y = yiScrFloor2; y < lastDrawedY2; ++y) {
 			unsigned char(&pixel)[3] = buf[y][columnN];
 			pixel[0] = 255;
 			pixel[1] = 255;
 			pixel[2] = 0;
 		}
+		if (yiScrFloor2 < lastDrawedY2)
+			lastDrawedY2 = yiScrFloor2;
+		if (lastDrawedY1 >= lastDrawedY2 - 1)
+			break;
 
-		lastDrawedY1 = yiScrCeil1 - 1;
-		lastDrawedY2 = yiScrFloor1;
-		zSlicePrev = zSliceCur;
+m1: 	zSlicePrev = zSliceCur;
 		edgeNComeFrom = poly.edges[edgeWithMaxZ].adjEdgeN;
 		curPolyN = poly.edges[edgeWithMaxZ].adjPolyN;
 		if (curPolyN == -1) {
