@@ -45,22 +45,22 @@ struct Edge
 	int firstInd;  // Индекс первой вершины ребра в verts. Индекс второй вершины ребра берём из следующего ребра в edges
 	int adjPolyN;  // Индекс смежного полигона в polies, либо -1, если смежного полигона нет
 	int adjEdgeN;  // Индекс смежного ребра в edges смежного полигона
-	//// Текстурные координаты стен
-	//float u[2];
-	//float vRoof;
-	//float vCeil;
-	//float vFloor;
-	//float vGroud;
-	//// Текстурные координаты пола/потолка
-	//float uFloorCeil;
-	//float vFloorCeil;
+	// Текстурные координаты стен
+	float u[2];
+	float vRoof;
+	float vCeil;
+	float vFloor;
+	float vGroud;
+	// Текстурные координаты пола/потолка
+	float uFloorCeil;
+	float vFloorCeil;
 };
 
 struct Poly
 {
-	float yFloor;
-	float yCeil;
 	float yRoof;
+	float yCeil;
+	float yFloor;
 	std::vector<Edge> edges;
 };
 // -------------------------------------------------------------------
@@ -72,7 +72,8 @@ const int bufSizeY = 200;
 
 // Описание игрового уровня
 std::vector<FPoint2D> verts = {{10,30}, {20,30}, {10,20} , {20,20} , {10,10} , {20,10} };
-std::vector<Poly> polies = { {41,44,100,{{0,-1,-1},{1,-1,-1},{3,1,0},{2,-1,-1}}}, {40,45,100,{{2,0,2},{3,-1,-1},{5,-1,-1},{4,-1,-1}}} };
+std::vector<Poly> polies = { {100,44,41,{{0,-1,-1,{0,1}},{1,-1,-1,{0,1}},{3,1,0,{0,1}},{2,-1,-1,{0,1}}}},
+	                         {100,45,40,{{2,0,2,{0,1}},{3,-1,-1,{0,1}},{5,-1,-1,{0,1}},{4,-1,-1,{0,1}}}} };
 
 // Параметры камеры
 float xCam=15, yCam=42.5f, zCam=10.5f;  // Позиция камеры в мире
@@ -302,6 +303,8 @@ void DrawOneColumn(double scanAngle, int columnN)
 	int curPolyN = startingPoly;
 	int edgeNComeFrom = -1;     // Номер ребра в текущем полигоне через которые мы пришли из предыдущего полигона
 	double zSlicePrev = 0.001;  // Z-координата предыдущей точки сечения в системе координат камеры
+	double interpEdgePrev = 0;  // [0..1] Пропорция в которой поделено предыдущее ребро
+	
 
 	int lastDrawedY1 = -1;         // Самый нижний отрисованный пиксел сверху
 	int lastDrawedY2 = bufSizeY;   // Самый верхний отрисованный пиксел снизу
@@ -327,6 +330,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 		// Выберём ребро с максимальным z-пересечения с осью
 		double maxZ = -100000;
 		int edgeWithMaxZ = -1;
+		double interpEdge = 0;
 		for (int i = 0; i < vertsInPoly; ++i) {       // Цикл по рёбрам полигона
 			if (i == edgeNComeFrom) {                 // Через это ребро мы пришли из предыдущего полигона
 				continue;
@@ -339,6 +343,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 			if (zIntersect > maxZ) {
 				maxZ = zIntersect;
 				edgeWithMaxZ = i;
+				interpEdge = -localVerts[i].x / (localVerts[nextInd].x - localVerts[i].x);  // [0..1]  в какой пропорции проделено ребро секущим лучом. Испльзуем это для расчёт U-координаты стен
 			}
 		}
 		if (edgeWithMaxZ == -1)	{
@@ -364,6 +369,9 @@ void DrawOneColumn(double scanAngle, int columnN)
 		int    yiScrCeil2 = (int)floor(yScrCeil2 + 0.5);
 		double yScrRoof2  = -(poly.yRoof  - yCam) / zSlicePrev * kProj + bufSizeY / 2;
 		int    yiScrRoof2 = (int)floor(yScrRoof2 + 0.5);
+
+		const Edge& curEdge = poly.edges[edgeWithMaxZ];
+		double curU = (curEdge.u[1] - curEdge.u[0]) * interpEdgePrev + curEdge.u[0];
 
 		bool otherNotVisible = false;  // Остальные отрезки не видны
 
@@ -395,7 +403,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 		}
 		for (int y = yiScrRoof2; y < yiScrCeil2; ++y) {
 			unsigned char (&pixel)[3] = buf[y][columnN];
-			pixel[0] = 255;
+			pixel[0] = int(255 * curU);
 			pixel[1] = 0;
 			pixel[2] = 0;
 		}
@@ -426,8 +434,6 @@ void DrawOneColumn(double scanAngle, int columnN)
 		if (otherNotVisible) 
 			goto m1;
 
-
-
 		// Рисуем внешнюю стенку полигона под полом
 		if (yiScrFloor2 <= lastDrawedY1) {
 			yiScrFloor2 = lastDrawedY1 + 1;
@@ -435,9 +441,9 @@ void DrawOneColumn(double scanAngle, int columnN)
 		}
 		for (int y = yiScrFloor2; y < lastDrawedY2; ++y) {
 			unsigned char(&pixel)[3] = buf[y][columnN];
-			pixel[0] = 255;
-			pixel[1] = 255;
-			pixel[2] = 255;
+			pixel[0] = int(255 * curU);
+			pixel[1] = int(255 * curU);
+			pixel[2] = int(255 * curU);
 		}
 		if (yiScrFloor2 < lastDrawedY2)
 			lastDrawedY2 = yiScrFloor2;
@@ -464,6 +470,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 
 
 m1: 	zSlicePrev = zSliceCur;
+		interpEdgePrev = interpEdge;
 		edgeNComeFrom = poly.edges[edgeWithMaxZ].adjEdgeN;
 		curPolyN = poly.edges[edgeWithMaxZ].adjPolyN;
 		if (curPolyN == -1) {
@@ -487,7 +494,7 @@ void Draw(HWND hWnd)
 	dz = 1.0 / tan(horCamlAngleRad / 2.0);
 	kProj = bufSizeX / 2 / tan(horCamlAngleRad / 2);
 	startingPoly = 1;
-	alCam += 0.00015f;
+	//alCam += 0.00015f;
 
 	for (int x = 0; x < bufSizeX; ++x) {
 		double curX = (x - bufSizeX / 2 + 0.5) * 2.0 / bufSizeX;  // Текущая горизонтальная позиция пиксела в системе камеры  -1..1
