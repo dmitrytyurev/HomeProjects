@@ -28,13 +28,13 @@ void Draw(HWND hWnd);
 
 // -------------------------------------------------------------------
 
-struct Point2D
+struct FPoint2D
 {
 	float x;
 	float z;
 };
 
-struct Point2dDbl
+struct DPoint2D
 {
 	double x;
 	double z;
@@ -45,6 +45,15 @@ struct Edge
 	int firstInd;  // Индекс первой вершины ребра в verts. Индекс второй вершины ребра берём из следующего ребра в edges
 	int adjPolyN;  // Индекс смежного полигона в polies, либо -1, если смежного полигона нет
 	int adjEdgeN;  // Индекс смежного ребра в edges смежного полигона
+	//// Текстурные координаты стен
+	//float u[2];
+	//float vRoof;
+	//float vCeil;
+	//float vFloor;
+	//float vGroud;
+	//// Текстурные координаты пола/потолка
+	//float uFloorCeil;
+	//float vFloorCeil;
 };
 
 struct Poly
@@ -62,11 +71,11 @@ const int bufSizeY = 200;
 // -------------------------------------------------------------------
 
 // Описание игрового уровня
-std::vector<Point2D> verts;
-std::vector<Poly> polies;
+std::vector<FPoint2D> verts = {{10,30}, {20,30}, {10,20} , {20,20} , {10,10} , {20,10} };
+std::vector<Poly> polies = { {41,44,100,{{0,-1,-1},{1,-1,-1},{3,1,0},{2,-1,-1}}}, {40,45,100,{{2,0,2},{3,-1,-1},{5,-1,-1},{4,-1,-1}}} };
 
 // Параметры камеры
-float xCam, yCam, zCam;  // Позиция камеры в мире
+float xCam=15, yCam=42.5f, zCam=10.5f;  // Позиция камеры в мире
 float alCam;  // Угол вращения камеры. Если 0, то смотрит вдоль оси OZ
 float horizontalAngle = 90.0;  // Горизонтальный угол обзора камеры в градусах
 
@@ -283,7 +292,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 {
 	constexpr int MAX_VERTS_IN_POLY = 100;
 	static bool leftFlags[MAX_VERTS_IN_POLY] = {};      // Флаги xn < 0 для вершин текущего полигона
-	static Point2dDbl localVerts[MAX_VERTS_IN_POLY] = {};  // Координаты полигона в системе координат, в которой текущий секущий луч (для текущего столбца пикселов) является осью x=0
+	static DPoint2D localVerts[MAX_VERTS_IN_POLY] = {};  // Координаты полигона в системе координат, в которой текущий секущий луч (для текущего столбца пикселов) является осью x=0
 
 	const float turnAngle = -scanAngle + alCam; // Угол, на который надо повернуть вершины полигонов, чтобы текущий секущий луч (для текущего столбца пикселов) являлся осью x=0
 	const double co = cos(turnAngle);
@@ -303,7 +312,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 
 		// Переводим вершины полигона в систему, где секущий луч это x=0
 		for (int i = 0; i < vertsInPoly; ++i) {
-			Point2D& curPoint = verts[poly.edges[i].firstInd];
+			FPoint2D& curPoint = verts[poly.edges[i].firstInd];
 			double x = double(curPoint.x) - xCam;
 			double z = double(curPoint.z) - zCam;
 			localVerts[i].x = x * co + z * si;
@@ -392,8 +401,6 @@ void DrawOneColumn(double scanAngle, int columnN)
 		}
 		if (yiScrCeil2 > lastDrawedY1 + 1)
 			lastDrawedY1 = yiScrCeil2 - 1;
-		if (yiScrRoof2 < lastDrawedY2)
-			lastDrawedY2 = yiScrRoof2;
 		if (lastDrawedY1 >= lastDrawedY2 - 1)
 			break;
 		if (otherNotVisible) 
@@ -414,48 +421,47 @@ void DrawOneColumn(double scanAngle, int columnN)
 		}
 		if (yiScrCeil1 > lastDrawedY1 + 1)
 			lastDrawedY1 = yiScrCeil1 - 1;
-		if (yiScrCeil2 < lastDrawedY2)
-			lastDrawedY2 = yiScrCeil2;
 		if (lastDrawedY1 >= lastDrawedY2 - 1)
 			break;
 		if (otherNotVisible) 
 			goto m1;
 
+
+
+		// Рисуем внешнюю стенку полигона под полом
+		if (yiScrFloor2 <= lastDrawedY1) {
+			yiScrFloor2 = lastDrawedY1 + 1;
+			otherNotVisible = true;
+		}
+		for (int y = yiScrFloor2; y < lastDrawedY2; ++y) {
+			unsigned char(&pixel)[3] = buf[y][columnN];
+			pixel[0] = 255;
+			pixel[1] = 255;
+			pixel[2] = 255;
+		}
+		if (yiScrFloor2 < lastDrawedY2)
+			lastDrawedY2 = yiScrFloor2;
+		if (lastDrawedY1 >= lastDrawedY2 - 1)
+			break;
+		if (otherNotVisible)
+			goto m1;
+
 		// Рисуем пол полигона
 		if (yiScrFloor1 <= lastDrawedY1)
 			yiScrFloor1 = lastDrawedY1 + 1;
-		if (yiScrFloor2 > lastDrawedY2) {
+		if (yiScrFloor2 > lastDrawedY2)
 			yiScrFloor2 = lastDrawedY2;
-			otherNotVisible = true;
-		}
 		for (int y = yiScrFloor1; y < yiScrFloor2; ++y) {
 			unsigned char(&pixel)[3] = buf[y][columnN];
 			pixel[0] = 0;
 			pixel[1] = 0;
 			pixel[2] = 255;
 		}
-		if (yiScrFloor2 > lastDrawedY1 + 1)
-			lastDrawedY1 = yiScrFloor2 - 1;
 		if (yiScrFloor1 < lastDrawedY2)
 			lastDrawedY2 = yiScrFloor1;
 		if (lastDrawedY1 >= lastDrawedY2 - 1)
 			break;
-		if (otherNotVisible) 
-			goto m1;
 
-		// Рисуем внешнюю стенку полигона под полом
-		if (yiScrFloor2 <= lastDrawedY1)
-			yiScrFloor2 = lastDrawedY1 + 1;
-		for (int y = yiScrFloor2; y < lastDrawedY2; ++y) {
-			unsigned char(&pixel)[3] = buf[y][columnN];
-			pixel[0] = 255;
-			pixel[1] = 255;
-			pixel[2] = 0;
-		}
-		if (yiScrFloor2 < lastDrawedY2)
-			lastDrawedY2 = yiScrFloor2;
-		if (lastDrawedY1 >= lastDrawedY2 - 1)
-			break;
 
 m1: 	zSlicePrev = zSliceCur;
 		edgeNComeFrom = poly.edges[edgeWithMaxZ].adjEdgeN;
@@ -480,7 +486,8 @@ void Draw(HWND hWnd)
 	horCamlAngleRad = horizontalAngle / 180.0 * 3.14159265359;
 	dz = 1.0 / tan(horCamlAngleRad / 2.0);
 	kProj = bufSizeX / 2 / tan(horCamlAngleRad / 2);
-	startingPoly = 0;
+	startingPoly = 1;
+	alCam += 0.00015f;
 
 	for (int x = 0; x < bufSizeX; ++x) {
 		double curX = (x - bufSizeX / 2 + 0.5) * 2.0 / bufSizeX;  // Текущая горизонтальная позиция пиксела в системе камеры  -1..1
@@ -488,15 +495,35 @@ void Draw(HWND hWnd)
 		DrawOneColumn(scanAngle, x);
 	}
 
-	for (int i = 0; i < bufSizeX; ++i)
+	int off = bufSizeY - 1;
+	for (int y = 0; y < bufSizeY/2; ++y)
 	{
-		for (int i2 = 0; i2 < bufSizeY; ++i2)
+		for (int x = 0; x < bufSizeX; ++x)
 		{
-			buf[i2][i][0] = 0;
-			buf[i2][i][1] = 0;
-			buf[i2][i][2] = rand();
+			unsigned char t = buf[y][x][0];
+			buf[y][x][0] = buf[off - y][x][0];
+			buf[off-y][x][0] = t;
+
+			t = buf[y][x][1];
+			buf[y][x][1] = buf[off - y][x][1];
+			buf[off - y][x][1] = t;
+
+			t = buf[y][x][2];
+			buf[y][x][2] = buf[off - y][x][2];
+			buf[off - y][x][2] = t;
 		}
 	}
+
+
+	//for (int i = 0; i < bufSizeX; ++i)
+	//{
+	//	for (int i2 = 0; i2 < bufSizeY; ++i2)
+	//	{
+	//		buf[i2][i][0] = 0;
+	//		buf[i2][i][1] = 0;
+	//		buf[i2][i][2] = rand();
+	//	}
+	//}
 
 	DrawFrameBuf(hWnd);
 }
