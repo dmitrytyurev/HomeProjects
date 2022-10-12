@@ -72,7 +72,7 @@ const int bufSizeY = 200;
 
 // Описание игрового уровня
 std::vector<FPoint2D> verts = {{10,30}, {20,30}, {10,20} , {20,20} , {10,10} , {20,10} };
-std::vector<Poly> polies = { {100,44,41,{{0,-1,-1,{0,1}},{1,-1,-1,{0,1}},{3,1,0,{0,1}},{2,-1,-1,{0,1}}}},
+std::vector<Poly> polies = { {100,44,41,{{0,-1,-1,{0,30}},{1,-1,-1,{0,30}},{3,1,0,{0,30}},{2,-1,-1,{0,30}}}},
 	                         {100,45,40,{{2,0,2,{0,1}},{3,-1,-1,{0,1}},{5,-1,-1,{0,1}},{4,-1,-1,{0,1}}}} };
 
 // Параметры камеры
@@ -371,7 +371,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 		int    yiScrRoof2 = (int)floor(yScrRoof2 + 0.5);
 
 		const Edge& curEdge = poly.edges[edgeWithMaxZ];
-		double curU = (curEdge.u[1] - curEdge.u[0]) * interpEdgePrev + curEdge.u[0];
+		double curU = (curEdge.u[0] - curEdge.u[1]) * interpEdgePrev + curEdge.u[1];
 
 		bool otherNotVisible = false;  // Остальные отрезки не видны
 
@@ -494,7 +494,7 @@ void Draw(HWND hWnd)
 	dz = 1.0 / tan(horCamlAngleRad / 2.0);
 	kProj = bufSizeX / 2 / tan(horCamlAngleRad / 2);
 	startingPoly = 1;
-	//alCam += 0.00015f;
+	alCam += 0.00015f;
 
 	for (int x = 0; x < bufSizeX; ++x) {
 		double curX = (x - bufSizeX / 2 + 0.5) * 2.0 / bufSizeX;  // Текущая горизонтальная позиция пиксела в системе камеры  -1..1
