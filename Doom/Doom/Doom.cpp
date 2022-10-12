@@ -72,8 +72,18 @@ const int bufSizeY = 200;
 
 // Описание игрового уровня
 std::vector<FPoint2D> verts = {{10,30}, {20,30}, {10,20} , {20,20} , {10,10} , {20,10} };
-std::vector<Poly> polies = { {100,44,41,{{0,-1,-1,{0,30}},{1,-1,-1,{0,30}},{3,1,0,{0,30}},{2,-1,-1,{0,30}}}},
-	                         {100,45,40,{{2,0,2,{0,1}},{3,-1,-1,{0,1}},{5,-1,-1,{0,1}},{4,-1,-1,{0,1}}}} };
+std::vector<Poly> polies = {
+	{100,44,41,
+		{{0,-1,-1,{0,30}, 0, 5, 0, 5},
+		{1,-1,-1,{0,30}, 0, 5, 0, 5},
+		{3,1,0,{0,30}, 0, 5, 0, 5},
+		{2,-1,-1,{0,30}, 0, 5, 0, 5}}},
+
+	{100,45,40,
+		{{2,0,2,{0,1}, 0, 5, 0, 5},
+			{3,-1,-1,{0,1}, 0, 5, 0, 5},
+			{5,-1,-1,{0,1}, 0, 5, 0, 5},
+			{4,-1,-1,{0,1}, 0, 5, 0, 5}}} };
 
 // Параметры камеры
 float xCam=15, yCam=42.5f, zCam=10.5f;  // Позиция камеры в мире
@@ -401,11 +411,16 @@ void DrawOneColumn(double scanAngle, int columnN)
 			yiScrCeil2 = lastDrawedY2;
 			otherNotVisible = true;
 		}
-		for (int y = yiScrRoof2; y < yiScrCeil2; ++y) {
-			unsigned char (&pixel)[3] = buf[y][columnN];
-			pixel[0] = int(255 * curU);
-			pixel[1] = 0;
-			pixel[2] = 0;
+		if (yiScrCeil2 > yiScrRoof2) {
+			double curV = curEdge.vRoof;
+			double addV = (curEdge.vCeil - curEdge.vRoof) / (yiScrCeil2 - yiScrRoof2);
+			for (int y = yiScrRoof2; y < yiScrCeil2; ++y) {
+				unsigned char(&pixel)[3] = buf[y][columnN];
+				pixel[0] = int(255 * curV);
+				pixel[1] = 0;
+				pixel[2] = 0;
+				curV += addV;
+			}
 		}
 		if (yiScrCeil2 > lastDrawedY1 + 1)
 			lastDrawedY1 = yiScrCeil2 - 1;
