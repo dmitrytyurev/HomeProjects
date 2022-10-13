@@ -46,11 +46,11 @@ struct Edge
 	int adjPolyN;  // Индекс смежного полигона в polies, либо -1, если смежного полигона нет
 	int adjEdgeN;  // Индекс смежного ребра в edges смежного полигона
 	// Текстурные координаты стен
-	float u[2];
-	float vRoof;
-	float vCeil;
-	float vFloor;
-	float vGroud;
+	float u[2];    // U-координаты в первой и второй точках ребра
+	float vCeil;     // V-координата а уровне потолка
+	float vCeilAdd;  // Приращение V-координаты (в единицах [0..1] на 1 метр)
+	float vFloor;    // V-координата а уровне пола
+	float vFloorAdd; // Приращение V-координаты (в единицах [0..1] на 1 метр)
 	// Текстурные координаты пола/потолка
 	float uFloorCeil;
 	float vFloorCeil;
@@ -73,20 +73,20 @@ const int bufSizeY = 200;
 // Описание игрового уровня
 std::vector<FPoint2D> verts = {{10,30}, {20,30}, {10,20} , {20,20} , {10,10} , {20,10} };
 std::vector<Poly> polies = {
-	{100,44,41,
-		{{0,-1,-1,{0,30}, 0, 5, 0, 5},
-		{1,-1,-1,{0,30}, 0, 5, 0, 5},
-		{3,1,0,{0,30}, 0, 5, 0, 5},
-		{2,-1,-1,{0,30}, 0, 5, 0, 5}}},
+	{100,42,41,
+		{{0,-1,-1,{0,30}, 1, -1, 0, 5},
+		{1,-1,-1,{0,30}, 1, -1, 0, 5},
+		{3,1,0,{0,30}, 1, -1, 0, 5},
+		{2,-1,-1,{0,30}, 1, -1, 0, 5}}},
 
 	{100,45,40,
-		{{2,0,2,{0,1}, 0, 5, 0, 5},
-			{3,-1,-1,{0,1}, 0, 5, 0, 5},
-			{5,-1,-1,{0,1}, 0, 5, 0, 5},
-			{4,-1,-1,{0,1}, 0, 5, 0, 5}}} };
+		{{2,0,2,{0,1}, 5, -5, 0, 5},
+			{3,-1,-1,{0,1}, 5, -5, 0, 5},
+			{5,-1,-1,{0,1}, 5, -5, 0, 5},
+			{4,-1,-1,{0,1}, 5, -5, 0, 5}}} };
 
 // Параметры камеры
-float xCam=15, yCam=42.5f, zCam=10.5f;  // Позиция камеры в мире
+float xCam=15, yCam=42.5f, zCam=15;  // Позиция камеры в мире
 float alCam;  // Угол вращения камеры. Если 0, то смотрит вдоль оси OZ
 float horizontalAngle = 90.0;  // Горизонтальный угол обзора камеры в градусах
 
@@ -368,11 +368,14 @@ void DrawOneColumn(double scanAngle, int columnN)
 			zSliceCur = 0.001;               // Ограничиваем значением, на которое можно будет ниже делить. Спроекцированные значения при этом уйдут за вернюю или нижнюю границу экрана - не страшно, отклипаем на общих основаниях
 		}
 
+		// Проецируем (находим Y в системе координат экрана)
+		// Для Z-пересечения текущего отрезка
 		double yScrFloor1 = -(poly.yFloor - yCam) / zSliceCur * kProj + bufSizeY / 2;
 		int    yiScrFloor1 = (int)floor(yScrFloor1 + 0.5);
 		double yScrCeil1  = -(poly.yCeil - yCam) / zSliceCur * kProj + bufSizeY / 2;
 		int    yiScrCeil1 = (int)floor(yScrCeil1 + 0.5);
 
+		// Для Z-пересечения предыдущего отрезка
 		double yScrFloor2 = -(poly.yFloor - yCam) / zSlicePrev * kProj + bufSizeY / 2;
 		int    yiScrFloor2 = (int)floor(yScrFloor2 + 0.5);
 		double yScrCeil2  = -(poly.yCeil  - yCam) / zSlicePrev * kProj + bufSizeY / 2;
@@ -383,9 +386,15 @@ void DrawOneColumn(double scanAngle, int columnN)
 		const Edge& curEdge = poly.edges[edgeWithMaxZ];
 		double curU = (curEdge.u[0] - curEdge.u[1]) * interpEdgePrev + curEdge.u[1];
 
+		double vDens = 0;
+		if (yiScrRoof2 != yiScrCeil2) {
+			vDens = (double(poly.yRoof) - poly.yCeil) / (yScrRoof2 - yScrCeil2);
+		}
+
+
 		bool otherNotVisible = false;  // Остальные отрезки не видны
 
-		// Рисуем небо над внешней стенкой полигона
+		// Рисуем небо над внешней стенкой полигона ---------------------------------------------------------
 		if (yiScrRoof2 > lastDrawedY2) {
 			yiScrRoof2 = lastDrawedY2;
 			otherNotVisible = true;
@@ -404,32 +413,63 @@ void DrawOneColumn(double scanAngle, int columnN)
 		if (otherNotVisible) 
 			goto m1;
 
-		// Рисуем внешнюю стенку полигона над потолком
-		if (yiScrRoof2 <= lastDrawedY1)
-			yiScrRoof2 = lastDrawedY1 + 1;
-		if (yiScrCeil2 > lastDrawedY2) {
-			yiScrCeil2 = lastDrawedY2;
-			otherNotVisible = true;
-		}
-		if (yiScrCeil2 > yiScrRoof2) {
-			double curV = curEdge.vRoof;
-			double addV = (curEdge.vCeil - curEdge.vRoof) / (yiScrCeil2 - yiScrRoof2);
-			for (int y = yiScrRoof2; y < yiScrCeil2; ++y) {
-				unsigned char(&pixel)[3] = buf[y][columnN];
-				pixel[0] = int(255 * curV);
-				pixel[1] = 0;
-				pixel[2] = 0;
-				curV += addV;
+		// Рисуем внешнюю стенку полигона над потолком  ---------------------------------------------------------
+		{
+			int keep2 = yiScrCeil2;
+			if (yiScrRoof2 <= lastDrawedY1)
+				yiScrRoof2 = lastDrawedY1 + 1;
+			if (yiScrCeil2 > lastDrawedY2) {
+				yiScrCeil2 = lastDrawedY2;
+				otherNotVisible = true;
 			}
+			if (yiScrCeil2 > yiScrRoof2) {
+				double addV = curEdge.vCeilAdd * vDens;
+				double curV = curEdge.vCeil - addV * (keep2 - yiScrRoof2);
+				for (int y = yiScrRoof2; y < yiScrCeil2; ++y) {
+					unsigned char(&pixel)[3] = buf[y][columnN];
+					pixel[0] = int(255 * curV);
+					pixel[1] = 0;
+					pixel[2] = 0;
+					curV += addV;
+				}
+				if (yiScrCeil2 > lastDrawedY1 + 1) {
+					lastDrawedY1 = yiScrCeil2 - 1;
+					if (lastDrawedY1 >= lastDrawedY2 - 1)
+						break;
+				}
+			}
+			if (otherNotVisible)
+				goto m1;
 		}
-		if (yiScrCeil2 > lastDrawedY1 + 1)
-			lastDrawedY1 = yiScrCeil2 - 1;
-		if (lastDrawedY1 >= lastDrawedY2 - 1)
-			break;
-		if (otherNotVisible) 
-			goto m1;
 
-		// Рисуем потолок полигона
+		// Рисуем внешнюю стенку полигона под полом  ---------------------------------------------------------
+		{
+			int keep1 = yiScrFloor2;
+			if (yiScrFloor2 <= lastDrawedY1) {
+				yiScrFloor2 = lastDrawedY1 + 1;
+				otherNotVisible = true;
+			}
+			if (lastDrawedY2 > yiScrFloor2) {
+				double addV = curEdge.vFloorAdd * vDens;
+				double curV = curEdge.vFloor + addV * (yiScrFloor2 - keep1);
+				for (int y = yiScrFloor2; y < lastDrawedY2; ++y) {
+					unsigned char(&pixel)[3] = buf[y][columnN];
+					pixel[0] = int(255 * curV);
+					pixel[1] = int(255 * curV);
+					pixel[2] = int(255 * curV);
+					curV += addV;
+				}
+				if (yiScrFloor2 < lastDrawedY2) {
+					lastDrawedY2 = yiScrFloor2;
+					if (lastDrawedY1 >= lastDrawedY2 - 1)
+						break;
+				}
+			}
+			if (otherNotVisible)
+				goto m1;
+		}
+
+		// Рисуем потолок полигона  ---------------------------------------------------------
 		if (yiScrCeil2 <= lastDrawedY1)
 			yiScrCeil2 = lastDrawedY1 + 1;
 		if (yiScrCeil1 > lastDrawedY2) {
@@ -449,25 +489,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 		if (otherNotVisible) 
 			goto m1;
 
-		// Рисуем внешнюю стенку полигона под полом
-		if (yiScrFloor2 <= lastDrawedY1) {
-			yiScrFloor2 = lastDrawedY1 + 1;
-			otherNotVisible = true;
-		}
-		for (int y = yiScrFloor2; y < lastDrawedY2; ++y) {
-			unsigned char(&pixel)[3] = buf[y][columnN];
-			pixel[0] = int(255 * curU);
-			pixel[1] = int(255 * curU);
-			pixel[2] = int(255 * curU);
-		}
-		if (yiScrFloor2 < lastDrawedY2)
-			lastDrawedY2 = yiScrFloor2;
-		if (lastDrawedY1 >= lastDrawedY2 - 1)
-			break;
-		if (otherNotVisible)
-			goto m1;
-
-		// Рисуем пол полигона
+		// Рисуем пол полигона  ---------------------------------------------------------
 		if (yiScrFloor1 <= lastDrawedY1)
 			yiScrFloor1 = lastDrawedY1 + 1;
 		if (yiScrFloor2 > lastDrawedY2)
@@ -509,7 +531,8 @@ void Draw(HWND hWnd)
 	dz = 1.0 / tan(horCamlAngleRad / 2.0);
 	kProj = bufSizeX / 2 / tan(horCamlAngleRad / 2);
 	startingPoly = 1;
-	alCam += 0.00015f;
+	//alCam += 0.00015f;
+	yCam -= 0.0002f;
 
 	for (int x = 0; x < bufSizeX; ++x) {
 		double curX = (x - bufSizeX / 2 + 0.5) * 2.0 / bufSizeX;  // Текущая горизонтальная позиция пиксела в системе камеры  -1..1
