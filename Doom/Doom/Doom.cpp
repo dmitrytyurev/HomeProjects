@@ -73,11 +73,11 @@ const int bufSizeY = 200;
 // Описание игрового уровня
 std::vector<FPoint2D> verts = {{10,30}, {20,30}, {10,20} , {20,20} , {10,10} , {20,10} };
 std::vector<Poly> polies = {
-	{100,42,41,
-		{{0,-1,-1,{0,30}, 1, -1, 0, 5},
-		{1,-1,-1,{0,30}, 1, -1, 0, 5},
-		{3,1,0,{0,30}, 1, -1, 0, 5},
-		{2,-1,-1,{0,30}, 1, -1, 0, 5}}},
+	{100,44,43,
+		{{0,-1,-1,{0,30}, 1, -1, 0, 1},
+		{1,-1,-1,{0,30}, 1, -1, 0, 1},
+		{3,1,0,{0,30}, 1, -1, 0, 1},
+		{2,-1,-1,{0,30}, 1, -1, 0, 1}}},
 
 	{100,45,40,
 		{{2,0,2,{0,1}, 5, -5, 0, 5},
@@ -86,7 +86,7 @@ std::vector<Poly> polies = {
 			{4,-1,-1,{0,1}, 5, -5, 0, 5}}} };
 
 // Параметры камеры
-float xCam=15, yCam=42.5f, zCam=15;  // Позиция камеры в мире
+float xCam=19, yCam=42.5f, zCam=16.5;  // Позиция камеры в мире
 float alCam;  // Угол вращения камеры. Если 0, то смотрит вдоль оси OZ
 float horizontalAngle = 90.0;  // Горизонтальный угол обзора камеры в градусах
 
@@ -450,7 +450,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 				otherNotVisible = true;
 			}
 			if (lastDrawedY2 > yiScrFloor2) {
-				double addV = curEdge.vFloorAdd * vDens;
+				double addV = -curEdge.vFloorAdd * vDens;
 				double curV = curEdge.vFloor + addV * (yiScrFloor2 - keep1);
 				for (int y = yiScrFloor2; y < lastDrawedY2; ++y) {
 					unsigned char(&pixel)[3] = buf[y][columnN];
@@ -531,8 +531,8 @@ void Draw(HWND hWnd)
 	dz = 1.0 / tan(horCamlAngleRad / 2.0);
 	kProj = bufSizeX / 2 / tan(horCamlAngleRad / 2);
 	startingPoly = 1;
-	//alCam += 0.00015f;
-	yCam -= 0.0002f;
+	alCam = 3.1459f / 2 - 3.1459f / 32;
+	//zCam += 0.0001f;
 
 	for (int x = 0; x < bufSizeX; ++x) {
 		double curX = (x - bufSizeX / 2 + 0.5) * 2.0 / bufSizeX;  // Текущая горизонтальная позиция пиксела в системе камеры  -1..1
