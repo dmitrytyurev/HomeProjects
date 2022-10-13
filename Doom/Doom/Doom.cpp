@@ -415,7 +415,6 @@ void DrawOneColumn(double scanAngle, int columnN)
 
 		// Рисуем внешнюю стенку полигона над потолком  ---------------------------------------------------------
 		{
-			int keep2 = yiScrCeil2;
 			if (yiScrRoof2 <= lastDrawedY1)
 				yiScrRoof2 = lastDrawedY1 + 1;
 			if (yiScrCeil2 > lastDrawedY2) {
@@ -424,12 +423,12 @@ void DrawOneColumn(double scanAngle, int columnN)
 			}
 			if (yiScrCeil2 > yiScrRoof2) {
 				double addV = curEdge.vCeilAdd * vDens;
-				double curV = curEdge.vCeil - addV * (keep2 - yiScrRoof2);
+				double curV = curEdge.vCeil - addV * (yScrCeil2 - (yiScrRoof2 + 0.5));  // В скобках сдвиг от необрезанного yScrCeil2 для которого задана V, до центра верхнего пиксела обрезанного отрезка, откуда начнём рисовать и где нам нужен V
 				for (int y = yiScrRoof2; y < yiScrCeil2; ++y) {
 					unsigned char(&pixel)[3] = buf[y][columnN];
 					pixel[0] = int(255 * curV);
-					pixel[1] = 0;
-					pixel[2] = 0;
+					pixel[1] = int(255 * curV);
+					pixel[2] = int(255 * curV);
 					curV += addV;
 				}
 				if (yiScrCeil2 > lastDrawedY1 + 1) {
@@ -450,8 +449,9 @@ void DrawOneColumn(double scanAngle, int columnN)
 				otherNotVisible = true;
 			}
 			if (lastDrawedY2 > yiScrFloor2) {
-				double addV = curEdge.vFloorAdd * vDens;
-				double curV = curEdge.vFloor + addV * (yiScrFloor2 - keep1);
+				double addV = curEdge.vFloorAdd * vDens; // Изменение V-координаты с каждым пикселем
+				double subPixelCorrection = (yiScrFloor2 + 0.5 - yScrFloor2);  // Субпиксельная коррекция, чтобы V-координата бралась для центра верхнего пиксела полигона
+				double curV = curEdge.vFloor + addV * (yiScrFloor2 - keep1 + subPixelCorrection);
 				for (int y = yiScrFloor2; y < lastDrawedY2; ++y) {
 					unsigned char(&pixel)[3] = buf[y][columnN];
 					pixel[0] = int(255 * curV);
