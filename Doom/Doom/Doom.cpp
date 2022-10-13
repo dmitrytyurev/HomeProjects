@@ -74,16 +74,16 @@ const int bufSizeY = 200;
 std::vector<FPoint2D> verts = {{10,30}, {20,30}, {10,20} , {20,20} , {10,10} , {20,10} };
 std::vector<Poly> polies = {
 	{100,44,43,
-		{{0,-1,-1,{0,30}, 1, -1, 0, 1},
-		{1,-1,-1,{0,30}, 1, -1, 0, 1},
-		{3,1,0,{0,30}, 1, -1, 0, 1},
-		{2,-1,-1,{0,30}, 1, -1, 0, 1}}},
+		{{0,-1,-1,{0,30}, 1, 1, 0, 1},
+		{1,-1,-1,{0,30}, 1, 1, 0, 1},
+		{3,1,0,{0,30}, 1, 1, 0, 1},
+		{2,-1,-1,{0,30}, 1, 1, 0, 1}}},
 
 	{100,45,40,
-		{{2,0,2,{0,1}, 5, -5, 0, 5},
-			{3,-1,-1,{0,1}, 5, -5, 0, 5},
-			{5,-1,-1,{0,1}, 5, -5, 0, 5},
-			{4,-1,-1,{0,1}, 5, -5, 0, 5}}} };
+		{{2,0,2,{0,1}, 5, 5, 0, 5},
+			{3,-1,-1,{0,1}, 5, 5, 0, 5},
+			{5,-1,-1,{0,1}, 5, 5, 0, 5},
+			{4,-1,-1,{0,1}, 5, 5, 0, 5}}} };
 
 // Параметры камеры
 float xCam=19, yCam=42.5f, zCam=16.5;  // Позиция камеры в мире
@@ -388,7 +388,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 
 		double vDens = 0;
 		if (yiScrRoof2 != yiScrCeil2) {
-			vDens = (double(poly.yRoof) - poly.yCeil) / (yScrRoof2 - yScrCeil2);
+			vDens = -(double(poly.yRoof) - poly.yCeil) / (yScrRoof2 - yScrCeil2);
 		}
 
 
@@ -450,7 +450,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 				otherNotVisible = true;
 			}
 			if (lastDrawedY2 > yiScrFloor2) {
-				double addV = -curEdge.vFloorAdd * vDens;
+				double addV = curEdge.vFloorAdd * vDens;
 				double curV = curEdge.vFloor + addV * (yiScrFloor2 - keep1);
 				for (int y = yiScrFloor2; y < lastDrawedY2; ++y) {
 					unsigned char(&pixel)[3] = buf[y][columnN];
