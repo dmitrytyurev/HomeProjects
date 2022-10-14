@@ -86,7 +86,7 @@ std::vector<Poly> polies = {
 			{4,-1,-1,{0,1}, 5, 5, 0, 5}}} };
 
 // Параметры камеры
-float xCam=19, yCam=42.5f, zCam=16.5;  // Позиция камеры в мире
+float xCam=15, yCam=42.5f, zCam=10.5;  // Позиция камеры в мире
 float alCam;  // Угол вращения камеры. Если 0, то смотрит вдоль оси OZ
 float horizontalAngle = 90.0;  // Горизонтальный угол обзора камеры в градусах
 
@@ -311,7 +311,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 	const double coCam = cos(scanAngle);        // Последующий поворот на этот угол, переведвёт точку из системы секущего луча в систему камеры (в ней нам нужна z-координата точки для проекции Y на экран)
 
 	int curPolyN = startingPoly;
-	int edgeNComeFrom = -1;     // Номер ребра в текущем полигоне через которые мы пришли из предыдущего полигона
+	int edgeNComeFrom = -1;     // Номер ребра в текущем полигоне через которое мы пришли из предыдущего полигона
 	double zSlicePrev = 0.001;  // Z-координата предыдущей точки сечения в системе координат камеры
 	double interpEdgePrev = 0;  // [0..1] Пропорция в которой поделено предыдущее ребро
 	
@@ -383,8 +383,12 @@ void DrawOneColumn(double scanAngle, int columnN)
 		double yScrRoof2  = -(poly.yRoof  - yCam) / zSlicePrev * kProj + bufSizeY / 2;
 		int    yiScrRoof2 = (int)floor(yScrRoof2 + 0.5);
 
-		const Edge& curEdge = poly.edges[edgeWithMaxZ];
-		double curU = (curEdge.u[0] - curEdge.u[1]) * interpEdgePrev + curEdge.u[1];
+		if (edgeNComeFrom == -1)  // Рисуем первый полигон, для него нет предыдущего ребра, но оно и не нужно, поскольку используется только для стен, а стены в первом полигоне не рисуются
+			edgeNComeFrom = 0;
+		const Edge& edgeComeFrom = poly.edges[edgeNComeFrom];
+		//const Edge& nextEdge = poly.edges[(edgeWithMaxZ + 1) % vertsInPoly];
+
+		double curU = (double(edgeComeFrom.u[0]) - edgeComeFrom.u[1]) * interpEdgePrev + edgeComeFrom.u[1];
 
 		double vDens = 0;
 		if (yiScrRoof2 != yiScrCeil2) {
@@ -422,8 +426,8 @@ void DrawOneColumn(double scanAngle, int columnN)
 				otherNotVisible = true;
 			}
 			if (yiScrCeil2 > yiScrRoof2) {
-				double addV = curEdge.vCeilAdd * vDens;
-				double curV = curEdge.vCeil - addV * (yScrCeil2 - (yiScrRoof2 + 0.5));  // В скобках сдвиг от необрезанного yScrCeil2 для которого задана V, до центра верхнего пиксела обрезанного отрезка, откуда начнём рисовать и где нам нужен V
+				double addV = edgeComeFrom.vCeilAdd * vDens;
+				double curV = edgeComeFrom.vCeil - addV * (yScrCeil2 - (yiScrRoof2 + 0.5));  // В скобках сдвиг от необрезанного yScrCeil2 для которого задана V, до центра верхнего пиксела обрезанного отрезка, откуда начнём рисовать и где нам нужен V
 				for (int y = yiScrRoof2; y < yiScrCeil2; ++y) {
 					unsigned char(&pixel)[3] = buf[y][columnN];
 					pixel[0] = int(255 * curV);
@@ -449,9 +453,9 @@ void DrawOneColumn(double scanAngle, int columnN)
 				otherNotVisible = true;
 			}
 			if (lastDrawedY2 > yiScrFloor2) {
-				double addV = curEdge.vFloorAdd * vDens; // Изменение V-координаты с каждым пикселем
+				double addV = edgeComeFrom.vFloorAdd * vDens; // Изменение V-координаты с каждым пикселем
 				double subPixelCorrection = (yiScrFloor2 + 0.5 - yScrFloor2);  // Субпиксельная коррекция, чтобы V-координата бралась для центра верхнего пиксела полигона
-				double curV = curEdge.vFloor + addV * (yiScrFloor2 - keep1 + subPixelCorrection);
+				double curV = edgeComeFrom.vFloor + addV * (yiScrFloor2 - keep1 + subPixelCorrection);
 				for (int y = yiScrFloor2; y < lastDrawedY2; ++y) {
 					unsigned char(&pixel)[3] = buf[y][columnN];
 					pixel[0] = int(255 * curV);
@@ -470,40 +474,59 @@ void DrawOneColumn(double scanAngle, int columnN)
 		}
 
 		// Рисуем потолок полигона  ---------------------------------------------------------
-		if (yiScrCeil2 <= lastDrawedY1)
-			yiScrCeil2 = lastDrawedY1 + 1;
-		if (yiScrCeil1 > lastDrawedY2) {
-			yiScrCeil1 = lastDrawedY2;
-			otherNotVisible = true;
+
+		{
+			if (yiScrCeil2 <= lastDrawedY1)
+				yiScrCeil2 = lastDrawedY1 + 1;
+			if (yiScrCeil1 > lastDrawedY2) {
+				yiScrCeil1 = lastDrawedY2;
+				otherNotVisible = true;
+			}
+			if (yiScrCeil1 > yiScrCeil2) {
+				//double curU1 = (double(edgeComeFrom.uFloorCeil) - nextEdge.uFloorCeil) * interpEdge + edgeComeFrom.uFloorCeil;
+				//double curV1 = (double(edgeComeFrom.vFloorCeil) - nextEdge.vFloorCeil) * interpEdge + edgeComeFrom.vFloorCeil;
+
+				//double curU2 = (double(edgeComeFrom.uFloorCeil) - nextEdge.uFloorCeil) * interpEdgePrev + edgeComeFrom.uFloorCeil;
+				//double curV2 = (double(edgeComeFrom.vFloorCeil) - nextEdge.vFloorCeil) * interpEdgePrev + edgeComeFrom.vFloorCeil;
+
+
+				for (int y = yiScrCeil2; y < yiScrCeil1; ++y) {
+					unsigned char(&pixel)[3] = buf[y][columnN];
+					pixel[0] = 0;
+					pixel[1] = 255;
+					pixel[2] = 0;
+				}
+				if (yiScrCeil1 > lastDrawedY1 + 1) {
+					lastDrawedY1 = yiScrCeil1 - 1;
+					if (lastDrawedY1 >= lastDrawedY2 - 1)
+						break;
+				}
+			}
+			if (otherNotVisible)
+				goto m1;
 		}
-		for (int y = yiScrCeil2; y < yiScrCeil1; ++y) {
-			unsigned char(&pixel)[3] = buf[y][columnN];
-			pixel[0] = 0;
-			pixel[1] = 255;
-			pixel[2] = 0;
-		}
-		if (yiScrCeil1 > lastDrawedY1 + 1)
-			lastDrawedY1 = yiScrCeil1 - 1;
-		if (lastDrawedY1 >= lastDrawedY2 - 1)
-			break;
-		if (otherNotVisible) 
-			goto m1;
 
 		// Рисуем пол полигона  ---------------------------------------------------------
-		if (yiScrFloor1 <= lastDrawedY1)
-			yiScrFloor1 = lastDrawedY1 + 1;
-		if (yiScrFloor2 > lastDrawedY2)
-			yiScrFloor2 = lastDrawedY2;
-		for (int y = yiScrFloor1; y < yiScrFloor2; ++y) {
-			unsigned char(&pixel)[3] = buf[y][columnN];
-			pixel[0] = 0;
-			pixel[1] = 0;
-			pixel[2] = 255;
+		{
+			if (yiScrFloor1 <= lastDrawedY1)
+				yiScrFloor1 = lastDrawedY1 + 1;
+			if (yiScrFloor2 > lastDrawedY2)
+				yiScrFloor2 = lastDrawedY2;
+			if (yiScrFloor2 > yiScrFloor1) {
+				for (int y = yiScrFloor1; y < yiScrFloor2; ++y) {
+					unsigned char(&pixel)[3] = buf[y][columnN];
+					pixel[0] = 0;
+					pixel[1] = 0;
+					pixel[2] = 255;
+				}
+				if (yiScrFloor1 < lastDrawedY2)
+				{
+					lastDrawedY2 = yiScrFloor1;
+					if (lastDrawedY1 >= lastDrawedY2 - 1)
+						break;
+				}
+			}
 		}
-		if (yiScrFloor1 < lastDrawedY2)
-			lastDrawedY2 = yiScrFloor1;
-		if (lastDrawedY1 >= lastDrawedY2 - 1)
-			break;
 
 
 m1: 	zSlicePrev = zSliceCur;
@@ -531,8 +554,8 @@ void Draw(HWND hWnd)
 	dz = 1.0 / tan(horCamlAngleRad / 2.0);
 	kProj = bufSizeX / 2 / tan(horCamlAngleRad / 2);
 	startingPoly = 1;
-	alCam = 3.1459f / 2 - 3.1459f / 32;
 	//zCam += 0.0001f;
+	//alCam += 0.0001f;
 
 	for (int x = 0; x < bufSizeX; ++x) {
 		double curX = (x - bufSizeX / 2 + 0.5) * 2.0 / bufSizeX;  // Текущая горизонтальная позиция пиксела в системе камеры  -1..1
@@ -572,3 +595,7 @@ void Draw(HWND hWnd)
 
 	DrawFrameBuf(hWnd);
 }
+
+
+
+//Проблема! При растеризации первого полигона у нас нет edgeNComeFrom и других параметров с предыдущего сечения ребра, а они нужны для мэппинга
