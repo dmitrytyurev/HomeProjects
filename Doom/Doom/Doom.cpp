@@ -73,11 +73,11 @@ const int bufSizeY = 200;
 // Описание игрового уровня
 std::vector<FPoint2D> verts = {{10,30}, {20,30}, {10,20} , {20,20} , {10,10} , {20,10} };
 std::vector<Poly> polies = {
-	{100,44,43,
-		{{0,-1,-1,{0,30}, 1, 1, 0, 1},
-		{1,-1,-1,{0,30}, 1, 1, 0, 1},
-		{3,1,0,{0,30}, 1, 1, 0, 1},
-		{2,-1,-1,{0,30}, 1, 1, 0, 1}}},
+	{100,44,41,
+		{{0,-1,-1,{0,30}, 1, 1, 0, 1, 0 ,0 },
+		{1,-1,-1,{0,30}, 1, 1, 0, 1, 3, 0},
+		{3,1,0,{0,30}, 1, 1, 0, 1, 3, 3},
+		{2,-1,-1,{0,30}, 1, 1, 0, 1, 0, 3}}},
 
 	{100,45,40,
 		{{2,0,2,{0,1}, 5, 5, 0, 5},
@@ -86,7 +86,7 @@ std::vector<Poly> polies = {
 			{4,-1,-1,{0,1}, 5, 5, 0, 5}}} };
 
 // Параметры камеры
-float xCam=15, yCam=42.5f, zCam=10.5;  // Позиция камеры в мире
+float xCam=15, yCam=42.5f, zCam=14.5;  // Позиция камеры в мире
 float alCam;  // Угол вращения камеры. Если 0, то смотрит вдоль оси OZ
 float horizontalAngle = 90.0;  // Горизонтальный угол обзора камеры в градусах
 
@@ -386,7 +386,6 @@ void DrawOneColumn(double scanAngle, int columnN)
 		if (edgeNComeFrom == -1)  // Рисуем первый полигон, для него нет предыдущего ребра, но оно и не нужно, поскольку используется только для стен, а стены в первом полигоне не рисуются
 			edgeNComeFrom = 0;
 		const Edge& edgeComeFrom = poly.edges[edgeNComeFrom];
-		//const Edge& nextEdge = poly.edges[(edgeWithMaxZ + 1) % vertsInPoly];
 
 		double curU = (double(edgeComeFrom.u[0]) - edgeComeFrom.u[1]) * interpEdgePrev + edgeComeFrom.u[1];
 
@@ -483,18 +482,45 @@ void DrawOneColumn(double scanAngle, int columnN)
 				otherNotVisible = true;
 			}
 			if (yiScrCeil1 > yiScrCeil2) {
-				//double curU1 = (double(edgeComeFrom.uFloorCeil) - nextEdge.uFloorCeil) * interpEdge + edgeComeFrom.uFloorCeil;
-				//double curV1 = (double(edgeComeFrom.vFloorCeil) - nextEdge.vFloorCeil) * interpEdge + edgeComeFrom.vFloorCeil;
+				const Edge& edgeComeFromNext = poly.edges[(edgeNComeFrom + 1) % vertsInPoly];
+				double u1 = (double(edgeComeFrom.uFloorCeil) - edgeComeFromNext.uFloorCeil) * interpEdgePrev + edgeComeFromNext.uFloorCeil;
+				double v1 = (double(edgeComeFrom.vFloorCeil) - edgeComeFromNext.vFloorCeil) * interpEdgePrev + edgeComeFromNext.vFloorCeil;
+				double u1DivZ = u1 / zSlicePrev;
+				double v1DivZ = v1 / zSlicePrev;
+				double oneDivZ1 = 1 / zSlicePrev;
 
-				//double curU2 = (double(edgeComeFrom.uFloorCeil) - nextEdge.uFloorCeil) * interpEdgePrev + edgeComeFrom.uFloorCeil;
-				//double curV2 = (double(edgeComeFrom.vFloorCeil) - nextEdge.vFloorCeil) * interpEdgePrev + edgeComeFrom.vFloorCeil;
+				const Edge& edgeCur = poly.edges[edgeWithMaxZ];
+				const Edge& edgeCurNext = poly.edges[(edgeWithMaxZ + 1) % vertsInPoly];
+				double u2 = (double(edgeCurNext.uFloorCeil) - edgeCur.uFloorCeil) * interpEdge + edgeCur.uFloorCeil;
+				double v2 = (double(edgeCurNext.vFloorCeil) - edgeCur.vFloorCeil) * interpEdge + edgeCur.vFloorCeil;
+				double u2DivZ = u2 / zSliceCur;
+				double v2DivZ = v2 / zSliceCur;
+				double oneDivZ2 = 1 / zSliceCur;
 
+				double srcInterp1 = ((yiScrCeil2 + 0.5) - yScrCeil2) / (yScrCeil1 - yScrCeil2);
+				double uCur = (u2DivZ - u1DivZ) * srcInterp1 + u1DivZ;
+				double vCur = (v2DivZ - v1DivZ) * srcInterp1 + v1DivZ;
+				double zCur = (oneDivZ2 - oneDivZ1) * srcInterp1 + oneDivZ1;
+
+				double srcInterp2 = (yScrCeil1 - (yiScrCeil2 + 0.5)) / (yScrCeil1 - yScrCeil2);
+				double uCorr = (u2DivZ - u1DivZ) * srcInterp2 + u1DivZ;
+				double vCorr = (v2DivZ - v1DivZ) * srcInterp2 + v1DivZ;
+				double zCorr = (oneDivZ2 - oneDivZ1) * srcInterp2 + oneDivZ1;
+
+				double uAdd = (uCorr - uCur) / (yiScrCeil1 - yiScrCeil2);
+				double vAdd = (vCorr - vCur) / (yiScrCeil1 - yiScrCeil2);
+				double zAdd = (zCorr - zCur) / (yiScrCeil1 - yiScrCeil2);
 
 				for (int y = yiScrCeil2; y < yiScrCeil1; ++y) {
 					unsigned char(&pixel)[3] = buf[y][columnN];
-					pixel[0] = 0;
-					pixel[1] = 255;
-					pixel[2] = 0;
+					double uPixel = uCur / zCur;
+					double vPixel = vCur / zCur;
+					pixel[0] = int(255 * vPixel);
+					pixel[1] = int(255 * vPixel);
+					pixel[2] = int(255 * vPixel);
+					uCur += uAdd;
+					vCur += vAdd;
+					zCur += zAdd;
 				}
 				if (yiScrCeil1 > lastDrawedY1 + 1) {
 					lastDrawedY1 = yiScrCeil1 - 1;
