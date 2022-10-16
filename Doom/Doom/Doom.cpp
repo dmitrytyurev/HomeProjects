@@ -65,8 +65,8 @@ struct Poly
 };
 // -------------------------------------------------------------------
 
-const int bufSizeX = 320;
-const int bufSizeY = 200;
+const int bufSizeX = 500;
+const int bufSizeY = 340;
 
 // -------------------------------------------------------------------
 
@@ -74,16 +74,16 @@ const int bufSizeY = 200;
 std::vector<FPoint2D> verts = {{10,30}, {20,30}, {10,20} , {20,20} , {10,10} , {20,10} };
 std::vector<Poly> polies = {
 	{45,44,41,
-		{{0,-1,-1,{0,30}, 1, 3, 0, 3, 0 ,0 },
-		{1,-1,-1,{0,30}, 1, 3, 0, 3, 3, 0},
-		{3,1,0,{0,30}, 1, 3, 0, 3, 3, 3},
-		{2,-1,-1,{0,30}, 1, 3, 0, 3, 0, 3}}},
+		{{0,-1,-1,{0,10}, 1, 1, 0, 1,    0 ,0 },
+		       {1,-1,-1,{0,10}, 1, 1, 0, 1,    3, 0},
+		       {3, 1, 0,{0,10}, 1, 1, 0, 1,    3, 3},
+		       {2,-1,-1,{0,10}, 1, 1, 0, 1,    0, 3}}},
 
 	{46,45,40,
-		{{2,0,2,{0,1}, 5, 5, 0, 5},
-			{3,-1,-1,{0,1}, 5, 5, 0, 5},
-			{5,-1,-1,{0,1}, 5, 5, 0, 5},
-			{4,-1,-1,{0,1}, 5, 5, 0, 5}}} };
+		{{2, 0, 2,{0,1}, 5, 5, 0, 5},
+			   {3,-1,-1,{0,1}, 5, 5, 0, 5},
+			   {5,-1,-1,{0,1}, 5, 5, 0, 5},
+			   {4,-1,-1,{0,1}, 5, 5, 0, 5}}} };
 
 // Параметры камеры
 float xCam=15, yCam=42.5f, zCam=14.5;  // Позиция камеры в мире
@@ -429,9 +429,10 @@ void DrawOneColumn(double scanAngle, int columnN)
 				double curV = edgeComeFrom.vCeil - addV * (yScrCeil2 - (yiScrRoof2 + 0.5));  // В скобках сдвиг от необрезанного yScrCeil2 для которого задана V, до центра верхнего пиксела обрезанного отрезка, откуда начнём рисовать и где нам нужен V
 				for (int y = yiScrRoof2; y < yiScrCeil2; ++y) {
 					unsigned char(&pixel)[3] = buf[y][columnN];
-					pixel[0] = int(255 * curV);
-					pixel[1] = int(255 * curV);
-					pixel[2] = int(255 * curV);
+					int scale = 5;
+					pixel[0] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
+					pixel[1] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
+					pixel[2] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
 					curV += addV;
 				}
 				if (yiScrCeil2 > lastDrawedY1 + 1) {
@@ -457,9 +458,10 @@ void DrawOneColumn(double scanAngle, int columnN)
 				double curV = edgeComeFrom.vFloor + addV * (yiScrFloor2 - keep1 + subPixelCorrection);
 				for (int y = yiScrFloor2; y < lastDrawedY2; ++y) {
 					unsigned char(&pixel)[3] = buf[y][columnN];
-					pixel[0] = int(255 * curV);
-					pixel[1] = int(255 * curV);
-					pixel[2] = int(255 * curV);
+					int scale = 5;
+					pixel[0] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
+					pixel[1] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
+					pixel[2] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
 					curV += addV;
 				}
 				if (yiScrFloor2 < lastDrawedY2) {
@@ -515,9 +517,10 @@ void DrawOneColumn(double scanAngle, int columnN)
 					unsigned char(&pixel)[3] = buf[y][columnN];
 					double uPixel = uCur / zCur;
 					double vPixel = vCur / zCur;
-					pixel[0] = int(255 * vPixel);
-					pixel[1] = int(255 * vPixel);
-					pixel[2] = int(255 * vPixel);
+					int scale = 5;
+					pixel[0] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
+					pixel[1] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
+					pixel[2] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
 					uCur += uAdd;
 					vCur += vAdd;
 					zCur += zAdd;
@@ -572,9 +575,10 @@ void DrawOneColumn(double scanAngle, int columnN)
 					unsigned char(&pixel)[3] = buf[y][columnN];
 					double uPixel = uCur / zCur;
 					double vPixel = vCur / zCur;
-					pixel[0] = int(255 * vPixel);
-					pixel[1] = int(255 * vPixel);
-					pixel[2] = int(255 * vPixel);
+					int scale = 5;
+					pixel[0] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
+					pixel[1] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
+					pixel[2] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
 					uCur += uAdd;
 					vCur += vAdd;
 					zCur += zAdd;
@@ -614,8 +618,8 @@ void Draw(HWND hWnd)
 	dz = 1.0 / tan(horCamlAngleRad / 2.0);
 	kProj = bufSizeX / 2 / tan(horCamlAngleRad / 2);
 	startingPoly = 1;
-	//yCam -= 0.0001f;
-	alCam += 0.0001f;
+	zCam += 0.0003f;
+	//alCam += 0.0001f;
 
 	for (int x = 0; x < bufSizeX; ++x) {
 		double curX = (x - bufSizeX / 2 + 0.5) * 2.0 / bufSizeX;  // Текущая горизонтальная позиция пиксела в системе камеры  -1..1
