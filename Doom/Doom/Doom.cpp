@@ -539,11 +539,45 @@ void DrawOneColumn(double scanAngle, int columnN)
 			if (yiScrFloor2 > lastDrawedY2)
 				yiScrFloor2 = lastDrawedY2;
 			if (yiScrFloor2 > yiScrFloor1) {
+				const Edge& edgeCur = poly.edges[edgeWithMaxZ];
+				const Edge& edgeCurNext = poly.edges[(edgeWithMaxZ + 1) % vertsInPoly];
+				double u1 = (double(edgeCurNext.uFloorCeil) - edgeCur.uFloorCeil) * interpEdge + edgeCur.uFloorCeil;
+				double v1 = (double(edgeCurNext.vFloorCeil) - edgeCur.vFloorCeil) * interpEdge + edgeCur.vFloorCeil;
+				double u1DivZ = u1 / zSliceCur;
+				double v1DivZ = v1 / zSliceCur;
+				double oneDivZ1 = 1 / zSliceCur;
+
+				const Edge& edgeComeFromNext = poly.edges[(edgeNComeFrom + 1) % vertsInPoly];
+				double u2 = (double(edgeComeFrom.uFloorCeil) - edgeComeFromNext.uFloorCeil) * interpEdgePrev + edgeComeFromNext.uFloorCeil;
+				double v2 = (double(edgeComeFrom.vFloorCeil) - edgeComeFromNext.vFloorCeil) * interpEdgePrev + edgeComeFromNext.vFloorCeil;
+				double u2DivZ = u2 / zSlicePrev;
+				double v2DivZ = v2 / zSlicePrev;
+				double oneDivZ2 = 1 / zSlicePrev;
+
+				double srcInterp1 = ((yiScrFloor1 + 0.5) - yScrFloor1) / (yScrFloor2 - yScrFloor1);
+				double uCur = (u2DivZ - u1DivZ) * srcInterp1 + u1DivZ;
+				double vCur = (v2DivZ - v1DivZ) * srcInterp1 + v1DivZ;
+				double zCur = (oneDivZ2 - oneDivZ1) * srcInterp1 + oneDivZ1;
+
+				double srcInterp2 = (yiScrFloor2 + 0.5 - yScrFloor1) / (yScrFloor2 - yScrFloor1);
+				double uCorr = (u2DivZ - u1DivZ) * srcInterp2 + u1DivZ;
+				double vCorr = (v2DivZ - v1DivZ) * srcInterp2 + v1DivZ;
+				double zCorr = (oneDivZ2 - oneDivZ1) * srcInterp2 + oneDivZ1;
+
+				double uAdd = (uCorr - uCur) / (yiScrFloor2 - yiScrFloor1);
+				double vAdd = (vCorr - vCur) / (yiScrFloor2 - yiScrFloor1);
+				double zAdd = (zCorr - zCur) / (yiScrFloor2 - yiScrFloor1);
+
 				for (int y = yiScrFloor1; y < yiScrFloor2; ++y) {
 					unsigned char(&pixel)[3] = buf[y][columnN];
-					pixel[0] = 0;
-					pixel[1] = 0;
-					pixel[2] = 255;
+					double uPixel = uCur / zCur;
+					double vPixel = vCur / zCur;
+					pixel[0] = int(255 * vPixel);
+					pixel[1] = int(255 * vPixel);
+					pixel[2] = int(255 * vPixel);
+					uCur += uAdd;
+					vCur += vAdd;
+					zCur += zAdd;
 				}
 				if (yiScrFloor1 < lastDrawedY2)
 				{
@@ -580,7 +614,7 @@ void Draw(HWND hWnd)
 	dz = 1.0 / tan(horCamlAngleRad / 2.0);
 	kProj = bufSizeX / 2 / tan(horCamlAngleRad / 2);
 	startingPoly = 1;
-	//zCam += 0.0001f;
+	//yCam -= 0.0001f;
 	alCam += 0.0001f;
 
 	for (int x = 0; x < bufSizeX; ++x) {
