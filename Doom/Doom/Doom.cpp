@@ -81,10 +81,10 @@ std::vector<Poly> polies = {
 		       {2,-1,-1,{0,10}, 1, 1, 0, 1,    0, 3}}},
 
 	{46,45,40,
-		{{2, 0, 2,{0,1}, 5, 5, 0, 5},
-			   {3,-1,-1,{0,1}, 5, 5, 0, 5},
-			   {5,-1,-1,{0,1}, 5, 5, 0, 5},
-			   {4,-1,-1,{0,1}, 5, 5, 0, 5}}} };
+		{{2, 0, 2,{0,1}, 5, 5, 0, 5,   0,0},
+			   {3,-1,-1,{0,1}, 5, 5, 0, 5,   3 ,0},
+			   {5,-1,-1,{0,1}, 5, 5, 0, 5,   3, 3},
+			   {4,-1,-1,{0,1}, 5, 5, 0, 5,   0,3}}} };
 
 // Параметры камеры
 float xCam=15, yCam=42.5f, zCam=14.5;  // Позиция камеры в мире
@@ -313,6 +313,11 @@ void DrawOneColumn(double scanAngle, int columnN)
 	const double si = sin(turnAngle);
 	const double coCam = cos(scanAngle);        // Последующий поворот на этот угол, переведвёт точку из системы секущего луча в систему камеры (в ней нам нужна z-координата точки для проекции Y на экран)
 
+	const double co2 = cos(alCam);
+	const double si2 = sin(alCam);
+	const double co3 = cos(-scanAngle);
+	const double si3 = sin(-scanAngle);
+
 	int curPolyN = startingPoly;
 	int edgeNComeFrom = -1;     // Номер ребра в текущем полигоне через которое мы пришли из предыдущего полигона
 	double zSlicePrev = zNear;  // Z-координата предыдущей точки сечения в системе координат камеры
@@ -368,36 +373,103 @@ void DrawOneColumn(double scanAngle, int columnN)
 		// Точнее мы поворачиваем не всею точку, а только её Z-координату. Только она нам нужна дальше - для проекции Y на экран
 		double zSliceCur = maxZ * coCam;     // Z-координата полученной точки сечения в системе координат камеры
 		if (zSliceCur >= zNear) {
-
 			if (zSlicePrev < zNear)	{
 				// Текущий отрезок залезает в zNear, поэтому предыдущей точкой считаем (poly.yFloor; zNear) и (poly.yCeil; zNear)
 				// Соответственно в zSlicePrev запишем zNear, а floorCeilNearU, floorCeilNearV расчитаем так:
 				// Сначала найдём сечение текущего полигона прямой z=zNear, потом найдём сечение полученного отрезка текущим секущим лучом
 				zSlicePrev = zNear;
 
-				//// Переводим вершины полигона в систему, где секущая прямая это z=zNear
-				//for (int i = 0; i < vertsInPoly; ++i) {
-				//	FPoint2D& curPoint = verts[poly.edges[i].firstInd];
-				//	double x = double(curPoint.x) - xCam;
-				//	double z = double(curPoint.z) - zCam;
-				//	localVerts[i].x = x * co + z * si;
-				//	localVerts[i].z = -x * si + z * co;
-				//}
-
-				//// Для вершин полигона заполняем флаги xn < 0
-				//for (int i = 0; i < vertsInPoly; ++i) {
-				//	leftFlags[i] = localVerts[i].x < 0;
-				//}
-
-
-
-
-
-				
+				// Переводим вершины полигона в систему, где секущая прямая это z=zNear
+				for (int i = 0; i < vertsInPoly; ++i) {
+					FPoint2D& curPoint = verts[poly.edges[i].firstInd];
+					double x = double(curPoint.x) - xCam;
+					double z = double(curPoint.z) - zCam;
+					localVerts[i].x = x * co2 + z * si2;
+					localVerts[i].z = -x * si2 + z * co2 - zNear;
+				}
+				// Для вершин полигона заполняем флаги zn < 0
+				for (int i = 0; i < vertsInPoly; ++i) {
+					leftFlags[i] = localVerts[i].z < 0;
+				}
+				// Расчитаем пересечения рёбер полигона с осью z=zNear, пропуская рёбра если они с одной стороны от оси
+				double maxX = -100000;
+				int edgeWithMaxX = -1;
+				double interpEdgeMaxX = 0;
+				double minX = 100000;
+				int edgeWithMinX = -1;
+				double interpEdgeMinX = 0;
+				for (int i = 0; i < vertsInPoly; ++i) {       // Цикл по рёбрам полигона
+					int nextInd = (i + 1) % vertsInPoly;
+					if (leftFlags[i] == leftFlags[nextInd]) {  // Ребро лежит по одну сторону от секущей прямой и значит пересекать его не может
+						continue;
+					}
+					double xIntersect = localVerts[i].x - localVerts[i].z * (localVerts[nextInd].x - localVerts[i].x) / (localVerts[nextInd].z - localVerts[i].z);
+					double interp = -localVerts[i].z / (localVerts[nextInd].z - localVerts[i].z);  // [0..1]  в какой пропорции проделено ребро секущим лучом. Испльзуем это для расчёт UV-координат краёв полученного отрезка
+					if (xIntersect > maxX) {
+						maxX = xIntersect;
+						edgeWithMaxX = i;
+						interpEdgeMaxX = interp;
+					}
+					if (xIntersect < minX) {
+						minX = xIntersect;
+						edgeWithMinX = i;
+						interpEdgeMinX = interp;
+					}
+				}
+				// Рассчитаем UV на концах отрезка полученного рассечением полигона прямой z=zNear
+				if (edgeWithMaxX == -1 && edgeWithMinX == -1) {
+					OutputDebugStringA("Error: edgeWithMaxX == -1 && edgeWithMinX == -1\n");
+					exit(1);
+				}
+				if (edgeWithMaxX == -1)	{
+					edgeWithMaxX = edgeWithMinX;
+					interpEdgeMaxX = interpEdgeMinX;
+				}
+				else
+					if (edgeWithMinX == -1) {
+						edgeWithMinX = edgeWithMaxX;
+						interpEdgeMinX = interpEdgeMaxX;
+					}
+				double u1 = interpEdgeMinX * (poly.edges[(edgeWithMinX + 1) % vertsInPoly].uFloorCeil - poly.edges[edgeWithMinX].uFloorCeil) + poly.edges[edgeWithMinX].uFloorCeil;
+				double v1 = interpEdgeMinX * (poly.edges[(edgeWithMinX + 1) % vertsInPoly].vFloorCeil - poly.edges[edgeWithMinX].vFloorCeil) + poly.edges[edgeWithMinX].vFloorCeil;
+				double u2 = interpEdgeMaxX * (poly.edges[(edgeWithMaxX + 1) % vertsInPoly].uFloorCeil - poly.edges[edgeWithMaxX].uFloorCeil) + poly.edges[edgeWithMaxX].uFloorCeil;
+				double v2 = interpEdgeMaxX * (poly.edges[(edgeWithMaxX + 1) % vertsInPoly].vFloorCeil - poly.edges[edgeWithMaxX].vFloorCeil) + poly.edges[edgeWithMaxX].vFloorCeil;
+				// Полученный отрезок поверхнуть так, чтобы текущий секущий луч был прямой x=0
+				double x1 = minX * co3 + zNear * si3;
+				double z1 = -minX * si3 + zNear * co3;
+				double x2 = maxX * co3 + zNear * si3;
+				double z2 = -maxX * si3 + zNear * co3;
+				if (x2 < x1) {
+					OutputDebugStringA("Error: x2 < x1\n");
+					exit(1);
+				}
+				if (x1 > 0.01 || x2 < -0.01) {
+					OutputDebugStringA("Error: x1 > 0.01 || x2 < -0.01\n");
+					exit(1);
+				}
+				if (x2 - x1 < 0.001)
+				{
+					floorCeilNearU = u1;
+					floorCeilNearV = v1;
+				}
+				else {
+					if (x1 >= 0) {
+						floorCeilNearU = u1;
+						floorCeilNearV = v1;
+					}
+					else {
+						if (x2 <= 0) {
+							floorCeilNearU = u2;
+							floorCeilNearV = v2;
+						}
+						else {
+							double interp = -x1 / (x2 - x1);
+							floorCeilNearU = (u2 - u1) * interp + u1;
+							floorCeilNearV = (v2 - v1) * interp + v1;
+						}
+					}
+				}
 			}
-
-
-
 
 			// Проецируем (находим Y в системе координат экрана)
 			// Для Z-пересечения текущего отрезка
@@ -416,7 +488,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 
 			bool otherNotVisible = false;  // Остальные отрезки не видны
 
-			if (edgeNComeFrom != -1 /*||  zSlicePrev != zNear*/) {
+			if (edgeNComeFrom != -1 && zSlicePrev != zNear) {
 				const Edge* edgeComeFrom = &poly.edges[edgeNComeFrom];
 				double curU = (double(edgeComeFrom->u[0]) - edgeComeFrom->u[1]) * interpEdgePrev + edgeComeFrom->u[1];
 				double vDens = 0;
@@ -644,8 +716,8 @@ void Draw(HWND hWnd)
 	dz = 1.0 / tan(horCamlAngleRad / 2.0);
 	kProj = bufSizeX / 2 / tan(horCamlAngleRad / 2);
 	startingPoly = 1;
-	zCam += 0.0003f;
-	//alCam += 0.0001f;
+	//zCam += 0.0003f;
+	alCam += 0.0001f;
 
 	for (int x = 0; x < bufSizeX; ++x) {
 		double curX = (x - bufSizeX / 2 + 0.5) * 2.0 / bufSizeX;  // Текущая горизонтальная позиция пиксела в системе камеры  -1..1
