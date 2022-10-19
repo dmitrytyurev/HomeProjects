@@ -67,6 +67,7 @@ struct Poly
 
 const int bufSizeX = 500;
 const int bufSizeY = 340;
+const double zNear = 0.1;
 
 // -------------------------------------------------------------------
 
@@ -97,6 +98,8 @@ double horCamlAngleRad;
 double dz;
 double kProj;
 int startingPoly;
+double floorCeilNearU = 0;
+double floorCeilNearV = 0;
 
 // -------------------------------------------------------------------
 
@@ -312,14 +315,12 @@ void DrawOneColumn(double scanAngle, int columnN)
 
 	int curPolyN = startingPoly;
 	int edgeNComeFrom = -1;     // Номер ребра в текущем полигоне через которое мы пришли из предыдущего полигона
-	double zSlicePrev = 0.1;  // Z-координата предыдущей точки сечения в системе координат камеры
+	double zSlicePrev = zNear;  // Z-координата предыдущей точки сечения в системе координат камеры
 	double interpEdgePrev = 0;  // [0..1] Пропорция в которой поделено предыдущее ребро
 	
 
 	int lastDrawedY1 = -1;         // Самый нижний отрисованный пиксел сверху
 	int lastDrawedY2 = bufSizeY;   // Самый верхний отрисованный пиксел снизу
-	double uN = 0;
-	double vN = 0;
 
 	while(true)	{
 		Poly& poly = polies[curPolyN];
@@ -366,235 +367,252 @@ void DrawOneColumn(double scanAngle, int columnN)
 		// Поворачиваем найденную точку сечения ребра (0, maxZ) обратно, но не полностью - в систему камеры (где ось взгляда камеры - 0Z)
 		// Точнее мы поворачиваем не всею точку, а только её Z-координату. Только она нам нужна дальше - для проекции Y на экран
 		double zSliceCur = maxZ * coCam;     // Z-координата полученной точки сечения в системе координат камеры
-		if (zSliceCur < 0.001) {
-			zSliceCur = 0.001;               // Ограничиваем значением, на которое можно будет ниже делить. Спроекцированные значения при этом уйдут за вернюю или нижнюю границу экрана - не страшно, отклипаем на общих основаниях
-		}
+		if (zSliceCur >= zNear) {
 
-		// Проецируем (находим Y в системе координат экрана)
-		// Для Z-пересечения текущего отрезка
-		double yScrFloor1 = -(poly.yFloor - yCam) / zSliceCur * kProj + bufSizeY / 2;
-		int    yiScrFloor1 = (int)floor(yScrFloor1 + 0.5);
-		double yScrCeil1  = -(poly.yCeil - yCam) / zSliceCur * kProj + bufSizeY / 2;
-		int    yiScrCeil1 = (int)floor(yScrCeil1 + 0.5);
+			if (zSlicePrev < zNear)	{
+				// Текущий отрезок залезает в zNear, поэтому предыдущей точкой считаем (poly.yFloor; zNear) и (poly.yCeil; zNear)
+				// Соответственно в zSlicePrev запишем zNear, а floorCeilNearU, floorCeilNearV расчитаем так:
+				// Сначала найдём сечение текущего полигона прямой z=zNear, потом найдём сечение полученного отрезка текущим секущим лучом
+				zSlicePrev = zNear;
 
-		// Для Z-пересечения предыдущего отрезка
-		double yScrFloor2 = -(poly.yFloor - yCam) / zSlicePrev * kProj + bufSizeY / 2;
-		int    yiScrFloor2 = (int)floor(yScrFloor2 + 0.5);
-		double yScrCeil2  = -(poly.yCeil  - yCam) / zSlicePrev * kProj + bufSizeY / 2;
-		int    yiScrCeil2 = (int)floor(yScrCeil2 + 0.5);
-		double yScrRoof2  = -(poly.yRoof  - yCam) / zSlicePrev * kProj + bufSizeY / 2;
-		int    yiScrRoof2 = (int)floor(yScrRoof2 + 0.5);
+				//// Переводим вершины полигона в систему, где секущая прямая это z=zNear
+				//for (int i = 0; i < vertsInPoly; ++i) {
+				//	FPoint2D& curPoint = verts[poly.edges[i].firstInd];
+				//	double x = double(curPoint.x) - xCam;
+				//	double z = double(curPoint.z) - zCam;
+				//	localVerts[i].x = x * co + z * si;
+				//	localVerts[i].z = -x * si + z * co;
+				//}
 
-		bool otherNotVisible = false;  // Остальные отрезки не видны
-		const Edge* edgeComeFrom = nullptr;
-		double curU = 0;
-		double vDens = 0;
-		const Edge* edgeComeFromT = nullptr;
-		if (edgeNComeFrom != -1) {  // Если рисуем уже не первый полигон
-			edgeComeFrom = &poly.edges[edgeNComeFrom];
-			curU = (double(edgeComeFrom->u[0]) - edgeComeFrom->u[1]) * interpEdgePrev + edgeComeFrom->u[1];
-			if (yiScrRoof2 != yiScrCeil2) {
-				vDens = -(double(poly.yRoof) - poly.yCeil) / (yScrRoof2 - yScrCeil2);
+				//// Для вершин полигона заполняем флаги xn < 0
+				//for (int i = 0; i < vertsInPoly; ++i) {
+				//	leftFlags[i] = localVerts[i].x < 0;
+				//}
+
+
+
+
+
+				
 			}
-		}
-		else
-			goto m2;     // Если первый полигон, то у него может рисовать только потолок и стены
 
-		// Рисуем небо над внешней стенкой полигона ---------------------------------------------------------
-		{
-			if (yiScrRoof2 > lastDrawedY2) {
-				yiScrRoof2 = lastDrawedY2;
-				otherNotVisible = true;
-			}
-			int from = lastDrawedY1 + 1;
-			for (int y = from; y < yiScrRoof2; ++y) {
-				unsigned char(&pixel)[3] = buf[y][columnN];
-				pixel[0] = 0;
-				pixel[1] = 255;
-				pixel[2] = 255;
-			}
-			if (yiScrRoof2 > lastDrawedY1 + 1)
-				lastDrawedY1 = yiScrRoof2 - 1;
-			if (lastDrawedY1 >= lastDrawedY2 - 1)
-				break;
-			if (otherNotVisible)
-				goto m1;
-		}
 
-		// Рисуем внешнюю стенку полигона над потолком  ---------------------------------------------------------
-		{
-			if (yiScrRoof2 <= lastDrawedY1)
-				yiScrRoof2 = lastDrawedY1 + 1;
-			if (yiScrCeil2 > lastDrawedY2) {
-				yiScrCeil2 = lastDrawedY2;
-				otherNotVisible = true;
-			}
-			if (yiScrCeil2 > yiScrRoof2) {
-				double addV = edgeComeFrom->vCeilAdd * vDens;
-				double curV = edgeComeFrom->vCeil - addV * (yScrCeil2 - (yiScrRoof2 + 0.5));  // В скобках сдвиг от необрезанного yScrCeil2 для которого задана V, до центра верхнего пиксела обрезанного отрезка, откуда начнём рисовать и где нам нужен V
-				for (int y = yiScrRoof2; y < yiScrCeil2; ++y) {
+
+
+			// Проецируем (находим Y в системе координат экрана)
+			// Для Z-пересечения текущего отрезка
+			double yScrFloor1 = -(poly.yFloor - yCam) / zSliceCur * kProj + bufSizeY / 2;
+			int    yiScrFloor1 = (int)floor(yScrFloor1 + 0.5);
+			double yScrCeil1 = -(poly.yCeil - yCam) / zSliceCur * kProj + bufSizeY / 2;
+			int    yiScrCeil1 = (int)floor(yScrCeil1 + 0.5);
+
+			// Для Z-пересечения предыдущего отрезка
+			double yScrFloor2 = -(poly.yFloor - yCam) / zSlicePrev * kProj + bufSizeY / 2;
+			int    yiScrFloor2 = (int)floor(yScrFloor2 + 0.5);
+			double yScrCeil2 = -(poly.yCeil - yCam) / zSlicePrev * kProj + bufSizeY / 2;
+			int    yiScrCeil2 = (int)floor(yScrCeil2 + 0.5);
+			double yScrRoof2 = -(poly.yRoof - yCam) / zSlicePrev * kProj + bufSizeY / 2;
+			int    yiScrRoof2 = (int)floor(yScrRoof2 + 0.5);
+
+			bool otherNotVisible = false;  // Остальные отрезки не видны
+
+			if (edgeNComeFrom != -1 /*||  zSlicePrev != zNear*/) {
+				const Edge* edgeComeFrom = &poly.edges[edgeNComeFrom];
+				double curU = (double(edgeComeFrom->u[0]) - edgeComeFrom->u[1]) * interpEdgePrev + edgeComeFrom->u[1];
+				double vDens = 0;
+				if (yiScrRoof2 != yiScrCeil2) {
+					vDens = -(double(poly.yRoof) - poly.yCeil) / (yScrRoof2 - yScrCeil2);
+				}
+
+				// Рисуем небо над внешней стенкой полигона ---------------------------------------------------------
+				if (yiScrRoof2 > lastDrawedY2) {
+					yiScrRoof2 = lastDrawedY2;
+					otherNotVisible = true;
+				}
+				int from = lastDrawedY1 + 1;
+				for (int y = from; y < yiScrRoof2; ++y) {
 					unsigned char(&pixel)[3] = buf[y][columnN];
-					int scale = 5;
-					pixel[0] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
-					pixel[1] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
-					pixel[2] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
-					curV += addV;
+					pixel[0] = 0;
+					pixel[1] = 255;
+					pixel[2] = 255;
 				}
-				if (yiScrCeil2 > lastDrawedY1 + 1) {
-					lastDrawedY1 = yiScrCeil2 - 1;
-					if (lastDrawedY1 >= lastDrawedY2 - 1)
-						break;
+				if (yiScrRoof2 > lastDrawedY1 + 1)
+					lastDrawedY1 = yiScrRoof2 - 1;
+				if (lastDrawedY1 >= lastDrawedY2 - 1)
+					break;
+				if (otherNotVisible)
+					goto m1;
+
+				// Рисуем внешнюю стенку полигона над потолком  ---------------------------------------------------------
+				if (yiScrRoof2 <= lastDrawedY1)
+					yiScrRoof2 = lastDrawedY1 + 1;
+				if (yiScrCeil2 > lastDrawedY2) {
+					yiScrCeil2 = lastDrawedY2;
+					otherNotVisible = true;
+				}
+				if (yiScrCeil2 > yiScrRoof2) {
+					double addV = edgeComeFrom->vCeilAdd * vDens;
+					double curV = edgeComeFrom->vCeil - addV * (yScrCeil2 - (yiScrRoof2 + 0.5));  // В скобках сдвиг от необрезанного yScrCeil2 для которого задана V, до центра верхнего пиксела обрезанного отрезка, откуда начнём рисовать и где нам нужен V
+					for (int y = yiScrRoof2; y < yiScrCeil2; ++y) {
+						unsigned char(&pixel)[3] = buf[y][columnN];
+						int scale = 5;
+						pixel[0] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
+						pixel[1] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
+						pixel[2] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
+						curV += addV;
+					}
+					if (yiScrCeil2 > lastDrawedY1 + 1) {
+						lastDrawedY1 = yiScrCeil2 - 1;
+						if (lastDrawedY1 >= lastDrawedY2 - 1)
+							break;
+					}
+				}
+				if (otherNotVisible)
+					goto m1;
+
+				// Рисуем внешнюю стенку полигона под полом  ---------------------------------------------------------
+				int keep1 = yiScrFloor2;
+				if (yiScrFloor2 <= lastDrawedY1) {
+					yiScrFloor2 = lastDrawedY1 + 1;
+					otherNotVisible = true;
+				}
+				if (lastDrawedY2 > yiScrFloor2) {
+					double addV = edgeComeFrom->vFloorAdd * vDens; // Изменение V-координаты с каждым пикселем
+					double subPixelCorrection = (yiScrFloor2 + 0.5 - yScrFloor2);  // Субпиксельная коррекция, чтобы V-координата бралась для центра верхнего пиксела полигона
+					double curV = edgeComeFrom->vFloor + addV * (yiScrFloor2 - keep1 + subPixelCorrection);
+					for (int y = yiScrFloor2; y < lastDrawedY2; ++y) {
+						unsigned char(&pixel)[3] = buf[y][columnN];
+						int scale = 5;
+						pixel[0] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
+						pixel[1] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
+						pixel[2] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
+						curV += addV;
+					}
+					if (yiScrFloor2 < lastDrawedY2) {
+						lastDrawedY2 = yiScrFloor2;
+						if (lastDrawedY1 >= lastDrawedY2 - 1)
+							break;
+					}
+				}
+				if (otherNotVisible)
+					goto m1;
+			}
+
+			// Рисуем потолок полигона  ---------------------------------------------------------
+			{
+				if (yiScrCeil2 <= lastDrawedY1)
+					yiScrCeil2 = lastDrawedY1 + 1;
+				if (yiScrCeil1 > lastDrawedY2) {
+					yiScrCeil1 = lastDrawedY2;
+					otherNotVisible = true;
+				}
+				if (yiScrCeil1 > yiScrCeil2) {
+					double u1 = floorCeilNearU;
+					double v1 = floorCeilNearV;
+					double u1DivZ = u1 / zSlicePrev;
+					double v1DivZ = v1 / zSlicePrev;
+					double oneDivZ1 = 1 / zSlicePrev;
+
+					const Edge& edgeCur = poly.edges[edgeWithMaxZ];
+					const Edge& edgeCurNext = poly.edges[(edgeWithMaxZ + 1) % vertsInPoly];
+					double u2 = (double(edgeCurNext.uFloorCeil) - edgeCur.uFloorCeil) * interpEdge + edgeCur.uFloorCeil;
+					double v2 = (double(edgeCurNext.vFloorCeil) - edgeCur.vFloorCeil) * interpEdge + edgeCur.vFloorCeil;
+					double u2DivZ = u2 / zSliceCur;
+					double v2DivZ = v2 / zSliceCur;
+					double oneDivZ2 = 1 / zSliceCur;
+
+					double srcInterp1 = ((yiScrCeil2 + 0.5) - yScrCeil2) / (yScrCeil1 - yScrCeil2);
+					double uCur = (u2DivZ - u1DivZ) * srcInterp1 + u1DivZ;
+					double vCur = (v2DivZ - v1DivZ) * srcInterp1 + v1DivZ;
+					double zCur = (oneDivZ2 - oneDivZ1) * srcInterp1 + oneDivZ1;
+
+					double srcInterp2 = (yiScrCeil1 + 0.5 - yScrCeil2) / (yScrCeil1 - yScrCeil2);
+					double uCorr = (u2DivZ - u1DivZ) * srcInterp2 + u1DivZ;
+					double vCorr = (v2DivZ - v1DivZ) * srcInterp2 + v1DivZ;
+					double zCorr = (oneDivZ2 - oneDivZ1) * srcInterp2 + oneDivZ1;
+
+					double uAdd = (uCorr - uCur) / (yiScrCeil1 - yiScrCeil2);
+					double vAdd = (vCorr - vCur) / (yiScrCeil1 - yiScrCeil2);
+					double zAdd = (zCorr - zCur) / (yiScrCeil1 - yiScrCeil2);
+
+					for (int y = yiScrCeil2; y < yiScrCeil1; ++y) {
+						unsigned char(&pixel)[3] = buf[y][columnN];
+						double uPixel = uCur / zCur;
+						double vPixel = vCur / zCur;
+						int scale = 5;
+						pixel[0] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
+						pixel[1] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
+						pixel[2] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
+						uCur += uAdd;
+						vCur += vAdd;
+						zCur += zAdd;
+					}
+					if (yiScrCeil1 > lastDrawedY1 + 1) {
+						lastDrawedY1 = yiScrCeil1 - 1;
+						if (lastDrawedY1 >= lastDrawedY2 - 1)
+							break;
+					}
+				}
+				if (otherNotVisible)
+					goto m1;
+			}
+
+			// Рисуем пол полигона  ---------------------------------------------------------
+			{
+				if (yiScrFloor1 <= lastDrawedY1)
+					yiScrFloor1 = lastDrawedY1 + 1;
+				if (yiScrFloor2 > lastDrawedY2)
+					yiScrFloor2 = lastDrawedY2;
+				if (yiScrFloor2 > yiScrFloor1) {
+					const Edge& edgeCur = poly.edges[edgeWithMaxZ];
+					const Edge& edgeCurNext = poly.edges[(edgeWithMaxZ + 1) % vertsInPoly];
+					double u1 = (double(edgeCurNext.uFloorCeil) - edgeCur.uFloorCeil) * interpEdge + edgeCur.uFloorCeil;
+					double v1 = (double(edgeCurNext.vFloorCeil) - edgeCur.vFloorCeil) * interpEdge + edgeCur.vFloorCeil;
+					double u1DivZ = u1 / zSliceCur;
+					double v1DivZ = v1 / zSliceCur;
+					double oneDivZ1 = 1 / zSliceCur;
+
+					double u2 = floorCeilNearU;
+					double v2 = floorCeilNearV;
+					double u2DivZ = u2 / zSlicePrev;
+					double v2DivZ = v2 / zSlicePrev;
+					double oneDivZ2 = 1 / zSlicePrev;
+
+					double srcInterp1 = ((yiScrFloor1 + 0.5) - yScrFloor1) / (yScrFloor2 - yScrFloor1);
+					double uCur = (u2DivZ - u1DivZ) * srcInterp1 + u1DivZ;
+					double vCur = (v2DivZ - v1DivZ) * srcInterp1 + v1DivZ;
+					double zCur = (oneDivZ2 - oneDivZ1) * srcInterp1 + oneDivZ1;
+
+					double srcInterp2 = (yiScrFloor2 + 0.5 - yScrFloor1) / (yScrFloor2 - yScrFloor1);
+					double uCorr = (u2DivZ - u1DivZ) * srcInterp2 + u1DivZ;
+					double vCorr = (v2DivZ - v1DivZ) * srcInterp2 + v1DivZ;
+					double zCorr = (oneDivZ2 - oneDivZ1) * srcInterp2 + oneDivZ1;
+
+					double uAdd = (uCorr - uCur) / (yiScrFloor2 - yiScrFloor1);
+					double vAdd = (vCorr - vCur) / (yiScrFloor2 - yiScrFloor1);
+					double zAdd = (zCorr - zCur) / (yiScrFloor2 - yiScrFloor1);
+
+					for (int y = yiScrFloor1; y < yiScrFloor2; ++y) {
+						unsigned char(&pixel)[3] = buf[y][columnN];
+						double uPixel = uCur / zCur;
+						double vPixel = vCur / zCur;
+						int scale = 5;
+						pixel[0] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
+						pixel[1] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
+						pixel[2] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
+						uCur += uAdd;
+						vCur += vAdd;
+						zCur += zAdd;
+					}
+					if (yiScrFloor1 < lastDrawedY2)
+					{
+						lastDrawedY2 = yiScrFloor1;
+						if (lastDrawedY1 >= lastDrawedY2 - 1)
+							break;
+					}
 				}
 			}
-			if (otherNotVisible)
-				goto m1;
 		}
-
-		// Рисуем внешнюю стенку полигона под полом  ---------------------------------------------------------
-		{
-			int keep1 = yiScrFloor2;
-			if (yiScrFloor2 <= lastDrawedY1) {
-				yiScrFloor2 = lastDrawedY1 + 1;
-				otherNotVisible = true;
-			}
-			if (lastDrawedY2 > yiScrFloor2) {
-				double addV = edgeComeFrom->vFloorAdd * vDens; // Изменение V-координаты с каждым пикселем
-				double subPixelCorrection = (yiScrFloor2 + 0.5 - yScrFloor2);  // Субпиксельная коррекция, чтобы V-координата бралась для центра верхнего пиксела полигона
-				double curV = edgeComeFrom->vFloor + addV * (yiScrFloor2 - keep1 + subPixelCorrection);
-				for (int y = yiScrFloor2; y < lastDrawedY2; ++y) {
-					unsigned char(&pixel)[3] = buf[y][columnN];
-					int scale = 5;
-					pixel[0] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
-					pixel[1] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
-					pixel[2] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
-					curV += addV;
-				}
-				if (yiScrFloor2 < lastDrawedY2) {
-					lastDrawedY2 = yiScrFloor2;
-					if (lastDrawedY1 >= lastDrawedY2 - 1)
-						break;
-				}
-			}
-			if (otherNotVisible)
-				goto m1;
-		}
-
-		// Рисуем потолок полигона  ---------------------------------------------------------
-m2:
-		{
-			if (yiScrCeil2 <= lastDrawedY1)
-				yiScrCeil2 = lastDrawedY1 + 1;
-			if (yiScrCeil1 > lastDrawedY2) {
-				yiScrCeil1 = lastDrawedY2;
-				otherNotVisible = true;
-			}
-			if (yiScrCeil1 > yiScrCeil2) {
-				double u1 = uN;
-				double v1 = vN;
-				double u1DivZ = u1 / zSlicePrev;
-				double v1DivZ = v1 / zSlicePrev;
-				double oneDivZ1 = 1 / zSlicePrev;
-
-				const Edge& edgeCur = poly.edges[edgeWithMaxZ];
-				const Edge& edgeCurNext = poly.edges[(edgeWithMaxZ + 1) % vertsInPoly];
-				double u2 = (double(edgeCurNext.uFloorCeil) - edgeCur.uFloorCeil) * interpEdge + edgeCur.uFloorCeil;
-				double v2 = (double(edgeCurNext.vFloorCeil) - edgeCur.vFloorCeil) * interpEdge + edgeCur.vFloorCeil;
-				double u2DivZ = u2 / zSliceCur;
-				double v2DivZ = v2 / zSliceCur;
-				double oneDivZ2 = 1 / zSliceCur;
-
-				double srcInterp1 = ((yiScrCeil2 + 0.5) - yScrCeil2) / (yScrCeil1 - yScrCeil2);
-				double uCur = (u2DivZ - u1DivZ) * srcInterp1 + u1DivZ;
-				double vCur = (v2DivZ - v1DivZ) * srcInterp1 + v1DivZ;
-				double zCur = (oneDivZ2 - oneDivZ1) * srcInterp1 + oneDivZ1;
-
-				double srcInterp2 = (yiScrCeil1 + 0.5 - yScrCeil2) / (yScrCeil1 - yScrCeil2);
-				double uCorr = (u2DivZ - u1DivZ) * srcInterp2 + u1DivZ;
-				double vCorr = (v2DivZ - v1DivZ) * srcInterp2 + v1DivZ;
-				double zCorr = (oneDivZ2 - oneDivZ1) * srcInterp2 + oneDivZ1;
-
-				double uAdd = (uCorr - uCur) / (yiScrCeil1 - yiScrCeil2);
-				double vAdd = (vCorr - vCur) / (yiScrCeil1 - yiScrCeil2);
-				double zAdd = (zCorr - zCur) / (yiScrCeil1 - yiScrCeil2);
-
-				for (int y = yiScrCeil2; y < yiScrCeil1; ++y) {
-					unsigned char(&pixel)[3] = buf[y][columnN];
-					double uPixel = uCur / zCur;
-					double vPixel = vCur / zCur;
-					int scale = 5;
-					pixel[0] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
-					pixel[1] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
-					pixel[2] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
-					uCur += uAdd;
-					vCur += vAdd;
-					zCur += zAdd;
-				}
-				if (yiScrCeil1 > lastDrawedY1 + 1) {
-					lastDrawedY1 = yiScrCeil1 - 1;
-					if (lastDrawedY1 >= lastDrawedY2 - 1)
-						break;
-				}
-			}
-			if (otherNotVisible)
-				goto m1;
-		}
-
-		// Рисуем пол полигона  ---------------------------------------------------------
-		{
-			if (yiScrFloor1 <= lastDrawedY1)
-				yiScrFloor1 = lastDrawedY1 + 1;
-			if (yiScrFloor2 > lastDrawedY2)
-				yiScrFloor2 = lastDrawedY2;
-			if (yiScrFloor2 > yiScrFloor1) {
-				const Edge& edgeCur = poly.edges[edgeWithMaxZ];
-				const Edge& edgeCurNext = poly.edges[(edgeWithMaxZ + 1) % vertsInPoly];
-				double u1 = (double(edgeCurNext.uFloorCeil) - edgeCur.uFloorCeil) * interpEdge + edgeCur.uFloorCeil;
-				double v1 = (double(edgeCurNext.vFloorCeil) - edgeCur.vFloorCeil) * interpEdge + edgeCur.vFloorCeil;
-				double u1DivZ = u1 / zSliceCur;
-				double v1DivZ = v1 / zSliceCur;
-				double oneDivZ1 = 1 / zSliceCur;
-
-				double u2 = uN;
-				double v2 = vN;
-				double u2DivZ = u2 / zSlicePrev;
-				double v2DivZ = v2 / zSlicePrev;
-				double oneDivZ2 = 1 / zSlicePrev;
-
-				double srcInterp1 = ((yiScrFloor1 + 0.5) - yScrFloor1) / (yScrFloor2 - yScrFloor1);
-				double uCur = (u2DivZ - u1DivZ) * srcInterp1 + u1DivZ;
-				double vCur = (v2DivZ - v1DivZ) * srcInterp1 + v1DivZ;
-				double zCur = (oneDivZ2 - oneDivZ1) * srcInterp1 + oneDivZ1;
-
-				double srcInterp2 = (yiScrFloor2 + 0.5 - yScrFloor1) / (yScrFloor2 - yScrFloor1);
-				double uCorr = (u2DivZ - u1DivZ) * srcInterp2 + u1DivZ;
-				double vCorr = (v2DivZ - v1DivZ) * srcInterp2 + v1DivZ;
-				double zCorr = (oneDivZ2 - oneDivZ1) * srcInterp2 + oneDivZ1;
-
-				double uAdd = (uCorr - uCur) / (yiScrFloor2 - yiScrFloor1);
-				double vAdd = (vCorr - vCur) / (yiScrFloor2 - yiScrFloor1);
-				double zAdd = (zCorr - zCur) / (yiScrFloor2 - yiScrFloor1);
-
-				for (int y = yiScrFloor1; y < yiScrFloor2; ++y) {
-					unsigned char(&pixel)[3] = buf[y][columnN];
-					double uPixel = uCur / zCur;
-					double vPixel = vCur / zCur;
-					int scale = 5;
-					pixel[0] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
-					pixel[1] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
-					pixel[2] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
-					uCur += uAdd;
-					vCur += vAdd;
-					zCur += zAdd;
-				}
-				if (yiScrFloor1 < lastDrawedY2)
-				{
-					lastDrawedY2 = yiScrFloor1;
-					if (lastDrawedY1 >= lastDrawedY2 - 1)
-						break;
-				}
-			}
-		}
-
 
 m1: 	zSlicePrev = zSliceCur;
 		interpEdgePrev = interpEdge;
@@ -610,10 +628,11 @@ m1: 	zSlicePrev = zSliceCur;
 			}
 			break;                                   
 		}
-		edgeComeFromT = &polies[curPolyN].edges[edgeNComeFrom];
-		const Edge& edgeComeFromNextT = polies[curPolyN].edges[(edgeNComeFrom + 1) % vertsInPoly];
-		uN = (double(edgeComeFromT->uFloorCeil) - edgeComeFromNextT.uFloorCeil) * interpEdgePrev + edgeComeFromNextT.uFloorCeil;
-		vN = (double(edgeComeFromT->vFloorCeil) - edgeComeFromNextT.vFloorCeil) * interpEdgePrev + edgeComeFromNextT.vFloorCeil;
+		Poly& poly2 = polies[curPolyN];
+		const Edge& edgeComeFrom = poly2.edges[edgeNComeFrom];
+		const Edge& edgeComeFromNextT = poly2.edges[(edgeNComeFrom + 1) % poly2.edges.size()];
+		floorCeilNearU = (double(edgeComeFrom.uFloorCeil) - edgeComeFromNextT.uFloorCeil) * interpEdgePrev + edgeComeFromNextT.uFloorCeil;
+		floorCeilNearV = (double(edgeComeFrom.vFloorCeil) - edgeComeFromNextT.vFloorCeil) * interpEdgePrev + edgeComeFromNextT.vFloorCeil;
 	}
 }
 
@@ -666,6 +685,3 @@ void Draw(HWND hWnd)
 
 	DrawFrameBuf(hWnd);
 }
-
-
-
