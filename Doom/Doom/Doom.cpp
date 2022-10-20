@@ -320,7 +320,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 
 	int curPolyN = startingPoly;
 	int edgeNComeFrom = -1;     // Номер ребра в текущем полигоне через которое мы пришли из предыдущего полигона
-	double zSlicePrev = zNear;  // Z-координата предыдущей точки сечения в системе координат камеры
+	double zSlicePrev = -1;  // Z-координата предыдущей точки сечения в системе координат камеры
 	double interpEdgePrev = 0;  // [0..1] Пропорция в которой поделено предыдущее ребро
 	
 
