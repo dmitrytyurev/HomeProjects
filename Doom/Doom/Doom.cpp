@@ -369,7 +369,10 @@ void DrawOneColumn(double scanAngle, int columnN)
 			}
 		}
 		if (edgeWithMaxZ == -1)	{
-			std::string str = "Error: edgeWithMaxZ == -1. columnN:" + std::to_string(columnN) + "\n";
+			std::string str = "Error: edgeWithMaxZ == -1.\n";
+			str += "columnN:" + std::to_string(columnN) + "\n";
+			str += "zCam:" + std::to_string(zCam) + "\n";
+			str += "alCam:" + std::to_string(alCam) + "\n";
 			OutputDebugStringA(str.c_str());
 			exit(1);
 		}
@@ -762,6 +765,9 @@ int FindPolygonUnderCamera() // Возвращает индекс полигон
 
 void Draw(HWND hWnd)
 {
+	zCam -= 0.08f;
+	alCam += 0.001f;
+
 	horCamlAngleRad = horizontalAngle / 180.0 * 3.14159265359;
 	dz = 1.0 / tan(horCamlAngleRad / 2.0);
 	kProj = bufSizeX / 2 / tan(horCamlAngleRad / 2);
@@ -769,8 +775,6 @@ void Draw(HWND hWnd)
 	if (startingPoly == -1) {
 		return;
 	}
-	//zCam += 0.0003f;
-	alCam += 0.001f;
 
 	for (int x = 0; x < bufSizeX; ++x) {
 		double curX = (x - bufSizeX / 2 + 0.5) * 2.0 / bufSizeX;  // Текущая горизонтальная позиция пиксела в системе камеры  -1..1
