@@ -1261,12 +1261,21 @@ m1:;
 		Poly& poly1 = polies[pn1];
 		int vertsNum1 = poly1.edges.size();
 		for (int en1 = 0; en1 < vertsNum1; ++en1) {
-			poly1.edges[en1].u[0] = rand() / 32768.f;
-			poly1.edges[en1].u[1] = rand() / 32768.f;
-			poly1.edges[en1].vCeil = rand() / 32768.f;
-			poly1.edges[en1].vCeilAdd = rand() / 32768.f;
-			poly1.edges[en1].vFloor = rand() / 32768.f;
-			poly1.edges[en1].vFloorAdd = rand() / 32768.f;
+			poly1.edges[en1].u[0] = 0;
+
+			int nextInd = (en1 + 1) % vertsNum1;
+			double dx = verts[poly1.edges[en1].firstInd].x - verts[poly1.edges[nextInd].firstInd].x;
+			double dz = verts[poly1.edges[en1].firstInd].z - verts[poly1.edges[nextInd].firstInd].z;
+			double dist = sqrt(dx * dx + dz * dz);
+			poly1.edges[en1].u[1] = dist * 0.02;
+
+			poly1.edges[en1].vCeil = 1;
+			poly1.edges[en1].vCeilAdd = 0.02;
+			poly1.edges[en1].vFloor = 0;
+			poly1.edges[en1].vFloorAdd = 0.02;
+
+			poly1.edges[en1].uFloorCeil = verts[poly1.edges[en1].firstInd].x * 0.02;
+			poly1.edges[en1].vFloorCeil = verts[poly1.edges[en1].firstInd].z * 0.02;
 		}
 	}
 
