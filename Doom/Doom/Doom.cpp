@@ -551,6 +551,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 					goto m1;
 
 				// Рисуем внешнюю стенку полигона под полом  ---------------------------------------------------------
+				double subPixelCorrection = (yiScrFloor2 + 0.5 - yScrFloor2);  // Субпиксельная коррекция, чтобы V-координата бралась для центра верхнего пиксела полигона
 				int keep1 = yiScrFloor2;
 				if (yiScrFloor2 <= lastDrawedY1) {
 					yiScrFloor2 = lastDrawedY1 + 1;
@@ -558,7 +559,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 				}
 				if (lastDrawedY2 > yiScrFloor2) {
 					double addV = edgeComeFrom->vFloorAdd * vDens; // Изменение V-координаты с каждым пикселем
-					double subPixelCorrection = (yiScrFloor2 + 0.5 - yScrFloor2);  // Субпиксельная коррекция, чтобы V-координата бралась для центра верхнего пиксела полигона
+					//double curV = edgeComeFrom->vFloor + addV * (yiScrFloor2 - keep1 + subPixelCorrection) *0.5;
 					double curV = edgeComeFrom->vFloor + addV * (yiScrFloor2 - keep1 + subPixelCorrection);
 					for (int y = yiScrFloor2; y < lastDrawedY2; ++y) {
 						unsigned char(&pixel)[3] = buf[y][columnN];
@@ -767,6 +768,7 @@ void Draw(HWND hWnd)
 {
 	zCam -= 0.08f;
 	alCam += 0.001f;
+	//alCam = 0.9;
 
 	horCamlAngleRad = horizontalAngle / 180.0 * 3.14159265359;
 	dz = 1.0 / tan(horCamlAngleRad / 2.0);
