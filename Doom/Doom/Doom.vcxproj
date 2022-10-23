@@ -127,13 +127,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="bmp.h" />
     <ClInclude Include="Doom.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="LevelData.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="bmp.cpp" />
     <ClCompile Include="Doom.cpp" />
+    <ClCompile Include="LevelData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Doom.rc" />
