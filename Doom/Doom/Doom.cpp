@@ -36,25 +36,10 @@ const double zNear = 1;
 
 // -------------------------------------------------------------------
 
-
-std::vector<Texture> textures;
-
-
-
 // Описание игрового уровня
-std::vector<FPoint2D> verts = {{10,30}, {20,30}, {10,20} , {20,20} , {10,10} , {20,10} };
-std::vector<Poly> polies = {
-	{45,44,41,
-		{{0,-1,-1,{0,10}, 1, 1, 0, 1, {""}, {""},    0 ,0},
-		       {1,-1,-1,{0,10}, 1, 1, 0, 1, {""}, {""},    3, 0},
-		       {3, 1, 0,{0,10}, 1, 1, 0, 1, {""}, {""},    3, 3},
-		       {2,-1,-1,{0,10}, 1, 1, 0, 1, {""}, {""},    0, 3}}},
-
-	{46,45,40,
-		{{2, 0, 2,{0,1}, 5, 5, 0, 5, {""}, {""},   0,0},
-			   {3,-1,-1,{0,1}, 5, 5, 0, 5, {""}, {""},   3 ,0},
-			   {5,-1,-1,{0,1}, 5, 5, 0, 5, {""}, {""},   3, 3},
-			   {4,-1,-1,{0,1}, 5, 5, 0, 5, {""}, {""},   0,3}}} };
+std::vector<FPoint2D> verts;
+std::vector<Poly> polies;
+std::vector<Texture> textures;
 
 // Параметры камеры
 float xCam, yCam, zCam;  // Позиция камеры в мире
@@ -526,13 +511,13 @@ void DrawOneColumn(double scanAngle, int columnN)
 				if (lastDrawedY2 > yiScrFloor2) {
 					double addV = edgeComeFrom->vFloorAdd * vDens; // Изменение V-координаты с каждым пикселем
 					double curV = edgeComeFrom->vFloor + addV * (yiScrFloor2 - keep1 + subPixelCorrection);
-					const Texture& curTex = textures[0];
-					unsigned char* texture = curTex.buf;
+					const Texture& curTex = textures[edgeComeFrom->texDown.texIndex];
+					int ui = int(curU * curTex.sizeX) & (curTex.sizeX - 1);
+					unsigned char* texture = curTex.buf + (ui << 2);
 					for (int y = yiScrFloor2; y < lastDrawedY2; ++y) {
 						unsigned char(&dst)[3] = buf[y][columnN];
-						int ui = int(curU * curTex.sizeX) & (curTex.sizeX - 1);
 						int vi = int(curV * curTex.sizeY) & (curTex.sizeY - 1);
-						unsigned char* src = texture + (((vi << curTex.xPow2) + ui) << 2);
+						unsigned char* src = texture + ((vi << curTex.xPow2) << 2);
 						dst[0] = src[2];
 						dst[1] = src[1];
 						dst[2] = src[0];

@@ -22,20 +22,23 @@ struct TextureOnModel
 struct Edge
 {
 	int firstInd = 0;  // Индекс первой вершины ребра в verts. Индекс второй вершины ребра берём из следующего ребра в edges
-	int adjPolyN = -1;  // Индекс смежного полигона в polies, либо -1, если смежного полигона нет
-	int adjEdgeN = 0;  // Индекс смежного ребра в edges смежного полигона
 	// Текстурные координаты стен
 	float u[2] = {};    // U-координаты в первой и второй точках ребра
+
+	TextureOnModel texUp;   // Текстура верхнего простенка
 	float vCeil = 0;     // V-координата а уровне потолка
 	float vCeilAdd = 1;  // Приращение V-координаты (в единицах [0..1] на 1 метр сдвига вниз)
+
+	TextureOnModel texDown; // Текстура нижнего простенка
 	float vFloor = 0;    // V-координата а уровне пола
 	float vFloorAdd = 1; // Приращение V-координаты (в единицах [0..1] на 1 метр сдвига вниз)
-	TextureOnModel texUp;   // Текстура верхнего простенка
-	TextureOnModel texDown; // Текстура нижнего простенка
 
 	// Текстурные координаты пола/потолка
 	float uFloorCeil = 0;
 	float vFloorCeil = 0;
+	// Заполняется всегда автоматически
+	int adjPolyN = -1;  // Индекс смежного полигона в polies, либо -1, если смежного полигона нет
+	int adjEdgeN = 0;  // Индекс смежного ребра в edges смежного полигона
 };
 
 struct Poly
@@ -50,13 +53,14 @@ struct Poly
 
 struct Texture
 {
-	Texture(const std::string& fileName);
-	~Texture() { if (buf) delete[]buf; }
+	Texture(const std::string& name_);
+	~Texture() { /*if (buf) delete[]buf; */ }
 
 	int sizeX = 0;   // Размер текстуры по X (разрешается только степени двойки)
 	int sizeY = 0;   // Размер текстуры по Y (разрешается только степени двойки)
 	int xPow2 = 0;   // Сама степень двойки для sizeX
 	unsigned char* buf = nullptr;  // Буфер пикселей по 4 байта на пиксел
+	std::string name;
 };
 
 void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std::vector<Texture>& textures);
