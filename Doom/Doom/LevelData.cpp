@@ -516,13 +516,15 @@ m1:;
 			double dist = sqrt(dx * dx + dz * dz);
 			poly1.edges[en1].u[1] = float(dist * 0.01);
 
-			poly1.edges[en1].vCeil = 1;
+			poly1.edges[en1].vWallCeil = 1;
 			poly1.edges[en1].vCeilAdd = 0.01f;
-			poly1.edges[en1].vFloor = 0;
+			poly1.edges[en1].vWallFloor = 0;
 			poly1.edges[en1].vFloorAdd = 0.01f;
 
-			poly1.edges[en1].uFloorCeil = float(verts[poly1.edges[en1].firstInd].x * 0.008);
-			poly1.edges[en1].vFloorCeil = float(verts[poly1.edges[en1].firstInd].z * 0.008);
+			poly1.edges[en1].uCeil = float(verts[poly1.edges[en1].firstInd].x * 0.008);
+			poly1.edges[en1].vCeil = float(verts[poly1.edges[en1].firstInd].z * 0.008);
+			poly1.edges[en1].uFloor = float(verts[poly1.edges[en1].firstInd].x * 0.008);
+			poly1.edges[en1].vFloor = float(verts[poly1.edges[en1].firstInd].z * 0.008);
 		}
 	}
 
