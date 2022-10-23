@@ -35,11 +35,11 @@ struct Edge
 	float vFloorAdd = 1;    // Приращение V-координаты (в единицах [0..1] на 1 метр сдвига вниз)
 
 	// Текстурные координаты потолка
-	float uCeil = 0;
-	float vCeil = 0;
+	float uCeil = -1;
+	float vCeil = -1;
 	// Текстурные координаты пола
-	float uFloor = 0;
-	float vFloor = 0;
+	float uFloor = -1;
+	float vFloor = -1;
 
 	// Заполняется всегда автоматически
 	int adjPolyN = -1;  // Индекс смежного полигона в polies, либо -1, если смежного полигона нет

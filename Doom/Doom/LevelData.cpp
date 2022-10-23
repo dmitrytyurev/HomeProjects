@@ -373,7 +373,7 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{{26,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{27,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{35,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{34,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
+		{34,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
 
 	polies[42] = { 0,1250,1000,
 		{{19,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -502,32 +502,6 @@ m1:;
 		}
 	}
 
-	// Тестовое заполнение текстурных координат
-
-	for (int pn1 = 0; pn1 < polies.size(); ++pn1) {
-		Poly& poly1 = polies[pn1];
-		int vertsNum1 = (int)poly1.edges.size();
-		for (int en1 = 0; en1 < vertsNum1; ++en1) {
-			poly1.edges[en1].u[0] = 0;
-
-			int nextInd = (en1 + 1) % vertsNum1;
-			double dx = verts[poly1.edges[en1].firstInd].x - verts[poly1.edges[nextInd].firstInd].x;
-			double dz = verts[poly1.edges[en1].firstInd].z - verts[poly1.edges[nextInd].firstInd].z;
-			double dist = sqrt(dx * dx + dz * dz);
-			poly1.edges[en1].u[1] = float(dist * 0.01);
-
-			poly1.edges[en1].vWallCeil = 1;
-			poly1.edges[en1].vCeilAdd = 0.01f;
-			poly1.edges[en1].vWallFloor = 0;
-			poly1.edges[en1].vFloorAdd = 0.01f;
-
-			poly1.edges[en1].uCeil = float(verts[poly1.edges[en1].firstInd].x * 0.008);
-			poly1.edges[en1].vCeil = float(verts[poly1.edges[en1].firstInd].z * 0.008);
-			poly1.edges[en1].uFloor = float(verts[poly1.edges[en1].firstInd].x * 0.008);
-			poly1.edges[en1].vFloor = float(verts[poly1.edges[en1].firstInd].z * 0.008);
-		}
-	}
-
 	// Разворачиваем систему координат, чтобы был обход по часовой стрелке
 	for (FPoint2D& vert: verts) {
 		vert.z = -vert.z;
@@ -551,4 +525,38 @@ m1:;
 			edge.texDown.texIndex = getTextureIndex(edge.texDown.texFileName, textures);
 		}
 	}
+
+
+	// Заполнение текстурных координат
+
+	for (int pn1 = 0; pn1 < polies.size(); ++pn1) {
+		Poly& poly1 = polies[pn1];
+		int vertsNum1 = (int)poly1.edges.size();
+		for (int en1 = 0; en1 < vertsNum1; ++en1) {
+			poly1.edges[en1].u[0] = 0;
+
+			int nextInd = (en1 + 1) % vertsNum1;
+			double dx = verts[poly1.edges[en1].firstInd].x - verts[poly1.edges[nextInd].firstInd].x;
+			double dz = verts[poly1.edges[en1].firstInd].z - verts[poly1.edges[nextInd].firstInd].z;
+			double dist = sqrt(dx * dx + dz * dz);
+			poly1.edges[en1].u[1] = float(dist * 0.01);
+
+			poly1.edges[en1].vWallCeil = 1;
+			poly1.edges[en1].vCeilAdd = 0.01f;
+			poly1.edges[en1].vWallFloor = 0;
+			poly1.edges[en1].vFloorAdd = 0.01f;
+
+			if (poly1.edges[en1].uCeil == -1.f)
+				poly1.edges[en1].uCeil = float(verts[poly1.edges[en1].firstInd].x * 0.008 * 256 / textures[poly1.ceilTex.texIndex].sizeX);
+			if (poly1.edges[en1].vCeil == -1.f)
+				poly1.edges[en1].vCeil = float(verts[poly1.edges[en1].firstInd].z * 0.008 * 256 / textures[poly1.ceilTex.texIndex].sizeX);
+
+			if (poly1.edges[en1].uFloor == -1.f)
+					poly1.edges[en1].uFloor = float(verts[poly1.edges[en1].firstInd].x * 0.008 * 256 / textures[poly1.floorTex.texIndex].sizeX);
+			if (poly1.edges[en1].vFloor == -1.f)
+				poly1.edges[en1].vFloor = float(verts[poly1.edges[en1].firstInd].z * 0.008 * 256 / textures[poly1.floorTex.texIndex].sizeX);
+		}
+	}
+
+
 }
