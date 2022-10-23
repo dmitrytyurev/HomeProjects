@@ -13,6 +13,12 @@ struct DPoint2D
 	double z;
 };
 
+struct TextureOnModel
+{
+	std::string texFileName;  // Имя файла текстуры
+	int texIndex = 0;         // Индекс текстуры в массиве textures
+};
+
 struct Edge
 {
 	int firstInd = 0;  // Индекс первой вершины ребра в verts. Индекс второй вершины ребра берём из следующего ребра в edges
@@ -24,6 +30,9 @@ struct Edge
 	float vCeilAdd = 1;  // Приращение V-координаты (в единицах [0..1] на 1 метр сдвига вниз)
 	float vFloor = 0;    // V-координата а уровне пола
 	float vFloorAdd = 1; // Приращение V-координаты (в единицах [0..1] на 1 метр сдвига вниз)
+	TextureOnModel texUp;   // Текстура верхнего простенка
+	TextureOnModel texDown; // Текстура нижнего простенка
+
 	// Текстурные координаты пола/потолка
 	float uFloorCeil = 0;
 	float vFloorCeil = 0;
@@ -35,6 +44,8 @@ struct Poly
 	float yCeil = 0;
 	float yFloor = 0;
 	std::vector<Edge> edges;
+	TextureOnModel floorTex;
+	TextureOnModel ceilTex;
 };
 
 struct Texture
