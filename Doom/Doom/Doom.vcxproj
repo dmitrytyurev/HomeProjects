@@ -133,11 +133,13 @@
     <ClInclude Include="LevelData.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bmp.cpp" />
     <ClCompile Include="Doom.cpp" />
     <ClCompile Include="LevelData.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Doom.rc" />

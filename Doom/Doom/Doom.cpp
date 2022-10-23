@@ -9,10 +9,11 @@
 #include <string>
 #include <xutility>
 #include "LevelData.h"
-
-
+#include "bmp.h"
+#include "Utils.h"
 
 #define MAX_LOADSTRING 100
+
 
 // Глобальные переменные:
 HINSTANCE hInst;                                // текущий экземпляр
@@ -30,15 +31,69 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 void Update();
 void Draw(HWND hWnd);
 
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
 const int bufSizeX = 500;
 const int bufSizeY = 340;
 const double zNear = 1;
 
 // -------------------------------------------------------------------
+
+struct Texture
+{
+	Texture(const std::string& fileName);
+	~Texture() { if (buf) delete[]buf; }
+
+	int sizeX = 0;   // Размер текстуры по X (разрешается только степени двойки)
+	int sizeY = 0;   // Размер текстуры по Y (разрешается только степени двойки)
+	int xPow2 = 0;   // Сама степень двойки для sizeX
+	unsigned char* buf = nullptr;  // Буфер пикселей по 4 байта на пиксел
+};
+
+std::vector<Texture> textures;
+
+
+bool IsPow2(int value, int* pow)
+{
+	int mask = 1;
+	for (int i = 0; i < 20; ++i) {
+		if (value == mask) {
+			if (pow)
+				*pow = i;
+			return true;
+		}
+		mask = mask << 1;
+	}
+	return false;
+}
+
+Texture::Texture(const std::string& fileName)
+{
+	int bitDepth;
+	give_bmp_size(fileName.c_str(), &sizeX, &sizeY, &bitDepth);
+	if (bitDepth != 24 || !IsPow2(sizeX, &xPow2) || !IsPow2(sizeY, nullptr)) {
+		ExitMsg("Texture file %s params is wrong %d %d %d", fileName.c_str(), sizeX, sizeY, bitDepth);
+	}
+
+	unsigned char* tmpBuf = new unsigned char[sizeX * sizeY * 3];
+	read_bmp24(fileName.c_str(), tmpBuf);
+
+	unsigned char* src = tmpBuf;
+	buf = new unsigned char[sizeX * sizeY * 4];
+	unsigned char* dst = buf;
+
+	for (int i = 0; i < sizeX * sizeY; ++i) {
+		unsigned char b = *src++;
+		unsigned char g = *src++;
+		unsigned char r = *src++;
+		*dst++ = r;
+		*dst++ = g;
+		*dst++ = b;
+		*dst++ = 0;
+	}
+
+	delete []tmpBuf;
+}
+
+
 
 // Описание игрового уровня
 std::vector<FPoint2D> verts = {{10,30}, {20,30}, {10,20} , {20,20} , {10,10} , {20,10} };
@@ -56,7 +111,7 @@ std::vector<Poly> polies = {
 			   {4,-1,-1,{0,1}, 5, 5, 0, 5,   0,3}}} };
 
 // Параметры камеры
-float xCam=540, yCam=1070, zCam=-1100;  // Позиция камеры в мире
+float xCam, yCam, zCam;  // Позиция камеры в мире
 float alCam;  // Угол вращения камеры. Если 0, то смотрит вдоль оси OZ
 float horizontalAngle = 90.0;  // Горизонтальный угол обзора камеры в градусах
 
@@ -69,11 +124,6 @@ double kProj;
 int startingPoly;
 double floorCeilNearU = 0;
 double floorCeilNearV = 0;
-
-int texSizeX = 32;  // Степень двойки!
-int texXPow2 = 5;
-int texSizeY = 32;   // Степень двойки!
-unsigned char textureBuf[32*32*4];
 
 // -------------------------------------------------------------------
 
@@ -92,6 +142,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     LoadStringW(hInstance, IDC_DOOM, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
+	textures.emplace_back("gray_wall.bmp");
 	FillLevelData(verts, polies);
 
     // Выполнить инициализацию приложения:
@@ -246,19 +297,6 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     return (INT_PTR)FALSE;
 }
 
-// -------------------------------------------------------------------
-
-void _cdecl ExitMsg(const char* text, ...)
-{
-	static char tmpStr[1024];
-	va_list args;
-	va_start(args, text);
-	vsprintf_s(tmpStr, sizeof(tmpStr), text, args);
-	va_end(args);
-
-	OutputDebugStringA(tmpStr);
-	exit(1);
-}
 
 // -------------------------------------------------------------------
 
@@ -543,15 +581,16 @@ void DrawOneColumn(double scanAngle, int columnN)
 				if (lastDrawedY2 > yiScrFloor2) {
 					double addV = edgeComeFrom->vFloorAdd * vDens; // Изменение V-координаты с каждым пикселем
 					double curV = edgeComeFrom->vFloor + addV * (yiScrFloor2 - keep1 + subPixelCorrection);
-					unsigned char* texture = textureBuf;
+					const Texture& curTex = textures[0];
+					unsigned char* texture = curTex.buf;
 					for (int y = yiScrFloor2; y < lastDrawedY2; ++y) {
 						unsigned char(&dst)[3] = buf[y][columnN];
-						int ui = int(curU * texSizeX) & (texSizeX - 1);
-						int vi = int(curV * texSizeY) & (texSizeY - 1);
-						unsigned char* src = texture + (((vi << texXPow2) + ui) << 2);
-						dst[0] = src[0];
+						int ui = int(curU * curTex.sizeX) & (curTex.sizeX - 1);
+						int vi = int(curV * curTex.sizeY) & (curTex.sizeY - 1);
+						unsigned char* src = texture + (((vi << curTex.xPow2) + ui) << 2);
+						dst[0] = src[2];
 						dst[1] = src[1];
-						dst[2] = src[2];
+						dst[2] = src[0];
 						curV += addV;
 					}
 					if (yiScrFloor2 < lastDrawedY2) {
@@ -688,9 +727,9 @@ m1: 	zSlicePrev = zSliceCur;
 			// Рисуем пустоту (где уже нет лабиринта)
 			for (int y = lastDrawedY1+1; y < lastDrawedY2; ++y) {
 				unsigned char(&pixel)[3] = buf[y][columnN];
-				pixel[0] = 60;
+				pixel[0] = 0;
 				pixel[1] = 60;
-				pixel[2] = 60;
+				pixel[2] = 0;
 			}
 			break;                                   
 		}
@@ -751,9 +790,13 @@ int FindPolygonUnderCamera() // Возвращает индекс полигон
 
 void Draw(HWND hWnd)
 {
-	zCam -= 0.08f;
-	alCam += 0.001f;
-	//alCam = 0.9;
+	//zCam -= 0.08f;
+	//alCam += 0.001f;
+	alCam = 3.14159; // +0.4;
+	xCam = 313; // ; 794
+	yCam = 1070;
+	zCam = -1500; // -1160;
+
 
 	horCamlAngleRad = horizontalAngle / 180.0 * 3.14159265359;
 	dz = 1.0 / tan(horCamlAngleRad / 2.0);

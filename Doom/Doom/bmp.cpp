@@ -11,35 +11,10 @@ void _cdecl ExitMsg(const char *text, ...);
   //--------------------------------------------------------------------------------------------
   // Глобальные параметры
   //--------------------------------------------------------------------------------------------
-using BYTE = unsigned char;
 #pragma warning(suppress : 4996)
 
-  BYTE *color_bmp;           // указатель на bmp-файл текстуры, отмэпленный на память
-  int map_size_x_aligned;    // расстояние между строками текущей BMP-текстуры
-  int bytesDepth;            // глубина цвета текстуры в байтах(!).  3 или 4 (с альфа-каналом)
-  int x_size, y_size;        // размер открытой текстуры
 
-  //--------------------------------------------------------------------------------------------
-  // Функции для работы с BMP
-  //--------------------------------------------------------------------------------------------
-
-  char *FileMapping(const char *fname)
-  {
-    HANDLE hFile,hFileMapping;
-    char *res;
-
-    hFile = CreateFileA(fname, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0);
-    if (hFile == INVALID_HANDLE_VALUE) ExitMsg("Can't open file ", fname);
-    hFileMapping = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
-    CloseHandle(hFile);
-    if (hFileMapping == INVALID_HANDLE_VALUE) ExitMsg("CreateFileMapping failed: ", fname);
-    res = (char *)MapViewOfFile(hFileMapping, FILE_MAP_READ, 0, 0, 0);
-    CloseHandle(hFileMapping);
-    if (res == NULL) ExitMsg("MapViewOfFile failed: ", fname);
-    return res;
-  }
-
-  //--------------------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------------
 
   int my_create(const char *fullFileName)
   {
@@ -85,7 +60,7 @@ using BYTE = unsigned char;
   // По имени файла картинки вернуть её размеры и битность
   //--------------------------------------------------------------------------------------------
 
-  void give_bmp_size(const char *fname, int *px, int *py) 
+  void give_bmp_size(const char *fname, int* px, int *py, int *bits)
   {
     int hdl,res;
     WORD sign;
@@ -103,14 +78,12 @@ m1:    ExitMsg("Error reading file ", fname);
     res = _read(hdl, py, 4);
     if (-1 == res) goto m1;
     _lseek(hdl, 28, SEEK_SET);
-    int bitsDepth;
-    res = _read(hdl, &bitsDepth, 4);
+    res = _read(hdl, bits, 4);
     if (-1 == res) goto m1;
     _close(hdl);
-    if (bitsDepth != 24)  ExitMsg("%s is not a valid BMP-file (only 24 bit depth supported)", fname);
-    bytesDepth = bitsDepth / 8;
   }
 
+  //--------------------------------------------------------------------------------------------
 
 void read_bmp24(const char* fileName, unsigned char* pixels)
 {
@@ -123,9 +96,9 @@ void read_bmp24(const char* fileName, unsigned char* pixels)
 	int ySize = 0;
 	int res = fseek(f, 18, SEEK_SET);
 	if (res) ExitMsg("error reading 1");
-	res = fread(&xSize, 1, 4, f);
+	res = (int)fread(&xSize, 1, 4, f);
 	if (res != 4) ExitMsg("error reading 1");
-	res = fread(&ySize, 1, 4, f);
+	res = (int)fread(&ySize, 1, 4, f);
 	if (res != 4) ExitMsg("error reading 1");
 
 	int linePadd = (-3 * xSize) & 3;
@@ -133,53 +106,16 @@ void read_bmp24(const char* fileName, unsigned char* pixels)
 	res = fseek(f, 54, SEEK_SET);
 	if (res) ExitMsg("error reading 1");
 	for (int i = 0; i < ySize; ++i) {
-		res = fread(pixels + (ySize-1-i)* 3 * xSize, 1, 3*xSize, f);
+		res = (int)fread(pixels + (ySize-1-i)* 3 * xSize, 1, 3*xSize, f);
 		if (res != 3 * xSize) ExitMsg("error reading 1");
 		if (linePadd) {
-			res = fseek(f, linePadd, SEEK_CUR);
+			res = (int)fseek(f, linePadd, SEEK_CUR);
 			if (res) ExitMsg("error reading 1");
 		}
 
 	}
 	fclose(f);
 }
-
-
-  //--------------------------------------------------------------------------------------------
-  // Открыть картинку в режиме отображения на память 
-  // Доступ осуществляется через функцию give_pixel_adr
-  // По окончании работы закрыть файл функцией close_color_bmp
-  //--------------------------------------------------------------------------------------------
-
-  void open_color_bmp(const char *fname)
-  {
-    give_bmp_size(fname, &x_size, &y_size);
-    map_size_x_aligned = (x_size * bytesDepth + 3) & ~3;
-    color_bmp = (BYTE *)FileMapping(fname);
-  }
-
-  //--------------------------------------------------------------------------------------------
-  // Закрыть картинку, открытую функцией open_color_bmp
-  //--------------------------------------------------------------------------------------------
-
-  void close_color_bmp()
-  {
-    if (NULL != color_bmp) UnmapViewOfFile(color_bmp);
-  }
-
-  //--------------------------------------------------------------------------------------------
-  // Возвращает адрес заданного пиксела открытого файла
-  // Можно читать всю строку до конца
-  //--------------------------------------------------------------------------------------------
-
-
-  BYTE *give_pixel_adr(int x, int y, BMP_Y_FLIP flip)
-  {
-    if (flip == BMP_Y_FLIPPED)
-      return  color_bmp + 54 + y * map_size_x_aligned + x*bytesDepth;
-
-    return  color_bmp + 54 + (y_size - 1 - y) * map_size_x_aligned + x*bytesDepth;
-  }
 
   //--------------------------------------------------------------------------------------------
 
