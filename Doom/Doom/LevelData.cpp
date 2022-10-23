@@ -1,7 +1,52 @@
 
 #include "LevelData.h"
+#include "bmp.h"
+#include "Utils.h"
 
-void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies)
+bool IsPow2(int value, int* pow)
+{
+	int mask = 1;
+	for (int i = 0; i < 20; ++i) {
+		if (value == mask) {
+			if (pow)
+				*pow = i;
+			return true;
+		}
+		mask = mask << 1;
+	}
+	return false;
+}
+
+Texture::Texture(const std::string& fileName)
+{
+	int bitDepth;
+	give_bmp_size(fileName.c_str(), &sizeX, &sizeY, &bitDepth);
+	if (bitDepth != 24 || !IsPow2(sizeX, &xPow2) || !IsPow2(sizeY, nullptr)) {
+		ExitMsg("Texture file %s params is wrong %d %d %d", fileName.c_str(), sizeX, sizeY, bitDepth);
+	}
+
+	unsigned char* tmpBuf = new unsigned char[sizeX * sizeY * 3];
+	read_bmp24(fileName.c_str(), tmpBuf);
+
+	unsigned char* src = tmpBuf;
+	buf = new unsigned char[sizeX * sizeY * 4];
+	unsigned char* dst = buf;
+
+	for (int i = 0; i < sizeX * sizeY; ++i) {
+		unsigned char b = *src++;
+		unsigned char g = *src++;
+		unsigned char r = *src++;
+		*dst++ = r;
+		*dst++ = g;
+		*dst++ = b;
+		*dst++ = 0;
+	}
+
+	delete[]tmpBuf;
+}
+
+
+void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std::vector<Texture>& textures)
 {
 	verts.resize(58);
 
@@ -469,4 +514,8 @@ m1:;
 	for (FPoint2D& vert: verts) {
 		vert.z = -vert.z;
 	}
+
+	textures.emplace_back("gray_wall.bmp");
+
+
 }

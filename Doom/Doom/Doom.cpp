@@ -9,7 +9,6 @@
 #include <string>
 #include <xutility>
 #include "LevelData.h"
-#include "bmp.h"
 #include "Utils.h"
 
 #define MAX_LOADSTRING 100
@@ -37,61 +36,8 @@ const double zNear = 1;
 
 // -------------------------------------------------------------------
 
-struct Texture
-{
-	Texture(const std::string& fileName);
-	~Texture() { if (buf) delete[]buf; }
-
-	int sizeX = 0;   // Размер текстуры по X (разрешается только степени двойки)
-	int sizeY = 0;   // Размер текстуры по Y (разрешается только степени двойки)
-	int xPow2 = 0;   // Сама степень двойки для sizeX
-	unsigned char* buf = nullptr;  // Буфер пикселей по 4 байта на пиксел
-};
 
 std::vector<Texture> textures;
-
-
-bool IsPow2(int value, int* pow)
-{
-	int mask = 1;
-	for (int i = 0; i < 20; ++i) {
-		if (value == mask) {
-			if (pow)
-				*pow = i;
-			return true;
-		}
-		mask = mask << 1;
-	}
-	return false;
-}
-
-Texture::Texture(const std::string& fileName)
-{
-	int bitDepth;
-	give_bmp_size(fileName.c_str(), &sizeX, &sizeY, &bitDepth);
-	if (bitDepth != 24 || !IsPow2(sizeX, &xPow2) || !IsPow2(sizeY, nullptr)) {
-		ExitMsg("Texture file %s params is wrong %d %d %d", fileName.c_str(), sizeX, sizeY, bitDepth);
-	}
-
-	unsigned char* tmpBuf = new unsigned char[sizeX * sizeY * 3];
-	read_bmp24(fileName.c_str(), tmpBuf);
-
-	unsigned char* src = tmpBuf;
-	buf = new unsigned char[sizeX * sizeY * 4];
-	unsigned char* dst = buf;
-
-	for (int i = 0; i < sizeX * sizeY; ++i) {
-		unsigned char b = *src++;
-		unsigned char g = *src++;
-		unsigned char r = *src++;
-		*dst++ = r;
-		*dst++ = g;
-		*dst++ = b;
-		*dst++ = 0;
-	}
-
-	delete []tmpBuf;
-}
 
 
 
@@ -142,8 +88,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     LoadStringW(hInstance, IDC_DOOM, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
-	textures.emplace_back("gray_wall.bmp");
-	FillLevelData(verts, polies);
+	FillLevelData(verts, polies, textures);
 
     // Выполнить инициализацию приложения:
     if (!InitInstance (hInstance, nCmdShow))

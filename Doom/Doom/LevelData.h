@@ -1,4 +1,5 @@
 #include <vector>
+#include <string>
 
 struct FPoint2D
 {
@@ -36,5 +37,15 @@ struct Poly
 	std::vector<Edge> edges;
 };
 
+struct Texture
+{
+	Texture(const std::string& fileName);
+	~Texture() { if (buf) delete[]buf; }
 
-void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies);
+	int sizeX = 0;   // Размер текстуры по X (разрешается только степени двойки)
+	int sizeY = 0;   // Размер текстуры по Y (разрешается только степени двойки)
+	int xPow2 = 0;   // Сама степень двойки для sizeX
+	unsigned char* buf = nullptr;  // Буфер пикселей по 4 байта на пиксел
+};
+
+void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std::vector<Texture>& textures);
