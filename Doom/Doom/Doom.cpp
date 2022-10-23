@@ -463,9 +463,9 @@ void DrawOneColumn(double scanAngle, int columnN)
 				int from = lastDrawedY1 + 1;
 				for (int y = from; y < yiScrRoof2; ++y) {
 					unsigned char(&pixel)[3] = buf[y][columnN];
-					pixel[0] = 0;
-					pixel[1] = 255;
-					pixel[2] = 255;
+					pixel[0] = 255;
+					pixel[1] = 192;
+					pixel[2] = 0;
 				}
 				if (yiScrRoof2 > lastDrawedY1 + 1)
 					lastDrawedY1 = yiScrRoof2 - 1;
@@ -484,12 +484,16 @@ void DrawOneColumn(double scanAngle, int columnN)
 				if (yiScrCeil2 > yiScrRoof2) {
 					double addV = edgeComeFrom->vCeilAdd * vDens;
 					double curV = edgeComeFrom->vCeil - addV * (yScrCeil2 - (yiScrRoof2 + 0.5));  // В скобках сдвиг от необрезанного yScrCeil2 для которого задана V, до центра верхнего пиксела обрезанного отрезка, откуда начнём рисовать и где нам нужен V
+					const Texture& curTex = textures[edgeComeFrom->texUp.texIndex];
+					int ui = int(curU * curTex.sizeX) & (curTex.sizeX - 1);
+					unsigned char* texture = curTex.buf + (ui << 2);
 					for (int y = yiScrRoof2; y < yiScrCeil2; ++y) {
-						unsigned char(&pixel)[3] = buf[y][columnN];
-						int scale = 5;
-						pixel[0] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
-						pixel[1] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
-						pixel[2] = (((int(curU * scale) + int(curV * scale)) % 2) * curV) * 255;
+						unsigned char(&dst)[3] = buf[y][columnN];
+						int vi = int(curV * curTex.sizeY) & (curTex.sizeY - 1);
+						unsigned char* src = texture + ((vi << curTex.xPow2) << 2);
+						dst[0] = src[2];
+						dst[1] = src[1];
+						dst[2] = src[0];
 						curV += addV;
 					}
 					if (yiScrCeil2 > lastDrawedY1 + 1) {
@@ -570,14 +574,18 @@ void DrawOneColumn(double scanAngle, int columnN)
 					double vAdd = (vCorr - vCur) / (yiScrCeil1 - yiScrCeil2);
 					double zAdd = (zCorr - zCur) / (yiScrCeil1 - yiScrCeil2);
 
+					const Texture& curTex = textures[poly.ceilTex.texIndex];
+					unsigned char* texture = curTex.buf;
 					for (int y = yiScrCeil2; y < yiScrCeil1; ++y) {
-						unsigned char(&pixel)[3] = buf[y][columnN];
+						unsigned char(&dst)[3] = buf[y][columnN];
 						double uPixel = uCur / zCur;
 						double vPixel = vCur / zCur;
-						int scale = 5;
-						pixel[0] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
-						pixel[1] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
-						pixel[2] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
+						int ui = int(uPixel * curTex.sizeX) & (curTex.sizeX - 1);
+						int vi = int(vPixel * curTex.sizeY) & (curTex.sizeY - 1);
+						unsigned char* src = texture + (((vi << curTex.xPow2) + ui) << 2);
+						dst[0] = src[2];
+						dst[1] = src[1];
+						dst[2] = src[0];
 						uCur += uAdd;
 						vCur += vAdd;
 						zCur += zAdd;
@@ -627,14 +635,18 @@ void DrawOneColumn(double scanAngle, int columnN)
 					double vAdd = (vCorr - vCur) / (yiScrFloor2 - yiScrFloor1);
 					double zAdd = (zCorr - zCur) / (yiScrFloor2 - yiScrFloor1);
 
+					const Texture& curTex = textures[poly.floorTex.texIndex];
+					unsigned char* texture = curTex.buf;
 					for (int y = yiScrFloor1; y < yiScrFloor2; ++y) {
-						unsigned char(&pixel)[3] = buf[y][columnN];
+						unsigned char(&dst)[3] = buf[y][columnN];
 						double uPixel = uCur / zCur;
 						double vPixel = vCur / zCur;
-						int scale = 5;
-						pixel[0] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
-						pixel[1] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
-						pixel[2] = (((int(uPixel * scale) + int(vPixel * scale)) % 2) * vPixel) * 255;
+						int ui = int(uPixel * curTex.sizeX) & (curTex.sizeX - 1);
+						int vi = int(vPixel * curTex.sizeY) & (curTex.sizeY - 1);
+						unsigned char* src = texture + (((vi << curTex.xPow2) + ui) << 2);
+						dst[0] = src[2];
+						dst[1] = src[1];
+						dst[2] = src[0];
 						uCur += uAdd;
 						vCur += vAdd;
 						zCur += zAdd;
