@@ -27,6 +27,7 @@ int getTextureIndex(const std::string& name, std::vector<Texture>& textures)
 			return i;
 	}
 	ExitMsg("Texture not loaded:  %s\n", name.c_str());
+	return 0;  // Сюда управление не приходит
 }
 
 Texture::Texture(const std::string& name_)
@@ -209,7 +210,7 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{{48,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{49,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{45,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{47,{0,0}, {""}, 0, 0, {"test_texture"}, 0, 0}} };
+		{47,{0,0}, {""}, 0, 0, {"gray_wall"}, 0, 0}} };
 
 	polies[14] = { 0,1250,1092,
 		{{47,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -531,8 +532,8 @@ m1:;
 	}
 
 	// Загрузка текстур
+	textures.emplace_back("checker");
 	textures.emplace_back("gray_wall");
-	textures.emplace_back("test_texture");
 
 	// Прописываем индексы текстур в полигоны и рёбра
 	for (int pn1 = 0; pn1 < polies.size(); ++pn1) {

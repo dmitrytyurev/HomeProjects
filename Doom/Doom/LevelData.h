@@ -1,5 +1,6 @@
 #include <vector>
 #include <string>
+#include "Utils.h"
 
 struct FPoint2D
 {
@@ -54,7 +55,18 @@ struct Poly
 struct Texture
 {
 	Texture(const std::string& name_);
-	~Texture() { /*if (buf) delete[]buf; */ }
+	~Texture() { PrintConsole("~Texture()");  /* if (buf) delete[]buf; */ }
+
+	Texture(Texture& src) = delete;
+	Texture(Texture&& src)
+	{
+		buf = src.buf;
+		src.buf = nullptr;
+		sizeX = src.sizeX;
+		sizeY = src.sizeY;
+		xPow2 = src.xPow2;
+		name = src.name;
+	}
 
 	int sizeX = 0;   // Размер текстуры по X (разрешается только степени двойки)
 	int sizeY = 0;   // Размер текстуры по Y (разрешается только степени двойки)
