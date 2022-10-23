@@ -48,8 +48,8 @@ struct Poly
 	float yCeil = 0;
 	float yFloor = 0;
 	std::vector<Edge> edges;
-	TextureOnModel floorTex;
 	TextureOnModel ceilTex;
+	TextureOnModel floorTex;
 };
 
 struct Texture
