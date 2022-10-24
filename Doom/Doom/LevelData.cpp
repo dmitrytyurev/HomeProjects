@@ -65,7 +65,7 @@ Texture::Texture(const std::string& name_)
 }
 
 
-void project_uv_ceil(std::vector<int> pols, std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std::vector<Texture>& textures)
+void project_uv_ceil(float scale, std::vector<int> pols, std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std::vector<Texture>& textures)
 {
 	float xMin = 1000000;
 	float xMax = -1000000;
@@ -91,8 +91,8 @@ void project_uv_ceil(std::vector<int> pols, std::vector<FPoint2D>& verts, std::v
 		int vertsNum = (int)poly.edges.size();
 		for (int en = 0; en < vertsNum; ++en) {
 			const FPoint2D& point = verts[poly.edges[en].firstInd];
-			poly.edges[en].uCeil = (double(point.x) - xMin) / (double(xMax) - xMin) * repeatsNumX;
-			poly.edges[en].vCeil = (double(point.z) - zMin) / (double(zMax) - zMin) * repeatsNumZ;
+			poly.edges[en].uCeil = (double(point.x) - xMin) / (double(xMax) - xMin) * repeatsNumX / scale;
+			poly.edges[en].vCeil = (double(point.z) - zMin) / (double(zMax) - zMin) * repeatsNumZ / scale;
 		}
 	}
 }
@@ -177,7 +177,7 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{{1,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{2,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{9,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{8,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
+		{8,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 
 	polies[2] = { 0,0,1252,
 		{{2,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -279,7 +279,7 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{{6,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{8,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{15,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{14,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
+		{14,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 
 	polies[20] = { 0,1250,1000,
 		{{8,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -287,19 +287,19 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{16,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{20,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{19,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{15,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
+		{15,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 
 	polies[21] = { 0,1250,1000,
 		{{9,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{11,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{17,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{16,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
+		{16,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 
 	polies[22] = { 0,1250,1000,
 		{{11,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{29,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{21,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{17,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
+		{17,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 
 	polies[23] = { 1252,1120,1000,
 		{{16,{0,0}, {""}, 0, 0, {""}, 0, 0, 0, 0},
@@ -310,13 +310,13 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 	polies[24] = { 0,1250,1000,
 		{{21,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{29,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{28,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
+		{28,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 
 	polies[25] = { 0,1250,1000,
 		{{20,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{21,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{28,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{27,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
+		{27,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 
 	polies[26] = { 1252,1090,1035,
 		{{11,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -334,18 +334,18 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{{28,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{29,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{54,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{37,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
+		{37,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 
 	polies[29] = { 0,1250,1000,
 		{{37,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{54,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{44,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{36,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
+		{36,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 
 	polies[30] = { 0,1250,1000,
 		{{44,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{54,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{53,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
+		{53,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 
 	polies[31] = { 0,0,1252,
 		{{43,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -408,13 +408,13 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{{26,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{27,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{35,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{34,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
+		{34,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 
 	polies[42] = { 0,1250,1000,
 		{{19,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{20,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{27,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{26,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
+		{26,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 
 	polies[43] = { 1252,1120,1000,
 		{{14,{0,0}, {""}, 0, 0, {""}, 0, 0 , 0, 0},
@@ -426,7 +426,7 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{{18,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{19,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{26,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{25,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
+		{25,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 
 	polies[45] = { 0,0,1252,
 		{{25,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -464,30 +464,30 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 	polies[51] = { 0,1250,1000,
 		{{47,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{57,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{48,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
+		{48,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 
 	polies[52] = { 0,1250,1000,
 		{{47,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{32,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{33,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{57,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
+		{57,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 
 	polies[53] = { 0,1250,1000,
 		{{24,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{25,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{32,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{47,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
+		{47,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 
 	polies[54] = { 0,1250,1000,
 		{{18,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{25,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{24,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
+		{24,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 
 	polies[55] = { 0,1250,1000,
 		{{6,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{14,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{18,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{24,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"hexa_floor"} };
+		{24,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 
 	polies[56] = { 1252,1090,1035,
 		{{23,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -547,7 +547,8 @@ m1:;
 	textures.emplace_back("gray_wall");
 	textures.emplace_back("hexa_floor");
 	textures.emplace_back("ceil_lights");
-
+	textures.emplace_back("stone_wall");
+	
 	// Прописываем индексы текстур в полигоны и рёбра
 	for (int pn1 = 0; pn1 < polies.size(); ++pn1) {
 		Poly& poly1 = polies[pn1];
@@ -596,7 +597,8 @@ m1:;
 		}
 	}
 
-	project_uv_ceil({37,38,39,40}, verts, polies, textures);
+	project_uv_ceil(1, {37,38,39,40}, verts, polies, textures);
+	project_uv_ceil(2, { 19,20,21,22,24,25,28,29,30,41,42,44,51,52,53,54,55,}, verts, polies, textures);
 
 
 }
