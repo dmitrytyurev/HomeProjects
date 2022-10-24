@@ -384,25 +384,25 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{{42,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{43,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{51,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{50,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"ceil_lights"}, {""} };
+		{50,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"ceil_lights"}, {"blue_hexa_floor"} };
 
 	polies[38] = { 1252,1160,1030,
 		{{40,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{41,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{43,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{42,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"ceil_lights"}, {""} };
+		{42,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"ceil_lights"}, {"blue_hexa_floor"} };
 
 	polies[39] = { 1252,1160,1020,
 		{{38,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{39,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{41,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{40,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"ceil_lights"}, {""} };
+		{40,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"ceil_lights"}, {"blue_hexa_floor"} };
 
 	polies[40] = { 1252,1160,1010,
 		{{34,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{35,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{39,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{38,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"ceil_lights"}, {""} };
+		{38,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"ceil_lights"}, {"blue_hexa_floor"} };
 
 	polies[41] = { 0,1250,1000,
 		{{26,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -548,7 +548,8 @@ m1:;
 	textures.emplace_back("hexa_floor");
 	textures.emplace_back("ceil_lights");
 	textures.emplace_back("stone_wall");
-	
+	textures.emplace_back("blue_hexa_floor");
+
 	// Прописываем индексы текстур в полигоны и рёбра
 	for (int pn1 = 0; pn1 < polies.size(); ++pn1) {
 		Poly& poly1 = polies[pn1];
@@ -583,13 +584,13 @@ m1:;
 			poly.edges[en].vWallFloor = 0;
 			poly.edges[en].vFloorAdd = 0.01f;
 
-			// Заполняем незаполненые ранее текстурные координаты ПОТОЛКА с универсальной плотностю текселей/метр (должно хватить для большинства случаев)
+			// Заполняем незаполненые ранее текстурные координаты ПОТОЛКА с универсальной плотностью текселей/метр (должно хватить для большинства случаев)
 			if (poly.edges[en].uCeil == -1.f)
-				poly.edges[en].uCeil = float(verts[poly.edges[en].firstInd].x * TEX_DENS / textures[poly.ceilTex.texIndex].sizeX);
+				poly.edges[en].uCeil = float(verts[poly.edges[en].firstInd].x * TEX_DENS / textures[poly.ceilTex.texIndex].sizeX) * 0.5;
 			if (poly.edges[en].vCeil == -1.f)
-				poly.edges[en].vCeil = float(verts[poly.edges[en].firstInd].z * TEX_DENS / textures[poly.ceilTex.texIndex].sizeX);
+				poly.edges[en].vCeil = float(verts[poly.edges[en].firstInd].z * TEX_DENS / textures[poly.ceilTex.texIndex].sizeX) * 0.5;
 
-			// Заполняем незаполненые ранее текстурные координаты ПОЛА с универсальной плотностю текселей/метр (должно хватить для большинства случаев)
+			// Заполняем незаполненые ранее текстурные координаты ПОЛА с универсальной плотностью текселей/метр (должно хватить для большинства случаев)
 			if (poly.edges[en].uFloor == -1.f)
 					poly.edges[en].uFloor = float(verts[poly.edges[en].firstInd].x * TEX_DENS / textures[poly.floorTex.texIndex].sizeX);
 			if (poly.edges[en].vFloor == -1.f)
@@ -598,7 +599,7 @@ m1:;
 	}
 
 	project_uv_ceil(1, {37,38,39,40}, verts, polies, textures);
-	project_uv_ceil(2, { 19,20,21,22,24,25,28,29,30,41,42,44,51,52,53,54,55,}, verts, polies, textures);
+	//project_uv_ceil(2, { 19,20,21,22,24,25,28,29,30,41,42,44,51,52,53,54,55,}, verts, polies, textures);
 
 
 }

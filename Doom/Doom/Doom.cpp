@@ -756,7 +756,7 @@ void Draw(HWND hWnd)
 	//alCam = 3.14159 +0.2;
 	xCam = 513; // ; 794
 	yCam = 1070; //1070;
-	zCam = -1200; // ;  -1390
+	zCam = -1500; // ;  -1390
 
 
 	horCamlAngleRad = horizontalAngle / 180.0 * 3.14159265359;
