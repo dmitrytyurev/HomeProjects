@@ -3,6 +3,9 @@
 #include "bmp.h"
 #include "Utils.h"
 
+const double TEX_DENS = 2.048;  // Рекомендуемая плотностью текселей на единицу размера глобальной системы координат 
+
+
 bool IsPow2(int value, int* pow)
 {
 	int mask = 1;
@@ -61,6 +64,38 @@ Texture::Texture(const std::string& name_)
 	delete[]tmpBuf;
 }
 
+
+void project_uv_ceil(std::vector<int> pols, std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std::vector<Texture>& textures)
+{
+	float xMin = 1000000;
+	float xMax = -1000000;
+	float zMin = 1000000;
+	float zMax = -1000000;
+	for (int pn =0; pn <(int)pols.size(); ++pn) {
+		Poly& poly = polies[pols[pn]];
+		int vertsNum = (int)poly.edges.size();
+		for (int en = 0; en < vertsNum; ++en) {
+			const FPoint2D& point = verts[poly.edges[en].firstInd];
+			if (point.x < xMin) xMin = point.x;
+			if (point.x > xMax) xMax = point.x;
+			if (point.z < zMin) zMin = point.z;
+			if (point.z > zMax) zMax = point.z;
+		}
+	}
+	double texelsNumX = (xMax - xMin) * TEX_DENS;
+	double texelsNumZ = (zMax - zMin) * TEX_DENS;
+	int repeatsNumX = int(texelsNumX / textures[polies[pols[0]].ceilTex.texIndex].sizeX + 0.5);
+	int repeatsNumZ = int(texelsNumZ / textures[polies[pols[0]].ceilTex.texIndex].sizeY + 0.5);
+	for (int pn = 0; pn < (int)pols.size(); ++pn) {
+		Poly& poly = polies[pols[pn]];
+		int vertsNum = (int)poly.edges.size();
+		for (int en = 0; en < vertsNum; ++en) {
+			const FPoint2D& point = verts[poly.edges[en].firstInd];
+			poly.edges[en].uCeil = (double(point.x) - xMin) / (double(xMax) - xMin) * repeatsNumX;
+			poly.edges[en].vCeil = (double(point.z) - zMin) / (double(zMax) - zMin) * repeatsNumZ;
+		}
+	}
+}
 
 void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std::vector<Texture>& textures)
 {
@@ -528,36 +563,40 @@ m1:;
 	}
 
 
-	// Заполнение текстурных координат
+	// Заполнение текстурных координат 
 
-	for (int pn1 = 0; pn1 < polies.size(); ++pn1) {
-		Poly& poly1 = polies[pn1];
-		int vertsNum1 = (int)poly1.edges.size();
-		for (int en1 = 0; en1 < vertsNum1; ++en1) {
-			poly1.edges[en1].u[0] = 0;
+	for (int pn = 0; pn < polies.size(); ++pn) {
+		Poly& poly = polies[pn];
+		int vertsNum = (int)poly.edges.size();
+		for (int en = 0; en < vertsNum; ++en) {
+			poly.edges[en].u[0] = 0;
 
-			int nextInd = (en1 + 1) % vertsNum1;
-			double dx = verts[poly1.edges[en1].firstInd].x - verts[poly1.edges[nextInd].firstInd].x;
-			double dz = verts[poly1.edges[en1].firstInd].z - verts[poly1.edges[nextInd].firstInd].z;
+			int nextInd = (en + 1) % vertsNum;
+			double dx = verts[poly.edges[en].firstInd].x - verts[poly.edges[nextInd].firstInd].x;
+			double dz = verts[poly.edges[en].firstInd].z - verts[poly.edges[nextInd].firstInd].z;
 			double dist = sqrt(dx * dx + dz * dz);
-			poly1.edges[en1].u[1] = float(dist * 0.01);
+			poly.edges[en].u[1] = float(dist * 0.01);
 
-			poly1.edges[en1].vWallCeil = 1;
-			poly1.edges[en1].vCeilAdd = 0.01f;
-			poly1.edges[en1].vWallFloor = 0;
-			poly1.edges[en1].vFloorAdd = 0.01f;
+			poly.edges[en].vWallCeil = 1;
+			poly.edges[en].vCeilAdd = 0.01f;
+			poly.edges[en].vWallFloor = 0;
+			poly.edges[en].vFloorAdd = 0.01f;
 
-			if (poly1.edges[en1].uCeil == -1.f)
-				poly1.edges[en1].uCeil = float(verts[poly1.edges[en1].firstInd].x * 0.008 * 256 / textures[poly1.ceilTex.texIndex].sizeX);
-			if (poly1.edges[en1].vCeil == -1.f)
-				poly1.edges[en1].vCeil = float(verts[poly1.edges[en1].firstInd].z * 0.008 * 256 / textures[poly1.ceilTex.texIndex].sizeX);
+			// Заполняем незаполненые ранее текстурные координаты ПОТОЛКА с универсальной плотностю текселей/метр (должно хватить для большинства случаев)
+			if (poly.edges[en].uCeil == -1.f)
+				poly.edges[en].uCeil = float(verts[poly.edges[en].firstInd].x * TEX_DENS / textures[poly.ceilTex.texIndex].sizeX);
+			if (poly.edges[en].vCeil == -1.f)
+				poly.edges[en].vCeil = float(verts[poly.edges[en].firstInd].z * TEX_DENS / textures[poly.ceilTex.texIndex].sizeX);
 
-			if (poly1.edges[en1].uFloor == -1.f)
-					poly1.edges[en1].uFloor = float(verts[poly1.edges[en1].firstInd].x * 0.008 * 256 / textures[poly1.floorTex.texIndex].sizeX);
-			if (poly1.edges[en1].vFloor == -1.f)
-				poly1.edges[en1].vFloor = float(verts[poly1.edges[en1].firstInd].z * 0.008 * 256 / textures[poly1.floorTex.texIndex].sizeX);
+			// Заполняем незаполненые ранее текстурные координаты ПОЛА с универсальной плотностю текселей/метр (должно хватить для большинства случаев)
+			if (poly.edges[en].uFloor == -1.f)
+					poly.edges[en].uFloor = float(verts[poly.edges[en].firstInd].x * TEX_DENS / textures[poly.floorTex.texIndex].sizeX);
+			if (poly.edges[en].vFloor == -1.f)
+				poly.edges[en].vFloor = float(verts[poly.edges[en].firstInd].z * TEX_DENS / textures[poly.floorTex.texIndex].sizeX);
 		}
 	}
+
+	project_uv_ceil({37,38,39,40}, verts, polies, textures);
 
 
 }
