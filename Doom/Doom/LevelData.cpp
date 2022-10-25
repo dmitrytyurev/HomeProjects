@@ -282,7 +282,7 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{{48,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{49,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{45,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{47,{0,0}, {""}, 0, 0, {"gray_wall"}, 0, 0}} };
+		{47,{1,0}, {""}, 0, 0, {"gray_wall"}, 0, 2}} };
 
 	polies[14] = { 0,1250,1092,
 		{{47,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -613,19 +613,20 @@ m1:;
 		int vertsNum = (int)poly.edges.size();
 		for (int en = 0; en < vertsNum; ++en) {
 
-			//poly.edges[en].u[0] = 0;
+			if (poly.edges[en].texUp.texFileName.empty() && poly.edges[en].texDown.texFileName.empty()) {
+				poly.edges[en].u[0] = 0;
 
-			//int nextInd = (en + 1) % vertsNum;
-			//double dx = verts[poly.edges[en].firstInd].x - verts[poly.edges[nextInd].firstInd].x;
-			//double dz = verts[poly.edges[en].firstInd].z - verts[poly.edges[nextInd].firstInd].z;
-			//double dist = sqrt(dx * dx + dz * dz);
-			//poly.edges[en].u[1] = float(dist * 0.01);
+				int nextInd = (en + 1) % vertsNum;
+				double dx = verts[poly.edges[en].firstInd].x - verts[poly.edges[nextInd].firstInd].x;
+				double dz = verts[poly.edges[en].firstInd].z - verts[poly.edges[nextInd].firstInd].z;
+				double dist = sqrt(dx * dx + dz * dz);
+				poly.edges[en].u[1] = float(dist * 0.01);
 
-			//poly.edges[en].vWallCeil = 1;
-			//poly.edges[en].vCeilAdd = 0.01f;
-			//poly.edges[en].vWallFloor = 0;
-			//poly.edges[en].vFloorAdd = 0.01f;
-
+				poly.edges[en].vWallCeil = 1;
+				poly.edges[en].vCeilAdd = 0.01f;
+				poly.edges[en].vWallFloor = 0;
+				poly.edges[en].vFloorAdd = 0.01f;
+			}
 
 			// Заполняем незаполненые ранее текстурные координаты ПОТОЛКА с универсальной плотностью текселей/метр (должно хватить для большинства случаев)
 			if (poly.edges[en].uCeil == -1.f)
@@ -653,12 +654,14 @@ m1:;
 		Poly& poly = polies[pn];
 		int vertsNum = (int)poly.edges.size();
 		for (int en = 0; en < vertsNum; ++en) {
-			if (poly.edges[en].adjPolyN >= 0) {
-				float dy = poly.yFloor - polies[poly.edges[en].adjPolyN].yFloor;
-				if (dy > 0) {
-					float repeatsN = poly.edges[en].vFloorAdd;
-					poly.edges[en].vWallFloor = 0;
-					poly.edges[en].vFloorAdd = repeatsN / dy;
+			if (!poly.edges[en].texUp.texFileName.empty() || !poly.edges[en].texDown.texFileName.empty()) {
+				if (poly.edges[en].adjPolyN >= 0) {
+					float dy = poly.yFloor - polies[poly.edges[en].adjPolyN].yFloor;
+					if (dy > 0) {
+						float repeatsN = poly.edges[en].vFloorAdd;
+						poly.edges[en].vWallFloor = 0;
+						poly.edges[en].vFloorAdd = repeatsN / dy;
+					}
 				}
 			}
 		}
