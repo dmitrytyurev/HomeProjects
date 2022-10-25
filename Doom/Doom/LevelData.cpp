@@ -267,11 +267,11 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{52,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{51,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
 
-	polies[11] = { 0,0,1252,
+	polies[11] = { 0,0,1162,
 		{{51,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{52,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{49,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{50,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
+		{50,{2,0}, {""}, 0, 0, {"cyber_wall_blue"}, 0, 1}} };
 
 	polies[12] = { 0,0,1252,
 		{{50,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -588,6 +588,7 @@ m1:;
 	textures.emplace_back("blue_hexa_floor");
 	textures.emplace_back("panel");
 	textures.emplace_back("panel_light");
+	textures.emplace_back("cyber_wall_blue");
 
 	
 	// Прописываем индексы текстур в полигоны и рёбра
@@ -611,18 +612,20 @@ m1:;
 		Poly& poly = polies[pn];
 		int vertsNum = (int)poly.edges.size();
 		for (int en = 0; en < vertsNum; ++en) {
-			poly.edges[en].u[0] = 0;
 
-			int nextInd = (en + 1) % vertsNum;
-			double dx = verts[poly.edges[en].firstInd].x - verts[poly.edges[nextInd].firstInd].x;
-			double dz = verts[poly.edges[en].firstInd].z - verts[poly.edges[nextInd].firstInd].z;
-			double dist = sqrt(dx * dx + dz * dz);
-			poly.edges[en].u[1] = float(dist * 0.01);
+			//poly.edges[en].u[0] = 0;
 
-			poly.edges[en].vWallCeil = 1;
-			poly.edges[en].vCeilAdd = 0.01f;
-			poly.edges[en].vWallFloor = 0;
-			poly.edges[en].vFloorAdd = 0.01f;
+			//int nextInd = (en + 1) % vertsNum;
+			//double dx = verts[poly.edges[en].firstInd].x - verts[poly.edges[nextInd].firstInd].x;
+			//double dz = verts[poly.edges[en].firstInd].z - verts[poly.edges[nextInd].firstInd].z;
+			//double dist = sqrt(dx * dx + dz * dz);
+			//poly.edges[en].u[1] = float(dist * 0.01);
+
+			//poly.edges[en].vWallCeil = 1;
+			//poly.edges[en].vCeilAdd = 0.01f;
+			//poly.edges[en].vWallFloor = 0;
+			//poly.edges[en].vFloorAdd = 0.01f;
+
 
 			// Заполняем незаполненые ранее текстурные координаты ПОТОЛКА с универсальной плотностью текселей/метр (должно хватить для большинства случаев)
 			if (poly.edges[en].uCeil == -1.f)
@@ -644,6 +647,22 @@ m1:;
 	project_uv(false, 5, 1, { 26,27 }, verts, polies, textures);
 	project_uv(false, 5, 1, { 18,56 }, verts, polies, textures);
 	//project_uv_ceil(2, { 19,20,21,22,24,25,28,29,30,41,42,44,51,52,53,54,55,}, verts, polies, textures);
+
+
+	for (int pn = 0; pn < polies.size(); ++pn) {
+		Poly& poly = polies[pn];
+		int vertsNum = (int)poly.edges.size();
+		for (int en = 0; en < vertsNum; ++en) {
+			if (poly.edges[en].adjPolyN >= 0) {
+				float dy = poly.yFloor - polies[poly.edges[en].adjPolyN].yFloor;
+				if (dy > 0) {
+					float repeatsN = poly.edges[en].vFloorAdd;
+					poly.edges[en].vWallFloor = 0;
+					poly.edges[en].vFloorAdd = repeatsN / dy;
+				}
+			}
+		}
+	}
 
 
 }

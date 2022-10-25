@@ -752,11 +752,11 @@ int FindPolygonUnderCamera() // Возвращает индекс полигон
 void Draw(HWND hWnd)
 {
 	//zCam -= 0.08f;
-	alCam += 0.001f;
-	//alCam = -3.14159 / 2 + 0.25;
-	xCam = 274; // ; 794
+	//alCam += 0.001f;
+	alCam = -3.14159;
+	xCam = 553; // ; 794
 	yCam = 1070; //1070;
-	zCam = -1500; // ;  -1390
+	zCam = -1700; // ;  -1390
 
 
 	horCamlAngleRad = horizontalAngle / 180.0 * 3.14159265359;
