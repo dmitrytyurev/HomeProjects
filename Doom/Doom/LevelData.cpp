@@ -97,6 +97,43 @@ void project_uv_ceil(float scale, std::vector<int> pols, std::vector<FPoint2D>& 
 	}
 }
 
+void project_uv(bool isFloor, float repeatsNumX, float repeatsNumZ, std::vector<int> pols, std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std::vector<Texture>& textures)
+{
+	float xMin = 1000000;
+	float xMax = -1000000;
+	float zMin = 1000000;
+	float zMax = -1000000;
+	for (int pn = 0; pn < (int)pols.size(); ++pn) {
+		Poly& poly = polies[pols[pn]];
+		int vertsNum = (int)poly.edges.size();
+		for (int en = 0; en < vertsNum; ++en) {
+			const FPoint2D& point = verts[poly.edges[en].firstInd];
+			if (point.x < xMin) xMin = point.x;
+			if (point.x > xMax) xMax = point.x;
+			if (point.z < zMin) zMin = point.z;
+			if (point.z > zMax) zMax = point.z;
+		}
+	}
+	for (int pn = 0; pn < (int)pols.size(); ++pn) {
+		Poly& poly = polies[pols[pn]];
+		int vertsNum = (int)poly.edges.size();
+		for (int en = 0; en < vertsNum; ++en) {
+			const FPoint2D& point = verts[poly.edges[en].firstInd];
+			float u = (double(point.z) - zMin) / (double(zMax) - zMin) * repeatsNumX;
+			float v = (double(point.x) - xMin) / (double(xMax) - xMin) * repeatsNumZ;
+			if (isFloor) {
+				poly.edges[en].uFloor = u;
+				poly.edges[en].vFloor = v;
+			}
+			else {
+				poly.edges[en].uCeil = u;
+				poly.edges[en].vCeil = v;
+			}
+		}
+	}
+}
+
+
 void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std::vector<Texture>& textures)
 {
 	verts.resize(58);
@@ -273,7 +310,7 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{{5,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{6,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{24,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{23,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
+		{23,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"panel_light"}, {"panel"} };
 
 	polies[19] = { 0,1250,1000,
 		{{6,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -322,13 +359,13 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{{11,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{12,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{30,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{29,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
+		{29,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"panel_light"}, {"panel"} };
 
 	polies[27] = { 1252,1090,1035,
 		{{29,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{30,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{55,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{54,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
+		{54,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"panel_light"}, {"panel"} };
 
 	polies[28] = { 0,1250,1000,
 		{{28,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -493,7 +530,7 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{{23,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{24,{0,0}, {"gray_wall"}, 0, 0, {"gray_wall"}, 0, 0},
 		{47,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{46,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
+		{46,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"panel_light"}, {"panel"} };
 
 	// Заполнение  poly.yCeil и poly.yRoof
 
@@ -549,7 +586,10 @@ m1:;
 	textures.emplace_back("ceil_lights");
 	textures.emplace_back("stone_wall");
 	textures.emplace_back("blue_hexa_floor");
+	textures.emplace_back("panel");
+	textures.emplace_back("panel_light");
 
+	
 	// Прописываем индексы текстур в полигоны и рёбра
 	for (int pn1 = 0; pn1 < polies.size(); ++pn1) {
 		Poly& poly1 = polies[pn1];
@@ -599,6 +639,10 @@ m1:;
 	}
 
 	project_uv_ceil(1, {37,38,39,40}, verts, polies, textures);
+	project_uv(true, 2, 1, { 26,27}, verts, polies, textures);
+	project_uv(true, 2, 1, { 18,56 }, verts, polies, textures);
+	project_uv(false, 5, 1, { 26,27 }, verts, polies, textures);
+	project_uv(false, 5, 1, { 18,56 }, verts, polies, textures);
 	//project_uv_ceil(2, { 19,20,21,22,24,25,28,29,30,41,42,44,51,52,53,54,55,}, verts, polies, textures);
 
 
