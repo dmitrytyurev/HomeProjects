@@ -13,6 +13,8 @@
 
 #define MAX_LOADSTRING 100
 
+void InitGameLogic();
+
 
 // Глобальные переменные:
 HINSTANCE hInst;                                // текущий экземпляр
@@ -76,7 +78,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     LoadStringW(hInstance, IDC_DOOM, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
-	FillLevelData(verts, polies, textures);
+	InitGameLogic();
 
     // Выполнить инициализацию приложения:
     if (!InitInstance (hInstance, nCmdShow))
@@ -204,7 +206,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
-    default:
+	case WM_KEYDOWN:
+		PrintConsole("WM_KEYDOWN %d %d", int(wParam), int(lParam));
+		if (wParam == 27)
+			PostQuitMessage(0);
+		break;
+	default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
     return 0;
@@ -257,15 +264,9 @@ void DrawFrameBuf(HWND hWnd)
 
 // -------------------------------------------------------------------
 
-void Update()
-{
-	
-}
-
-// -------------------------------------------------------------------
-
 void DrawOneColumn(double scanAngle, int columnN)
 {
+	PrintConsole("columnN: %d\n", columnN);
 	constexpr int MAX_VERTS_IN_POLY = 100;
 	static bool leftFlags[MAX_VERTS_IN_POLY] = {};      // Флаги xn < 0 для вершин текущего полигона
 	static DPoint2D localVerts[MAX_VERTS_IN_POLY] = {};  // Координаты полигона в системе координат, в которой текущий секущий луч (для текущего столбца пикселов) является осью x=0
@@ -383,7 +384,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 				}
 				// Рассчитаем UV на концах отрезка полученного рассечением полигона прямой z=zNear
 				if (edgeWithMaxX == -1 && edgeWithMinX == -1) {
-					ExitMsg("Error: edgeWithMaxX == -1 && edgeWithMinX == -1\n");
+					ExitMsg("Error: edgeWithMaxX == -1 && edgeWithMinX == -1 %f %f %f %d %f\n", xCam, yCam, zCam, columnN, alCam);
 				}
 				if (edgeWithMaxX == -1)	{
 					edgeWithMaxX = edgeWithMinX;
@@ -749,16 +750,45 @@ int FindPolygonUnderCamera() // Возвращает индекс полигон
 
 // -------------------------------------------------------------------
 
-void Draw(HWND hWnd)
+void InitGameLogic()
 {
-	//zCam -= 0.08f;
-	//alCam += 0.001f;
-	alCam = -3.14159;
+	FillLevelData(verts, polies, textures);
+
 	xCam = 310; // ; 794
 	yCam = 1070; //1070;
 	zCam = -1400; // ;  -1390
+}
 
+// -------------------------------------------------------------------
+const float TRUN_SPEED = 0.02f;
+const float MOVE_SPEED = 0.5;
 
+void Update()
+{
+	if (GetKeyState(VK_LEFT) & 0x8000)
+	{
+		alCam += TRUN_SPEED;
+	}
+	if (GetKeyState(VK_RIGHT) & 0x8000)
+	{
+		alCam -= TRUN_SPEED;
+	}
+	if (GetKeyState(VK_UP) & 0x8000)
+	{
+		xCam += sin(-alCam) * MOVE_SPEED;
+		zCam += cos(-alCam) * MOVE_SPEED;
+	}
+	if (GetKeyState(VK_DOWN) & 0x8000)
+	{
+		xCam -= sin(-alCam) * MOVE_SPEED;
+		zCam -= cos(-alCam) * MOVE_SPEED;
+	}
+}
+
+// -------------------------------------------------------------------
+
+void Draw(HWND hWnd)
+{
 	horCamlAngleRad = horizontalAngle / 180.0 * 3.14159265359;
 	dz = 1.0 / tan(horCamlAngleRad / 2.0);
 	kProj = bufSizeX / 2 / tan(horCamlAngleRad / 2);
