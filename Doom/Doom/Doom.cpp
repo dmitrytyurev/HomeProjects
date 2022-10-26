@@ -207,7 +207,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         PostQuitMessage(0);
         break;
 	case WM_KEYDOWN:
-		PrintConsole("WM_KEYDOWN %d %d", int(wParam), int(lParam));
+		//PrintConsole("WM_KEYDOWN %d %d", int(wParam), int(lParam));
 		if (wParam == 27)
 			PostQuitMessage(0);
 		break;
@@ -266,7 +266,6 @@ void DrawFrameBuf(HWND hWnd)
 
 void DrawOneColumn(double scanAngle, int columnN)
 {
-	PrintConsole("columnN: %d\n", columnN);
 	constexpr int MAX_VERTS_IN_POLY = 100;
 	static bool leftFlags[MAX_VERTS_IN_POLY] = {};      // Флаги xn < 0 для вершин текущего полигона
 	static DPoint2D localVerts[MAX_VERTS_IN_POLY] = {};  // Координаты полигона в системе координат, в которой текущий секущий луч (для текущего столбца пикселов) является осью x=0
@@ -339,7 +338,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 		// Точнее мы поворачиваем не всею точку, а только её Z-координату. Только она нам нужна дальше - для проекции Y на экран
 		double zSliceCur = maxZ * coCam;     // Z-координата полученной точки сечения в системе координат камеры
 		if (zSliceCur >= zNear) {
-			if (zSlicePrev < zNear)	{
+			if (zSlicePrev < zNear - 0.001)	{
 				// Текущий отрезок залезает в zNear, поэтому предыдущей точкой считаем (poly.yFloor; zNear) и (poly.yCeil; zNear)
 				// Соответственно в zSlicePrev запишем zNear, а floorCeilNearU, floorCeilNearV расчитаем так:
 				// Сначала найдём сечение текущего полигона прямой z=zNear, потом найдём сечение полученного отрезка текущим секущим лучом
@@ -405,7 +404,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 				double u2Fl = interpEdgeMaxX * (poly.edges[(edgeWithMaxX + 1) % vertsInPoly].uFloor - poly.edges[edgeWithMaxX].uFloor) + poly.edges[edgeWithMaxX].uFloor;
 				double v2Fl = interpEdgeMaxX * (poly.edges[(edgeWithMaxX + 1) % vertsInPoly].vFloor - poly.edges[edgeWithMaxX].vFloor) + poly.edges[edgeWithMaxX].vFloor;
 
-				// Полученный отрезок поверхнуть так, чтобы текущий секущий луч был прямой x=0
+				// Полученный отрезок повернуть так, чтобы текущий секущий луч был прямой x=0
 				double x1 = minX * co3 + zNear * si3;
 				double z1 = -minX * si3 + zNear * co3;
 				double x2 = maxX * co3 + zNear * si3;
