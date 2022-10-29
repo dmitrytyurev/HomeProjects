@@ -778,7 +778,7 @@ void InitGameLogic()
 	FillLevelData(verts, polies, textures);
 
 	xCam = 310; // ; 794
-	yCam = 1070; //1070;
+	yCam = 1060;
 	zCam = -1398; // ;  -1390
 }
 
