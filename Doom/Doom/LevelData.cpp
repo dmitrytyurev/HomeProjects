@@ -401,7 +401,7 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{{11,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{12,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{30,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{29,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"panel_light"}, {"panel"} };
+		{29,{0,2}, {"big_wall"}, 0, 1, {""}, 0, 0}}, {"panel_light"}, {"panel"} };
 
 	polies[27] = { 1252,1090,1035,
 		{{29,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -634,6 +634,7 @@ m1:;
 	textures.emplace_back("metal_column");
 	textures.emplace_back("steps_light");
 	textures.emplace_back("monitors");
+	textures.emplace_back("big_wall");
 
 	
 	
