@@ -375,6 +375,8 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{8,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{15,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{14,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
+	polies[19].edges[1].brightFloor = 100;
+	polies[19].edges[2].brightFloor = 130;
 
 	polies[20] = { 0,1250,1000,
 		{{8,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -383,12 +385,20 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{20,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{19,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{15,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
+	polies[20].edges[0].brightFloor = 100;
+	polies[20].edges[1].brightFloor = 100;
+	polies[20].edges[2].brightFloor = 130;
+	polies[20].edges[3].brightFloor = 130;
+	polies[20].edges[4].brightFloor = 130;
+	polies[20].edges[5].brightFloor = 130;
 
 	polies[21] = { 0,1250,1000,
 		{{9,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{11,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{17,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{16,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
+	polies[21].edges[0].brightFloor = 100;
+	polies[21].edges[3].brightFloor = 130;
 
 	polies[22] = { 0,1250,1000,
 		{{11,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -401,6 +411,8 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{17,{0,1}, {"monitors"}, 0, 1, {""}, 0, 0, 1, 0},
 		{21,{0.25f,0.5f}, {"monitors"}, 0, 1, {""}, 0, 0, 1 ,3},
 		{20,{1,0}, {"monitors"}, 0, 1, {""}, 0, 0, 0, 3}}, {"ceil_lights"}, {"hexa_floor"} };
+	polies[23].edges[0].brightFloor = 130;
+	polies[23].edges[3].brightFloor = 130;
 
 	polies[24] = { 0,1250,1000,
 		{{21,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -412,6 +424,7 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{21,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{28,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{27,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
+	polies[25].edges[0].brightFloor = 130;
 
 	polies[26] = { 1252,1090,1035,
 		{{11,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -530,18 +543,23 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{20,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{27,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{26,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
+	polies[42].edges[0].brightFloor = 130;
+	polies[42].edges[1].brightFloor = 130;
 
 	polies[43] = { 1252,1120,1000,
 		{{14,{0.5f,0.75f}, {"monitors"}, 0, 1, {""}, 0, 0 , 0, 0},
 		{15,{1,0}, {"monitors"}, 0, 1, {""}, 0, 0, 1, 0},
 		{19,{0.25f,0.5f}, {"monitors"}, 0, 1, {""}, 0, 0, 1, 3},
 		{18,{1,0}, {"monitors"}, 0, 1, {""}, 0, 0, 0, 3}}, {"ceil_lights"}, {"hexa_floor"} };
+	polies[43].edges[1].brightFloor = 130;
+	polies[43].edges[2].brightFloor = 130;
 
 	polies[44] = { 0,1250,1000,
 		{{18,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{19,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{26,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{25,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
+	polies[44].edges[1].brightFloor = 130;
 
 	polies[45] = { 0,0,1252,
 		{{25,{0.234f,0}, {""}, 0, 0, {"cyber_wall_blue"}, 0, 2},

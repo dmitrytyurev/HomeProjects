@@ -807,6 +807,9 @@ int FindPolygonUnderCamera() // Возвращает индекс полигон
 			break;
 		}
 	}
+	if (curPolyN == polies.size())
+		return -1;
+
 	return curPolyN;
 }
 
