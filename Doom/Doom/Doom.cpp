@@ -706,12 +706,13 @@ m1: 	zSlicePrev = zSliceCur;
 
 int FindPolygonUnderCamera() // Возвращает индекс полигона под камерой (или -1)
 {
-	double maxDist = -1;
-	int bestPolyN = -1;
-	for (int curPolyN = 0; curPolyN < polies.size(); ++curPolyN) {
+	const double DELTA = 0.001;
+	int curPolyN = 0;
+	for (; curPolyN < polies.size(); ++curPolyN) {
 		const Poly& poly = polies[curPolyN];
 		int edgesNum = poly.edges.size();
-		double minDist = 100000;
+		int nearEdge1N = -1;
+		int nearEdge2N = -1;
 		int i = 0;
 		for (; i < edgesNum; ++i) {
 			const Edge& edge1 = poly.edges[i];
@@ -732,19 +733,42 @@ int FindPolygonUnderCamera() // Возвращает индекс полигон
 			if (dist < 0) {
 				break;              // Камера за пределами текущего полигона (снаружи от текущего ребра). Нет смысла проверять остальные рёбра полигона
 			}
-			if (dist < minDist) {
-				minDist = dist;
+			if (dist < DELTA) {
+				if (nearEdge1N == -1)
+					nearEdge1N = i;
+				else
+					if (nearEdge2N == -1)
+						nearEdge2N = i;
+					else
+						ExitMsg("More than 2 close edges");
 			}
 		}
-		if (i < edgesNum) {
-			continue;
-		}
-		if (minDist > maxDist) {
-			maxDist = minDist;
-			bestPolyN = curPolyN;
+		if (i == edgesNum) {          // Нашли полигон внутри которого мы
+			if (nearEdge1N != -1) {   // Если одно или два ребра этого полигона слишком близко к камере, но отодвинем камеру от них
+				FPoint2D& vr1 = verts[poly.edges[nearEdge1N].firstInd];
+				FPoint2D& vr2 = verts[poly.edges[(nearEdge1N + 1) % edgesNum].firstInd];
+				double nX = vr2.z - vr1.z;
+				double nZ = vr1.x - vr2.x;
+				double len = sqrt(nX * nX + nZ * nZ);
+				double normalX = nX / len;
+				double normalZ = nZ / len;
+				if (nearEdge2N != -1) {
+					FPoint2D& vr1b = verts[poly.edges[nearEdge2N].firstInd];
+					FPoint2D& vr2b = verts[poly.edges[(nearEdge2N + 1) % edgesNum].firstInd];
+					nX = vr2b.z - vr1b.z;
+					nZ = vr1b.x - vr2b.x;
+					len = sqrt(nX * nX + nZ * nZ);
+					normalX += nX / len;
+					normalZ += nZ / len;
+				}
+
+				xCam += normalX * DELTA;
+				zCam += normalZ * DELTA;
+			}
+			break;
 		}
 	}
-	return bestPolyN;
+	return curPolyN;
 }
 
 // -------------------------------------------------------------------
@@ -755,7 +779,7 @@ void InitGameLogic()
 
 	xCam = 310; // ; 794
 	yCam = 1070; //1070;
-	zCam = -1400; // ;  -1390
+	zCam = -1398; // ;  -1390
 }
 
 // -------------------------------------------------------------------
