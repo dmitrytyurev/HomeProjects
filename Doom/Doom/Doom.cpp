@@ -58,6 +58,7 @@ int startingPoly;
 
 double ceilNearU = 0;
 double ceilNearV = 0;
+double ceilNearBr = 0;
 double floorNearU = 0;
 double floorNearV = 0;
 double floorNearBr = 0;
@@ -400,6 +401,9 @@ void DrawOneColumn(double scanAngle, int columnN)
 				double u2Ce = interpEdgeMaxX * (poly.edges[(edgeWithMaxX + 1) % vertsInPoly].uCeil - poly.edges[edgeWithMaxX].uCeil) + poly.edges[edgeWithMaxX].uCeil;
 				double v2Ce = interpEdgeMaxX * (poly.edges[(edgeWithMaxX + 1) % vertsInPoly].vCeil - poly.edges[edgeWithMaxX].vCeil) + poly.edges[edgeWithMaxX].vCeil;
 
+				double br1Ce = interpEdgeMinX * (poly.edges[(edgeWithMinX + 1) % vertsInPoly].brightCeil - poly.edges[edgeWithMinX].brightCeil) + poly.edges[edgeWithMinX].brightCeil;
+				double br2Ce = interpEdgeMaxX * (poly.edges[(edgeWithMaxX + 1) % vertsInPoly].brightCeil - poly.edges[edgeWithMaxX].brightCeil) + poly.edges[edgeWithMaxX].brightCeil;
+
 				double u1Fl = interpEdgeMinX * (poly.edges[(edgeWithMinX + 1) % vertsInPoly].uFloor - poly.edges[edgeWithMinX].uFloor) + poly.edges[edgeWithMinX].uFloor;
 				double v1Fl = interpEdgeMinX * (poly.edges[(edgeWithMinX + 1) % vertsInPoly].vFloor - poly.edges[edgeWithMinX].vFloor) + poly.edges[edgeWithMinX].vFloor;
 				double u2Fl = interpEdgeMaxX * (poly.edges[(edgeWithMaxX + 1) % vertsInPoly].uFloor - poly.edges[edgeWithMaxX].uFloor) + poly.edges[edgeWithMaxX].uFloor;
@@ -423,6 +427,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 				{
 					ceilNearU = u1Ce;
 					ceilNearV = v1Ce;
+					ceilNearBr = br1Ce;
 					floorNearU = u1Fl;
 					floorNearV = v1Fl;
 					floorNearBr = br1Fl;
@@ -431,6 +436,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 					if (x1 >= 0) {
 						ceilNearU = u1Ce;
 						ceilNearV = v1Ce;
+						ceilNearBr = br1Ce;
 						floorNearU = u1Fl;
 						floorNearV = v1Fl;
 						floorNearBr = br1Fl;
@@ -439,6 +445,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 						if (x2 <= 0) {
 							ceilNearU = u2Ce;
 							ceilNearV = v2Ce;
+							ceilNearBr = br2Ce;
 							floorNearU = u2Fl;
 							floorNearV = v2Fl;
 							floorNearBr = br2Fl;
@@ -447,6 +454,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 							double interp = -x1 / (x2 - x1);
 							ceilNearU = (u2Ce - u1Ce) * interp + u1Ce;
 							ceilNearV = (v2Ce - v1Ce) * interp + v1Ce;
+							ceilNearBr = (br2Ce - br1Ce) * interp + br1Ce;
 							floorNearU = (u2Fl - u1Fl) * interp + u1Fl;
 							floorNearV = (v2Fl - v1Fl) * interp + v1Fl;
 							floorNearBr = (br2Fl - br1Fl) * interp + br1Fl;
@@ -575,30 +583,37 @@ void DrawOneColumn(double scanAngle, int columnN)
 				if (yiScrCeil1 > yiScrCeil2) {
 					double u1 = ceilNearU;
 					double v1 = ceilNearV;
+					double br1 = ceilNearBr;
 					double u1DivZ = u1 / zSlicePrev;
 					double v1DivZ = v1 / zSlicePrev;
+					double br1DivZ = br1 / zSlicePrev;
 					double oneDivZ1 = 1 / zSlicePrev;
 
 					const Edge& edgeCur = poly.edges[edgeWithMaxZ];
 					const Edge& edgeCurNext = poly.edges[(edgeWithMaxZ + 1) % vertsInPoly];
 					double u2 = (double(edgeCurNext.uCeil) - edgeCur.uCeil) * interpEdge + edgeCur.uCeil;
 					double v2 = (double(edgeCurNext.vCeil) - edgeCur.vCeil) * interpEdge + edgeCur.vCeil;
+					double br2 = (double(edgeCurNext.brightCeil) - edgeCur.brightCeil) * interpEdge + edgeCur.brightCeil;
 					double u2DivZ = u2 / zSliceCur;
 					double v2DivZ = v2 / zSliceCur;
+					double br2DivZ = br2 / zSliceCur;
 					double oneDivZ2 = 1 / zSliceCur;
 
 					double srcInterp1 = ((yiScrCeil2 + 0.5) - yScrCeil2) / (yScrCeil1 - yScrCeil2);
 					double uCur = (u2DivZ - u1DivZ) * srcInterp1 + u1DivZ;
 					double vCur = (v2DivZ - v1DivZ) * srcInterp1 + v1DivZ;
+					double brCur = (br2DivZ - br1DivZ) * srcInterp1 + br1DivZ;
 					double zCur = (oneDivZ2 - oneDivZ1) * srcInterp1 + oneDivZ1;
 
 					double srcInterp2 = (yiScrCeil1 + 0.5 - yScrCeil2) / (yScrCeil1 - yScrCeil2);
 					double uCorr = (u2DivZ - u1DivZ) * srcInterp2 + u1DivZ;
 					double vCorr = (v2DivZ - v1DivZ) * srcInterp2 + v1DivZ;
+					double brCorr = (br2DivZ - br1DivZ) * srcInterp2 + br1DivZ;
 					double zCorr = (oneDivZ2 - oneDivZ1) * srcInterp2 + oneDivZ1;
 
 					double uAdd = (uCorr - uCur) / (yiScrCeil1 - yiScrCeil2);
 					double vAdd = (vCorr - vCur) / (yiScrCeil1 - yiScrCeil2);
+					double brAdd = (brCorr - brCur) / (yiScrCeil1 - yiScrCeil2);
 					double zAdd = (zCorr - zCur) / (yiScrCeil1 - yiScrCeil2);
 
 					const Texture& curTex = textures[poly.ceilTex.texIndex];
@@ -607,14 +622,16 @@ void DrawOneColumn(double scanAngle, int columnN)
 						unsigned char(&dst)[3] = buf[y][columnN];
 						double uPixel = uCur / zCur;
 						double vPixel = vCur / zCur;
+						int brPixel = int(brCur / zCur);
 						int ui = int(uPixel * curTex.sizeX) & (curTex.sizeX - 1);
 						int vi = int(vPixel * curTex.sizeY) & (curTex.sizeY - 1);
 						unsigned char* src = texture + (((vi << curTex.xPow2) + ui) << 2);
-						dst[0] = src[2];
-						dst[1] = src[1];
-						dst[2] = src[0];
+						dst[0] = int(src[2] * brPixel) >> 8;
+						dst[1] = int(src[1] * brPixel) >> 8;
+						dst[2] = int(src[0] * brPixel) >> 8;
 						uCur += uAdd;
 						vCur += vAdd;
+						brCur += brAdd;
 						zCur += zAdd;
 					}
 					if (yiScrCeil1 > lastDrawedY1 + 1) {
@@ -719,6 +736,7 @@ m1: 	zSlicePrev = zSliceCur;
 		floorNearU = (double(edgeComeFrom.uFloor) - edgeComeFromNextT.uFloor) * interpEdgePrev + edgeComeFromNextT.uFloor;
 		floorNearV = (double(edgeComeFrom.vFloor) - edgeComeFromNextT.vFloor) * interpEdgePrev + edgeComeFromNextT.vFloor;
 		floorNearBr = (double(edgeComeFrom.brightFloor) - edgeComeFromNextT.brightFloor) * interpEdgePrev + edgeComeFromNextT.brightFloor;
+		ceilNearBr = (double(edgeComeFrom.brightCeil) - edgeComeFromNextT.brightCeil) * interpEdgePrev + edgeComeFromNextT.brightCeil;
 	}
 }
 

@@ -446,6 +446,7 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 	polies[30].edges[0].brightFloor = 60;
 	polies[30].edges[1].brightFloor = 60;
 	polies[30].edges[2].brightFloor = 60;
+	polies[30].edges[2].brightCeil = 60;
 
 
 	polies[31] = { 0,0,1252,
