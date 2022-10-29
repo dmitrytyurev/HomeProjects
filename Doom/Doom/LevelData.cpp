@@ -335,11 +335,15 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{49,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{45,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{47,{1,0}, {""}, 0, 0, {"gray_wall"}, 0, 2}} };
+	polies[13].edges[3].wallBrightsDown[0] = 0.5f;
+	polies[13].edges[3].wallBrightsDown[1] = 0.2f;
 
 	polies[14] = { 0,1250,1092,
 		{{47,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{45,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{46,{0,0.125f}, {""}, 0, 0, {"panel2"}, 0, 1}} };
+	polies[14].edges[2].wallBrightsDown[0] = 0.7f;
+	polies[14].edges[2].wallBrightsDown[1] = 0.4f;
 
 	polies[15] = { 0,1250,1092,
 		{{22,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -448,7 +452,6 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 	polies[30].edges[2].brightFloor = 60;
 	polies[30].edges[2].brightCeil = 60;
 
-
 	polies[31] = { 0,0,1252,
 		{{43,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{44,{1,0}, {""}, 0, 0, {"gray_wall"}, 0, 2},
@@ -479,12 +482,16 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{{27,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{36,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{35,{1,0}, {""}, 0, 0, {"metal_column"}, 0, 2}} };
+	polies[35].edges[2].wallBrightsDown[0] = 0.6f;
+	polies[35].edges[2].wallBrightsDown[1] = 0.6f;
 
 	polies[36] = { 0,0,1252,
 		{{28,{0.234f,0}, {""}, 0, 0, {"cyber_wall_blue"}, 0, 2},
 		{37,{0.063f,0}, {""}, 0, 0, {"cyber_wall_blue"}, 0, 2},
 		{36,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{27,{0,0.234f}, {""}, 0, 0, {"cyber_wall_blue"}, 0, 2}} };
+	polies[36].edges[3].wallBrightsDown[0] = 0.6f;
+	polies[36].edges[3].wallBrightsDown[1] = 0.6f;
 
 	polies[37] = { 1252,1160,1040,
 		{{42,{2,0}, {""}, 0, 0, {"steps_light"}, 0, 1},
@@ -509,6 +516,8 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{35,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{39,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{38,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"ceil_lights"}, {"blue_hexa_floor"} };
+	polies[40].edges[0].wallBrightsUp[0] = 0.6f;
+	polies[40].edges[0].wallBrightsUp[1] = 0.6f;
 
 	polies[41] = { 0,1250,1000,
 		{{26,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -539,17 +548,23 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{26,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{33,{0,0.063f}, {""}, 0, 0, {"cyber_wall_blue"}, 0, 2},
 		{32,{0,0.234f}, {""}, 0, 0, {"cyber_wall_blue"}, 0, 2}} };
+	polies[45].edges[0].wallBrightsDown[0] = 0.6f;
+	polies[45].edges[0].wallBrightsDown[1] = 0.6f;
 
 	polies[46] = { 0,0,1252,
 		{{26,{0,1}, {""}, 0, 0, {"metal_column"}, 0, 2},
 		{34,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{33,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
+	polies[46].edges[0].wallBrightsDown[0] = 0.6f;
+	polies[46].edges[0].wallBrightsDown[1] = 0.6f;
 
 	polies[47] = { 0,0,1252,
 		{{34,{0,0}, {""}, 0, 0, {"cyber_wall_blue"}, 0, 0},
 		{38,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{57,{1,0}, {""}, 0, 0, {"gray_wall"}, 0, 2},
 		{33,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
+	polies[47].edges[2].wallBrightsDown[0] = 0.4f;
+	polies[47].edges[2].wallBrightsDown[1] = 0.7f;
 
 	polies[48] = { 0,0,1252,
 		{{57,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -566,23 +581,35 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{42,{0,0}, {""}, 0, 0, {"cyber_wall_blue"}, 0, 0},
 		{50,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{48,{1,0}, {""}, 0, 0, {"gray_wall"}, 0, 2}} };
+	polies[50].edges[3].wallBrightsDown[0] = 0.2f;
+	polies[50].edges[3].wallBrightsDown[1] = 0.4f;
 
 	polies[51] = { 0,1250,1000,
 		{{47,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{57,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{48,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
+	polies[51].edges[0].brightFloor = 60;
+	polies[51].edges[1].brightFloor = 60;
+	polies[51].edges[2].brightFloor = 60;
+	polies[51].edges[2].brightCeil = 60;
 
 	polies[52] = { 0,1250,1000,
 		{{47,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{32,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{33,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{57,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
+	polies[52].edges[0].brightFloor = 60;
+	polies[52].edges[1].brightFloor = 150;
+	polies[52].edges[2].brightFloor = 150;
+	polies[52].edges[3].brightFloor = 60;
 
 	polies[53] = { 0,1250,1000,
 		{{24,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{25,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{32,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{47,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
+	polies[53].edges[2].brightFloor = 150;
+	polies[53].edges[3].brightFloor = 60;
 
 	polies[54] = { 0,1250,1000,
 		{{18,{0,0}, {""}, 0, 0, {""}, 0, 0},
