@@ -467,6 +467,8 @@ void DrawOneColumn(double scanAngle, int columnN)
 			if (edgeNComeFrom != -1 && zSlicePrev != zNear) {
 				const Edge* edgeComeFrom = &poly.edges[edgeNComeFrom];
 				double curU = (double(edgeComeFrom->u[0]) - edgeComeFrom->u[1]) * interpEdgePrev + edgeComeFrom->u[1];
+				int wallBrightDown = int(((edgeComeFrom->wallBrightsDown[0] - edgeComeFrom->wallBrightsDown[1]) * interpEdgePrev + edgeComeFrom->wallBrightsDown[1]) * 256);
+
 				double vDens = 0;
 				if (yiScrRoof2 != yiScrCeil2) {
 					vDens = -(double(poly.yRoof) - poly.yCeil) / (yScrRoof2 - yScrCeil2);
@@ -539,9 +541,9 @@ void DrawOneColumn(double scanAngle, int columnN)
 						unsigned char(&dst)[3] = buf[y][columnN];
 						int vi = int(curV * curTex.sizeY) & (curTex.sizeY - 1);
 						unsigned char* src = texture + ((vi << curTex.xPow2) << 2);
-						dst[0] = src[2];
-						dst[1] = src[1];
-						dst[2] = src[0];
+						dst[0] = (src[2] * wallBrightDown) >> 8;
+						dst[1] = (src[1] * wallBrightDown) >> 8;
+						dst[2] = (src[0] * wallBrightDown) >> 8;
 						curV += addV;
 					}
 					if (yiScrFloor2 < lastDrawedY2) {

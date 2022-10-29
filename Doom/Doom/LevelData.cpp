@@ -269,17 +269,23 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{7,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{8,{2,0}, {""}, 0, 0, {"gray_wall"}, 0, 2},
 		{6,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
+	polies[3].edges[2].wallBrightsDown[0] = 0.4f;
+	polies[3].edges[2].wallBrightsDown[1] = 0.7f;
 
 	polies[4] = { 0,0,1252,
 		{{10,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{13,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{11,{2,0}, {""}, 0, 0, {"gray_wall"}, 0, 2},
 		{9,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
+	polies[4].edges[2].wallBrightsDown[0] = 0.7f;
+	polies[4].edges[2].wallBrightsDown[1] = 0.4f;
 
 	polies[5] = { 0,1250,1092,
 		{{13,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{12,{0,0.125f}, {""}, 0, 0, {"panel2"}, 0, 1},
 		{11,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
+	polies[5].edges[1].wallBrightsDown[0] = 0.7f;
+	polies[5].edges[1].wallBrightsDown[1] = 0.4f;
 
 	polies[6] = { 0,1250,1092,
 		{{12,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -303,6 +309,8 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{54,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{56,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{52,{0,0}, {""}, 0, 0, {""}, 0, }} };
+	polies[9].edges[0].wallBrightsDown[0] = 0.4f;
+	polies[9].edges[0].wallBrightsDown[1] = 0.7f;
 
 	polies[10] = { 0,0,1252,
 		{{53,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -347,6 +355,8 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 	{{4,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{6,{0,0.125f}, {""}, 0, 0, {"panel2"}, 0, 1},
 		{5,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
+	polies[17].edges[1].wallBrightsDown[0] = 0.4f;
+	polies[17].edges[1].wallBrightsDown[1] = 0.7f;
 
 	polies[18] = { 1252,1090,1035,
 		{{5,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -431,6 +441,8 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{44,{1,0}, {""}, 0, 0, {"gray_wall"}, 0, 2},
 		{53,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{51,{0,0}, {""}, 0, 0, {"cyber_wall_blue"}, 0, 0}} };
+	polies[31].edges[1].wallBrightsDown[0] = 0.7f;
+	polies[31].edges[1].wallBrightsDown[1] = 0.4f;
 
 	polies[32] = { 0,0,1252,
 		{{41,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -447,6 +459,8 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{44,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{39,{0,0}, {""}, 0, 0, {"cyber_wall_blue"}, 0, 0},
 		{35,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
+	polies[34].edges[0].wallBrightsDown[0] = 0.7f;
+	polies[34].edges[0].wallBrightsDown[1] = 0.7f;
 
 	polies[35] = { 0,0,1252,
 		{{27,{0,0}, {""}, 0, 0, {""}, 0, 0},

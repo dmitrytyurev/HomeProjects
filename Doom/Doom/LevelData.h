@@ -44,6 +44,9 @@ struct Edge
 	// Заполняется всегда автоматически
 	int adjPolyN = -1;  // Индекс смежного полигона в polies, либо -1, если смежного полигона нет
 	int adjEdgeN = 0;  // Индекс смежного ребра в edges смежного полигона
+
+	float wallBrightsUp[2] = {1, 1}; // Яркость стены сверху
+	float wallBrightsDown[2] = {1, 1}; // Яркость стены снизу
 };
 
 struct Poly
