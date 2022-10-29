@@ -60,6 +60,7 @@ double ceilNearU = 0;
 double ceilNearV = 0;
 double floorNearU = 0;
 double floorNearV = 0;
+double floorNearBr = 0;
 
 // -------------------------------------------------------------------
 
@@ -404,6 +405,9 @@ void DrawOneColumn(double scanAngle, int columnN)
 				double u2Fl = interpEdgeMaxX * (poly.edges[(edgeWithMaxX + 1) % vertsInPoly].uFloor - poly.edges[edgeWithMaxX].uFloor) + poly.edges[edgeWithMaxX].uFloor;
 				double v2Fl = interpEdgeMaxX * (poly.edges[(edgeWithMaxX + 1) % vertsInPoly].vFloor - poly.edges[edgeWithMaxX].vFloor) + poly.edges[edgeWithMaxX].vFloor;
 
+				double br1Fl = interpEdgeMinX * (poly.edges[(edgeWithMinX + 1) % vertsInPoly].brightFloor - poly.edges[edgeWithMinX].brightFloor) + poly.edges[edgeWithMinX].brightFloor;
+				double br2Fl = interpEdgeMaxX * (poly.edges[(edgeWithMaxX + 1) % vertsInPoly].brightFloor - poly.edges[edgeWithMaxX].brightFloor) + poly.edges[edgeWithMaxX].brightFloor;
+
 				// Полученный отрезок повернуть так, чтобы текущий секущий луч был прямой x=0
 				double x1 = minX * co3 + zNear * si3;
 				double z1 = -minX * si3 + zNear * co3;
@@ -421,6 +425,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 					ceilNearV = v1Ce;
 					floorNearU = u1Fl;
 					floorNearV = v1Fl;
+					floorNearBr = br1Fl;
 				}
 				else {
 					if (x1 >= 0) {
@@ -428,6 +433,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 						ceilNearV = v1Ce;
 						floorNearU = u1Fl;
 						floorNearV = v1Fl;
+						floorNearBr = br1Fl;
 					}
 					else {
 						if (x2 <= 0) {
@@ -435,6 +441,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 							ceilNearV = v2Ce;
 							floorNearU = u2Fl;
 							floorNearV = v2Fl;
+							floorNearBr = br2Fl;
 						}
 						else {
 							double interp = -x1 / (x2 - x1);
@@ -442,6 +449,7 @@ void DrawOneColumn(double scanAngle, int columnN)
 							ceilNearV = (v2Ce - v1Ce) * interp + v1Ce;
 							floorNearU = (u2Fl - u1Fl) * interp + u1Fl;
 							floorNearV = (v2Fl - v1Fl) * interp + v1Fl;
+							floorNearBr = (br2Fl - br1Fl) * interp + br1Fl;
 						}
 					}
 				}
@@ -630,28 +638,35 @@ void DrawOneColumn(double scanAngle, int columnN)
 					const Edge& edgeCurNext = poly.edges[(edgeWithMaxZ + 1) % vertsInPoly];
 					double u1 = (double(edgeCurNext.uFloor) - edgeCur.uFloor) * interpEdge + edgeCur.uFloor;
 					double v1 = (double(edgeCurNext.vFloor) - edgeCur.vFloor) * interpEdge + edgeCur.vFloor;
+					double br1 = (double(edgeCurNext.brightFloor) - edgeCur.brightFloor) * interpEdge + edgeCur.brightFloor;
 					double u1DivZ = u1 / zSliceCur;
 					double v1DivZ = v1 / zSliceCur;
+					double br1DivZ = br1 / zSliceCur;
 					double oneDivZ1 = 1 / zSliceCur;
 
 					double u2 = floorNearU;
 					double v2 = floorNearV;
+					double br2 = floorNearBr;
 					double u2DivZ = u2 / zSlicePrev;
 					double v2DivZ = v2 / zSlicePrev;
+					double br2DivZ = br2 / zSlicePrev;
 					double oneDivZ2 = 1 / zSlicePrev;
 
 					double srcInterp1 = ((yiScrFloor1 + 0.5) - yScrFloor1) / (yScrFloor2 - yScrFloor1);
 					double uCur = (u2DivZ - u1DivZ) * srcInterp1 + u1DivZ;
 					double vCur = (v2DivZ - v1DivZ) * srcInterp1 + v1DivZ;
+					double brCur = (br2DivZ - br1DivZ) * srcInterp1 + br1DivZ;
 					double zCur = (oneDivZ2 - oneDivZ1) * srcInterp1 + oneDivZ1;
 
 					double srcInterp2 = (yiScrFloor2 + 0.5 - yScrFloor1) / (yScrFloor2 - yScrFloor1);
 					double uCorr = (u2DivZ - u1DivZ) * srcInterp2 + u1DivZ;
 					double vCorr = (v2DivZ - v1DivZ) * srcInterp2 + v1DivZ;
+					double brCorr = (br2DivZ - br1DivZ) * srcInterp2 + br1DivZ;
 					double zCorr = (oneDivZ2 - oneDivZ1) * srcInterp2 + oneDivZ1;
 
 					double uAdd = (uCorr - uCur) / (yiScrFloor2 - yiScrFloor1);
 					double vAdd = (vCorr - vCur) / (yiScrFloor2 - yiScrFloor1);
+					double brAdd = (brCorr - brCur) / (yiScrFloor2 - yiScrFloor1);
 					double zAdd = (zCorr - zCur) / (yiScrFloor2 - yiScrFloor1);
 
 					const Texture& curTex = textures[poly.floorTex.texIndex];
@@ -660,14 +675,16 @@ void DrawOneColumn(double scanAngle, int columnN)
 						unsigned char(&dst)[3] = buf[y][columnN];
 						double uPixel = uCur / zCur;
 						double vPixel = vCur / zCur;
+						int brPixel = int(brCur / zCur);
 						int ui = int(uPixel * curTex.sizeX) & (curTex.sizeX - 1);
 						int vi = int(vPixel * curTex.sizeY) & (curTex.sizeY - 1);
 						unsigned char* src = texture + (((vi << curTex.xPow2) + ui) << 2);
-						dst[0] = src[2];
-						dst[1] = src[1];
-						dst[2] = src[0];
+						dst[0] = int(src[2] * brPixel) >> 8;
+						dst[1] = int(src[1] * brPixel) >> 8;
+						dst[2] = int(src[0] * brPixel) >> 8;
 						uCur += uAdd;
 						vCur += vAdd;
+						brCur += brAdd;
 						zCur += zAdd;
 					}
 					if (yiScrFloor1 < lastDrawedY2)
@@ -701,6 +718,7 @@ m1: 	zSlicePrev = zSliceCur;
 		ceilNearV = (double(edgeComeFrom.vCeil) - edgeComeFromNextT.vCeil) * interpEdgePrev + edgeComeFromNextT.vCeil;
 		floorNearU = (double(edgeComeFrom.uFloor) - edgeComeFromNextT.uFloor) * interpEdgePrev + edgeComeFromNextT.uFloor;
 		floorNearV = (double(edgeComeFrom.vFloor) - edgeComeFromNextT.vFloor) * interpEdgePrev + edgeComeFromNextT.vFloor;
+		floorNearBr = (double(edgeComeFrom.brightFloor) - edgeComeFromNextT.brightFloor) * interpEdgePrev + edgeComeFromNextT.brightFloor;
 	}
 }
 
