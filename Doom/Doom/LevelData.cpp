@@ -805,8 +805,8 @@ m1:;
 	project_u_wall_z(1632, 0, 1916, 2, { 47, 0, 48, 1, 49, 0, 50, 1 }, verts, polies, textures);
 	project_v_wall(false, true, 1160, 0, 1010, 1, { 47, 0, 48, 1, 49, 0, 50, 1 }, verts, polies, textures);
 
-	project_u_wall_x(190, 0, 910, 5, { 3, 2, 1, 2, 4, 2 }, verts, polies, textures);
-	project_v_wall(true, true,1250, 0, 1000, 2, { 3, 2, 1, 2, 4, 2 }, verts, polies, textures);
+	project_u_wall_x(468, 0, 628, 1, { 3, 2, 1, 2, 4, 2 }, verts, polies, textures);
+	project_v_wall(true, true, 1120, 0, 1000, 1, { 3, 2, 1, 2, 4, 2 }, verts, polies, textures);
 
 
 	for (int pn = 0; pn < polies.size(); ++pn) {
