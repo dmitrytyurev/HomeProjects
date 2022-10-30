@@ -36,7 +36,7 @@ int getTextureIndex(const std::string& name, std::vector<Texture>& textures)
 Texture::Texture(const std::string& name_)
 {
 	name = name_;
-	std::string fileName = name + ".bmp";
+	std::string fileName = "../Textures/" + name + ".bmp";
 
 	int bitDepth = 0;
 	give_bmp_size(fileName.c_str(), &sizeX, &sizeY, &bitDepth);
@@ -206,7 +206,7 @@ void project_v_wall(bool feelCeilV, bool feelFloorV, float y1, float v1, float y
 
 void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std::vector<Texture>& textures)
 {
-	verts.resize(58);
+	verts.resize(84);
 
 	verts[0] = {464,840};
 	verts[1] = { 468,840 };
@@ -272,7 +272,38 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 	verts[56] = { 990,1943 };
 	verts[57] = { 364,1746 };
 
-	polies.resize(57);
+	verts[58] = { 628, 818 };
+	verts[59] = { 693, 818};
+
+	verts[60] = { 852, 818 };
+	verts[61] = { 901, 818 };
+	verts[62] = { 852, 840};
+	verts[63] = { 1074, 818 };
+	verts[64] = { 1074, 658 };
+	verts[65] = { 901, 658 };
+	verts[66] = { 852, 658 };
+	verts[67] = { 693, 658};
+	verts[68] = { 628, 658 };
+	verts[69] = { 468, 658 };
+
+	verts[70] = { 453, 658 };
+	verts[71] = { 453, 818 };
+	verts[72] = { 468, 818 };
+	verts[73] = { 693, 609};
+	verts[74] = { 852, 609 };
+	verts[75] = { 693, 451};
+	verts[76] = { 852, 451 };
+	verts[77] = { 870, 451 };
+	verts[78] = { 852, 359 };
+	verts[79] = { 750, 340};
+
+	verts[80] = { 292 , 451 };
+	verts[81] = { 270, 550};
+	verts[82] = { 292, 609 };
+	verts[83] = { 693, 359};
+
+
+	polies.resize(84);
 
 	polies[0] = { 0,0,1252,
 		{{0,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -675,6 +706,16 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		{24,{1,0}, {"big_wall"}, 0, 1, {"metal_plates2"}, 0, 1},
 		{47,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{46,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"panel_light"}, {"panel"} };
+
+
+	// ========= Коридор ========
+
+	//polies[0] = { 0,0,1000,
+	//	{{0,{0,0}, {""}, 0, 0, {""}, 0, 0},
+	//	 {1,{1,0}, {""}, 0, 0, {""}, 0, 0},
+	//	 {8,{0,0}, {""}, 0, 0, {""}, 0, 0},
+	//	 {7,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
+
 
 	// Заполнение  poly.yCeil и poly.yRoof
 

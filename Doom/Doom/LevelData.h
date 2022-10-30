@@ -65,7 +65,7 @@ struct Poly
 struct Texture
 {
 	Texture(const std::string& name_);
-	~Texture() { /*PrintConsole("~Texture()");*/  /* if (buf) delete[]buf; */ }
+	~Texture() { if (buf) delete[]buf;  }
 
 	Texture(Texture& src) = delete;
 	Texture(Texture&& src)
