@@ -172,33 +172,33 @@ void project_v_wall(bool feelCeilV, bool feelFloorV, float y1, float v1, float y
 		Poly& poly = polies[polsEdges[pn * 2]];
 		int edge = polsEdges[pn * 2 + 1];
 
-		// Заполнение у рёбер vCeil и vCeilAdd
+		// Заполнение у рёбер vCeil и vWallUpAdd
 		if (feelCeilV) {
 			float y = poly.yCeil;
 			double k = (double(v2) - v1) / (double(y2) - y1);
-			poly.edges[edge].vWallCeil = (y - y1) * k + v1;
+			poly.edges[edge].vWallUp = (y - y1) * k + v1;
 
 			int adjPolyN = poly.edges[edge].adjPolyN;
 			if (adjPolyN == -1) 
 				ExitMsg("adjPolyN == -1");
 			Poly& adjPoly = polies[adjPolyN];
 			y = adjPoly.yCeil;
-			poly.edges[edge].vCeilAdd = (y - y1) * k + v1;
+			poly.edges[edge].vWallUpAdd = (y - y1) * k + v1;
 			PrintConsole("");
 		}
 
-		// Заполнение у рёбер vFloor и vFloorAdd
+		// Заполнение у рёбер vFloor и vWallDownAdd
 		if (feelFloorV) {
 			float y = poly.yFloor;
 			double k = (double(v2) - v1) / (double(y2) - y1);
-			poly.edges[edge].vWallFloor = (y - y1) * k + v1;
+			poly.edges[edge].vWallDown = (y - y1) * k + v1;
 
 			int adjPolyN = poly.edges[edge].adjPolyN;
 			if (adjPolyN == -1)
 				ExitMsg("adjPolyN == -1");
 			Poly& adjPoly = polies[adjPolyN];
 			y = adjPoly.yFloor;
-			poly.edges[edge].vFloorAdd = (y - y1) * k + v1;
+			poly.edges[edge].vWallDownAdd = (y - y1) * k + v1;
 			PrintConsole("");
 		}
 	}
@@ -309,10 +309,10 @@ m1:;
 				double dist = sqrt(dx * dx + dz * dz);
 				poly.edges[en].u[1] = float(dist * 0.01);
 
-				poly.edges[en].vWallCeil = 1;
-				poly.edges[en].vCeilAdd = 0.01f;
-				poly.edges[en].vWallFloor = 0;
-				poly.edges[en].vFloorAdd = 0.01f;
+				poly.edges[en].vWallUp = 1;
+				poly.edges[en].vWallUpAdd = 0.01f;
+				poly.edges[en].vWallDown = 0;
+				poly.edges[en].vWallDownAdd = 0.01f;
 			}
 
 			// Заполняем незаполненые ранее текстурные координаты ПОТОЛКА с универсальной плотностью текселей/метр (должно хватить для большинства случаев)
@@ -357,14 +357,14 @@ m1:;
 				if (poly.edges[en].adjPolyN >= 0) {
 					float dy = poly.yFloor - polies[poly.edges[en].adjPolyN].yFloor;
 					if (dy > 0) {
-						float repeatsN = poly.edges[en].vFloorAdd - poly.edges[en].vWallFloor;
-						poly.edges[en].vFloorAdd = repeatsN / dy;
+						float repeatsN = poly.edges[en].vWallDownAdd - poly.edges[en].vWallDown;
+						poly.edges[en].vWallDownAdd = repeatsN / dy;
 					}
 
 					dy = polies[poly.edges[en].adjPolyN].yCeil - poly.yCeil;
 					if (dy > 0) {
-						float repeatsN = poly.edges[en].vCeilAdd - poly.edges[en].vWallCeil;
-						poly.edges[en].vCeilAdd = -repeatsN / dy;
+						float repeatsN = poly.edges[en].vWallUpAdd - poly.edges[en].vWallUp;
+						poly.edges[en].vWallUpAdd = -repeatsN / dy;
 					}
 
 				}

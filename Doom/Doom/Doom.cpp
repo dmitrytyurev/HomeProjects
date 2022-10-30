@@ -518,8 +518,8 @@ void DrawOneColumn(double scanAngle, int columnN)
 					otherNotVisible = true;
 				}
 				if (yiScrCeil2 > yiScrRoof2) {
-					double addV = edgeComeFrom->vCeilAdd * vDens;
-					double curV = edgeComeFrom->vWallCeil - addV * (yScrCeil2 - (yiScrRoof2 + 0.5));  // В скобках сдвиг от необрезанного yScrCeil2 для которого задана V, до центра верхнего пиксела обрезанного отрезка, откуда начнём рисовать и где нам нужен V
+					double addV = edgeComeFrom->vWallUpAdd * vDens;
+					double curV = edgeComeFrom->vWallUp - addV * (yScrCeil2 - (yiScrRoof2 + 0.5));  // В скобках сдвиг от необрезанного yScrCeil2 для которого задана V, до центра верхнего пиксела обрезанного отрезка, откуда начнём рисовать и где нам нужен V
 					const Texture& curTex = textures[edgeComeFrom->texUp.texIndex];
 					int ui = int(curU * curTex.sizeX) & (curTex.sizeX - 1);
 					unsigned char* texture = curTex.buf + (ui << 2);
@@ -549,8 +549,8 @@ void DrawOneColumn(double scanAngle, int columnN)
 					otherNotVisible = true;
 				}
 				if (lastDrawedY2 > yiScrFloor2) {
-					double addV = edgeComeFrom->vFloorAdd * vDens; // Изменение V-координаты с каждым пикселем
-					double curV = edgeComeFrom->vWallFloor + addV * (yiScrFloor2 - keep1 + subPixelCorrection);
+					double addV = edgeComeFrom->vWallDownAdd * vDens; // Изменение V-координаты с каждым пикселем
+					double curV = edgeComeFrom->vWallDown + addV * (yiScrFloor2 - keep1 + subPixelCorrection);
 					const Texture& curTex = textures[edgeComeFrom->texDown.texIndex];
 					int ui = int(curU * curTex.sizeX) & (curTex.sizeX - 1);
 					unsigned char* texture = curTex.buf + (ui << 2);
