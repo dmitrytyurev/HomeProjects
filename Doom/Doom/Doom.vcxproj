@@ -130,6 +130,8 @@
     <ClInclude Include="bmp.h" />
     <ClInclude Include="Doom.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Level1Room.h" />
+    <ClInclude Include="Level2Corridor.h" />
     <ClInclude Include="LevelData.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
@@ -138,6 +140,8 @@
   <ItemGroup>
     <ClCompile Include="bmp.cpp" />
     <ClCompile Include="Doom.cpp" />
+    <ClCompile Include="Level1Room.cpp" />
+    <ClCompile Include="Level2Corridor.cpp" />
     <ClCompile Include="LevelData.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
