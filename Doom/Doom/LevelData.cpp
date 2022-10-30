@@ -133,45 +133,73 @@ void project_uv(bool isFloor, float repeatsNumX, float repeatsNumZ, std::vector<
 	}
 }
 
-void project_uv_wall(float y1, float v1, float y2, float v2, float repeatsNumZ, std::vector<int> polsEdges, std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std::vector<Texture>& textures)
+void project_u_wall_x(float x1, float u1, float x2, float u2, std::vector<int> polsEdges, std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std::vector<Texture>& textures)
 {
-	float zMin = 1000000;
-	float zMax = -1000000;
 	int polsNum = polsEdges.size() / 2;
-	for (int pn = 0; pn < polsNum; ++pn) {
-		Poly& poly = polies[polsEdges[pn * 2]];
-		int edge = polsEdges[pn * 2 + 1];
-		float z = verts[poly.edges[edge].firstInd].z;
-		if (z < zMin) zMin = z;
-		if (z > zMax) zMax = z;
-		int nextEdge = (edge + 1) % poly.edges.size();
-		z = verts[poly.edges[nextEdge].firstInd].z;
-		if (z < zMin) zMin = z;
-		if (z > zMax) zMax = z;
-	}
-
 	for (int pn = 0; pn < polsNum; ++pn) {
 		// Заполнение у рёбер u[0] и u[1]
 		Poly& poly = polies[polsEdges[pn * 2]];
 		int edge = polsEdges[pn * 2 + 1];
+		double k = (double(u2) - u1) / (double(x2) - x1);
+		float x = verts[poly.edges[edge].firstInd].x;
+		poly.edges[edge].u[0] = (double(x) - x1) * k + u1;
+		x = verts[poly.edges[(edge + 1) % poly.edges.size()].firstInd].x;
+		poly.edges[edge].u[1] = (double(x) - x1) * k + u1;
+	}
+}
+
+void project_u_wall_z(float z1, float u1, float z2, float u2, std::vector<int> polsEdges, std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std::vector<Texture>& textures)
+{
+	int polsNum = polsEdges.size() / 2;
+	for (int pn = 0; pn < polsNum; ++pn) {
+		// Заполнение у рёбер u[0] и u[1]
+		Poly& poly = polies[polsEdges[pn * 2]];
+		int edge = polsEdges[pn * 2 + 1];
+		double k = (double(u2) - u1) / (double(z2) - z1);
 		float z = verts[poly.edges[edge].firstInd].z;
-		poly.edges[edge].u[0] = (double(z) - zMin) / (double(zMax) - zMin) * repeatsNumZ;
-		int nextEdge = (edge + 1) % poly.edges.size();
-		z = verts[poly.edges[nextEdge].firstInd].z;
-		poly.edges[edge].u[1] = (double(z) - zMin) / (double(zMax) - zMin) * repeatsNumZ;
+		poly.edges[edge].u[0] = (double(z) - z1) * k + u1;
+		z = verts[poly.edges[(edge+1)%poly.edges.size()].firstInd].z;
+		poly.edges[edge].u[1] = (double(z) - z1) * k + u1;
+	}
+}
+
+void project_v_wall(bool feelCeilV, bool feelFloorV, float y1, float v1, float y2, float v2, std::vector<int> polsEdges, std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std::vector<Texture>& textures)
+{
+	int polsNum = polsEdges.size() / 2;
+	for (int pn = 0; pn < polsNum; ++pn) {
+		Poly& poly = polies[polsEdges[pn * 2]];
+		int edge = polsEdges[pn * 2 + 1];
+
+		// Заполнение у рёбер vCeil и vCeilAdd
+		if (feelCeilV) {
+			float y = poly.yCeil;
+			double k = (double(v2) - v1) / (double(y2) - y1);
+			poly.edges[edge].vWallCeil = (y - y1) * k + v1;
+
+			int adjPolyN = poly.edges[edge].adjPolyN;
+			if (adjPolyN == -1) 
+				ExitMsg("adjPolyN == -1");
+			Poly& adjPoly = polies[adjPolyN];
+			y = adjPoly.yCeil;
+			poly.edges[edge].vCeilAdd = (y - y1) * k + v1;
+			PrintConsole("");
+		}
 
 		// Заполнение у рёбер vFloor и vFloorAdd
-		float y = poly.yFloor;
-		double k = (double(v2) - v1) / (double(y2) - y1);
-		poly.edges[edge].vWallFloor = (y - y1) * k + v1;
+		if (feelFloorV) {
+			float y = poly.yFloor;
+			double k = (double(v2) - v1) / (double(y2) - y1);
+			poly.edges[edge].vWallFloor = (y - y1) * k + v1;
 
-		int adjPolyN = poly.edges[edge].adjPolyN;
-		Poly& adjPoly = polies[adjPolyN];
-		y = adjPoly.yFloor;
-		poly.edges[edge].vFloorAdd = (y - y1) * k + v1;
+			int adjPolyN = poly.edges[edge].adjPolyN;
+			if (adjPolyN == -1)
+				ExitMsg("adjPolyN == -1");
+			Poly& adjPoly = polies[adjPolyN];
+			y = adjPoly.yFloor;
+			poly.edges[edge].vFloorAdd = (y - y1) * k + v1;
+			PrintConsole("");
+		}
 	}
-
-	PrintConsole("");
 }
 
 
@@ -181,15 +209,15 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 	verts.resize(58);
 
 	verts[0] = {464,840};
-	verts[1] = { 488,840 };
-	verts[2] = { 608,840 };
+	verts[1] = { 468,840 };
+	verts[2] = { 628,840 };
 	verts[3] = { 634,840 };
 	verts[4] = { 106,988 };
 	verts[5] = { 140,1012 };
 	verts[6] = { 190,1012 };
 	verts[7] = { 464,988 };
-	verts[8] = { 488,1012 };
-	verts[9] = { 608,1012 };
+	verts[8] = { 468,1012 };
+	verts[9] = { 628,1012 };
 
 	verts[10] = { 634,988 };
 	verts[11] = { 910,1012 };
@@ -252,11 +280,13 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 		 {8,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {7,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
 
-	polies[1] = { 0,1250,1000,
+	polies[1] = { 1252,1120,1000,
 		{{1,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{2,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		{9,{0,0}, {""}, 0, 0, {""}, 0, 0},
+		{9,{0,1}, {"gray_wall"}, 0, 1.25, {""}, 0, 0},
 		{8,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
+	polies[1].edges[2].wallBrightsUp[0] = 0.4f;
+	polies[1].edges[2].wallBrightsUp[1] = 0.4f;
 
 	polies[2] = { 0,0,1252,
 		{{2,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -769,8 +799,14 @@ m1:;
 	project_uv(false, 5, 1, { 26,27 }, verts, polies, textures);
 	project_uv(false, 5, 1, { 18,56 }, verts, polies, textures);
 
-	project_uv_wall(1160, 0, 1010, 1, 2, { 34, 2, 33, 1, 32, 2, 31, 3 }, verts, polies, textures);
-	project_uv_wall(1160, 0, 1010, 1, 2, { 47, 0, 48, 1, 49, 0, 50, 1 }, verts, polies, textures);
+	project_u_wall_z(1632, 0, 1916, 2, { 34, 2, 33, 1, 32, 2, 31, 3 }, verts, polies, textures);
+	project_v_wall(false, true, 1160, 0, 1010, 1, { 34, 2, 33, 1, 32, 2, 31, 3 }, verts, polies, textures);
+
+	project_u_wall_z(1632, 0, 1916, 2, { 47, 0, 48, 1, 49, 0, 50, 1 }, verts, polies, textures);
+	project_v_wall(false, true, 1160, 0, 1010, 1, { 47, 0, 48, 1, 49, 0, 50, 1 }, verts, polies, textures);
+
+	project_u_wall_x(190, 0, 910, 5, { 3, 2, 1, 2, 4, 2 }, verts, polies, textures);
+	project_v_wall(true, true,1250, 0, 1000, 2, { 3, 2, 1, 2, 4, 2 }, verts, polies, textures);
 
 
 	for (int pn = 0; pn < polies.size(); ++pn) {
@@ -787,9 +823,8 @@ m1:;
 
 					dy = polies[poly.edges[en].adjPolyN].yCeil - poly.yCeil;
 					if (dy > 0) {
-						float repeatsN = poly.edges[en].vCeilAdd;
-						poly.edges[en].vWallCeil = 0;
-						poly.edges[en].vCeilAdd = repeatsN / dy;
+						float repeatsN = poly.edges[en].vCeilAdd - poly.edges[en].vWallCeil;
+						poly.edges[en].vCeilAdd = -repeatsN / dy;
 					}
 
 				}
