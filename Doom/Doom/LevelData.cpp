@@ -279,6 +279,8 @@ m1:;
 	textures.emplace_back("cyber_door");
 	textures.emplace_back("ceil");
 	textures.emplace_back("lift_door");
+	textures.emplace_back("lift_floor");
+	textures.emplace_back("lift_wall");
 
 	
 	// Прописываем индексы текстур в полигоны и рёбра
