@@ -274,8 +274,10 @@ m1:;
 	textures.emplace_back("big_wall");
 	textures.emplace_back("metal_plates2");
 	textures.emplace_back("panel2");
+	textures.emplace_back("cyber_wall2");
+	textures.emplace_back("cyber_wall3");
+	textures.emplace_back("cyber_door");
 
-	
 	
 	// Прописываем индексы текстур в полигоны и рёбра
 	for (int pn1 = 0; pn1 < polies.size(); ++pn1) {
@@ -345,6 +347,16 @@ m1:;
 
 	project_u_wall_x(468, 0, 628, 1, { 3, 2, 1, 2, 4, 2 }, verts, polies, textures);
 	project_v_wall(true, true, 1120, 0, 1000, 1, { 3, 2, 1, 2, 4, 2 }, verts, polies, textures);
+
+	project_u_wall_x(468, 0, 693, 1.5, { 72, 1, 73, 1 , 79, 1, 82, 0}, verts, polies, textures);
+	project_u_wall_x(852, 0, 1074, 1.5, { 69, 1}, verts, polies, textures);
+	project_u_wall_x(628, 0, 1074, 3, { 58, 0, 66, 2, 68, 0 }, verts, polies, textures);
+
+	project_v_wall(false, true,1120, 0, 1000, 1, { 2, 3, 58, 2, 58, 0, 66, 2, 68, 0, 0, 1, 59, 1, 72, 1, 73, 1 , 79, 1, 82, 0, 69, 1, 70, 1, 75, 2, 81, 0 }, verts, polies, textures);
+
+	
+	
+
 
 	// Если текстура верхнего или нижнего простенка заданы (значит выше для них не были заполнены текстурные координаты под чеккер с параметромами *Add уже в виде приращения), то
 	// параметры *Add содержат текстурную координату, которую сейчас пересчитаем в приращение
