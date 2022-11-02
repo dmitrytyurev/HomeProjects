@@ -121,8 +121,8 @@ void project_uv(bool isFloor, float repeatsNumX, float repeatsNumZ, std::vector<
 		int vertsNum = (int)poly.edges.size();
 		for (int en = 0; en < vertsNum; ++en) {
 			const FPoint2D& point = verts[poly.edges[en].firstInd];
-			float u = (double(point.z) - zMin) / (double(zMax) - zMin) * repeatsNumX;
-			float v = (double(point.x) - xMin) / (double(xMax) - xMin) * repeatsNumZ;
+			float u = (double(point.z) - zMin) / (double(zMax) - zMin) * repeatsNumZ;
+			float v = (double(point.x) - xMin) / (double(xMax) - xMin) * repeatsNumX;
 			if (isFloor) {
 				poly.edges[en].uFloor = u;
 				poly.edges[en].vFloor = v;
@@ -277,6 +277,8 @@ m1:;
 	textures.emplace_back("cyber_wall2");
 	textures.emplace_back("cyber_wall3");
 	textures.emplace_back("cyber_door");
+	textures.emplace_back("ceil");
+	textures.emplace_back("lift_door");
 
 	
 	// Прописываем индексы текстур в полигоны и рёбра
@@ -334,10 +336,10 @@ m1:;
 	// Делаем мэппинг заданных групп плокостей по единым правилам
 
 	project_uv_ceil(1, {37,38,39,40}, verts, polies, textures);
-	project_uv(true, 2, 1, { 26,27}, verts, polies, textures);
-	project_uv(true, 2, 1, { 18,56 }, verts, polies, textures);
-	project_uv(false, 5, 1, { 26,27 }, verts, polies, textures);
-	project_uv(false, 5, 1, { 18,56 }, verts, polies, textures);
+	project_uv(true, 1, 2, { 26,27}, verts, polies, textures);
+	project_uv(true, 1, 2, { 18,56 }, verts, polies, textures);
+	project_uv(false, 1, 5, { 26,27 }, verts, polies, textures);
+	project_uv(false, 1, 5, { 18,56 }, verts, polies, textures);
 
 	project_u_wall_z(1632, 0, 1916, 2, { 34, 2, 33, 1, 32, 2, 31, 3 }, verts, polies, textures);
 	project_v_wall(false, true, 1160, 0, 1010, 1, { 34, 2, 33, 1, 32, 2, 31, 3 }, verts, polies, textures);
@@ -348,13 +350,17 @@ m1:;
 	project_u_wall_x(468, 0, 628, 1, { 3, 2, 1, 2, 4, 2 }, verts, polies, textures);
 	project_v_wall(true, true, 1120, 0, 1000, 1, { 3, 2, 1, 2, 4, 2 }, verts, polies, textures);
 
+	// Стены коридора
 	project_u_wall_x(468, 0, 693, 1.5, { 72, 1, 73, 1 , 79, 1, 82, 0}, verts, polies, textures);
 	project_u_wall_x(852, 0, 1074, 1.5, { 69, 1}, verts, polies, textures);
 	project_u_wall_x(628, 0, 1074, 3, { 58, 0, 66, 2, 68, 0 }, verts, polies, textures);
 
 	project_v_wall(false, true,1120, 0, 1000, 1, { 2, 3, 58, 2, 58, 0, 66, 2, 68, 0, 0, 1, 59, 1, 72, 1, 73, 1 , 79, 1, 82, 0, 69, 1, 70, 1, 75, 2, 81, 0 }, verts, polies, textures);
 
-	
+	// Потолок коридора
+	project_uv(false, 4, 1, { 61, 62, 63, 64, 65 }, verts, polies, textures);
+	project_uv(false, 4, 1, { 80, 74 }, verts, polies, textures);
+
 	
 
 

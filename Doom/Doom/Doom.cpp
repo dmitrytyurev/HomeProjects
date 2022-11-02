@@ -852,6 +852,9 @@ void Update()
 		xCam -= sin(-alCam) * MOVE_SPEED;
 		zCam -= cos(-alCam) * MOVE_SPEED;
 	}
+	static double t = 0;
+	t += 0.005f;
+	polies[77].yFloor = ((sin(t) + 1.f) * 0.5f) * 120 + 1000;
 }
 
 // -------------------------------------------------------------------
