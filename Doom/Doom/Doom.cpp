@@ -29,7 +29,7 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 // -------------------------------------------------------------------
 
-void Update();
+void Update(double dt);
 void Draw(HWND hWnd);
 
 const int bufSizeX = 500;
@@ -200,7 +200,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //// TODO: Добавьте сюда любой код прорисовки, использующий HDC...
             //EndPaint(hWnd, &ps);
 
-		Update();
+		static double prevTime = 0;
+		double curTime = GetTimeDbl();
+		double dt = curTime - prevTime;
+		prevTime = curTime;
+
+		Update(dt);
 		Draw(hWnd);
 
         }
@@ -829,38 +834,47 @@ void InitGameLogic()
 }
 
 // -------------------------------------------------------------------
-const float TRUN_SPEED = 0.02f;
-const float MOVE_SPEED = 0.5;
+constexpr float TRUN_SPEED = 0.02f * 300;
+constexpr float MOVE_SPEED = 0.5 * 300;
 
-void Update()
+void Update(double dt)
 {
 	// Движение камеры от кнопок
 	if (GetKeyState(VK_LEFT) & 0x8000)
 	{
-		alCam += TRUN_SPEED;
+		alCam += TRUN_SPEED * dt;
 	}
 	if (GetKeyState(VK_RIGHT) & 0x8000)
 	{
-		alCam -= TRUN_SPEED;
+		alCam -= TRUN_SPEED * dt;
 	}
 	if (GetKeyState(VK_UP) & 0x8000)
 	{
-		xCam += sin(-alCam) * MOVE_SPEED;
-		zCam += cos(-alCam) * MOVE_SPEED;
+		xCam += sin(-alCam) * MOVE_SPEED * dt;
+		zCam += cos(-alCam) * MOVE_SPEED * dt;
 	}
 	if (GetKeyState(VK_DOWN) & 0x8000)
 	{
-		xCam -= sin(-alCam) * MOVE_SPEED;
-		zCam -= cos(-alCam) * MOVE_SPEED;
+		xCam -= sin(-alCam) * MOVE_SPEED * dt;
+		zCam -= cos(-alCam) * MOVE_SPEED * dt;
 	}
 
 	// Лифт поднимается-опускается
 	static double t = 0;
-	t += 0.005f;
+	t += 1.25f * dt;
 	polies[77].yFloor = ((sin(t) + 1.f) * 0.5f) * 120 + 1000;
 
 	// Лампочка в коридоре мерцает
-	float interp = ((sin(t*4) + 1.f) * 0.5f);
+
+	static double timeToSwitch = 0;
+	static bool isLightOn = false;
+	timeToSwitch -= dt;
+	if (timeToSwitch <= 0) {
+		timeToSwitch = RandF(0.05f, 0.3f);
+		isLightOn ^= true;
+	}
+
+	float interp = 1; // isLightOn ? 1 : 0;
 	polies[57].edges[1].brightFloor = (190 - 256) * interp + 256;
 	polies[61].edges[0].brightFloor = (220 - 256) * interp + 256;
 	polies[61].edges[1].brightFloor = (120 - 256) * interp + 256;
