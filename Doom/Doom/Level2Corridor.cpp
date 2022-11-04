@@ -41,6 +41,7 @@ void FillLevel2Corridor(std::vector<FPoint2D>& verts, std::vector<Poly>& polies,
 		 {58,{0,0}, {""}, 0, 0, {""}, 0, 0, 1, 1},
 		 {2,{0,0}, {""}, 0, 0, {""}, 0, 0, 0.5f, 1},
 		 {1,{0,0}, {""}, 0, 0, {""}, 0, 0, 0.5f, 0}}, {"metal_column"}, {"hexa_floor"} };
+	polies[57].edges[1].brightFloor = 190;
 
 	polies[58] = { 0,0,1252,
 		{{58,{0,0}, {""}, 0, 0, {"gray_wall"}, 0, 2},
@@ -48,8 +49,8 @@ void FillLevel2Corridor(std::vector<FPoint2D>& verts, std::vector<Poly>& polies,
 		 {2,{1,1.2}, {""}, 0, 0, {"gray_wall"}, 0, 2}} };
 
 	polies[59] = { 0,0,1252,
-		{{71,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		 {72,{1.2,1}, {""}, 0, 0, {"gray_wall"}, 0, 2},
+		{{71,{0,0.05}, {""}, 0, 0, {"gray_wall"}, 0, 0},
+		 {72,{1.2,1}, {""}, 0, 0, {"gray_wall"}, 0, 0},
 		 {1,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
 
 
@@ -58,37 +59,55 @@ void FillLevel2Corridor(std::vector<FPoint2D>& verts, std::vector<Poly>& polies,
 		{{70,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {69,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {72,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		 {71,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
+		 {71,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"ceil"}, {"hexa_floor"} };
 
 	polies[61] = { 0,1120,1000,
 		{{69,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {68,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {58,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {72,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"ceil"}, {"hexa_floor"} };
+	polies[61].edges[0].brightFloor = 220;
+	polies[61].edges[1].brightFloor = 120;
+	polies[61].edges[2].brightFloor = 190;
+	//polies[61].edges[3].brightFloor = 190;
 
 	polies[62] = { 0,1120,1000,
 		{{68,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {67,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {59,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {58,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"ceil"}, {"hexa_floor"} };
+	polies[62].edges[0].brightFloor = 120;
+	polies[62].edges[1].brightFloor = 80;
+	polies[62].edges[2].brightFloor = 80;
+	polies[62].edges[3].brightFloor = 190;
 
 	polies[63] = { 0,1120,1000,
 		{{67,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {66,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {60,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {59,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"ceil"}, {"hexa_floor"} };
+	polies[63].edges[0].brightFloor = 80;
+	polies[63].edges[1].brightFloor = 80;
+	polies[63].edges[2].brightFloor = 80;
+	polies[63].edges[3].brightFloor = 80;
 
 	polies[64] = { 0,1120,1000,
 		{{66,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {65,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {61,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {60,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"ceil"}, {"hexa_floor"} };
+	polies[64].edges[0].brightFloor = 80;
+	polies[64].edges[1].brightFloor = 100;
+	polies[64].edges[2].brightFloor = 100;
+	polies[64].edges[3].brightFloor = 80;
 
 	polies[65] = { 0,1120,1000,
 		{{65,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {64,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {63,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {61,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"ceil"}, {"hexa_floor"} };
+	polies[65].edges[0].brightFloor = 100;
+	polies[65].edges[3].brightFloor = 100;
 
 	polies[66] = { 0,0,1122,
 		{{60,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -122,6 +141,10 @@ void FillLevel2Corridor(std::vector<FPoint2D>& verts, std::vector<Poly>& polies,
 		 {74,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {66,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {67,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"ceil"}, {"hexa_floor"} };
+	polies[71].edges[0].brightFloor = 110;
+	polies[71].edges[1].brightFloor = 110;
+	polies[71].edges[2].brightFloor = 80;
+	polies[71].edges[3].brightFloor = 80;
 
 	polies[72] = { 0,0,1122,
 		{{73,{0,1}, {""}, 0, 0, {"cyber_wall2"}, 0, 1},
@@ -138,6 +161,9 @@ void FillLevel2Corridor(std::vector<FPoint2D>& verts, std::vector<Poly>& polies,
 		 {76,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {74,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {73,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"ceil"}, {"hexa_floor"} };
+	polies[74].edges[2].brightFloor = 110;
+	polies[74].edges[3].brightFloor = 110;
+
 
 	polies[75] = { 0,0,1122,
 		{{76,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -181,7 +207,7 @@ void FillLevel2Corridor(std::vector<FPoint2D>& verts, std::vector<Poly>& polies,
 	polies[82] = { 0,0,1122,
 		{{82,{0,0}, {""}, 0, 0, {"gray_wall"}, 0, 1},
 		 {73,{0,0}, {""}, 0, 0, {""}, 0, 0},
-		 {69,{0,0}, {""}, 0, 0, {""}, 0, 0},
+		 {69,{0,0}, {""}, 0, 0, {"gray_wall"}, 0, 1},
 		 {70,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
 
 	polies[83] = { 0,0,1122,

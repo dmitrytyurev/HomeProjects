@@ -77,6 +77,7 @@ void FillLevel1Room(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std
 		 {1,{1,0}, {""}, 0, 0, {"gray_wall"}, 0, 2},
 		 {8,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		 {7,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
+	polies[0].edges[1].wallBrightsDown[1] = 0.4f;
 
 	polies[1] = { 1252,1120,1000,
 		{{1,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -85,12 +86,16 @@ void FillLevel1Room(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std
 		{8,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {"stone_wall"}, {"hexa_floor"} };
 	polies[1].edges[2].wallBrightsUp[0] = 0.4f;
 	polies[1].edges[2].wallBrightsUp[1] = 0.4f;
+	polies[1].edges[2].brightFloor = 60;
+	polies[1].edges[3].brightFloor = 60;
+
 
 	polies[2] = { 0,0,1252,
 		{{2,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{3,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{10,{0,0}, {""}, 0, 0, {""}, 0, 0},
 		{9,{1,0}, {""}, 0, 0, {"gray_wall"}, 0, 2}} };
+	polies[2].edges[3].wallBrightsDown[0] = 0.4f;
 
 	polies[3] = { 0,0,1252,
 		{{4,{0,0}, {""}, 0, 0, {""}, 0, 0},

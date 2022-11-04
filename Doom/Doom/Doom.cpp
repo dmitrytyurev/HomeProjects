@@ -834,6 +834,7 @@ const float MOVE_SPEED = 0.5;
 
 void Update()
 {
+	// Движение камеры от кнопок
 	if (GetKeyState(VK_LEFT) & 0x8000)
 	{
 		alCam += TRUN_SPEED;
@@ -852,9 +853,63 @@ void Update()
 		xCam -= sin(-alCam) * MOVE_SPEED;
 		zCam -= cos(-alCam) * MOVE_SPEED;
 	}
+
+	// Лифт поднимается-опускается
 	static double t = 0;
 	t += 0.005f;
 	polies[77].yFloor = ((sin(t) + 1.f) * 0.5f) * 120 + 1000;
+
+	// Лампочка в коридоре мерцает
+	float interp = ((sin(t*4) + 1.f) * 0.5f);
+	polies[57].edges[1].brightFloor = (190 - 256) * interp + 256;
+	polies[61].edges[0].brightFloor = (220 - 256) * interp + 256;
+	polies[61].edges[1].brightFloor = (120 - 256) * interp + 256;
+	polies[61].edges[2].brightFloor = (190 - 256) * interp + 256;
+	polies[62].edges[0].brightFloor = (120 - 256) * interp + 256;
+	polies[62].edges[1].brightFloor = (80 - 256) * interp + 256;
+	polies[62].edges[2].brightFloor = (80 - 256) * interp + 256;
+	polies[62].edges[3].brightFloor = (190 - 256) * interp + 256;
+	polies[63].edges[0].brightFloor = (80 - 256) * interp + 256;
+	polies[63].edges[1].brightFloor = (80 - 256) * interp + 256;
+	polies[63].edges[2].brightFloor = (80 - 256) * interp + 256;
+	polies[63].edges[3].brightFloor = (80 - 256) * interp + 256;
+	polies[64].edges[0].brightFloor = (80 - 256) * interp + 256;
+	polies[64].edges[1].brightFloor = (100 - 256) * interp + 256;
+	polies[64].edges[2].brightFloor = (100 - 256) * interp + 256;
+	polies[64].edges[3].brightFloor = (80 - 256) * interp + 256;
+	polies[65].edges[0].brightFloor = (100 - 256) * interp + 256;
+	polies[65].edges[3].brightFloor = (100 - 256) * interp + 256;
+	polies[71].edges[0].brightFloor = (110 - 256) * interp + 256;
+	polies[71].edges[1].brightFloor = (110 - 256) * interp + 256;
+	polies[71].edges[2].brightFloor = (80 - 256) * interp + 256;
+	polies[71].edges[3].brightFloor = (80 - 256) * interp + 256;
+	polies[74].edges[2].brightFloor = (110 - 256) * interp + 256;
+	polies[74].edges[3].brightFloor = (110 - 256) * interp + 256;
+
+	polies[57].edges[1].brightCeil = (190 - 256) * interp + 256;
+	polies[61].edges[0].brightCeil = (220 - 256) * interp + 256;
+	polies[61].edges[1].brightCeil = (120 - 256) * interp + 256;
+	polies[61].edges[2].brightCeil = (190 - 256) * interp + 256;
+	polies[62].edges[0].brightCeil = (120 - 256) * interp + 256;
+	polies[62].edges[1].brightCeil = (80 - 256) * interp + 256;
+	polies[62].edges[2].brightCeil = (80 - 256) * interp + 256;
+	polies[62].edges[3].brightCeil = (190 - 256) * interp + 256;
+	polies[63].edges[0].brightCeil = (80 - 256) * interp + 256;
+	polies[63].edges[1].brightCeil = (80 - 256) * interp + 256;
+	polies[63].edges[2].brightCeil = (80 - 256) * interp + 256;
+	polies[63].edges[3].brightCeil = (80 - 256) * interp + 256;
+	polies[64].edges[0].brightCeil = (80 - 256) * interp + 256;
+	polies[64].edges[1].brightCeil = (100 - 256) * interp + 256;
+	polies[64].edges[2].brightCeil = (100 - 256) * interp + 256;
+	polies[64].edges[3].brightCeil = (80 - 256) * interp + 256;
+	polies[65].edges[0].brightCeil = (100 - 256) * interp + 256;
+	polies[65].edges[3].brightCeil = (100 - 256) * interp + 256;
+	polies[71].edges[0].brightCeil = (110 - 256) * interp + 256;
+	polies[71].edges[1].brightCeil = (110 - 256) * interp + 256;
+	polies[71].edges[2].brightCeil = (80 - 256) * interp + 256;
+	polies[71].edges[3].brightCeil = (80 - 256) * interp + 256;
+	polies[74].edges[2].brightCeil = (110 - 256) * interp + 256;
+	polies[74].edges[3].brightCeil = (110 - 256) * interp + 256;
 }
 
 // -------------------------------------------------------------------

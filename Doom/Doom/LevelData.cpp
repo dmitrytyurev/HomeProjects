@@ -353,14 +353,14 @@ m1:;
 	project_v_wall(true, true, 1120, 0, 1000, 1, { 3, 2, 1, 2, 4, 2 }, verts, polies, textures);
 
 	// Стены коридора
-	project_u_wall_x(468, 0, 693, 1.5, { 72, 1, 73, 1 , 79, 1, 82, 0}, verts, polies, textures);
+	project_u_wall_x(468, 0, 693, 1.5, { 82, 2, 72, 1, 73, 1 , 79, 1, 82, 0}, verts, polies, textures);
 	project_u_wall_x(852, 0, 1074, 1.5, { 69, 1}, verts, polies, textures);
 	project_u_wall_x(628, 0, 1074, 3, { 58, 0, 66, 2, 68, 0 }, verts, polies, textures);
 
-	project_v_wall(false, true,1120, 0, 1000, 1, { 2, 3, 58, 2, 58, 0, 66, 2, 68, 0, 0, 1, 59, 1, 72, 1, 73, 1 , 79, 1, 82, 0, 69, 1, 70, 1, 75, 2, 81, 0 }, verts, polies, textures);
+	project_v_wall(false, true,1120, 0, 1000, 1, { 2, 3, 58, 2, 58, 0, 66, 2, 68, 0, 0, 1, 59, 0, 59, 1, 72, 1, 73, 1 , 79, 1, 82, 0, 69, 1, 70, 1, 75, 2, 81, 0 }, verts, polies, textures);
 
 	// Потолок коридора
-	project_uv(false, 4, 1, { 61, 62, 63, 64, 65 }, verts, polies, textures);
+	project_uv(false, 4, 1, { 60, 61, 62, 63, 64, 65 }, verts, polies, textures);
 	project_uv(false, 4, 1, { 80, 74 }, verts, polies, textures);
 
 	
