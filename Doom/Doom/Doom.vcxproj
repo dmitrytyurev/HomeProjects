@@ -132,6 +132,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="Level1Room.h" />
     <ClInclude Include="Level2Corridor.h" />
+    <ClInclude Include="Level3Arena.h" />
     <ClInclude Include="LevelData.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
@@ -142,6 +143,7 @@
     <ClCompile Include="Doom.cpp" />
     <ClCompile Include="Level1Room.cpp" />
     <ClCompile Include="Level2Corridor.cpp" />
+    <ClCompile Include="Level3Arena.cpp" />
     <ClCompile Include="LevelData.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>

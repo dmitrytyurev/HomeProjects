@@ -4,6 +4,7 @@
 #include "Utils.h"
 #include "Level1Room.h"
 #include "Level2Corridor.h"
+#include "Level3Arena.h"
 
 const double TEX_DENS = 2.048;  // Рекомендуемая плотностью текселей на единицу размера глобальной системы координат 
 
@@ -210,6 +211,7 @@ void FillLevelData(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, std:
 {
 	FillLevel1Room(verts, polies, textures);
 	FillLevel2Corridor(verts, polies, textures);
+	FillLevel3Arena(verts, polies, textures);
 
 	// Заполнение незаполненных poly.yCeil и poly.yRoof
 
