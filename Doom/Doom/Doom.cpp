@@ -870,11 +870,14 @@ void Update(double dt)
 	static bool isLightOn = false;
 	timeToSwitch -= dt;
 	if (timeToSwitch <= 0) {
-		timeToSwitch = RandF(0.05f, 0.3f);
 		isLightOn ^= true;
+		if (isLightOn)
+			timeToSwitch = RandF(0.05f, 0.1f);
+		else
+			timeToSwitch = RandF(0.05f, 0.45f);
 	}
 
-	float interp = 1; // isLightOn ? 1 : 0;
+	float interp = isLightOn ? 0.5 : 1;
 	polies[57].edges[1].brightFloor = (190 - 256) * interp + 256;
 	polies[61].edges[0].brightFloor = (220 - 256) * interp + 256;
 	polies[61].edges[1].brightFloor = (120 - 256) * interp + 256;
@@ -924,6 +927,31 @@ void Update(double dt)
 	polies[71].edges[3].brightCeil = (80 - 256) * interp + 256;
 	polies[74].edges[2].brightCeil = (110 - 256) * interp + 256;
 	polies[74].edges[3].brightCeil = (110 - 256) * interp + 256;
+
+	polies[72].edges[1].wallBrightsDown[0] = (0.2 - 1) * interp + 1;
+	polies[72].edges[1].wallBrightsDown[1] = (0.4 - 1) * interp + 1;
+	polies[73].edges[1].wallBrightsDown[0] = (0.4 - 1) * interp + 1;
+
+	polies[58].edges[0].wallBrightsDown[0] = (0.5 - 1) * interp + 1;
+	polies[58].edges[0].wallBrightsDown[1] = (0.2 - 1) * interp + 1;
+
+	polies[66].edges[2].wallBrightsDown[0] = (0.2 - 1) * interp + 1;
+	polies[66].edges[2].wallBrightsDown[1] = (0.2 - 1) * interp + 1;
+	polies[67].edges[0].wallBrightsDown[0] = (0.2 - 1) * interp + 1;
+	polies[67].edges[0].wallBrightsDown[1] = (0.4 - 1) * interp + 1;
+	polies[68].edges[0].wallBrightsDown[0] = (0.4 - 1) * interp + 1;
+	polies[69].edges[1].wallBrightsDown[1] = (0.4 - 1) * interp + 1;
+
+	polies[70].edges[1].wallBrightsDown[1] = (0.2 - 1) * interp + 1;
+	polies[70].edges[1].wallBrightsDown[0] = (0.4 - 1) * interp + 1;
+
+	polies[72].edges[0].wallBrightsDown[1] = (0.3 - 1) * interp + 1;
+	polies[72].edges[0].wallBrightsDown[0] = (0.3 - 1) * interp + 1;
+	polies[70].edges[2].wallBrightsDown[1] = (0.3 - 1) * interp + 1;
+	polies[70].edges[2].wallBrightsDown[0] = (0.2 - 1) * interp + 1;
+
+	polies[75].edges[2].wallBrightsDown[0] = (0.3 - 1) * interp + 1;
+
 }
 
 // -------------------------------------------------------------------
