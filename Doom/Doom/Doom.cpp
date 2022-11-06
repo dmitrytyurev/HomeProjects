@@ -50,6 +50,7 @@ int mouseAccumulateDY;
 // Параметры камеры
 float xCam, yCam, zCam;  // Позиция камеры в мире
 float alCam;  // Угол вращения камеры. Если 0, то смотрит вдоль оси OZ
+float yScrOffsCam;  // Вертикальный сдвиг проекции (имитация наклона камеры)
 float horizontalAngle = 90.0;  // Горизонтальный угол обзора камеры в градусах
 
 // -------------------------------------------------------------------
@@ -256,6 +257,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if (raw->header.dwType == RIM_TYPEMOUSE)
 			{
 				mouseAccumulateDX += raw->data.mouse.lLastX;
+				mouseAccumulateDY += raw->data.mouse.lLastY;
 			}
 			delete[] lpb;
 		}
@@ -512,17 +514,17 @@ void DrawOneColumn(double scanAngle, int columnN)
 
 			// Проецируем (находим Y в системе координат экрана)
 			// Для Z-пересечения текущего отрезка
-			double yScrFloor1 = -(poly.yFloor - yCam) / zSliceCur * kProj + bufSizeY / 2;
+			double yScrFloor1 = -(poly.yFloor - yCam) / zSliceCur * kProj + bufSizeY / 2 + yScrOffsCam;
 			int    yiScrFloor1 = (int)floor(yScrFloor1 + 0.5);
-			double yScrCeil1 = -(poly.yCeil - yCam) / zSliceCur * kProj + bufSizeY / 2;
+			double yScrCeil1 = -(poly.yCeil - yCam) / zSliceCur * kProj + bufSizeY / 2 + yScrOffsCam;
 			int    yiScrCeil1 = (int)floor(yScrCeil1 + 0.5);
 
 			// Для Z-пересечения предыдущего отрезка
-			double yScrFloor2 = -(poly.yFloor - yCam) / zSlicePrev * kProj + bufSizeY / 2;
+			double yScrFloor2 = -(poly.yFloor - yCam) / zSlicePrev * kProj + bufSizeY / 2 + yScrOffsCam;
 			int    yiScrFloor2 = (int)floor(yScrFloor2 + 0.5);
-			double yScrCeil2 = -(poly.yCeil - yCam) / zSlicePrev * kProj + bufSizeY / 2;
+			double yScrCeil2 = -(poly.yCeil - yCam) / zSlicePrev * kProj + bufSizeY / 2 + yScrOffsCam;
 			int    yiScrCeil2 = (int)floor(yScrCeil2 + 0.5);
-			double yScrRoof2 = -(poly.yRoof - yCam) / zSlicePrev * kProj + bufSizeY / 2;
+			double yScrRoof2 = -(poly.yRoof - yCam) / zSlicePrev * kProj + bufSizeY / 2 + yScrOffsCam;
 			int    yiScrRoof2 = (int)floor(yScrRoof2 + 0.5);
 
 			bool otherNotVisible = false;  // Остальные отрезки не видны
@@ -882,6 +884,7 @@ void InitGameLogic()
 // -------------------------------------------------------------------
 constexpr float TRUN_SPEED = 0.02f * 300;
 constexpr float MOVE_SPEED = 0.5 * 300;
+constexpr float MAX_CAMERA_Y_OFF = 100;
 
 void Update(double dt, int mouseDx, int mouseDy)
 {
@@ -905,9 +908,11 @@ void Update(double dt, int mouseDx, int mouseDy)
 		zCam -= cos(-alCam) * MOVE_SPEED * dt;
 	}
 
+	// Вращение и наклон камеры от мыши
 	alCam -= mouseDx * 0.003f;
-
-
+	yScrOffsCam += mouseDy;
+	yScrOffsCam = yScrOffsCam < -MAX_CAMERA_Y_OFF ? -MAX_CAMERA_Y_OFF : yScrOffsCam;
+	yScrOffsCam = yScrOffsCam > MAX_CAMERA_Y_OFF ? MAX_CAMERA_Y_OFF : yScrOffsCam;
 
 	// Лифт поднимается-опускается
 	static double t = 0;
@@ -915,7 +920,6 @@ void Update(double dt, int mouseDx, int mouseDy)
 	polies[77].yFloor = ((sin(t) + 1.f) * 0.5f) * 120 + 1000;
 
 	// Лампочка в коридоре мерцает
-
 	static double timeToSwitch = 0;
 	static bool isLightOn = false;
 	timeToSwitch -= dt;
@@ -1001,7 +1005,6 @@ void Update(double dt, int mouseDx, int mouseDy)
 	polies[70].edges[2].wallBrightsDown[0] = (0.2 - 1) * interp + 1;
 
 	polies[75].edges[2].wallBrightsDown[0] = (0.3 - 1) * interp + 1;
-
 }
 
 // -------------------------------------------------------------------
