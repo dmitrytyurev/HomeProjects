@@ -29,7 +29,7 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 // -------------------------------------------------------------------
 
-void Update(double dt);
+void Update(double dt, int mouseDx, int mouseDy);
 void Draw(HWND hWnd);
 
 const int bufSizeX = 500;
@@ -42,6 +42,10 @@ const double zNear = 1;
 std::vector<FPoint2D> verts;
 std::vector<Poly> polies;
 std::vector<Texture> textures;
+
+// Накопленный сдвиг мыши между вызовами Update
+int mouseAccumulateDX;
+int mouseAccumulateDY;
 
 // Параметры камеры
 float xCam, yCam, zCam;  // Позиция камеры в мире
@@ -80,6 +84,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     LoadStringW(hInstance, IDC_DOOM, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
+
+	// Инициализировать ввод от мыши
+	RAWINPUTDEVICE Rid[1];
+
+	Rid[0].usUsagePage = 0x01;          // HID_USAGE_PAGE_GENERIC
+	Rid[0].usUsage = 0x02;              // HID_USAGE_GENERIC_MOUSE
+	Rid[0].dwFlags = RIDEV_NOLEGACY;    // adds mouse and also ignores legacy mouse messages
+	Rid[0].hwndTarget = 0;
+
+
+	if (RegisterRawInputDevices(Rid, 1, sizeof(Rid[0])) == FALSE)
+	{
+		//registration failed. Call GetLastError for the cause of the error
+		ExitMsg("RegisterRawInputDevices failed");
+	}
+
+	// Инициализировать игровую логику
 	InitGameLogic();
 
     // Выполнить инициализацию приложения:
@@ -205,7 +226,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		double dt = curTime - prevTime;
 		prevTime = curTime;
 
-		Update(dt);
+		Update(dt, mouseAccumulateDX, mouseAccumulateDY);
+		mouseAccumulateDX = 0;
+		mouseAccumulateDY = 0;
 		Draw(hWnd);
 
         }
@@ -217,6 +240,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//PrintConsole("WM_KEYDOWN %d %d", int(wParam), int(lParam));
 		if (wParam == 27)
 			PostQuitMessage(0);
+		break;
+	case WM_INPUT:
+		{
+			UINT dwSize;
+			GetRawInputData((HRAWINPUT)lParam, RID_INPUT, NULL, &dwSize, sizeof(RAWINPUTHEADER));
+			LPBYTE lpb = new BYTE[dwSize];
+			if (lpb == NULL)
+			{
+				return 0;
+			}
+			if (GetRawInputData((HRAWINPUT)lParam, RID_INPUT, lpb, &dwSize, sizeof(RAWINPUTHEADER)) != dwSize)
+				OutputDebugString(TEXT("GetRawInputData does not return correct size !\n"));
+			RAWINPUT* raw = (RAWINPUT*)lpb;
+			if (raw->header.dwType == RIM_TYPEMOUSE)
+			{
+				mouseAccumulateDX += raw->data.mouse.lLastX;
+			}
+			delete[] lpb;
+		}
 		break;
 	default:
         return DefWindowProc(hWnd, message, wParam, lParam);
@@ -841,7 +883,7 @@ void InitGameLogic()
 constexpr float TRUN_SPEED = 0.02f * 300;
 constexpr float MOVE_SPEED = 0.5 * 300;
 
-void Update(double dt)
+void Update(double dt, int mouseDx, int mouseDy)
 {
 	// Движение камеры от кнопок
 	if (GetKeyState(VK_LEFT) & 0x8000)
@@ -862,6 +904,10 @@ void Update(double dt)
 		xCam -= sin(-alCam) * MOVE_SPEED * dt;
 		zCam -= cos(-alCam) * MOVE_SPEED * dt;
 	}
+
+	alCam -= mouseDx * 0.003f;
+
+
 
 	// Лифт поднимается-опускается
 	static double t = 0;
