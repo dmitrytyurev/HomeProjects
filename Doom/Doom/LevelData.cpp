@@ -283,6 +283,16 @@ m1:;
 	textures.emplace_back("lift_door");
 	textures.emplace_back("lift_floor");
 	textures.emplace_back("lift_wall");
+	textures.emplace_back("arena_stones1");
+	textures.emplace_back("arena_stones2");
+	textures.emplace_back("arena_column1");
+	textures.emplace_back("arena_ground");
+	textures.emplace_back("arena_ceiling");
+	textures.emplace_back("arena_portal");
+	textures.emplace_back("arena_fon");
+	textures.emplace_back("arena_column2");
+	textures.emplace_back("arena_column3");
+	textures.emplace_back("arena_text");
 
 	
 	// Прописываем индексы текстур в полигоны и рёбра
@@ -365,7 +375,8 @@ m1:;
 	project_uv(false, 4, 1, { 60, 61, 62, 63, 64, 65 }, verts, polies, textures);
 	project_uv(false, 4, 1, { 80, 74 }, verts, polies, textures);
 
-	
+	// Потолок арены	
+	project_uv_ceil(0.7, {135,136,129,130,137,133,134,132,131,177,181,178,179,180,139,142,143,144,145,146,140,141,193,194,195,183,184,185,186,187,188,189,190,191,192,148,149,150,151,152,153,154,105,205,196,197,198,199,200,201,202,203,104,122,123,124,125,126,127,175,166,167,168,169,170,171,172,173,112,113,114,115,116,117,118,119,109,164,155,156,157,158,159,160,161,162,110}, verts, polies, textures);
 
 
 	// Если текстура верхнего или нижнего простенка заданы (значит выше для них не были заполнены текстурные координаты под чеккер с параметромами *Add уже в виде приращения), то
