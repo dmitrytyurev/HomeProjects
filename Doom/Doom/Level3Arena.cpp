@@ -271,12 +271,18 @@ void FillLevel3Arena(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, st
 	 {122,{0,0}, {""}, 0, 0, {""}, 0, 0},
 	 {123,{0,0}, {""}, 0, 0, {""}, 0, 0},
 	 {128,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"arena_ground"} };
+	polies[106].edges[1].brightFloor = 180;
+	polies[106].edges[2].brightFloor = 180;
+	polies[106].edges[3].brightFloor = 180;
+	polies[106].edges[4].brightFloor = 180;
 
 	polies[107] = { 0,3000,1000,
 	{{94,{0,0}, {""}, 0, 0, {""}, 0, 0},
 	 {114,{0,0}, {""}, 0, 0, {""}, 0, 0},
 	 {115,{0,0}, {""}, 0, 0, {""}, 0, 0},
 	 {99,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"arena_ground"} };
+	polies[107].edges[1].brightFloor = 180;
+	polies[107].edges[2].brightFloor = 180;
 
 	polies[108] = { 0,3000,1000,
 	{{105,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -284,6 +290,10 @@ void FillLevel3Arena(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, st
 	 {109,{0,0}, {""}, 0, 0, {""}, 0, 0},
 	 {114,{0,0}, {""}, 0, 0, {""}, 0, 0},
 	 {94,{0,0}, {""}, 0, 0, {""}, 0, 0}}, {""}, {"arena_ground"} };
+	polies[108].edges[0].brightFloor = 180;
+	polies[108].edges[1].brightFloor = 180;
+	polies[108].edges[2].brightFloor = 180;
+	polies[108].edges[3].brightFloor = 180;
 
 	polies[109] = { 1600,1550,1100,
 	{{103,{0,0}, {""}, 0, 0, {""}, 0, 0},
@@ -608,7 +618,7 @@ void FillLevel3Arena(std::vector<FPoint2D>& verts, std::vector<Poly>& polies, st
 	{{139,{0,0}, {""}, 0, 0, {""}, 0, 0},
 	 {140,{0,0}, {""}, 0, 0, {""}, 0, 0},
 	 {141,{1,0}, {""}, 0, 0, {"arena_column2"}, 0, 1},
-	 {142,{0,0}, {""}, 0, 0, {""}, 0, 0}} };
+	 {142,{1,0}, {""}, 0, 0, {"arena_column2"}, 0, 1}} };
 
 	polies[166] = { 1600,1550,1250,
 	{{153,{0,0}, {""}, 0, 0, {""}, 0, 0},
