@@ -866,6 +866,8 @@ int FindPolygonUnderCamera() // Возвращает индекс полигон
 
 void InitGameLogic()
 {
+	ShowCursor(false);
+
 	FillLevelData(verts, polies, textures);
 
 	xCam = 310;
@@ -891,11 +893,15 @@ void Update(double dt, int mouseDx, int mouseDy)
 	// Движение камеры от кнопок
 	if (GetKeyState(VK_LEFT) & 0x8000)
 	{
-		alCam += TRUN_SPEED * dt;
+		xCam -= cos(-alCam) * MOVE_SPEED * dt;
+		zCam += sin(-alCam) * MOVE_SPEED * dt;
+//		alCam += TRUN_SPEED * dt;
 	}
 	if (GetKeyState(VK_RIGHT) & 0x8000)
 	{
-		alCam -= TRUN_SPEED * dt;
+		xCam += cos(-alCam) * MOVE_SPEED * dt;
+		zCam -= sin(-alCam) * MOVE_SPEED * dt;
+//		alCam -= TRUN_SPEED * dt;
 	}
 	if (GetKeyState(VK_UP) & 0x8000)
 	{
