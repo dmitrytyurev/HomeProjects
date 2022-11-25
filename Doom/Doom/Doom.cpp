@@ -8,6 +8,8 @@
 #include <vector>
 #include <string>
 #include <xutility>
+
+#include "bmp.h"
 #include "LevelData.h"
 #include "Utils.h"
 
@@ -37,8 +39,11 @@ const int bufSizeY = 720; // 340;    950
 const double zNear = 1;
 
 // -------------------------------------------------------------------
-
+const int rowNum = 5;
+bool saveRunToTrack = false;
+bool renderToFrames = false;
 std::vector<float> saveRun;
+int renderFrameN = 0;
 
 // -------------------------------------------------------------------
 
@@ -248,12 +253,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//PrintConsole("WM_KEYDOWN %d %d", int(wParam), int(lParam));
 		if (wParam == 27)
 		{
-			FILE* f = nullptr;
-			fopen_s(&f, "save_run.bin", "wb");
-			if (f)
-			{
-				fwrite(&saveRun[0], 1, saveRun.size()*4*sizeof(float), f);
-				fclose(f);
+			if (saveRunToTrack) {
+				FILE* f = nullptr;
+				fopen_s(&f, "save_run.bin", "wb");
+				if (f)
+				{
+					fwrite(&saveRun[0], 1, saveRun.size() * rowNum * sizeof(float), f);
+					fclose(f);
+				}
 			}
 			PostQuitMessage(0);
 		}
@@ -882,6 +889,23 @@ int FindPolygonUnderCamera() // Возвращает индекс полигон
 
 void InitGameLogic()
 {
+	if (renderToFrames)	{
+		FILE* f = nullptr;
+		fopen_s(&f, "save_run.bin", "rb");
+		if (f) {
+			while (true) {
+				float buf[rowNum];
+				int res = (int)fread(&buf[0], 1, rowNum * sizeof(float), f);
+				if (res != rowNum * sizeof(float)) {
+					break;
+				}
+				for (int i = 0; i < rowNum; ++i) {
+					saveRun.push_back(buf[i]);
+				}
+			}
+		}
+	}
+
 	ShowCursor(false);
 
 	FillLevelData(verts, polies, textures);
@@ -903,35 +927,37 @@ constexpr float MAX_CAMERA_Y_OFF = 100;
 
 void Update(double dt, int mouseDx, int mouseDy)
 {
-	// Движение камеры от кнопок
-	if (GetKeyState(VK_LEFT) & 0x8000)
-	{
-		xCam -= cos(-alCam) * MOVE_SPEED * dt;
-		zCam += sin(-alCam) * MOVE_SPEED * dt;
-//		alCam += TRUN_SPEED * dt;
-	}
-	if (GetKeyState(VK_RIGHT) & 0x8000)
-	{
-		xCam += cos(-alCam) * MOVE_SPEED * dt;
-		zCam -= sin(-alCam) * MOVE_SPEED * dt;
-//		alCam -= TRUN_SPEED * dt;
-	}
-	if (GetKeyState(VK_UP) & 0x8000)
-	{
-		xCam += sin(-alCam) * MOVE_SPEED * dt;
-		zCam += cos(-alCam) * MOVE_SPEED * dt;
-	}
-	if (GetKeyState(VK_DOWN) & 0x8000)
-	{
-		xCam -= sin(-alCam) * MOVE_SPEED * dt;
-		zCam -= cos(-alCam) * MOVE_SPEED * dt;
-	}
+	if (!renderToFrames) {
+		// Движение камеры от кнопок
+		if (GetKeyState(VK_LEFT) & 0x8000)
+		{
+			xCam -= cos(-alCam) * MOVE_SPEED * dt;
+			zCam += sin(-alCam) * MOVE_SPEED * dt;
+			//		alCam += TRUN_SPEED * dt;
+		}
+		if (GetKeyState(VK_RIGHT) & 0x8000)
+		{
+			xCam += cos(-alCam) * MOVE_SPEED * dt;
+			zCam -= sin(-alCam) * MOVE_SPEED * dt;
+			//		alCam -= TRUN_SPEED * dt;
+		}
+		if (GetKeyState(VK_UP) & 0x8000)
+		{
+			xCam += sin(-alCam) * MOVE_SPEED * dt;
+			zCam += cos(-alCam) * MOVE_SPEED * dt;
+		}
+		if (GetKeyState(VK_DOWN) & 0x8000)
+		{
+			xCam -= sin(-alCam) * MOVE_SPEED * dt;
+			zCam -= cos(-alCam) * MOVE_SPEED * dt;
+		}
 
-	// Вращение и наклон камеры от мыши
-	alCam -= mouseDx * 0.003f;
-	yScrOffsCam += mouseDy;
-	yScrOffsCam = yScrOffsCam < -MAX_CAMERA_Y_OFF ? -MAX_CAMERA_Y_OFF : yScrOffsCam;
-	yScrOffsCam = yScrOffsCam > MAX_CAMERA_Y_OFF ? MAX_CAMERA_Y_OFF : yScrOffsCam;
+		// Вращение и наклон камеры от мыши
+		alCam -= mouseDx * 0.003f;
+		yScrOffsCam += mouseDy;
+		yScrOffsCam = yScrOffsCam < -MAX_CAMERA_Y_OFF ? -MAX_CAMERA_Y_OFF : yScrOffsCam;
+		yScrOffsCam = yScrOffsCam > MAX_CAMERA_Y_OFF ? MAX_CAMERA_Y_OFF : yScrOffsCam;
+	}
 
 	// Лифт поднимается-опускается
 	static double t = 0;
@@ -1030,10 +1056,24 @@ void Update(double dt, int mouseDx, int mouseDy)
 
 void Draw(HWND hWnd)
 {
-	saveRun.push_back(xCam);
-	saveRun.push_back(yCam);
-	saveRun.push_back(zCam);
-	saveRun.push_back(alCam);
+	if (saveRunToTrack) {
+		saveRun.push_back(xCam);
+		saveRun.push_back(yCam);
+		saveRun.push_back(zCam);
+		saveRun.push_back(alCam);
+		saveRun.push_back(yScrOffsCam);
+	}
+	if (renderToFrames)	{
+		if (renderFrameN >= saveRun.size() / rowNum) {
+			ExitMsg("Render done!");
+		}
+		xCam = saveRun[renderFrameN * rowNum + 0];
+		yCam = saveRun[renderFrameN * rowNum + 1];
+		zCam = saveRun[renderFrameN * rowNum + 2];
+		alCam = saveRun[renderFrameN * rowNum + 3];
+		yScrOffsCam = saveRun[renderFrameN * rowNum + 4];
+		renderFrameN++;
+	}
 
 	horCamlAngleRad = horizontalAngle / 180.0 * 3.14159265359;
 	dz = 1.0 / tan(horCamlAngleRad / 2.0);
@@ -1049,25 +1089,26 @@ void Draw(HWND hWnd)
 		DrawOneColumn(scanAngle, x);
 	}
 
-	int off = bufSizeY - 1;
-	for (int y = 0; y < bufSizeY/2; ++y)
-	{
-		for (int x = 0; x < bufSizeX; ++x)
+	if (!renderToFrames) {
+		int off = bufSizeY - 1;
+		for (int y = 0; y < bufSizeY / 2; ++y)
 		{
-			unsigned char t = buf[y][x][0];
-			buf[y][x][0] = buf[off - y][x][0];
-			buf[off-y][x][0] = t;
+			for (int x = 0; x < bufSizeX; ++x)
+			{
+				unsigned char t = buf[y][x][0];
+				buf[y][x][0] = buf[off - y][x][0];
+				buf[off - y][x][0] = t;
 
-			t = buf[y][x][1];
-			buf[y][x][1] = buf[off - y][x][1];
-			buf[off - y][x][1] = t;
+				t = buf[y][x][1];
+				buf[y][x][1] = buf[off - y][x][1];
+				buf[off - y][x][1] = t;
 
-			t = buf[y][x][2];
-			buf[y][x][2] = buf[off - y][x][2];
-			buf[off - y][x][2] = t;
+				t = buf[y][x][2];
+				buf[y][x][2] = buf[off - y][x][2];
+				buf[off - y][x][2] = t;
+			}
 		}
 	}
-
 
 	//for (int i = 0; i < bufSizeX; ++i)
 	//{
@@ -1078,6 +1119,16 @@ void Draw(HWND hWnd)
 	//		buf[i2][i][2] = rand();
 	//	}
 	//}
+
+	if (renderToFrames)	{
+		int frameN = renderFrameN - 1;
+		char fname[] = "frame000.bmp";
+		fname[5] = '0' + frameN / 100;
+		frameN -= frameN / 100 * 100;
+		fname[6] = '0' + frameN / 10;
+		fname[7] = '0' + frameN % 10;
+		save_bmp24(fname, bufSizeX, bufSizeY, (const char*)buf);
+	}
 
 	DrawFrameBuf(hWnd);
 	PrintConsole("%f %f %f %f\n", xCam, yCam, zCam, alCam);
