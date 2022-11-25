@@ -32,11 +32,17 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 void Update(double dt, int mouseDx, int mouseDy);
 void Draw(HWND hWnd);
 
-const int bufSizeX = 500;
-const int bufSizeY = 340;
+const int bufSizeX = 1280; // 500;  1300
+const int bufSizeY = 720; // 340;    950
 const double zNear = 1;
 
 // -------------------------------------------------------------------
+
+std::vector<float> saveRun;
+
+// -------------------------------------------------------------------
+
+
 
 // Описание игрового уровня
 std::vector<FPoint2D> verts;
@@ -179,6 +185,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
+   ShowWindow(hWnd, SW_MAXIMIZE);
 
    return TRUE;
 }
@@ -240,7 +247,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_KEYDOWN:
 		//PrintConsole("WM_KEYDOWN %d %d", int(wParam), int(lParam));
 		if (wParam == 27)
+		{
+			FILE* f = nullptr;
+			fopen_s(&f, "save_run.bin", "wb");
+			if (f)
+			{
+				fwrite(&saveRun[0], 1, saveRun.size()*4*sizeof(float), f);
+				fclose(f);
+			}
 			PostQuitMessage(0);
+		}
 		break;
 	case WM_INPUT:
 		{
@@ -308,7 +324,7 @@ void DrawFrameBuf(HWND hWnd)
 	info.bmiHeader.biSizeImage = size;
 	info.bmiHeader.biCompression = BI_RGB;
 
-	StretchDIBits(dc, 0, 0, bufSizeX * 2, bufSizeY * 2, 0, 0, bufSizeX, bufSizeY, buf, &info, DIB_RGB_COLORS, SRCCOPY);
+	StretchDIBits(dc, 0, 0, 1300, 950, 0, 0, bufSizeX, bufSizeY, buf, &info, DIB_RGB_COLORS, SRCCOPY);
 	ReleaseDC(hWnd, dc);
 }
 
@@ -870,17 +886,14 @@ void InitGameLogic()
 
 	FillLevelData(verts, polies, textures);
 
-	xCam = 310;
 	yCam = 1060;
-	zCam = -1398;
-
-	xCam = 690;
-	zCam = -750;
-
 	xCam = 1270;
 	zCam = -1200;
 
-
+	xCam = 543.746399;
+	yCam = 1060.000000;
+	zCam = -1011.682068;
+	alCam = -0.017999;
 }
 
 // -------------------------------------------------------------------
@@ -1017,6 +1030,11 @@ void Update(double dt, int mouseDx, int mouseDy)
 
 void Draw(HWND hWnd)
 {
+	saveRun.push_back(xCam);
+	saveRun.push_back(yCam);
+	saveRun.push_back(zCam);
+	saveRun.push_back(alCam);
+
 	horCamlAngleRad = horizontalAngle / 180.0 * 3.14159265359;
 	dz = 1.0 / tan(horCamlAngleRad / 2.0);
 	kProj = bufSizeX / 2 / tan(horCamlAngleRad / 2);
@@ -1062,4 +1080,5 @@ void Draw(HWND hWnd)
 	//}
 
 	DrawFrameBuf(hWnd);
+	PrintConsole("%f %f %f %f\n", xCam, yCam, zCam, alCam);
 }
