@@ -922,11 +922,13 @@ void InitGameLogic()
 
 // -------------------------------------------------------------------
 constexpr float TRUN_SPEED = 0.02f * 300;
-constexpr float MOVE_SPEED = 1.2 * 300;
+constexpr float MOVE_SPEED = 0.8 * 300;
 constexpr float MAX_CAMERA_Y_OFF = 100;
+float keepDt;
 
 void Update(double dt, int mouseDx, int mouseDy)
 {
+	keepDt = dt;
 	if (!renderToFrames) {
 		// Движение камеры от кнопок
 		if (GetKeyState(VK_LEFT) & 0x8000)
@@ -1056,10 +1058,12 @@ void Update(double dt, int mouseDx, int mouseDy)
 }
 
 // -------------------------------------------------------------------
+const float smoothInterp = 0.5f;
 
 void Draw(HWND hWnd)
 {
 	if (saveRunToTrack) {
+		Sleep(5);
 		saveRun.push_back(xCam);
 		saveRun.push_back(yCam);
 		saveRun.push_back(zCam);
@@ -1070,11 +1074,26 @@ void Draw(HWND hWnd)
 		if (renderFrameN >= saveRun.size() / rowNum) {
 			ExitMsg("Render done!");
 		}
-		xCam = saveRun[renderFrameN * rowNum + 0];
-		yCam = saveRun[renderFrameN * rowNum + 1];
-		zCam = saveRun[renderFrameN * rowNum + 2];
-		alCam = saveRun[renderFrameN * rowNum + 3];
-		yScrOffsCam = saveRun[renderFrameN * rowNum + 4];
+		float xCamCur = saveRun[renderFrameN * rowNum + 0];
+		float yCamCur = saveRun[renderFrameN * rowNum + 1];
+		float zCamCur = saveRun[renderFrameN * rowNum + 2];
+		float alCamCur = saveRun[renderFrameN * rowNum + 3];
+		float yScrOffsCamCur = saveRun[renderFrameN * rowNum + 4];
+
+		if (renderFrameN == 0) {
+			xCam = xCamCur;
+			yCam = yCamCur;
+			zCam = zCamCur;
+			alCam = alCamCur;
+			yScrOffsCam = yScrOffsCamCur;
+		}
+		else {
+			xCam = (xCamCur - xCam) * smoothInterp + xCam;
+			yCam = (yCamCur - yCam) * smoothInterp + yCam;
+			zCam = (zCamCur - zCam) * smoothInterp + zCam;
+			alCam = (alCamCur - alCam) * smoothInterp + alCam;
+			yScrOffsCam = (yScrOffsCamCur - yScrOffsCam) * smoothInterp + yScrOffsCam;
+		}
 		renderFrameN++;
 	}
 
@@ -1136,5 +1155,5 @@ void Draw(HWND hWnd)
 	}
 
 	DrawFrameBuf(hWnd);
-	PrintConsole("%f %f %f %f\n", xCam, yCam, zCam, alCam);
+	PrintConsole("%d %f %f %f %f\n", int(1./keepDt), xCam, yCam, zCam, alCam);
 }
