@@ -258,7 +258,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				fopen_s(&f, "save_run.bin", "wb");
 				if (f)
 				{
-					fwrite(&saveRun[0], 1, saveRun.size() * rowNum * sizeof(float), f);
+					fwrite(&saveRun[0], saveRun.size() * sizeof(float), 1, f);
 					fclose(f);
 				}
 			}
@@ -914,15 +914,15 @@ void InitGameLogic()
 	xCam = 1270;
 	zCam = -1200;
 
-	xCam = 543.746399;
+	xCam = 1170;
 	yCam = 1060.000000;
-	zCam = -1011.682068;
-	alCam = -0.017999;
+	zCam = -1088.682068;
+	alCam = 0.011995;
 }
 
 // -------------------------------------------------------------------
 constexpr float TRUN_SPEED = 0.02f * 300;
-constexpr float MOVE_SPEED = 0.5 * 300;
+constexpr float MOVE_SPEED = 1.2 * 300;
 constexpr float MAX_CAMERA_Y_OFF = 100;
 
 void Update(double dt, int mouseDx, int mouseDy)
@@ -957,6 +957,9 @@ void Update(double dt, int mouseDx, int mouseDy)
 		yScrOffsCam += mouseDy;
 		yScrOffsCam = yScrOffsCam < -MAX_CAMERA_Y_OFF ? -MAX_CAMERA_Y_OFF : yScrOffsCam;
 		yScrOffsCam = yScrOffsCam > MAX_CAMERA_Y_OFF ? MAX_CAMERA_Y_OFF : yScrOffsCam;
+	}
+	else {
+		dt = 1.0 / 60;
 	}
 
 	// Лифт поднимается-опускается
@@ -1122,11 +1125,13 @@ void Draw(HWND hWnd)
 
 	if (renderToFrames)	{
 		int frameN = renderFrameN - 1;
-		char fname[] = "frame000.bmp";
-		fname[5] = '0' + frameN / 100;
+		char fname[] = "frame0000.bmp";
+		fname[5] = '0' + frameN / 1000;
+		frameN -= frameN / 1000 * 1000;
+		fname[6] = '0' + frameN / 100;
 		frameN -= frameN / 100 * 100;
-		fname[6] = '0' + frameN / 10;
-		fname[7] = '0' + frameN % 10;
+		fname[7] = '0' + frameN / 10;
+		fname[8] = '0' + frameN % 10;
 		save_bmp24(fname, bufSizeX, bufSizeY, (const char*)buf);
 	}
 
