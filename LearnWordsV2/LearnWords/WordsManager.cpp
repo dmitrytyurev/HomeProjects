@@ -57,10 +57,9 @@ int WordsManager::GetWordsNum()
 
 void WordsManager::SetWordAsJustLearned(int id)
 {
-	PutWordToEndOfQueue(id);
+	PutWordToEndOfQueue(id, false);
 	_words[id].successCheckDays = 1;
 	_words[id].lastDaySuccCheckTimestamp = (int)std::time(nullptr);
-	_words[id].needSkip = false;
 }
 
 void WordsManager::SetWordAsUnlearned(int id)
@@ -68,17 +67,56 @@ void WordsManager::SetWordAsUnlearned(int id)
 	_words[id].checkOrderN = 0;
 	_words[id].successCheckDays = 0;
 	_words[id].lastDaySuccCheckTimestamp = 0;
-	_words[id].needSkip = false;
 }
 
-void WordsManager::PutWordToEndOfQueue(int id)
+void WordsManager::PutWordToEndOfQueue(int id, bool wasQuickAnswer)
 {
+	int minOrderN = INT_MAX;
 	int maxOrderN = 0;
+	int learnedNum = 0;
 	for (const auto& word: _words)
 	{
-		maxOrderN = std::max(maxOrderN, word.checkOrderN);
+		if (word.successCheckDays > 0) // РЎР»РѕРІРѕ РёР·СѓС‡РµРЅРѕ
+		{
+			++learnedNum;
+			minOrderN = std::min(minOrderN, word.checkOrderN);
+			maxOrderN = std::max(maxOrderN, word.checkOrderN);
+		}
 	}
-	_words[id].checkOrderN = maxOrderN + 1;
+	if (minOrderN == INT_MAX)
+	{
+		minOrderN = 0;
+	}
+
+	if (wasQuickAnswer)
+	{
+		int spaceNum = maxOrderN - minOrderN + 1 - learnedNum;  // РљРѕР»РёС‡РµСЃС‚РІРѕ РґС‹СЂРѕРє РІ РЅСѓРјРµСЂР°С†РёРё
+		int add = std::max(1, (100-spaceNum)/4);
+		_words[id].checkOrderN = maxOrderN + add;
+	}
+	else
+	{
+		// РСЃРїРѕР»СЊР·СѓРµРј РїРµСЂРІРѕРµ СЃРІРѕР±РѕРґРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ checkOrderN Р±РѕР»СЊС€Рµ minOrderN
+		int n = minOrderN + 1;
+		while(true)
+		{
+			bool found = false;
+			for (const auto& word : _words)
+			{
+				if (word.successCheckDays > 0 && word.checkOrderN == n)
+				{
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+			{
+				_words[id].checkOrderN = n;
+				break;
+			}
+			++n;
+		}
+	}
 }
 
 WordsManager::WordInfo& WordsManager::GetWordInfo(int id)
@@ -88,7 +126,7 @@ WordsManager::WordInfo& WordsManager::GetWordInfo(int id)
 
 
 //===============================================================================================
-// Вернуть число переводов в данном слове
+// Р’РµСЂРЅСѓС‚СЊ С‡РёСЃР»Рѕ РїРµСЂРµРІРѕРґРѕРІ РІ РґР°РЅРЅРѕРј СЃР»РѕРІРµ
 //===============================================================================================
 
 int WordsManager::getTranslationsNum(const char* translation)
@@ -122,7 +160,7 @@ void WordsManager::save()
 }
 
 //===============================================================================================
-// Печатает перевод с переносом значений (через ,) и затемняя произношение ([])
+// РџРµС‡Р°С‚Р°РµС‚ РїРµСЂРµРІРѕРґ СЃ РїРµСЂРµРЅРѕСЃРѕРј Р·РЅР°С‡РµРЅРёР№ (С‡РµСЂРµР· ,) Рё Р·Р°С‚РµРјРЅСЏСЏ РїСЂРѕРёР·РЅРѕС€РµРЅРёРµ ([])
 //===============================================================================================
 
 void WordsManager::printTranslationDecorated(const std::string& str)

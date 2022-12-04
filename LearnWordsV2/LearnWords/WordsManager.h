@@ -12,9 +12,8 @@ public:
 		std::string word;
 		std::string translation;
 		int checkOrderN = 0;      // Глобальный номер выполненной проверки. Это число больше у слов, знание которых проверялось позже
-		int successCheckDays = 0; // Число дней, когда проходили успешные проверки
+		int successCheckDays = 0; // Число дней, когда проходили успешные проверки. Если == 0, значит слово ещё не изучали
 		int lastDaySuccCheckTimestamp = 0;  // Таймстемп последней успешной проверки, но обновляется не чаще раза в сутки. Нужен для инкремента successCheckDays
-		bool needSkip = false;    // Ставится при быстрой успешной проверки, служит для пропуска одного круга проверки
 	};
 
 	WordsManager(const std::string& wordsFileName);
@@ -30,7 +29,7 @@ public:
 	// Установка свойств слова
 	void SetWordAsJustLearned(int id);
 	void SetWordAsUnlearned(int id);
-	void PutWordToEndOfQueue(int id);
+	void PutWordToEndOfQueue(int id, bool wasQuickAnswer);
 	// Работа со списком забытых при проверке слов
 	void clearForgottenList();
 	bool isForgottenListEmpty();

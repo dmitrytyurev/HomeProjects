@@ -84,21 +84,11 @@ int CheckManager::GetWordIdToCheckImpl(const std::vector<int>& lastCheckedIds)
 int CheckManager::GetWordIdToCheck(std::vector<int>& lastCheckedIds)
 {
 	auto wordsMgr = _pWordsData.lock();
-	while(true)
-	{
-		int res = GetWordIdToCheckImpl(lastCheckedIds);
-		WordsManager::WordInfo& w = wordsMgr->GetWordInfo(res);
-		if (!w.needSkip)
-		{
-			lastCheckedIds.push_back(res);
-			if (lastCheckedIds.size() > 10)
-				lastCheckedIds.erase(lastCheckedIds.begin());
-			return res;
-		}
-		w.needSkip = false;
-		wordsMgr->PutWordToEndOfQueue(res);
-	}
-	return 0; // Сюда не приходим
+	int res = GetWordIdToCheckImpl(lastCheckedIds);
+	lastCheckedIds.push_back(res);
+	if (lastCheckedIds.size() > 10)
+		lastCheckedIds.erase(lastCheckedIds.begin());
+	return res;
 }
 
 //===============================================================================================
@@ -153,8 +143,7 @@ void CheckManager::DoCheck()
 				return;
 			if (c == 72)  // Стрелка вверх
 			{
-				wordsMgr->PutWordToEndOfQueue(id);
-				w.needSkip = isQuickAnswer;
+				wordsMgr->PutWordToEndOfQueue(id, isQuickAnswer);
 				int curTimestamp = (int)std::time(nullptr);
 				if (curTimestamp - w.lastDaySuccCheckTimestamp > 3600*24) {
 					w.lastDaySuccCheckTimestamp = curTimestamp;

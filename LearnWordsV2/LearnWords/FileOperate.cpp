@@ -99,13 +99,6 @@ void FileOperate::LoadFromFile(const char* fullFileName, std::vector<WordsManage
 				ExitMsg("Sintax error in word %s", wi.word.c_str());
 			// ---------
 			wi.lastDaySuccCheckTimestamp = LoadIntFromArray(buffer, &parseIndex);
-			while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd && !IsDigit(buffer[parseIndex]))
-				++parseIndex;
-			if (buffer[parseIndex] == 0 || buffer[parseIndex] == 0xd)
-				ExitMsg("Sintax error in word %s", wi.word.c_str());
-
-			// ---------
-			wi.needSkip = !!LoadIntFromArray(buffer, &parseIndex);
 			while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd)
 				++parseIndex;
 		}
@@ -145,13 +138,12 @@ void FileOperate::SaveToFile(const char* fullFileName, const std::vector<WordsMa
 			fprintf(f, "\"%s\" \"%s\"\n", e.word.c_str(), e.translation.c_str());
 		else
 		{
-			fprintf(f, "\"%s\" \"%s\" %d %d %d %d",
+			fprintf(f, "\"%s\" \"%s\" %d %d %d",
 				e.word.c_str(),
 				e.translation.c_str(),
 				e.checkOrderN,
 				e.successCheckDays,
-				e.lastDaySuccCheckTimestamp,
-				int(e.needSkip));
+				e.lastDaySuccCheckTimestamp);
 
 			fprintf(f, "\n");
 		}
