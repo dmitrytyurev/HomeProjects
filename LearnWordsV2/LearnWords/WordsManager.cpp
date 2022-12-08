@@ -89,38 +89,47 @@ void WordsManager::PutWordToEndOfQueue(int id, bool wasQuickAnswer)
 	}
 
 	int prevOrderN = _words[id].checkOrderN;
+
+	// Найдём первое свободное значение checkOrderN больше prevOrderN
+	int firstUnused = prevOrderN + 1;
+	while (true)
+	{
+		bool found = false;
+		for (const auto& word : _words)
+		{
+			if (word.successCheckDays > 0 && word.checkOrderN == firstUnused)
+			{
+				found = true;
+				break;
+			}
+		}
+		if (!found)
+		{
+			break;
+		}
+		++firstUnused;
+	}
+
 	if (wasQuickAnswer)
 	{
-		int spaceNum = maxOrderN - minOrderN + 1 - learnedNum;  // Количество дырок в нумерации
-		int add = std::max(1, (100-spaceNum)/4);
-		_words[id].checkOrderN = maxOrderN + add;
+		const int SHIFT = 10;
+		int tryOrderN = firstUnused + SHIFT;  // Номер, который хотим назначить
+		if (tryOrderN > maxOrderN)
+		{
+			_words[id].checkOrderN = tryOrderN;
+		}
+		else
+		{
+			_words[id].checkOrderN = maxOrderN + 1;
+		}
 	}
 	else
 	{
-		// Используем первое свободное значение checkOrderN больше minOrderN
-		int n = _words[id].checkOrderN + 1;
-		while(true)
-		{
-			bool found = false;
-			for (const auto& word : _words)
-			{
-				if (word.successCheckDays > 0 && word.checkOrderN == n)
-				{
-					found = true;
-					break;
-				}
-			}
-			if (!found)
-			{
-				_words[id].checkOrderN = n;
-				break;
-			}
-			++n;
-		}
+		_words[id].checkOrderN = firstUnused;
 	}
-	// Если мы перезаписали слово не с меньшим индексом, значит образовалась дырка в нумерации, откуда забрали индекс.
+	// Если мы перезаписали слово не с меньшим исходным индексом, значит образовалась дырка в нумерации, откуда забрали индекс.
 	// Сдвинем идексы ниже, чтобы убрать дырку. Мы позволяем образовываться дыркам только при присвоении индекса быстро изученным словам.
-	// Но не позволяем образовываться дыркам, при забирании неминимального индекса. Забрать неминимальный индекс можем, поскольку при выборе слова для изучения
+	// Но не позволяем образовываться дыркам, при забирании неминимального индекса. Забрать же неминимальный индекс можем, поскольку при выборе слова для изучения
 	// рассматриваем слова не как один список, а как два списка - давно изученных и недавно изученных.
 	while (true)
 	{
