@@ -112,8 +112,8 @@ void WordsManager::PutWordToEndOfQueue(int id, bool wasQuickAnswer)
 
 	if (wasQuickAnswer)
 	{
-		const int SHIFT = 10;
-		int tryOrderN = firstUnused + SHIFT;  // Номер, который хотим назначить
+		int shiftAdd = std::max(1, std::min(50, int(learnedNum * 0.3)));  // На сколько слов хотим отложить проверку данного слова (его ведь хорошо помним)
+		int tryOrderN = firstUnused + shiftAdd;  // Номер, который хотим назначить
 		if (tryOrderN > maxOrderN)
 		{
 			_words[id].checkOrderN = tryOrderN;
