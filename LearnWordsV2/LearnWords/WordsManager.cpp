@@ -131,29 +131,17 @@ void WordsManager::PutWordToEndOfQueue(int id, bool wasQuickAnswer)
 	// Сдвинем идексы ниже, чтобы убрать дырку. Мы позволяем образовываться дыркам только при присвоении индекса быстро изученным словам.
 	// Но не позволяем образовываться дыркам, при забирании неминимального индекса. Забрать же неминимальный индекс можем, поскольку при выборе слова для изучения
 	// рассматриваем слова не как один список, а как два списка - давно изученных и недавно изученных.
-	while (true)
+
+
+	for (int i = 0; i < _words.size(); ++i)
 	{
-		// Найти слово с индексом меньше нашего прошлого, причём ближайшее
-		int indexFound = -1;
-		int minDist = INT_MAX;
-		for (int i = 0; i < _words.size(); ++i)
+		if (_words[i].successCheckDays > 0) // Слово изучено
 		{
-			if (_words[i].successCheckDays > 0) // Слово изучено
+			if (_words[i].checkOrderN < prevOrderN)
 			{
-				if (_words[i].checkOrderN < prevOrderN && prevOrderN - _words[i].checkOrderN < minDist)
-				{
-					indexFound = i;
-					minDist = prevOrderN - _words[i].checkOrderN;
-				}
+				++(_words[i].checkOrderN);
 			}
 		}
-		if (indexFound == -1)
-		{
-			break;
-		}
-		int tmp = _words[indexFound].checkOrderN;
-		_words[indexFound].checkOrderN = prevOrderN;
-		prevOrderN = tmp;
 	}
 }
 
