@@ -88,7 +88,7 @@ void WordsManager::PutWordToEndOfQueue(int id, bool wasQuickAnswer)
 		minOrderN = 0;
 	}
 
-	int prevOrderN = _words[id].checkOrderN;
+	int prevOrderN = _words[id].checkOrderN != 0 ? _words[id].checkOrderN : minOrderN - 1;
 
 	// Найдём первое свободное значение checkOrderN больше prevOrderN
 	int firstUnused = prevOrderN + 1;
