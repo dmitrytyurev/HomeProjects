@@ -29,7 +29,7 @@ public:
 	// Установка свойств слова
 	void SetWordAsJustLearned(int id);
 	void SetWordAsUnlearned(int id);
-	void PutWordToEndOfQueue(int id, bool wasQuickAnswer, bool isJustLearned);
+	void PutWordToEndOfQueue(int id, bool wasQuickAnswer);
 	// Работа со списком забытых при проверке слов
 	void clearForgottenList();
 	bool isForgottenListEmpty();
