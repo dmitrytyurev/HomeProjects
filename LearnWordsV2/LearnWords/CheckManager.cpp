@@ -143,7 +143,7 @@ void CheckManager::DoCheck()
 				return;
 			if (c == 72)  // Стрелка вверх
 			{
-				wordsMgr->PutWordToEndOfQueue(id, isQuickAnswer);
+				wordsMgr->PutWordToEndOfQueue(id, isQuickAnswer, false);
 				int curTimestamp = (int)std::time(nullptr);
 				if (curTimestamp - w.lastDaySuccCheckTimestamp > 3600*24) {
 					w.lastDaySuccCheckTimestamp = curTimestamp;

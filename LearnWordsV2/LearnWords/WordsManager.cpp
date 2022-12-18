@@ -57,7 +57,7 @@ int WordsManager::GetWordsNum()
 
 void WordsManager::SetWordAsJustLearned(int id)
 {
-	PutWordToEndOfQueue(id, false);
+	PutWordToEndOfQueue(id, false, true);
 	_words[id].successCheckDays = 1;
 	_words[id].lastDaySuccCheckTimestamp = (int)std::time(nullptr);
 }
@@ -69,7 +69,7 @@ void WordsManager::SetWordAsUnlearned(int id)
 	_words[id].lastDaySuccCheckTimestamp = 0;
 }
 
-void WordsManager::PutWordToEndOfQueue(int id, bool wasQuickAnswer)
+void WordsManager::PutWordToEndOfQueue(int id, bool wasQuickAnswer, bool isJustLearned)
 {
 	int minOrderN = INT_MAX;
 	int maxOrderN = 0;
@@ -88,7 +88,7 @@ void WordsManager::PutWordToEndOfQueue(int id, bool wasQuickAnswer)
 		minOrderN = 0;
 	}
 
-	int prevOrderN = _words[id].checkOrderN;
+	int prevOrderN = isJustLearned ? minOrderN - 1 : _words[id].checkOrderN;
 
 	// Найдём первое свободное значение checkOrderN больше prevOrderN
 	int firstUnused = prevOrderN + 1;
@@ -131,7 +131,6 @@ void WordsManager::PutWordToEndOfQueue(int id, bool wasQuickAnswer)
 	// Сдвинем идексы ниже, чтобы убрать дырку. Мы позволяем образовываться дыркам только при присвоении индекса быстро изученным словам.
 	// Но не позволяем образовываться дыркам, при забирании неминимального индекса. Забрать же неминимальный индекс можем, поскольку при выборе слова для изучения
 	// рассматриваем слова не как один список, а как два списка - давно изученных и недавно изученных.
-
 
 	for (int i = 0; i < _words.size(); ++i)
 	{
