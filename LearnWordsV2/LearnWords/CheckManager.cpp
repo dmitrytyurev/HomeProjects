@@ -25,7 +25,6 @@ extern Log logger;
 int CheckManager::GetWordIdToCheckImpl(const std::vector<int>& lastCheckedIds)
 {
 	auto wordsMgr = _pWordsData.lock();
-	const int TRESHOLD = 4; 
 	// Группа 1: слова с successCheckDays <= TRESHOLD
 	// Группа 2: слова с successCheckDays > TRESHOLD
 
@@ -37,7 +36,7 @@ int CheckManager::GetWordIdToCheckImpl(const std::vector<int>& lastCheckedIds)
 	for (int i=0; i< wordsMgr->GetWordsNum(); ++i)
 	{
 		const auto& w = wordsMgr->GetWordInfo(i);
-		if (w.successCheckDays <= TRESHOLD)
+		if (wordsMgr->isWordLearnedRecently(i))
 		{
 			if (w.checkOrderN < group1minOrder)
 			{

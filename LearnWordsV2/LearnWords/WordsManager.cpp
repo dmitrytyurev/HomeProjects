@@ -110,7 +110,7 @@ void WordsManager::PutWordToEndOfQueue(int id, bool wasQuickAnswer)
 		++firstUnused;
 	}
 
-	if (wasQuickAnswer)
+	if (wasQuickAnswer && !isWordLearnedRecently(id))
 	{
 		int shiftAdd = std::max(1, std::min(50, int(learnedNum * 0.3)));  // На сколько слов хотим отложить проверку данного слова (его ведь хорошо помним)
 		int tryOrderN = firstUnused + shiftAdd;  // Номер, который хотим назначить
@@ -177,6 +177,13 @@ int WordsManager::getTranslationsNum(const char* translation)
 	return commasCount + 1;
 }
 
+//===============================================================================================
+
+bool WordsManager::isWordLearnedRecently(int id)
+{
+	const int TRESHOLD = 4;
+	return _words[id].successCheckDays <= TRESHOLD;
+}
 
 //===============================================================================================
 

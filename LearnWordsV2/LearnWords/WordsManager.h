@@ -26,6 +26,7 @@ public:
 	WordInfo& GetWordInfo(int id);
 	std::vector<int> GetUnlearnedTextsId(int textsNumNeeded);
 	int getTranslationsNum(const char* translation);
+	bool isWordLearnedRecently(int id);
 	// Установка свойств слова
 	void SetWordAsJustLearned(int id);
 	void SetWordAsUnlearned(int id);
