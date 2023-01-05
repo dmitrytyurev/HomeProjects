@@ -59,9 +59,9 @@ int WordsManager::GetWordsNum()
 
 void WordsManager::SetWordAsJustLearned(int id)
 {
-	PutWordToEndOfQueue(id, false);
 	_words[id].successCheckDays = 1;
 	_words[id].lastDaySuccCheckTimestamp = (int)std::time(nullptr);
+	PutWordToEndOfQueue(id, false);
 }
 
 void WordsManager::SetWordAsUnlearned(int id)

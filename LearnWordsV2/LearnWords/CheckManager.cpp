@@ -92,12 +92,12 @@ void CheckManager::DoCheck()
 				return;
 			if (c == 72)  // Стрелка вверх
 			{
-				wordsMgr->PutWordToEndOfQueue(id, isQuickAnswer);
 				int curTimestamp = (int)std::time(nullptr);
 				if (curTimestamp - w.lastDaySuccCheckTimestamp > 3600*24) {
 					w.lastDaySuccCheckTimestamp = curTimestamp;
 					w.successCheckDays++;
 				}
+				wordsMgr->PutWordToEndOfQueue(id, isQuickAnswer);
 				wordsMgr->save();
 			}
 			else
