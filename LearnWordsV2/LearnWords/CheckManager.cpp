@@ -22,72 +22,23 @@ extern Log logger;
 // 
 //===============================================================================================
 
-int CheckManager::GetWordIdToCheckImpl(const std::vector<int>& lastCheckedIds)
+int CheckManager::GetWordIdToCheck()
 {
 	auto wordsMgr = _pWordsData.lock();
-	// Группа 1: слова с successCheckDays <= TRESHOLD
-	// Группа 2: слова с successCheckDays > TRESHOLD
 
-	// Если одна из групп пуста, вернуть слово из второй группы с наименьшим checkOrderN
-	int group1minOrderId = -1;
-	int group1minOrder = 2000000000;
-	int group2minOrderId = -1;
-	int group2minOrder = 2000000000;
+	int minOrderId = -1;
+	int minOrder = 2000000000;
 	for (int i=0; i< wordsMgr->GetWordsNum(); ++i)
 	{
 		const auto& w = wordsMgr->GetWordInfo(i);
-		if (wordsMgr->isWordLearnedRecently(i))
+		if (w.successCheckDays > 0 && w.checkOrderN < minOrder)
 		{
-			if (w.checkOrderN < group1minOrder)
-			{
-				group1minOrder = w.checkOrderN;
-				group1minOrderId = i;
-			}
-		}
-		else
-		{
-			if (w.checkOrderN < group2minOrder)
-			{
-				group2minOrder = w.checkOrderN;
-				group2minOrderId = i;
-			}
+			minOrder = w.checkOrderN;
+			minOrderId = i;
 		}
 	}
-	if (group1minOrderId == -1)
-		return group2minOrderId;
-	if (group2minOrderId == -1)
-		return group1minOrderId;
-
-	// Если ровно в одной из двух групп слово с наименьшим checkOrderN находится в списке из 10 последних повторённых, то вернуть слово из другого списка
-	bool wasLastlyUsed1 = std::find(lastCheckedIds.begin(), lastCheckedIds.end(), group1minOrderId) != lastCheckedIds.end();
-	bool wasLastlyUsed2 = std::find(lastCheckedIds.begin(), lastCheckedIds.end(), group2minOrderId) != lastCheckedIds.end();
-	if (wasLastlyUsed1 != wasLastlyUsed2)
-	{
-		if (wasLastlyUsed1)
-			return group2minOrderId;
-		return group1minOrderId;
-	}
-
-	// Выдаём слова с чередованием из групп 1 и 2
-	static bool switchFlag = false;
-	switchFlag ^= true;
-	if (switchFlag)
-		return group1minOrderId;
-	return group2minOrderId;
-}
-
-//===============================================================================================
-// 
-//===============================================================================================
-
-int CheckManager::GetWordIdToCheck(std::vector<int>& lastCheckedIds)
-{
-	auto wordsMgr = _pWordsData.lock();
-	int res = GetWordIdToCheckImpl(lastCheckedIds);
-	lastCheckedIds.push_back(res);
-	if (lastCheckedIds.size() > 10)
-		lastCheckedIds.erase(lastCheckedIds.begin());
-	return res;
+	
+	return minOrderId;
 }
 
 //===============================================================================================
@@ -97,7 +48,6 @@ int CheckManager::GetWordIdToCheck(std::vector<int>& lastCheckedIds)
 void CheckManager::DoCheck()
 {
 	auto wordsMgr = _pWordsData.lock();
-	std::vector<int> lastCheckedIds;   // Айдишники последних 10-ти проверенных слов
 
 	ClearConsoleScreen();
 
@@ -109,7 +59,7 @@ void CheckManager::DoCheck()
 	// Главный цикл проверки слов
 	for (int i = 0; i < wordsToCheck; ++i)
 	{
-		int id = GetWordIdToCheck(lastCheckedIds);
+		int id = GetWordIdToCheck();
 		WordsManager::WordInfo& w = wordsMgr->GetWordInfo(id);
 
 		ClearConsoleScreen();

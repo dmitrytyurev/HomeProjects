@@ -10,8 +10,7 @@ public:
 
 private:
 	bool IsQuickAnswer(double milliSec, const char* translation, bool* ifTooLongAnswer = nullptr, double* extraDurationForAnswer = nullptr);
-	int GetWordIdToCheck(std::vector<int>& lastCheckedIds);
-	int GetWordIdToCheckImpl(const std::vector<int>& lastCheckedIds);
+	int GetWordIdToCheck();
 
 private:
 	std::weak_ptr<WordsManager> _pWordsData;
