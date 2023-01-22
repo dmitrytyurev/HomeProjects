@@ -18,7 +18,7 @@ void CopyToClipboard(const std::string &s);
 struct Log
 {
 	explicit Log(const char* fileName): _fileName(fileName) {}
-	void _cdecl operator()(char *text, ...);
+	void _cdecl operator()(const char *text, ...);
 
 	std::string _fileName;
 };

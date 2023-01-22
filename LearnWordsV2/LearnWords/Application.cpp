@@ -12,6 +12,10 @@ extern Log logger;
 
 Application::Application(const std::string& wordsFileName)
 {
+	std::string backupName = wordsFileName;
+	backupName = backupName.substr(0, backupName.size() - 3) + "bak";
+	CopyFileA(wordsFileName.c_str(), backupName.c_str(), FALSE);
+
 	_wordsManager = std::make_shared<WordsManager>(wordsFileName);
 	_learn = std::make_unique<LearnManager>(_wordsManager);
 	_check = std::make_unique<CheckManager>(_wordsManager);

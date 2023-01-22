@@ -109,7 +109,7 @@ void CheckManager::DoCheck()
 				}
 				else
 					continue;
-			logger("Check by time, word = %s, key=%d, time = %s", wordsMgr->GetWord(id).c_str(), c, GetTimeInText(time(nullptr)));
+			logger("%s word = %s, key=%d, Quick=%d\n", GetTimeInText(time(nullptr)), wordsMgr->GetWord(id).c_str(), c, int(isQuickAnswer));
 			break;
 		}
 	}

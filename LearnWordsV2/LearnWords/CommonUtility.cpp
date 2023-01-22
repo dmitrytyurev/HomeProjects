@@ -11,7 +11,7 @@
 // 
 //===============================================================================================
 
-void _cdecl Log::operator()(char *text, ...)
+void _cdecl Log::operator()(const char *text, ...)
 {
 	static char tmpStr[1024];
 	va_list args;
@@ -38,6 +38,7 @@ const char* GetTimeInText(time_t curTime)
 	struct tm timeinfo;
 	localtime_s(&timeinfo, &curTime);
 	asctime_s(buf, sizeof(buf), &timeinfo);
+	buf[strlen(buf)-1] = 0;
 	return buf;
 }
 
