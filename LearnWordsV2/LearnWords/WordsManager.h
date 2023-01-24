@@ -9,6 +9,11 @@ class WordsManager
 public:
 	struct WordInfo
 	{
+		bool operator<(const WordInfo& val)
+		{
+			return 	checkOrderN < val.checkOrderN;
+		}
+
 		std::string word;
 		std::string translation;
 		int checkOrderN = 0;      // Глобальный номер выполненной проверки. Это число больше у слов, знание которых проверялось позже

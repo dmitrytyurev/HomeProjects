@@ -260,7 +260,10 @@ bool WordsManager::isWordLearnedRecently(int id)
 
 void WordsManager::save()
 {
-	FileOperate::SaveToFile(_fullFileName.c_str(), _words);
+	std::vector<WordInfo> wordsToSave = _words;
+
+	std::sort(wordsToSave.begin(), wordsToSave.end());
+	FileOperate::SaveToFile(_fullFileName.c_str(), wordsToSave);
 }
 
 //===============================================================================================
