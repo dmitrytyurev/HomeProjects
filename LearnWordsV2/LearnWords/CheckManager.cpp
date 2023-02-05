@@ -99,10 +99,14 @@ void CheckManager::DoCheck()
 				}
 				wordsMgr->PutWordToEndOfQueue(id, isQuickAnswer);
 				wordsMgr->save();
+				if (!isQuickAnswer) {
+					wordsMgr->addElementToNotQuickList(id);
+				}
 			}
 			else
 				if (c == 80) // Стрелка вниз
 				{
+					wordsMgr->addElementToNotQuickList(id);
 					wordsMgr->addElementToForgottenList(id);
 					wordsMgr->SetWordAsJustLearned(id);
 					wordsMgr->save();

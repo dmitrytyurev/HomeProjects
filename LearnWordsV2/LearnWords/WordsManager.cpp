@@ -9,6 +9,8 @@
 #include "CommonUtility.h"
 #include "FileOperate.h"
 
+extern Log logger;
+
 #ifdef min
 #undef min
 #endif
@@ -113,8 +115,11 @@ void WordsManager::PutWordToEndOfQueue(int id, bool wasQuickAnswer)
 		++firstUnused;
 	}
 
-	if (wasQuickAnswer && !isWordLearnedRecently(id))
+	if (wasQuickAnswer && 
+		!isWordLearnedRecently(id) && 
+		std::find(std::begin(_notQuickWordsIndices), std::end(_notQuickWordsIndices), id) == std::end(_notQuickWordsIndices))
 	{
+		logger("Treated as quick: ");
 		// Не просто в конец очереди, а сдвинуть на попозже (отложенные слова)
 		int shiftAdd = std::max(1, std::min(50, int(learnedNum * 0.3)));  // На сколько слов хотим отложить проверку данного слова (его ведь хорошо помним)
 		int tryOrderN = firstUnused + shiftAdd;  // Номер, который хотим назначить
@@ -129,6 +134,7 @@ void WordsManager::PutWordToEndOfQueue(int id, bool wasQuickAnswer)
 	}
 	else
 	{
+		logger("Treated as not quick: ");
 		if (!isWordLearnedRecently(id))
 		{
 			// В конец очереди неотложенных слов (отложенные идут чуть дальше, за них не залезаем)
@@ -350,4 +356,11 @@ const std::vector<int>& WordsManager::getForgottenList()
 void WordsManager::addElementToForgottenList(int id)
 {
 	_forgottenWordsIndices.push_back(id);
+}
+
+//===============================================================================================
+
+void WordsManager::addElementToNotQuickList(int id)
+{
+	_notQuickWordsIndices.push_back(id);
 }

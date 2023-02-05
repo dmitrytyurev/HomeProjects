@@ -42,6 +42,8 @@ public:
 	bool isForgottenListEmpty();
 	void addElementToForgottenList(int id);
 	const std::vector<int>& getForgottenList();
+	// Работа со списком слов, на которые при проверке был не быстрый ответ (ответили медленно или неправильно)
+	void addElementToNotQuickList(int id);
 
 private:
 	void load(const std::string& wordsFileName);
@@ -49,5 +51,6 @@ private:
 private:
 	std::string _fullFileName;
 	std::vector<int> _forgottenWordsIndices; // Индексы слов, которые были забыты при последней проверке слов
+	std::vector<int> _notQuickWordsIndices;  // Индексы слов, на которые при проверке был не быстрый ответ (ответили медленно или неправильно)
 	std::vector<WordInfo> _words;            // База всех слов
 };
