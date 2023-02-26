@@ -142,7 +142,7 @@ void WordsManager::PutWordToEndOfQueue(int id, bool wasQuickAnswer)
 		}
 		else
 		{
-			const int LEARNED_RECENTLY_SHIFT = 12;  
+			const int LEARNED_RECENTLY_SHIFT = 22;  
 			// Не очень далеко поместить:
 			// Если ближайшая свободная (firstUnused) находится не дальше LEARNED_RECENTLY_SHIFT, то вставляем туда
 			// Если дальше, то попробуем вставить на позицию: старая + LEARNED_RECENTLY_SHIFT
