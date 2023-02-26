@@ -62,9 +62,8 @@ int WordsManager::GetWordsNum()
 void WordsManager::SetWordAsJustLearned(int id)
 {
 	_words[id].lastDaySuccCheckTimestamp = (int)std::time(nullptr);
-	_words[id].successCheckDays = 0;   // Чтобы в методе PutWordToEndOfQueue это слово не использовалось для поиска свободного места
-	PutWordToEndOfQueue(id, false);
 	_words[id].successCheckDays = 1;
+	PutWordToEndOfQueue(id, false);
 }
 
 void WordsManager::SetWordAsUnlearned(int id)
@@ -76,136 +75,42 @@ void WordsManager::SetWordAsUnlearned(int id)
 
 void WordsManager::PutWordToEndOfQueue(int id, bool wasQuickAnswer)
 {
-	int minOrderN = INT_MAX;
 	int maxOrderN = 0;
-	int learnedNum = 0;
-	for (const auto& word: _words)
+	for (int i = 0; i < _words.size(); ++i)
 	{
-		if (word.successCheckDays > 0) // Слово изучено
+		if (i != id && isWordLearned(i))
 		{
-			++learnedNum;
-			minOrderN = std::min(minOrderN, word.checkOrderN);
-			maxOrderN = std::max(maxOrderN, word.checkOrderN);
+			maxOrderN = std::max(maxOrderN, _words[i].checkOrderN);
 		}
 	}
-	if (minOrderN == INT_MAX)
+
+	int prevOrderN = _words[id].checkOrderN;
+
+	_words[id].checkOrderN = maxOrderN + 1;
+	_words[id].wasQuickAnswer = wasQuickAnswer &&
+		!isWordLearnedRecently(id) &&
+		std::find(std::begin(_notQuickWordsIndices), std::end(_notQuickWordsIndices), id) == std::end(_notQuickWordsIndices);
+
+	// Если мы перезаписали слово не с меньшим исходным индексом, значит образовалась дырка в нумерации, откуда забрали индекс.
+	// Сдвинем идексы ниже, чтобы убрать дырку. 
+
+	for (int i = 0; i < _words.size(); ++i)
 	{
-		minOrderN = 0;
+		if (i != id && 
+			isWordLearned(i) &&
+			_words[i].checkOrderN < prevOrderN)
+		{
+			++(_words[i].checkOrderN);
+		}
 	}
 
-	int prevOrderN = _words[id].checkOrderN != 0 ? _words[id].checkOrderN : minOrderN - 1;
-
-	// Найдём первое свободное значение checkOrderN больше prevOrderN
-	int firstUnused = prevOrderN + 1;
-	while (true)
-	{
-		bool found = false;
-		for (const auto& word : _words)
-		{
-			if (word.successCheckDays > 0 && word.checkOrderN == firstUnused)
-			{
-				found = true;
-				break;
-			}
-		}
-		if (!found)
-		{
-			break;
-		}
-		++firstUnused;
-	}
-
-	if (wasQuickAnswer && 
-		!isWordLearnedRecently(id) && 
-		std::find(std::begin(_notQuickWordsIndices), std::end(_notQuickWordsIndices), id) == std::end(_notQuickWordsIndices))
+	if (_words[id].wasQuickAnswer)
 	{
 		logger("Treated as quick: ");
-		// Не просто в конец очереди, а сдвинуть на попозже (отложенные слова)
-		int shiftAdd = std::max(1, std::min(50, int(learnedNum * 0.3)));  // На сколько слов хотим отложить проверку данного слова (его ведь хорошо помним)
-		int tryOrderN = firstUnused + shiftAdd;  // Номер, который хотим назначить
-		if (tryOrderN > maxOrderN)
-		{
-			_words[id].checkOrderN = tryOrderN;
-		}
-		else
-		{
-			_words[id].checkOrderN = maxOrderN + 1;
-		}
 	}
 	else
 	{
 		logger("Treated as not quick: ");
-		if (!isWordLearnedRecently(id))
-		{
-			// В конец очереди неотложенных слов (отложенные идут чуть дальше, за них не залезаем)
-			_words[id].checkOrderN = firstUnused;
-		}
-		else
-		{
-			const int LEARNED_RECENTLY_SHIFT = 22;  
-			// Не очень далеко поместить:
-			// Если ближайшая свободная (firstUnused) находится не дальше LEARNED_RECENTLY_SHIFT, то вставляем туда
-			// Если дальше, то попробуем вставить на позицию: старая + LEARNED_RECENTLY_SHIFT
-			// Но не раньше, чем последнее недавновыученное слово + 1
-			if (firstUnused <= prevOrderN + LEARNED_RECENTLY_SHIFT)
-			{
-				_words[id].checkOrderN = firstUnused;
-			}
-			else
-			{
-				int keepPrev = firstUnused;
-				int checkOrderN = firstUnused - 1;
-				while (true)
-				{
-					int id = GetWordIdByOrder(checkOrderN);
-					if (id == -1)
-					{
-						ExitMsg("Word not found by order");
-					}
-					if (isWordLearnedRecently(id))
-					{
-						checkOrderN = keepPrev;
-						break;
-					}
-					if (checkOrderN < prevOrderN + LEARNED_RECENTLY_SHIFT)
-					{
-						break;
-					}
-					keepPrev = checkOrderN;
-					--checkOrderN;
-				}
-				// Если присваиваем не пустой индекс а уже использованный, то сдвинем меньшие индексы вниз
-				if (checkOrderN != firstUnused)
-				{
-					for (int i = 0; i < _words.size(); ++i)
-					{
-						if (_words[i].successCheckDays > 0) // Слово изучено
-						{
-							if (_words[i].checkOrderN <= checkOrderN)
-							{
-								--(_words[i].checkOrderN);
-							}
-						}
-					}
-				}
-				_words[id].checkOrderN = checkOrderN;
-			}
-		}
-	}
-	// Если мы перезаписали слово не с меньшим исходным индексом, значит образовалась дырка в нумерации, откуда забрали индекс.
-	// Сдвинем идексы ниже, чтобы убрать дырку. Мы позволяем образовываться дыркам только при присвоении индекса быстро изученным словам.
-	// Но не позволяем образовываться дыркам, при забирании неминимального индекса. Забрать же неминимальный индекс можем, поскольку при выборе слова для изучения
-	// рассматриваем слова не как один список, а как два списка - давно изученных и недавно изученных.
-
-	for (int i = 0; i < _words.size(); ++i)
-	{
-		if (_words[i].successCheckDays > 0) // Слово изучено
-		{
-			if (_words[i].checkOrderN < prevOrderN)
-			{
-				++(_words[i].checkOrderN);
-			}
-		}
 	}
 }
 
@@ -259,7 +164,14 @@ int WordsManager::getTranslationsNum(const char* translation)
 bool WordsManager::isWordLearnedRecently(int id)
 {
 	const int TRESHOLD = 4;
-	return _words[id].successCheckDays <= TRESHOLD;
+	return  isWordLearned(id) && _words[id].successCheckDays <= TRESHOLD;
+}
+
+//===============================================================================================
+
+bool WordsManager::isWordLearned(int id)
+{
+	return _words[id].successCheckDays > 0;
 }
 
 //===============================================================================================

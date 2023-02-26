@@ -16,8 +16,9 @@ public:
 
 		std::string word;
 		std::string translation;
-		int checkOrderN = 0;      // Глобальный номер выполненной проверки. Это число больше у слов, знание которых проверялось позже
-		int successCheckDays = 0; // Число дней, когда проходили успешные проверки. Если == 0, значит слово ещё не изучали, 1 - только что изученное слово
+		int checkOrderN = 0;          // Глобальный номер выполненной проверки. Это число больше у слов, знание которых проверялось позже
+		bool wasQuickAnswer = false;  // Был ли при последней проверке слова ответ дан быстро
+		int successCheckDays = 0;     // Число дней, когда проходили успешные проверки. Если == 0, значит слово ещё не изучали, 1 - только что изученное слово
 		int lastDaySuccCheckTimestamp = 0;  // Таймстемп последней успешной проверки, но обновляется не чаще раза в сутки. Нужен для инкремента successCheckDays
 	};
 
@@ -33,6 +34,7 @@ public:
 	std::vector<int> GetUnlearnedTextsId(int textsNumNeeded);
 	int getTranslationsNum(const char* translation);
 	bool isWordLearnedRecently(int id);
+	bool isWordLearned(int id);
 	// Установка свойств слова
 	void SetWordAsJustLearned(int id);
 	void SetWordAsUnlearned(int id);

@@ -22,22 +22,58 @@ extern Log logger;
 // 
 //===============================================================================================
 
-int CheckManager::GetWordIdToCheck()
+int CheckManager::GetWordIdToCheck(double& probSub)
 {
+	const int COEFF1 = 20;
+	const int COEFF2 = 25;
+
 	auto wordsMgr = _pWordsData.lock();
 
+	int recentlyLearnedNum = 0;
+
+	for (int i = 0; i < wordsMgr->GetWordsNum(); ++i)
+	{
+		if (wordsMgr->isWordLearnedRecently(i))
+		{
+			++recentlyLearnedNum;
+		}
+	}
+
+	if (recentlyLearnedNum)
+	{
+		int prob = std::max(2, (COEFF1 - recentlyLearnedNum) / recentlyLearnedNum);  // Выбор между недавно изученными и остальными будет с вероятностью 1 к prob
+		probSub -= 1. / (prob + 1);
+		if (probSub < 0) {
+			probSub += 1.;
+			// Выбираем слово из недавно изученных
+			int minOrderId = -1;
+			int minOrder = INT_MAX;
+			for (int i = 0; i < wordsMgr->GetWordsNum(); ++i)
+			{
+				const auto& w = wordsMgr->GetWordInfo(i);
+				if (wordsMgr->isWordLearnedRecently(i) && w.checkOrderN < minOrder)
+				{
+					minOrder = w.checkOrderN;
+					minOrderId = i;
+				}
+			}
+			return minOrderId;
+		}
+	}
+
+	// Выбираем слово из остальных. К словам на которые быстро отвечали, добавляем коэффициент
 	int minOrderId = -1;
-	int minOrder = 2000000000;
-	for (int i=0; i< wordsMgr->GetWordsNum(); ++i)
+	int minOrder = INT_MAX;
+	for (int i = 0; i < wordsMgr->GetWordsNum(); ++i)
 	{
 		const auto& w = wordsMgr->GetWordInfo(i);
-		if (w.successCheckDays > 0 && w.checkOrderN < minOrder)
+		int shift = w.wasQuickAnswer ? COEFF2 : 0;
+		if (!wordsMgr->isWordLearnedRecently(i) && wordsMgr->isWordLearned(i) && w.checkOrderN + shift < minOrder)
 		{
-			minOrder = w.checkOrderN;
+			minOrder = w.checkOrderN + shift;
 			minOrderId = i;
 		}
 	}
-	
 	return minOrderId;
 }
 
@@ -56,10 +92,12 @@ void CheckManager::DoCheck()
 	if (wordsToCheck <= 0 || wordsMgr->GetWordsNum() == 0)
 		return;
 
+	double probSub = 0;
+
 	// Главный цикл проверки слов
 	for (int i = 0; i < wordsToCheck; ++i)
 	{
-		int id = GetWordIdToCheck();
+		int id = GetWordIdToCheck(probSub);
 		WordsManager::WordInfo& w = wordsMgr->GetWordInfo(id);
 
 		ClearConsoleScreen();
