@@ -91,19 +91,6 @@ void WordsManager::PutWordToEndOfQueue(int id, bool wasQuickAnswer)
 		!isWordLearnedRecently(id) &&
 		std::find(std::begin(_notQuickWordsIndices), std::end(_notQuickWordsIndices), id) == std::end(_notQuickWordsIndices);
 
-	// Если мы перезаписали слово не с меньшим исходным индексом, значит образовалась дырка в нумерации, откуда забрали индекс.
-	// Сдвинем идексы ниже, чтобы убрать дырку. 
-
-	for (int i = 0; i < _words.size(); ++i)
-	{
-		if (i != id && 
-			isWordLearned(i) &&
-			_words[i].checkOrderN < prevOrderN)
-		{
-			++(_words[i].checkOrderN);
-		}
-	}
-
 	if (_words[id].wasQuickAnswer)
 	{
 		logger("Treated as quick: ");
