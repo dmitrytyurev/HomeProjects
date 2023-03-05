@@ -18,19 +18,19 @@ struct
 
 extern Log logger;
 
+const int COEFF1 = 20;
+const int COEFF2 = 25;
+
+
 //===============================================================================================
 // 
 //===============================================================================================
 
-int CheckManager::GetWordIdToCheck(double& probSub)
+int CheckManager::GetWordIdToCheck(int prob, double& probSub)
 {
-	const int COEFF1 = 20;
-	const int COEFF2 = 25;
-
 	auto wordsMgr = _pWordsData.lock();
 
 	int recentlyLearnedNum = 0;
-
 	for (int i = 0; i < wordsMgr->GetWordsNum(); ++i)
 	{
 		if (wordsMgr->isWordLearnedRecently(i))
@@ -41,7 +41,6 @@ int CheckManager::GetWordIdToCheck(double& probSub)
 
 	if (recentlyLearnedNum)
 	{
-		int prob = std::max(2, (COEFF1 - recentlyLearnedNum) / recentlyLearnedNum);  // Выбор между недавно изученными и остальными будет с вероятностью 1 к prob
 		probSub -= 1. / (prob + 1);
 		if (probSub < 0) {
 			probSub += 1.;
@@ -93,11 +92,23 @@ void CheckManager::DoCheck()
 		return;
 
 	double probSub = 0;
+	int recentlyLearnedNum = 0;
+	for (int i = 0; i < wordsMgr->GetWordsNum(); ++i)
+	{
+		if (wordsMgr->isWordLearnedRecently(i))
+		{
+			++recentlyLearnedNum;
+		}
+	}
+	int prob = 0;
+	if (recentlyLearnedNum)	{
+		prob = std::max(2, (COEFF1 - recentlyLearnedNum) / recentlyLearnedNum);  // Выбор между недавно изученными и остальными будет с вероятностью 1 к prob
+	}
 
 	// Главный цикл проверки слов
 	for (int i = 0; i < wordsToCheck; ++i)
 	{
-		int id = GetWordIdToCheck(probSub);
+		int id = GetWordIdToCheck(prob, probSub);
 		WordsManager::WordInfo& w = wordsMgr->GetWordInfo(id);
 
 		ClearConsoleScreen();
