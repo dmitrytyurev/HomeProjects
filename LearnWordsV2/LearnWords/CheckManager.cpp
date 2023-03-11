@@ -26,20 +26,11 @@ const int COEFF2 = 25;
 // 
 //===============================================================================================
 
-int CheckManager::GetWordIdToCheck(int prob, double& probSub)
+int CheckManager::GetWordIdToCheck(int prob, double& probSub, std::vector<int>& learnedRecentlyIds)
 {
 	auto wordsMgr = _pWordsData.lock();
 
-	int recentlyLearnedNum = 0;
-	for (int i = 0; i < wordsMgr->GetWordsNum(); ++i)
-	{
-		if (wordsMgr->isWordLearnedRecently(i))
-		{
-			++recentlyLearnedNum;
-		}
-	}
-
-	if (recentlyLearnedNum)
+	if (!learnedRecentlyIds.empty())
 	{
 		probSub -= 1. / (prob + 1);
 		if (probSub < 0) {
@@ -47,13 +38,14 @@ int CheckManager::GetWordIdToCheck(int prob, double& probSub)
 			// Выбираем слово из недавно изученных
 			int minOrderId = -1;
 			int minOrder = INT_MAX;
-			for (int i = 0; i < wordsMgr->GetWordsNum(); ++i)
+
+			for (auto id: learnedRecentlyIds)
 			{
-				const auto& w = wordsMgr->GetWordInfo(i);
-				if (wordsMgr->isWordLearnedRecently(i) && w.checkOrderN < minOrder)
+				const auto& w = wordsMgr->GetWordInfo(id);
+				if (w.checkOrderN < minOrder)
 				{
 					minOrder = w.checkOrderN;
-					minOrderId = i;
+					minOrderId = id;
 				}
 			}
 			return minOrderId;
@@ -91,24 +83,24 @@ void CheckManager::DoCheck()
 	if (wordsToCheck <= 0 || wordsMgr->GetWordsNum() == 0)
 		return;
 
+	std::vector<int> learnedRecentlyIds;
 	double probSub = 0;
-	int recentlyLearnedNum = 0;
 	for (int i = 0; i < wordsMgr->GetWordsNum(); ++i)
 	{
 		if (wordsMgr->isWordLearnedRecently(i))
 		{
-			++recentlyLearnedNum;
+			learnedRecentlyIds.emplace_back(i);
 		}
 	}
 	int prob = 0;
-	if (recentlyLearnedNum)	{
-		prob = std::max(2, (COEFF1 - recentlyLearnedNum) / recentlyLearnedNum);  // Выбор между недавно изученными и остальными будет с вероятностью 1 к prob
+	if (!learnedRecentlyIds.empty())	{
+		prob = std::max(2, (COEFF1 - int(learnedRecentlyIds.size())) / int(learnedRecentlyIds.size()));  // Выбор между недавно изученными и остальными будет с вероятностью 1 к prob
 	}
 
 	// Главный цикл проверки слов
 	for (int i = 0; i < wordsToCheck; ++i)
 	{
-		int id = GetWordIdToCheck(prob, probSub);
+		int id = GetWordIdToCheck(prob, probSub, learnedRecentlyIds);
 		WordsManager::WordInfo& w = wordsMgr->GetWordInfo(id);
 
 		ClearConsoleScreen();
