@@ -18,7 +18,7 @@ struct
 
 extern Log logger;
 
-const int COEFF1 = 20;
+const double COEFF1 = 20.;
 const int COEFF2 = 25;
 
 
@@ -26,13 +26,13 @@ const int COEFF2 = 25;
 // 
 //===============================================================================================
 
-int CheckManager::GetWordIdToCheck(int prob, double& probSub, std::vector<int>& learnedRecentlyIds)
+int CheckManager::GetWordIdToCheck(double prob, double& probSub, std::vector<int>& learnedRecentlyIds)
 {
 	auto wordsMgr = _pWordsData.lock();
 
 	if (!learnedRecentlyIds.empty())
 	{
-		probSub -= 1. / (prob + 1);
+		probSub -= 1. / (prob + 1.);
 		if (probSub < 0) {
 			probSub += 1.;
 			// Выбираем слово из недавно изученных
@@ -92,9 +92,9 @@ void CheckManager::DoCheck()
 			learnedRecentlyIds.emplace_back(i);
 		}
 	}
-	int prob = 0;
+	double prob = 0;
 	if (!learnedRecentlyIds.empty())	{
-		prob = std::max(2, (COEFF1 - int(learnedRecentlyIds.size())) / int(learnedRecentlyIds.size()));  // Выбор между недавно изученными и остальными будет с вероятностью 1 к prob
+		prob = std::max(1.4, (COEFF1 - double(learnedRecentlyIds.size())) / double(learnedRecentlyIds.size()));  // Выбор между недавно изученными и остальными будет с вероятностью 1 к prob
 	}
 
 	// Главный цикл проверки слов
