@@ -75,9 +75,8 @@ bool LearnManager::AreAllWordsLearned(std::vector<WordToLearn>& queue)
 // 
 //===============================================================================================
 
-void LearnManager::DoLearn(bool isLearnForgotten)
+void LearnManager::DoLearn(bool isLearnForgotten, std::unique_ptr<WordsManager>& wordsMgr, std::unique_ptr<CheckManager>& checkManager)
 {
-	auto wordsMgr = _pWordsData.lock();
 	std::vector<int> wordsToLearnIds;
 
 	// Составим список индексов слов, которые будем учить
@@ -159,6 +158,10 @@ void LearnManager::DoLearn(bool isLearnForgotten)
 		WordToLearn word(id);
 		learnCycleQueue.push_back(word);
 	}
+
+	constexpr int MAX_OUTTER_WORDS_NUM = 10;  // Максимальное число отвлекающих слов, которые вставляем между подучиваемыми словами
+	const int outterWordsNum = std::max(MAX_OUTTER_WORDS_NUM - static_cast<int>(wordsToLearnIds.size()), 0); // Сколько отвлекающих слов вствлять между соседними словами для подучивания
+	int useOutterWordCounter = 0;
 																									 // Главный цикл обучения
 	while (true)
 	{
@@ -167,8 +170,22 @@ void LearnManager::DoLearn(bool isLearnForgotten)
 		// Выбрать слово, которое будем показывать
 		WordToLearn wordToLearn;
 
-		wordToLearn = learnCycleQueue[0];
-		learnCycleQueue.erase(learnCycleQueue.begin());
+		useOutterWordCounter = (++useOutterWordCounter) % (outterWordsNum + 1);
+		bool outterWordIsUsed = isLearnForgotten && useOutterWordCounter;
+		if (!outterWordIsUsed)
+		{
+			// Берём слово для изучения или повторения
+			wordToLearn = learnCycleQueue[0];
+			learnCycleQueue.erase(learnCycleQueue.begin());
+		}
+		else
+		{
+			// Берём отвлекающее слово из общего набора для повторения
+			double probSub = 0;
+			std::vector<int> unusedIds;
+			int id = checkManager->GetWordIdToCheck(wordsMgr, 0, probSub, unusedIds);
+			wordToLearn = WordToLearn(id);
+		}
 
 		// Показываем слово
 		int id = wordToLearn._index;
@@ -191,24 +208,38 @@ void LearnManager::DoLearn(bool isLearnForgotten)
 				return;
 			if (c == 72)  // Стрелка вверх
 			{
-				if (++(wordToLearn._localRightAnswersNum) == TIMES_TO_GUESS_TO_LEARNED)
+				if (!outterWordIsUsed)
 				{
-					wordsMgr->SetWordAsJustLearned(id);
-					wordsMgr->save();
-					if (AreAllWordsLearned(learnCycleQueue))
-						return;
+					if (++(wordToLearn._localRightAnswersNum) == TIMES_TO_GUESS_TO_LEARNED)
+					{
+						wordsMgr->SetWordAsJustLearned(id);
+						wordsMgr->save();
+						if (AreAllWordsLearned(learnCycleQueue))
+							return;
+					}
+					PutToQueue(learnCycleQueue, wordToLearn, wordsToLearnIds.size() > 3);
 				}
-				PutToQueue(learnCycleQueue, wordToLearn, wordsToLearnIds.size()>3);
+				else
+				{
+					checkManager->ProcessRemember(wordsMgr, id, false);
+				}
 				break;
 			}
 			else
 				if (c == 80) // Стрелка вниз
 				{
-					wordToLearn._localRightAnswersNum = 0;
-					if (!isLearnForgotten)
-						wordsMgr->SetWordAsUnlearned(id);
-					wordsMgr->save();
-					PutToQueue(learnCycleQueue, wordToLearn, wordsToLearnIds.size()>3);
+					if (!outterWordIsUsed)
+					{
+						wordToLearn._localRightAnswersNum = 0;
+						if (!isLearnForgotten)
+							wordsMgr->SetWordAsUnlearned(id);
+						wordsMgr->save();
+						PutToQueue(learnCycleQueue, wordToLearn, wordsToLearnIds.size() > 3);
+					}
+					else
+					{
+						checkManager->ProcessForget(wordsMgr, id);
+					}
 					break;
 				}
 		}

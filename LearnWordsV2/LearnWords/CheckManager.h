@@ -5,13 +5,12 @@
 class CheckManager
 {
 public:
-	CheckManager(std::weak_ptr<WordsManager> pWordsData) : _pWordsData(pWordsData) {}
-	void DoCheck();
+	CheckManager() = default;
+	void DoCheck(std::unique_ptr<WordsManager>& wordsManager);
+	int GetWordIdToCheck(std::unique_ptr<WordsManager>& wordsManager, double prob, double& probSub, std::vector<int>& learnedRecentlyIds);
+	void ProcessRemember(std::unique_ptr<WordsManager>& wordsMgr, int id, bool isQuickAnswer);
+	void ProcessForget(std::unique_ptr<WordsManager>& wordsMgr, int id);
 
 private:
-	bool IsQuickAnswer(double milliSec, const char* translation, bool* ifTooLongAnswer = nullptr, double* extraDurationForAnswer = nullptr);
-	int GetWordIdToCheck(double prob, double& probSub, std::vector<int>& learnedRecentlyIds);
-
-private:
-	std::weak_ptr<WordsManager> _pWordsData;
+	bool IsQuickAnswer(std::unique_ptr<WordsManager>& wordsManager, double milliSec, const char* translation, bool* ifTooLongAnswer = nullptr, double* extraDurationForAnswer = nullptr);
 };

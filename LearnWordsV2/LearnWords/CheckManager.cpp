@@ -26,10 +26,8 @@ const int COEFF2 = 25;
 // 
 //===============================================================================================
 
-int CheckManager::GetWordIdToCheck(double prob, double& probSub, std::vector<int>& learnedRecentlyIds)
+int CheckManager::GetWordIdToCheck(std::unique_ptr<WordsManager>& wordsMgr, double prob, double& probSub, std::vector<int>& learnedRecentlyIds)
 {
-	auto wordsMgr = _pWordsData.lock();
-
 	if (!learnedRecentlyIds.empty())
 	{
 		probSub -= 1. / (prob + 1.);
@@ -72,10 +70,31 @@ int CheckManager::GetWordIdToCheck(double prob, double& probSub, std::vector<int
 // 
 //===============================================================================================
 
-void CheckManager::DoCheck()
+void CheckManager::ProcessRemember(std::unique_ptr<WordsManager>& wordsMgr, int id, bool isQuickAnswer)
 {
-	auto wordsMgr = _pWordsData.lock();
+	WordsManager::WordInfo& w = wordsMgr->GetWordInfo(id);
+	int curTimestamp = (int)std::time(nullptr);
+	if (curTimestamp - w.lastDaySuccCheckTimestamp > 3600*24) {
+		w.lastDaySuccCheckTimestamp = curTimestamp;
+		w.successCheckDays++;
+	}
+	wordsMgr->PutWordToEndOfQueue(id, isQuickAnswer);
+	wordsMgr->save();
+	if (!isQuickAnswer) {
+		wordsMgr->addElementToNotQuickList(id);
+	}
+}
 
+void CheckManager::ProcessForget(std::unique_ptr<WordsManager>& wordsMgr, int id)
+{
+	wordsMgr->addElementToNotQuickList(id);
+	wordsMgr->addElementToForgottenList(id);
+	wordsMgr->SetWordAsJustLearned(id);
+	wordsMgr->save();
+}
+
+void CheckManager::DoCheck(std::unique_ptr<WordsManager>& wordsMgr)
+{
 	ClearConsoleScreen();
 
 	printf("\nHow many words to check: ");
@@ -100,8 +119,7 @@ void CheckManager::DoCheck()
 	// Главный цикл проверки слов
 	for (int i = 0; i < wordsToCheck; ++i)
 	{
-		int id = GetWordIdToCheck(prob, probSub, learnedRecentlyIds);
-		WordsManager::WordInfo& w = wordsMgr->GetWordInfo(id);
+		int id = GetWordIdToCheck(wordsMgr, prob, probSub, learnedRecentlyIds);
 
 		ClearConsoleScreen();
 		printf("\n\n===============================\n %s\n===============================\n", wordsMgr->GetWord(id).c_str());
@@ -118,7 +136,7 @@ void CheckManager::DoCheck()
 		auto t_end = std::chrono::high_resolution_clock::now();
 		double durationForAnswer = std::chrono::duration<double, std::milli>(t_end - t_start).count();
 		bool ifTooLongAnswer = false;
-		bool isQuickAnswer = IsQuickAnswer(durationForAnswer, wordsMgr->GetTranslation(id).c_str(), &ifTooLongAnswer);
+		bool isQuickAnswer = IsQuickAnswer(wordsMgr, durationForAnswer, wordsMgr->GetTranslation(id).c_str(), &ifTooLongAnswer);
 
 		while (true)
 		{
@@ -133,24 +151,12 @@ void CheckManager::DoCheck()
 				return;
 			if (c == 72)  // Стрелка вверх
 			{
-				int curTimestamp = (int)std::time(nullptr);
-				if (curTimestamp - w.lastDaySuccCheckTimestamp > 3600*24) {
-					w.lastDaySuccCheckTimestamp = curTimestamp;
-					w.successCheckDays++;
-				}
-				wordsMgr->PutWordToEndOfQueue(id, isQuickAnswer);
-				wordsMgr->save();
-				if (!isQuickAnswer) {
-					wordsMgr->addElementToNotQuickList(id);
-				}
+				ProcessRemember(wordsMgr, id, isQuickAnswer);
 			}
 			else
 				if (c == 80) // Стрелка вниз
 				{
-					wordsMgr->addElementToNotQuickList(id);
-					wordsMgr->addElementToForgottenList(id);
-					wordsMgr->SetWordAsJustLearned(id);
-					wordsMgr->save();
+					ProcessForget(wordsMgr, id);
 				}
 				else
 					continue;
@@ -163,9 +169,8 @@ void CheckManager::DoCheck()
 //
 //===============================================================================================
 
-bool CheckManager::IsQuickAnswer(double milliSec, const char* translation, bool* ifTooLongAnswer, double* extraDurationForAnswer)
+bool CheckManager::IsQuickAnswer(std::unique_ptr<WordsManager>& wordsMgr, double milliSec, const char* translation, bool* ifTooLongAnswer, double* extraDurationForAnswer)
 {
-	auto wordsMgr = _pWordsData.lock();
 	int index = wordsMgr->getTranslationsNum(translation) - 1;
 	const int timesNum = sizeof(quickAnswerTime) / sizeof(quickAnswerTime[0]);
 	ClampMinmax(&index, 0, timesNum - 1);

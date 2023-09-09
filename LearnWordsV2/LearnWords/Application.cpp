@@ -16,9 +16,9 @@ Application::Application(const std::string& wordsFileName)
 	backupName = backupName.substr(0, backupName.size() - 3) + "bak";
 	CopyFileA(wordsFileName.c_str(), backupName.c_str(), FALSE);
 
-	_wordsManager = std::make_shared<WordsManager>(wordsFileName);
-	_learn = std::make_unique<LearnManager>(_wordsManager);
-	_check = std::make_unique<CheckManager>(_wordsManager);
+	_wordsManager = std::make_unique<WordsManager>(wordsFileName);
+	_learn = std::make_unique<LearnManager>();
+	_check = std::make_unique<CheckManager>();
 }
 
 //===============================================================================================
@@ -36,14 +36,14 @@ void Application::Process()
 			return;
 			break;
 		case '1':
-			_learn->DoLearn(false);
+			_learn->DoLearn(false, _wordsManager, _check);
 			break;
 		case '2':
-			_check->DoCheck();
+			_check->DoCheck(_wordsManager);
 			break;
 		case '3':
 			if (!_wordsManager->isForgottenListEmpty())
-				_learn->DoLearn(true);
+				_learn->DoLearn(true, _wordsManager, _check);
 			break;
 		default:
 			break;

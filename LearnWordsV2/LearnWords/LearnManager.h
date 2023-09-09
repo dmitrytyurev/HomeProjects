@@ -1,13 +1,15 @@
 #pragma once
 #include <memory>
+#include "CheckManager.h"
+#include "WordsManager.h"
 
 // Класс для выучивания новых слов и подучивания забытых 
 
 class LearnManager
 {
 public:
-	LearnManager(std::weak_ptr<WordsManager> pWordsData) : _pWordsData(pWordsData) {}
-	void DoLearn(bool isLearnForgotten);
+	LearnManager() = default;
+	void DoLearn(bool isLearnForgotten, std::unique_ptr<WordsManager>& wordsManager, std::unique_ptr<CheckManager>& checkManager);
 
 private:
 	struct WordToLearn
@@ -22,7 +24,5 @@ private:
 	void PrintMaskedTranslation(const char* _str, int symbolsToShowNum);
 	void PutToQueue(std::vector<WordToLearn>& queue, const WordToLearn& wordToPut, bool needRandomInsert);
 	bool AreAllWordsLearned(std::vector<WordToLearn>& queue);
-
-	std::weak_ptr<WordsManager> _pWordsData;
 };
 
