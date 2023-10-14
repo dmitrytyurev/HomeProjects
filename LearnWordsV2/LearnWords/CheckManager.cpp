@@ -18,7 +18,6 @@ struct
 
 extern Log logger;
 
-const double COEFF1 = 20.;
 const int COEFF2 = 25;
 
 
@@ -113,7 +112,7 @@ void CheckManager::DoCheck(std::unique_ptr<WordsManager>& wordsMgr)
 	}
 	double prob = 0;
 	if (!learnedRecentlyIds.empty())	{
-		prob = std::max(1.4, (COEFF1 - double(learnedRecentlyIds.size())) / double(learnedRecentlyIds.size()));  // Выбор между недавно изученными и остальными будет с вероятностью 1 к prob
+		prob = std::max(1.4, (wordsToCheck - double(learnedRecentlyIds.size())) / double(learnedRecentlyIds.size()));  // Выбор между недавно изученными и остальными будет с вероятностью 1 к prob
 	}
 
 	// Главный цикл проверки слов
