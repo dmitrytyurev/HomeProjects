@@ -254,12 +254,18 @@ const std::vector<int>& WordsManager::getForgottenList()
 
 void WordsManager::addElementToForgottenList(int id)
 {
-	_forgottenWordsIndices.push_back(id);
+	if (std::find(std::begin(_forgottenWordsIndices), std::end(_forgottenWordsIndices), id) == std::end(_forgottenWordsIndices))
+	{
+		_forgottenWordsIndices.push_back(id);
+	}
 }
 
 //===============================================================================================
 
 void WordsManager::addElementToNotQuickList(int id)
 {
-	_notQuickWordsIndices.push_back(id);
+	if (std::find(std::begin(_notQuickWordsIndices), std::end(_notQuickWordsIndices), id) == std::end(_notQuickWordsIndices))
+	{
+		_notQuickWordsIndices.push_back(id);
+	}
 }
