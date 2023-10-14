@@ -20,6 +20,13 @@ extern Log logger;
 
 const int COEFF2 = 25;
 
+struct ConfuseWords
+{
+	std::string word1;
+	std::string word2;
+};
+std::vector<ConfuseWords> confuseWords = { {"Plummet", "Plunge"}, {"Discern", "Diverge"} };
+
 
 //===============================================================================================
 // 
@@ -27,13 +34,32 @@ const int COEFF2 = 25;
 
 int CheckManager::GetWordIdToCheck(std::unique_ptr<WordsManager>& wordsMgr, double prob, double& probSub, std::vector<int>& learnedRecentlyIds)
 {
-	if (!learnedRecentlyIds.empty())
+	// Если предыдущее слово было одним из пары, которые мы путали раньше, то выдаём теперь второе слово из этой пары
+	static std::string prevWord;
+	static std::string prevPrevWord;
+
+	int minOrderId = -1;
+
+	for (auto w : confuseWords)
+	{
+		if (w.word1 == prevWord && prevPrevWord != w.word2)
+		{
+			minOrderId = wordsMgr->GetWordIdByWord(w.word2);
+			break;
+		}
+		if (w.word2 == prevWord && prevPrevWord != w.word1)
+		{
+			minOrderId = wordsMgr->GetWordIdByWord(w.word1);
+			break;
+		}
+	}
+
+	// Выбираем слово из недавно изученных c переданной вероятностью
+	if (minOrderId == -1 && !learnedRecentlyIds.empty())
 	{
 		probSub -= 1. / (prob + 1.);
 		if (probSub < 0) {
 			probSub += 1.;
-			// Выбираем слово из недавно изученных
-			int minOrderId = -1;
 			int minOrder = INT_MAX;
 
 			for (auto id: learnedRecentlyIds)
@@ -45,23 +71,27 @@ int CheckManager::GetWordIdToCheck(std::unique_ptr<WordsManager>& wordsMgr, doub
 					minOrderId = id;
 				}
 			}
-			return minOrderId;
 		}
 	}
 
 	// Выбираем слово из остальных. К словам на которые быстро отвечали, добавляем коэффициент
-	int minOrderId = -1;
-	int minOrder = INT_MAX;
-	for (int i = 0; i < wordsMgr->GetWordsNum(); ++i)
+	if (minOrderId == -1)
 	{
-		const auto& w = wordsMgr->GetWordInfo(i);
-		int shift = w.wasQuickAnswer ? COEFF2 : 0;
-		if (!wordsMgr->isWordLearnedRecently(i) && wordsMgr->isWordLearned(i) && w.checkOrderN + shift < minOrder)
+		int minOrder = INT_MAX;
+		for (int i = 0; i < wordsMgr->GetWordsNum(); ++i)
 		{
-			minOrder = w.checkOrderN + shift;
-			minOrderId = i;
+			const auto& w = wordsMgr->GetWordInfo(i);
+			int shift = w.wasQuickAnswer ? COEFF2 : 0;
+			if (!wordsMgr->isWordLearnedRecently(i) && wordsMgr->isWordLearned(i) && w.checkOrderN + shift < minOrder)
+			{
+				minOrder = w.checkOrderN + shift;
+				minOrderId = i;
+			}
 		}
 	}
+
+	prevPrevWord = prevWord;
+	prevWord = wordsMgr->GetWordInfo(minOrderId).word;
 	return minOrderId;
 }
 

@@ -31,6 +31,7 @@ public:
 	int GetWordsNum();
 	WordInfo& GetWordInfo(int id);
 	int GetWordIdByOrder(int orderN);
+	int GetWordIdByWord(const std::string& word);
 	std::vector<int> GetUnlearnedTextsId(int textsNumNeeded);
 	int getTranslationsNum(const char* translation);
 	bool isWordLearnedRecently(int id);

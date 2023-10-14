@@ -119,6 +119,18 @@ int WordsManager::GetWordIdByOrder(int orderN)
 	return -1;
 }
 
+int WordsManager::GetWordIdByWord(const std::string& word)
+{
+	for (int i = 0; i < _words.size(); ++i)
+	{
+		if (_words[i].word == word)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
 
 //===============================================================================================
 // Вернуть число переводов в данном слове
