@@ -142,7 +142,7 @@ void CheckManager::DoCheck(std::unique_ptr<WordsManager>& wordsMgr)
 	}
 	double prob = 0;
 	if (!learnedRecentlyIds.empty())	{
-		prob = std::max(1.4, (wordsToCheck - double(learnedRecentlyIds.size())) / double(learnedRecentlyIds.size()));  // Выбор между недавно изученными и остальными будет с вероятностью 1 к prob
+		prob = std::max(0.5, (wordsToCheck - double(learnedRecentlyIds.size() + 1)) / double(learnedRecentlyIds.size() + 1));  // Выбор между недавно изученными и остальными будет с вероятностью 1 к prob
 	}
 
 	// Главный цикл проверки слов
