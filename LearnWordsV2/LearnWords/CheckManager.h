@@ -12,5 +12,5 @@ public:
 	void ProcessForget(std::unique_ptr<WordsManager>& wordsMgr, int id);
 
 private:
-	bool IsQuickAnswer(std::unique_ptr<WordsManager>& wordsManager, double milliSec, const char* translation, bool* ifTooLongAnswer = nullptr, double* extraDurationForAnswer = nullptr);
+	bool IsQuickAnswer(std::unique_ptr<WordsManager>& wordsManager, double milliSec, const char* translation);
 };

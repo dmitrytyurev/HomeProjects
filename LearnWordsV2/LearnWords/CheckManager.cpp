@@ -9,11 +9,7 @@
 #include "CheckManager.h"
 #include "WordsManager.h"
 
-struct
-{
-	int min;
-	int max;
-} quickAnswerTime[] = { {2100 * 7 / 10, 3500}, {2600 * 7 / 10, 4000}, {3100 * 7 / 10, 4500}, {3600 * 7 / 10, 5000}, {4100 * 7 / 10, 5500} }; // Время быстрого и долгого ответа в зависимости от числа переводов данного слова
+int quickAnswerTime[] = { 1470, 1820, 2170, 2520, 2870 }; // Время быстрого ответа
 
 
 extern Log logger;
@@ -164,8 +160,7 @@ void CheckManager::DoCheck(std::unique_ptr<WordsManager>& wordsMgr)
 
 		auto t_end = std::chrono::high_resolution_clock::now();
 		double durationForAnswer = std::chrono::duration<double, std::milli>(t_end - t_start).count();
-		bool ifTooLongAnswer = false;
-		bool isQuickAnswer = IsQuickAnswer(wordsMgr, durationForAnswer, wordsMgr->GetTranslation(id).c_str(), &ifTooLongAnswer);
+		bool isQuickAnswer = IsQuickAnswer(wordsMgr, durationForAnswer, wordsMgr->GetTranslation(id).c_str());
 
 		while (true)
 		{
@@ -198,17 +193,11 @@ void CheckManager::DoCheck(std::unique_ptr<WordsManager>& wordsMgr)
 //
 //===============================================================================================
 
-bool CheckManager::IsQuickAnswer(std::unique_ptr<WordsManager>& wordsMgr, double milliSec, const char* translation, bool* ifTooLongAnswer, double* extraDurationForAnswer)
+bool CheckManager::IsQuickAnswer(std::unique_ptr<WordsManager>& wordsMgr, double milliSec, const char* translation)
 {
 	int index = wordsMgr->getTranslationsNum(translation) - 1;
 	const int timesNum = sizeof(quickAnswerTime) / sizeof(quickAnswerTime[0]);
 	ClampMinmax(&index, 0, timesNum - 1);
 
-	if (ifTooLongAnswer)
-		*ifTooLongAnswer = milliSec > quickAnswerTime[index].max;
-
-	if (extraDurationForAnswer)
-		*extraDurationForAnswer = milliSec - (double)quickAnswerTime[index].min;
-
-	return milliSec < quickAnswerTime[index].min;
+	return milliSec < quickAnswerTime[index];
 }
