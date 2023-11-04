@@ -9,7 +9,7 @@
 #include "CheckManager.h"
 #include "WordsManager.h"
 
-int quickAnswerTime[] = { 1470, 1820, 2170, 2520, 2870 }; // Время быстрого ответа
+int quickAnswerTime[] = { 1300, 1820, 2170 }; // Время быстрого ответа
 
 
 extern Log logger;
