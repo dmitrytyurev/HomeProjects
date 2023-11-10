@@ -9,12 +9,12 @@
 #include "CheckManager.h"
 #include "WordsManager.h"
 
-int quickAnswerTime[] = { 1300, 1820, 2170 }; // Время быстрого ответа
+int quickAnswerTime[] = { 1334, 1820, 2170 }; // Время быстрого ответа
 
 
 extern Log logger;
 
-const int COEFF2 = 25;
+const int COEFF2 = 60;
 
 struct ConfuseWords
 {
