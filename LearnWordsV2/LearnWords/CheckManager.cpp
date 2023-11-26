@@ -9,7 +9,7 @@
 #include "CheckManager.h"
 #include "WordsManager.h"
 
-int quickAnswerTime[] = { 1334, 1820, 2170 }; // Время быстрого ответа
+int quickAnswerTime[] = { 1400, 1900, 2500 }; // Время быстрого ответа
 
 
 extern Log logger;
@@ -184,7 +184,7 @@ void CheckManager::DoCheck(std::unique_ptr<WordsManager>& wordsMgr)
 				}
 				else
 					continue;
-			logger("%s word = %s, key=%d, Quick=%d\n", GetTimeInText(time(nullptr)), wordsMgr->GetWord(id).c_str(), c, int(isQuickAnswer));
+			logger("%s word = %s, key=%d, Quick=%d, Duration=%f\n", GetTimeInText(time(nullptr)), wordsMgr->GetWord(id).c_str(), c, int(isQuickAnswer), durationForAnswer);
 			break;
 		}
 	}
