@@ -90,6 +90,23 @@ int CheckManager::GetWordIdToCheck(std::unique_ptr<WordsManager>& wordsMgr, doub
 		}
 	}
 
+	// Если выбранное слово состоит в паре слов, которые мы путали раньше, то рандомно можем выбрать второе слово из пары,
+	// чтобы слова в паре не шли всегда в одном порядке
+
+	for (auto w : confuseWords)
+	{
+		if (w.word1 == wordsMgr->GetWordInfo(minOrderId).word && w.word2 != prevWord && RandFloat(0.f, 1.f) < 0.5f)
+		{
+			minOrderId = wordsMgr->GetWordIdByWord(w.word2);
+			break;
+		}
+		if (w.word2 == wordsMgr->GetWordInfo(minOrderId).word && w.word1 != prevWord && RandFloat(0.f, 1.f) < 0.5f)
+		{
+			minOrderId = wordsMgr->GetWordIdByWord(w.word1);
+			break;
+		}
+	}
+
 	prevPrevWord = prevWord;
 	prevWord = wordsMgr->GetWordInfo(minOrderId).word;
 	return minOrderId;
