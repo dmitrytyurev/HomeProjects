@@ -63,7 +63,7 @@ void WordsManager::SetWordAsJustLearned(int id)
 {
 	_words[id].lastDaySuccCheckTimestamp = (int)std::time(nullptr);
 	_words[id].successCheckDays = 1;
-	PutWordToEndOfQueue(id, false);
+	PutWordToEndOfQueue(id, 10000);
 }
 
 void WordsManager::SetWordAsUnlearned(int id)
@@ -73,7 +73,7 @@ void WordsManager::SetWordAsUnlearned(int id)
 	_words[id].lastDaySuccCheckTimestamp = 0;
 }
 
-void WordsManager::PutWordToEndOfQueue(int id, bool wasQuickAnswer)
+void WordsManager::PutWordToEndOfQueue(int id, int timeToAnswer)
 {
 	int maxOrderN = 0;
 	for (int i = 0; i < _words.size(); ++i)
@@ -87,18 +87,8 @@ void WordsManager::PutWordToEndOfQueue(int id, bool wasQuickAnswer)
 	int prevOrderN = _words[id].checkOrderN;
 
 	_words[id].checkOrderN = maxOrderN + 1;
-	_words[id].wasQuickAnswer = wasQuickAnswer &&
-		!isWordLearnedRecently(id) &&
-		std::find(std::begin(_notQuickWordsIndices), std::end(_notQuickWordsIndices), id) == std::end(_notQuickWordsIndices);
-
-	if (_words[id].wasQuickAnswer)
-	{
-		logger("Treated as quick: ");
-	}
-	else
-	{
-		logger("Treated as not quick: ");
-	}
+	int maxPrevTimeToAnswer = _maxAnswerTime.find(id) != _maxAnswerTime.end() ? _maxAnswerTime[id] : 0;
+	_words[id].timeToAnswer = std::max(timeToAnswer, maxPrevTimeToAnswer);
 }
 
 WordsManager::WordInfo& WordsManager::GetWordInfo(int id)
@@ -274,10 +264,14 @@ void WordsManager::addElementToForgottenList(int id)
 
 //===============================================================================================
 
-void WordsManager::addElementToNotQuickList(int id)
+void WordsManager::updateMaxTimeToAnswer(int id, int timeToAnswer)
 {
-	if (std::find(std::begin(_notQuickWordsIndices), std::end(_notQuickWordsIndices), id) == std::end(_notQuickWordsIndices))
+	if (_maxAnswerTime.find(id) != _maxAnswerTime.end())
 	{
-		_notQuickWordsIndices.push_back(id);
+		_maxAnswerTime[id] = std::max(timeToAnswer, _maxAnswerTime[id]);
+	}
+	else
+	{
+		_maxAnswerTime[id] = timeToAnswer;
 	}
 }

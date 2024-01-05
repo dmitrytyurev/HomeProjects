@@ -221,7 +221,7 @@ void LearnManager::DoLearn(bool isLearnForgotten, std::unique_ptr<WordsManager>&
 				}
 				else
 				{
-					checkManager->ProcessRemember(wordsMgr, id, false);
+					checkManager->ProcessRemember(wordsMgr, id, 10000);
 				}
 				break;
 			}

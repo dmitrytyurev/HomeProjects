@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include <vector>
 #include <string>
+#include <map>
 
 class WordsManager
 {
@@ -17,7 +18,7 @@ public:
 		std::string word;
 		std::string translation;
 		int checkOrderN = 0;          // Глобальный номер выполненной проверки. Это число больше у слов, знание которых проверялось позже
-		bool wasQuickAnswer = false;  // Был ли при последней проверке слова ответ дан быстро
+		int timeToAnswer = 0;         // За сколько миллисекунд был дан ответ 
 		int successCheckDays = 0;     // Число дней, когда проходили успешные проверки. Если == 0, значит слово ещё не изучали, 1 - только что изученное слово
 		int lastDaySuccCheckTimestamp = 0;  // Таймстемп последней успешной проверки, но обновляется не чаще раза в сутки. Нужен для инкремента successCheckDays
 	};
@@ -39,14 +40,14 @@ public:
 	// Установка свойств слова
 	void SetWordAsJustLearned(int id);
 	void SetWordAsUnlearned(int id);
-	void PutWordToEndOfQueue(int id, bool wasQuickAnswer);
+	void PutWordToEndOfQueue(int id, int timeToAnswer);
 	// Работа со списком забытых при проверке слов
 	void clearForgottenList();
 	bool isForgottenListEmpty();
 	void addElementToForgottenList(int id);
 	const std::vector<int>& getForgottenList();
 	// Работа со списком слов, на которые при проверке был не быстрый ответ (ответили медленно или неправильно)
-	void addElementToNotQuickList(int id);
+	void updateMaxTimeToAnswer(int id, int timeToAnswer);
 
 private:
 	void load(const std::string& wordsFileName);
@@ -54,6 +55,6 @@ private:
 private:
 	std::string _fullFileName;
 	std::vector<int> _forgottenWordsIndices; // Индексы слов, которые были забыты при последней проверке слов
-	std::vector<int> _notQuickWordsIndices;  // Индексы слов, на которые при проверке был не быстрый ответ (ответили медленно или неправильно)
+	std::map<int, int> _maxAnswerTime;  // Ключ:индекс слова, значение: максимальное время ответа в ms, если слово было предложено несколько раз за сессию работы программы
 	std::vector<WordInfo> _words;            // База всех слов
 };

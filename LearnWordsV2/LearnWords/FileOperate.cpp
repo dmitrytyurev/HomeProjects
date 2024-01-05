@@ -104,7 +104,7 @@ void FileOperate::LoadFromFile(const char* fullFileName, std::vector<WordsManage
 			if (buffer[parseIndex] == 0 || buffer[parseIndex] == 0xd)
 				ExitMsg("Sintax error in word %s", wi.word.c_str());
 			// ---------
-			wi.wasQuickAnswer = LoadIntFromArray(buffer, &parseIndex) != 0;
+			wi.timeToAnswer = LoadIntFromArray(buffer, &parseIndex);
 			while (buffer[parseIndex] != 0 && buffer[parseIndex] != 0xd)
 				++parseIndex;
 		}
@@ -150,7 +150,7 @@ void FileOperate::SaveToFile(const char* fullFileName, const std::vector<WordsMa
 				e.checkOrderN,
 				e.successCheckDays,
 				e.lastDaySuccCheckTimestamp,
-				int(e.wasQuickAnswer));
+				e.timeToAnswer);
 
 			fprintf(f, "\n");
 		}

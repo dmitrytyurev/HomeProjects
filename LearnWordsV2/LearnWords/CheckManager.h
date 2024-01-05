@@ -8,7 +8,7 @@ public:
 	CheckManager() = default;
 	void DoCheck(std::unique_ptr<WordsManager>& wordsManager);
 	int GetWordIdToCheck(std::unique_ptr<WordsManager>& wordsManager, double prob, double& probSub, std::vector<int>& learnedRecentlyIds);
-	void ProcessRemember(std::unique_ptr<WordsManager>& wordsMgr, int id, bool isQuickAnswer);
+	void ProcessRemember(std::unique_ptr<WordsManager>& wordsMgr, int id, int timeToAnswer);
 	void ProcessForget(std::unique_ptr<WordsManager>& wordsMgr, int id);
 
 private:

@@ -14,7 +14,8 @@ int quickAnswerTime[] = { 1400, 1900, 2500 }; // Время быстрого о�
 
 extern Log logger;
 
-const int COEFF2 = 60;
+const int COEFF1 = 800; // Количество миллисекунд в течение которых полностью растрачивается преимущество по быстрому времени ответа
+const int COEFF2 = 120;  // Максимальный сдвиг вперёд в очереди для слов, на которые ответил быстро
 
 struct ConfuseWords
 {
@@ -77,7 +78,10 @@ int CheckManager::GetWordIdToCheck(std::unique_ptr<WordsManager>& wordsMgr, doub
 		for (int i = 0; i < wordsMgr->GetWordsNum(); ++i)
 		{
 			const auto& w = wordsMgr->GetWordInfo(i);
-			int shift = w.wasQuickAnswer ? COEFF2 : 0;
+
+			int shift = COEFF2 - COEFF2 * (w.timeToAnswer - quickAnswerTime[0]) / COEFF1;
+			ClampMinmax(&shift, 0, COEFF2);
+
 			if (!wordsMgr->isWordLearnedRecently(i) && wordsMgr->isWordLearned(i) && w.checkOrderN + shift < minOrder)
 			{
 				minOrder = w.checkOrderN + shift;
@@ -95,7 +99,7 @@ int CheckManager::GetWordIdToCheck(std::unique_ptr<WordsManager>& wordsMgr, doub
 // 
 //===============================================================================================
 
-void CheckManager::ProcessRemember(std::unique_ptr<WordsManager>& wordsMgr, int id, bool isQuickAnswer)
+void CheckManager::ProcessRemember(std::unique_ptr<WordsManager>& wordsMgr, int id, int timeToAnswer)
 {
 	WordsManager::WordInfo& w = wordsMgr->GetWordInfo(id);
 	int curTimestamp = (int)std::time(nullptr);
@@ -103,16 +107,14 @@ void CheckManager::ProcessRemember(std::unique_ptr<WordsManager>& wordsMgr, int 
 		w.lastDaySuccCheckTimestamp = curTimestamp;
 		w.successCheckDays++;
 	}
-	wordsMgr->PutWordToEndOfQueue(id, isQuickAnswer);
+	wordsMgr->PutWordToEndOfQueue(id, timeToAnswer);
 	wordsMgr->save();
-	if (!isQuickAnswer) {
-		wordsMgr->addElementToNotQuickList(id);
-	}
+	wordsMgr->updateMaxTimeToAnswer(id, timeToAnswer);
 }
 
 void CheckManager::ProcessForget(std::unique_ptr<WordsManager>& wordsMgr, int id)
 {
-	wordsMgr->addElementToNotQuickList(id);
+	wordsMgr->updateMaxTimeToAnswer(id, 10000);
 	wordsMgr->addElementToForgottenList(id);
 	wordsMgr->SetWordAsJustLearned(id);
 	wordsMgr->save();
@@ -159,8 +161,7 @@ void CheckManager::DoCheck(std::unique_ptr<WordsManager>& wordsMgr)
 		} while (c != ' ');
 
 		auto t_end = std::chrono::high_resolution_clock::now();
-		double durationForAnswer = std::chrono::duration<double, std::milli>(t_end - t_start).count();
-		bool isQuickAnswer = IsQuickAnswer(wordsMgr, durationForAnswer, wordsMgr->GetTranslation(id).c_str());
+		int durationForAnswer = static_cast<int>(std::chrono::duration<double, std::milli>(t_end - t_start).count());
 
 		while (true)
 		{
@@ -168,14 +169,14 @@ void CheckManager::DoCheck(std::unique_ptr<WordsManager>& wordsMgr)
 			printf("\n\n===============================\n %s\n===============================\n", wordsMgr->GetWord(id).c_str());
 			wordsMgr->printTranslationDecorated(wordsMgr->GetTranslation(id));
 			printf("\n\n  Arrow up  - I remember!\n  Arrow down   - I am not sure\n");
-			printf("\n  Remain: %d, Quick = %d\n", wordsToCheck - i - 1, int(isQuickAnswer));
+			printf("\n  Remain: %d, Time = %d\n", wordsToCheck - i - 1, durationForAnswer);
 
 			c = GetchFiltered();
 			if (c == 27)
 				return;
 			if (c == 72)  // Стрелка вверх
 			{
-				ProcessRemember(wordsMgr, id, isQuickAnswer);
+				ProcessRemember(wordsMgr, id, durationForAnswer);
 			}
 			else
 				if (c == 80) // Стрелка вниз
@@ -184,7 +185,7 @@ void CheckManager::DoCheck(std::unique_ptr<WordsManager>& wordsMgr)
 				}
 				else
 					continue;
-			logger("%s word = %s, key=%d, Quick=%d, Duration=%f\n", GetTimeInText(time(nullptr)), wordsMgr->GetWord(id).c_str(), c, int(isQuickAnswer), durationForAnswer);
+			logger("%s word = %s, key=%d, Quick=%d, Duration=%f\n", GetTimeInText(time(nullptr)), wordsMgr->GetWord(id).c_str(), c, durationForAnswer, durationForAnswer);
 			break;
 		}
 	}
