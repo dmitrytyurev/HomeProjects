@@ -22,7 +22,11 @@ struct ConfuseWords
 	std::string word1;
 	std::string word2;
 };
-std::vector<ConfuseWords> confuseWords = { {"Plummet", "Plunge"}, {"Discern", "Diverge"} };
+std::vector<ConfuseWords> confuseWords = { {"Plummet", "Plunge"},
+	{"Discern", "Diverge"},
+	{"Gear up", "Rev up"},
+	{"Endorse", "Endure"},
+	{"Fiddly", "Flimsy"} };
 
 
 //===============================================================================================
