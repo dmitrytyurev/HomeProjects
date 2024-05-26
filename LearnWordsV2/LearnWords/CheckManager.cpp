@@ -26,7 +26,8 @@ std::vector<ConfuseWords> confuseWords = { {"Plummet", "Plunge"},
 	{"Discern", "Diverge"},
 	{"Gear up", "Rev up"},
 	{"Endorse", "Endure"},
-	{"Fiddly", "Flimsy"} };
+	{"Fiddly", "Flimsy"},
+	{"Conceive", "Comprehensive"}};
 
 
 //===============================================================================================
