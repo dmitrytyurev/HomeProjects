@@ -64,3 +64,5 @@ SpecialThread
 /Smoke/**/*.zip
 /Smoke/**/*.txt
 */.vs/*
+/Doom/Textures/*.psd
+/LearnWordsV2/Words.bak
