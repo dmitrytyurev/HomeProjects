@@ -1,0 +1,2052 @@
+1
+00:00:00,120 --> 00:00:02,070
+- [Derek] The modern era of electronics
+
+2
+00:00:02,070 --> 00:00:03,970
+began with the light bulb
+
+3
+00:00:04,860 --> 00:00:06,963
+but not in the way you might think.
+
+4
+00:00:08,010 --> 00:00:10,290
+Early light bulbs consisted
+of a carbon filament
+
+5
+00:00:10,290 --> 00:00:11,851
+sealed inside a glass bulb
+
+6
+00:00:11,851 --> 00:00:14,040
+with a vacuum inside.
+
+7
+00:00:14,040 --> 00:00:16,830
+When a potential difference was
+applied across the filament,
+
+8
+00:00:16,830 --> 00:00:18,510
+current flowed through it,
+
+9
+00:00:18,510 --> 00:00:21,210
+heating it up to over 2000 Kelvin,
+
+10
+00:00:21,210 --> 00:00:23,430
+so hot that it glowed.
+
+11
+00:00:23,430 --> 00:00:25,620
+If there had been much oxygen in the bulb,
+
+12
+00:00:25,620 --> 00:00:28,140
+the filament would've burned immediately.
+
+13
+00:00:28,140 --> 00:00:30,630
+That was the reason for the vacuum.
+
+14
+00:00:30,630 --> 00:00:32,790
+But from the perspective of electronics,
+
+15
+00:00:32,790 --> 00:00:35,580
+the real breakthrough came
+from a curious observation
+
+16
+00:00:35,580 --> 00:00:37,413
+made by Thomas Edison.
+
+17
+00:00:38,340 --> 00:00:40,512
+He saw that over a bulb's lifetime,
+
+18
+00:00:40,512 --> 00:00:43,200
+the glass became discolored,
+
+19
+00:00:43,200 --> 00:00:45,600
+turning yellow, and then brown,
+
+20
+00:00:45,600 --> 00:00:48,360
+but only on one side.
+
+21
+00:00:48,360 --> 00:00:50,283
+So what was going on?
+
+22
+00:00:51,180 --> 00:00:54,840
+Well, the heated filament
+emits not only light and heat
+
+23
+00:00:54,840 --> 00:00:57,000
+but also electrons.
+
+24
+00:00:57,000 --> 00:00:59,524
+You can think of them being
+boiled off the surface
+
+25
+00:00:59,524 --> 00:01:01,290
+of the carbon.
+
+26
+00:01:01,290 --> 00:01:04,019
+This phenomenon, known
+as thermionic emission,
+
+27
+00:01:04,019 --> 00:01:06,090
+had twice been discovered independently
+
+28
+00:01:06,090 --> 00:01:09,390
+by other scientists up
+to 27 years earlier.
+
+29
+00:01:09,390 --> 00:01:13,020
+But after Edison, it became widely known.
+
+30
+00:01:13,020 --> 00:01:14,070
+In fact, for a time,
+
+31
+00:01:14,070 --> 00:01:16,290
+the emission of electrons
+off a hot filament
+
+32
+00:01:16,290 --> 00:01:18,990
+was called the Edison effect.
+
+33
+00:01:18,990 --> 00:01:21,923
+Now, these electrons floating
+around were unobstructed
+
+34
+00:01:21,923 --> 00:01:24,210
+because they're in a vacuum.
+
+35
+00:01:24,210 --> 00:01:25,950
+But since there was a potential difference
+
+36
+00:01:25,950 --> 00:01:27,990
+across the wires that led to the filament,
+
+37
+00:01:27,990 --> 00:01:31,380
+the electrons were attracted
+to the positive wire.
+
+38
+00:01:31,380 --> 00:01:33,690
+So they accelerated towards it
+
+39
+00:01:33,690 --> 00:01:35,773
+and most would whizz straight past it
+
+40
+00:01:35,773 --> 00:01:38,010
+and crash into the glass,
+
+41
+00:01:38,010 --> 00:01:42,810
+over time discoloring it
+only on the positive side.
+
+42
+00:01:42,810 --> 00:01:45,258
+I should note that Edison
+was using DC electricity.
+
+43
+00:01:45,258 --> 00:01:47,460
+If he had been using AC,
+
+44
+00:01:47,460 --> 00:01:50,580
+then both sides would've been discolored.
+
+45
+00:01:50,580 --> 00:01:53,040
+But it was this observation
+that set the scene
+
+46
+00:01:53,040 --> 00:01:54,810
+for an electronics revolution,
+
+47
+00:01:54,810 --> 00:01:58,173
+and eventually the
+first digital computers.
+
+48
+00:01:59,910 --> 00:02:02,768
+In 1904, John Ambrose
+Fleming patented a device
+
+49
+00:02:02,768 --> 00:02:05,700
+that was very similar
+to Edison's light bulb,
+
+50
+00:02:05,700 --> 00:02:08,220
+but with one important addition:
+
+51
+00:02:08,220 --> 00:02:10,979
+a second electrode in the bulb.
+
+52
+00:02:10,979 --> 00:02:12,661
+By charging this plate positively
+
+53
+00:02:12,661 --> 00:02:14,310
+with respect to the filament,
+
+54
+00:02:14,310 --> 00:02:16,890
+electrons could be
+accelerated across the gap,
+
+55
+00:02:16,890 --> 00:02:18,600
+completing the circuit.
+
+56
+00:02:18,600 --> 00:02:20,430
+But if the plate were slightly negative
+
+57
+00:02:20,430 --> 00:02:21,660
+relative to the filament,
+
+58
+00:02:21,660 --> 00:02:23,220
+then it would repel electrons
+
+59
+00:02:23,220 --> 00:02:25,380
+and no current would flow.
+
+60
+00:02:25,380 --> 00:02:29,460
+Fleming called his device a
+one-way street for electricity.
+
+61
+00:02:29,460 --> 00:02:31,920
+Since only one of the
+electrodes was heated,
+
+62
+00:02:31,920 --> 00:02:34,770
+electrons could only flow
+from there to the plate
+
+63
+00:02:34,770 --> 00:02:37,110
+and not the other way around.
+
+64
+00:02:37,110 --> 00:02:39,840
+The device was called a thermionic diode
+
+65
+00:02:39,840 --> 00:02:43,320
+and it was used initially
+for detecting radio signals
+
+66
+00:02:43,320 --> 00:02:44,700
+but it could also convert
+
+67
+00:02:44,700 --> 00:02:47,223
+alternating current to direct current.
+
+68
+00:02:48,210 --> 00:02:51,180
+Scientists quickly realized
+that a more efficient design
+
+69
+00:02:51,180 --> 00:02:52,502
+had the filament in the center
+
+70
+00:02:52,502 --> 00:02:54,962
+and the other electrode
+to the plate or anode
+
+71
+00:02:54,962 --> 00:02:57,480
+as a cylinder surrounding it.
+
+72
+00:02:57,480 --> 00:02:59,713
+This geometry captured
+more of the electrons
+
+73
+00:02:59,713 --> 00:03:01,140
+coming off the filament
+
+74
+00:03:01,140 --> 00:03:03,693
+and allowed for larger currents to flow.
+
+75
+00:03:06,684 --> 00:03:09,270
+-  Oh, there she goes.
+
+76
+00:03:09,270 --> 00:03:10,890
+- [Derek] With just one of these diodes,
+
+77
+00:03:10,890 --> 00:03:15,240
+you could convert AC
+into a bumpy kind of DC.
+
+78
+00:03:15,240 --> 00:03:17,260
+But combining a few diodes and a capacitor
+
+79
+00:03:17,260 --> 00:03:21,030
+led to a fairly steady direct current,
+
+80
+00:03:21,030 --> 00:03:22,590
+and this was a big deal.
+
+81
+00:03:22,590 --> 00:03:25,440
+It was the first practical
+vacuum tube device
+
+82
+00:03:25,440 --> 00:03:27,660
+and the model for all vacuum tubes
+
+83
+00:03:27,660 --> 00:03:28,890
+that would dominate the industry
+
+84
+00:03:28,890 --> 00:03:30,453
+for the next half century.
+
+85
+00:03:33,450 --> 00:03:34,740
+In the early 1900s,
+
+86
+00:03:34,740 --> 00:03:37,890
+the big problem in
+electronics was amplification.
+
+87
+00:03:37,890 --> 00:03:39,690
+Radio had just been invented
+
+88
+00:03:39,690 --> 00:03:41,100
+but its range was limited
+
+89
+00:03:41,100 --> 00:03:42,840
+by the lack of reliable equipment
+
+90
+00:03:42,840 --> 00:03:44,940
+that could boost weak signals.
+
+91
+00:03:44,940 --> 00:03:47,040
+Similarly, telephone calls were limited
+
+92
+00:03:47,040 --> 00:03:49,680
+to at most 1300 kilometers
+
+93
+00:03:49,680 --> 00:03:50,850
+because by that point,
+
+94
+00:03:50,850 --> 00:03:53,544
+the signal was two faint to hear.
+
+95
+00:03:53,544 --> 00:03:55,941
+Rudimentary form of
+amplification had been built
+
+96
+00:03:55,941 --> 00:03:59,400
+for telegraph operation called the relay.
+
+97
+00:03:59,400 --> 00:04:01,980
+In a relay, there is an electromagnet.
+
+98
+00:04:01,980 --> 00:04:04,380
+And when current flows
+through that electromagnet,
+
+99
+00:04:04,380 --> 00:04:06,180
+it attracts a switch,
+
+100
+00:04:06,180 --> 00:04:08,340
+turning on a second circuit.
+
+101
+00:04:08,340 --> 00:04:10,470
+But when the current through
+the electromagnet stops,
+
+102
+00:04:10,470 --> 00:04:11,820
+the switch is released
+
+103
+00:04:11,820 --> 00:04:14,400
+and the second circuit is open again.
+
+104
+00:04:14,400 --> 00:04:16,350
+This device works well for amplifying
+
+105
+00:04:16,350 --> 00:04:19,709
+the dots and dashes of Morse
+code along a telegraph line
+
+106
+00:04:19,709 --> 00:04:21,929
+but its binary output means it's incapable
+
+107
+00:04:21,930 --> 00:04:24,983
+of amplifying the complex
+and analog signals
+
+108
+00:04:24,983 --> 00:04:27,573
+of phone calls and radio waves.
+
+109
+00:04:28,800 --> 00:04:31,530
+And that's why it was such
+a breakthrough in 1906
+
+110
+00:04:31,530 --> 00:04:33,720
+when Lee de Forest took the diode
+
+111
+00:04:33,720 --> 00:04:36,750
+and added another electrode into the bulb.
+
+112
+00:04:36,750 --> 00:04:39,630
+This electrode wasn't
+a solid piece of metal
+
+113
+00:04:39,630 --> 00:04:42,240
+but rather a sparse wire mesh
+
+114
+00:04:42,240 --> 00:04:45,660
+and it was positioned in
+between the filament or cathode
+
+115
+00:04:45,660 --> 00:04:47,280
+and the anode.
+
+116
+00:04:47,280 --> 00:04:50,910
+With three electrodes,
+it was called a triode.
+
+117
+00:04:50,910 --> 00:04:53,250
+Now, a large potential
+difference could be applied
+
+118
+00:04:53,250 --> 00:04:55,380
+across the anode and cathode
+
+119
+00:04:55,380 --> 00:04:56,520
+but the number of electrons
+
+120
+00:04:56,520 --> 00:04:58,560
+that actually flowed between them
+
+121
+00:04:58,560 --> 00:05:01,350
+was controlled by the voltage on the grid,
+
+122
+00:05:01,350 --> 00:05:03,600
+as this new electrode was known.
+
+123
+00:05:03,600 --> 00:05:05,760
+If the grid were slightly
+negatively charged,
+
+124
+00:05:05,760 --> 00:05:07,890
+it repelled electrons from the filament
+
+125
+00:05:07,890 --> 00:05:10,290
+so that none could flow
+through to the anode.
+
+126
+00:05:10,290 --> 00:05:12,300
+But if the grid were slightly positive,
+
+127
+00:05:12,300 --> 00:05:15,480
+then electrons were attracted
+away from the filament
+
+128
+00:05:15,480 --> 00:05:18,030
+and most of them would pass
+through the holes in the grid,
+
+129
+00:05:18,030 --> 00:05:20,580
+and then accelerate to the anode.
+
+130
+00:05:20,580 --> 00:05:24,300
+So in this way, a small
+change in voltage on the grid
+
+131
+00:05:24,300 --> 00:05:27,540
+can control a huge voltage at the anode
+
+132
+00:05:27,540 --> 00:05:29,040
+and the response is rapid.
+
+133
+00:05:29,040 --> 00:05:32,520
+So you can get high
+frequency amplification.
+
+134
+00:05:32,520 --> 00:05:33,630
+I like to think of it
+
+135
+00:05:33,630 --> 00:05:36,180
+as standing at the top of a high cliff,
+
+136
+00:05:36,180 --> 00:05:39,630
+opening and closing a valve on a big water pipe.
+
+137
+00:05:39,630 --> 00:05:42,690
+I mean, it doesn't take much
+energy to turn the valve
+
+138
+00:05:42,690 --> 00:05:44,542
+but that small input is converted
+
+139
+00:05:44,542 --> 00:05:49,113
+into a huge output of water
+falling down the cliff.
+
+140
+00:05:50,730 --> 00:05:52,299
+- [Derek] You're powering
+up this track here.
+
+141
+00:05:52,299 --> 00:05:54,510
+- [David] Warming up, you
+can see it warming up there.
+
+142
+00:05:54,510 --> 00:05:56,062
+- [Derek] So the yellow is the input?
+
+143
+00:05:56,062 --> 00:05:57,360
+- [David] Yellow is the input.
+
+144
+00:05:57,360 --> 00:05:58,620
+Purple is the output.
+
+145
+00:05:58,620 --> 00:06:00,247
+We have essentially a two-volt change
+
+146
+00:06:00,247 --> 00:06:02,250
+on the input giving us, what is this?
+
+147
+00:06:02,250 --> 00:06:06,360
+Five volts, so five, 10,
+15-volt change on the output.
+
+148
+00:06:06,360 --> 00:06:07,680
+- [Derek] For this demonstration,
+
+149
+00:06:07,680 --> 00:06:10,290
+we were only using 24 volts on the anode.
+
+150
+00:06:10,290 --> 00:06:11,820
+If we had used a higher voltage,
+
+151
+00:06:11,820 --> 00:06:14,520
+we could have got a lot more amplification
+
+152
+00:06:14,520 --> 00:06:16,650
+and people did.
+
+153
+00:06:16,650 --> 00:06:18,660
+This was the device that allowed us
+
+154
+00:06:18,660 --> 00:06:21,390
+to call long distance for the first time.
+
+155
+00:06:21,390 --> 00:06:22,440
+Using vacuum tubes,
+
+156
+00:06:22,440 --> 00:06:23,972
+the first transcontinental call
+
+157
+00:06:23,972 --> 00:06:25,830
+from New York to San Francisco
+
+158
+00:06:25,830 --> 00:06:29,433
+took place on the 25th of January, 1915.
+
+159
+00:06:31,710 --> 00:06:33,000
+- [Derek] Whoa.
+
+160
+00:06:33,000 --> 00:06:34,290
+- [David] Yeah, there we go,
+
+161
+00:06:34,290 --> 00:06:36,090
+should be 10 volts.
+
+162
+00:06:36,090 --> 00:06:37,736
+- [Derek] It's hard to see the grid here
+
+163
+00:06:37,736 --> 00:06:40,980
+because just like with
+the cylindrical diode,
+
+164
+00:06:40,980 --> 00:06:42,488
+the best configuration for a triode
+
+165
+00:06:42,488 --> 00:06:45,120
+is to have a cylindrical configuration.
+
+166
+00:06:45,120 --> 00:06:46,378
+The anode is on the outside,
+
+167
+00:06:46,378 --> 00:06:48,361
+the grid is cylindrically inside that,
+
+168
+00:06:48,361 --> 00:06:51,483
+and the cathode or
+filament is in the center.
+
+169
+00:06:52,530 --> 00:06:55,140
+The invention of the triode
+was incredibly important.
+
+170
+00:06:55,140 --> 00:06:58,830
+Radios, TVs, whatever
+electronics people had
+
+171
+00:06:58,830 --> 00:07:00,810
+were powered by vacuum tubes.
+
+172
+00:07:00,810 --> 00:07:02,730
+You would've had so many in your house
+
+173
+00:07:02,730 --> 00:07:05,760
+even up until the 1960s and '70s.
+
+174
+00:07:05,760 --> 00:07:09,303
+But vacuum tubes weren't done
+revolutionizing electronics.
+
+175
+00:07:10,500 --> 00:07:12,630
+In his 1937 thesis,
+
+176
+00:07:12,630 --> 00:07:15,810
+Claude Shannon found a connection
+between electric circuits
+
+177
+00:07:15,810 --> 00:07:19,410
+and a branch of mathematics
+known as Boolean algebra.
+
+178
+00:07:19,410 --> 00:07:21,390
+Working in the mid-1800s,
+
+179
+00:07:21,390 --> 00:07:23,340
+George Boole was trying to find
+
+180
+00:07:23,340 --> 00:07:25,710
+a mathematical foundation for logic.
+
+181
+00:07:25,710 --> 00:07:26,730
+Under his system,
+
+182
+00:07:26,730 --> 00:07:28,320
+a true statement was represented
+
+183
+00:07:28,320 --> 00:07:31,380
+as a 1 and a false statement as a 0.
+
+184
+00:07:31,380 --> 00:07:35,340
+And Boole also developed
+a few operations like AND.
+
+185
+00:07:35,340 --> 00:07:37,423
+If both statements A and B were true,
+
+186
+00:07:37,423 --> 00:07:40,143
+then the output would also be true.
+
+187
+00:07:41,310 --> 00:07:43,920
+What Shannon realized is
+that Boole's operations
+
+188
+00:07:43,920 --> 00:07:46,620
+could be represented
+as electronic circuits,
+
+189
+00:07:46,620 --> 00:07:48,090
+that there was an equivalence
+
+190
+00:07:48,090 --> 00:07:50,190
+between mathematical statements
+
+191
+00:07:50,190 --> 00:07:51,990
+and electric circuits.
+
+192
+00:07:51,990 --> 00:07:55,110
+All you needed to realize these
+circuits in the real world
+
+193
+00:07:55,110 --> 00:07:56,823
+were a couple switches.
+
+194
+00:07:57,780 --> 00:07:59,820
+That same year, 1937,
+
+195
+00:07:59,820 --> 00:08:02,910
+George Stibitz built the
+first digital calculator.
+
+196
+00:08:02,910 --> 00:08:06,330
+It could add two 1-bit binary numbers.
+
+197
+00:08:06,330 --> 00:08:08,250
+That is it could add two numbers
+
+198
+00:08:08,250 --> 00:08:11,070
+so long as they were either 0 or 1.
+
+199
+00:08:11,070 --> 00:08:13,500
+The calculator worked using a relay,
+
+200
+00:08:13,500 --> 00:08:16,500
+that electromechanical
+switch from telegraphy.
+
+201
+00:08:16,500 --> 00:08:17,880
+There were two inputs.
+
+202
+00:08:17,880 --> 00:08:20,520
+If they were left open, the input was 0.
+
+203
+00:08:20,520 --> 00:08:22,770
+If closed, it was a 1.
+
+204
+00:08:22,770 --> 00:08:25,283
+The output was shown with two light bulbs.
+
+205
+00:08:25,283 --> 00:08:26,970
+If no lights were on,
+
+206
+00:08:26,970 --> 00:08:28,260
+the answer was 0.
+
+207
+00:08:28,260 --> 00:08:29,730
+If the output light was on,
+
+208
+00:08:29,730 --> 00:08:30,810
+the answer was 1.
+
+209
+00:08:30,810 --> 00:08:32,100
+And if the carry light was on,
+
+210
+00:08:32,100 --> 00:08:33,630
+the answer was a 2.
+
+211
+00:08:33,630 --> 00:08:36,690
+The circuit diagram works like this.
+
+212
+00:08:36,690 --> 00:08:39,419
+If neither switch A or B is closed,
+
+213
+00:08:39,419 --> 00:08:41,249
+so adding 0 + 0,
+
+214
+00:08:41,250 --> 00:08:43,440
+then no current flows through the circuit
+
+215
+00:08:43,440 --> 00:08:45,600
+and no light bulb would light up.
+
+216
+00:08:45,600 --> 00:08:47,550
+But if input A was closed,
+
+217
+00:08:47,550 --> 00:08:49,200
+the current would flow
+through the solenoid,
+
+218
+00:08:49,200 --> 00:08:50,820
+creating a magnetic field
+
+219
+00:08:50,820 --> 00:08:53,460
+that pulls the switch inside it closed,
+
+220
+00:08:53,460 --> 00:08:55,845
+and this connects the
+output light bulb to power
+
+221
+00:08:55,845 --> 00:08:58,020
+and disconnects the carry light bulb.
+
+222
+00:08:58,020 --> 00:09:00,510
+So the output light bulb lights up,
+
+223
+00:09:00,510 --> 00:09:02,430
+meaning that the answer is 1.
+
+224
+00:09:02,430 --> 00:09:03,540
+And the same thing would happen
+
+225
+00:09:03,540 --> 00:09:07,050
+when input B was closed and A was open.
+
+226
+00:09:07,050 --> 00:09:09,609
+But if you closed both
+A and B simultaneously,
+
+227
+00:09:09,609 --> 00:09:13,110
+then there is no current
+flowing through the solenoid
+
+228
+00:09:13,110 --> 00:09:14,970
+but there would be a current flowing
+
+229
+00:09:14,970 --> 00:09:16,248
+from the battery connected to A,
+
+230
+00:09:16,248 --> 00:09:18,720
+which is connected to
+the carry light bulb.
+
+231
+00:09:18,720 --> 00:09:23,070
+So it lights up indicating 1 + 1 equals 2.
+
+232
+00:09:23,070 --> 00:09:25,239
+This is the beginning of the digital age,
+
+233
+00:09:25,239 --> 00:09:27,630
+and no it was not glamorous.
+
+234
+00:09:27,630 --> 00:09:30,539
+Stibitz built his device
+out of a few batteries,
+
+235
+00:09:30,539 --> 00:09:33,630
+light bulbs, and relays
+he had lying around.
+
+236
+00:09:33,630 --> 00:09:37,050
+And for the inputs, he
+cut up a tin of tobacco.
+
+237
+00:09:37,050 --> 00:09:39,450
+He built it in one night
+at his kitchen table
+
+238
+00:09:39,450 --> 00:09:42,720
+which is why it became
+known as the Model K.
+
+239
+00:09:42,720 --> 00:09:44,160
+The circuit that Stibitz built
+
+240
+00:09:44,160 --> 00:09:46,560
+is now called a half adder.
+
+241
+00:09:46,560 --> 00:09:47,910
+But if you look at the circuit
+
+242
+00:09:47,910 --> 00:09:49,650
+through the eyes of Claude Shannon,
+
+243
+00:09:49,650 --> 00:09:53,280
+you realize it's actually
+a pair of logic gates.
+
+244
+00:09:53,280 --> 00:09:55,290
+The output light bulb should turn on
+
+245
+00:09:55,290 --> 00:09:59,460
+when either A or B, but
+not both, are closed,
+
+246
+00:09:59,460 --> 00:10:02,850
+so this is known as an exclusive OR gate.
+
+247
+00:10:02,850 --> 00:10:04,890
+Whereas the carry light
+bulb should only turn on
+
+248
+00:10:04,890 --> 00:10:07,034
+when both A and B are closed,
+
+249
+00:10:07,034 --> 00:10:10,140
+so this is an AND gate.
+
+250
+00:10:10,140 --> 00:10:12,300
+This circuit uses electrical versions
+
+251
+00:10:12,300 --> 00:10:15,570
+of Boolean operators, XOR and AND.
+
+252
+00:10:15,570 --> 00:10:17,790
+And it's possible to build
+other Boolean operators
+
+253
+00:10:17,790 --> 00:10:18,742
+as electronic gates
+
+254
+00:10:18,742 --> 00:10:22,470
+for things like OR, NOR, and NAND.
+
+255
+00:10:22,470 --> 00:10:24,930
+And you might say, what's the big deal?
+
+256
+00:10:24,930 --> 00:10:26,640
+I mean, the big deal is
+that you just tricked
+
+257
+00:10:26,640 --> 00:10:29,160
+a bunch of electrons
+into doing math for you.
+
+258
+00:10:29,160 --> 00:10:30,927
+Sure, it's very simple math,
+
+259
+00:10:30,927 --> 00:10:33,570
+but you could connect a bunch
+of these half adders together
+
+260
+00:10:33,570 --> 00:10:35,526
+and build more and more
+complicated circuits
+
+261
+00:10:35,526 --> 00:10:38,340
+that could do more complex math,
+
+262
+00:10:38,340 --> 00:10:40,080
+which is exactly what Stibitz
+
+263
+00:10:40,080 --> 00:10:42,270
+and his colleagues at Bell Labs did.
+
+264
+00:10:42,270 --> 00:10:44,550
+Two years later, they built the model I,
+
+265
+00:10:44,550 --> 00:10:46,680
+which had more than 400 relays
+
+266
+00:10:46,680 --> 00:10:48,960
+and could add two eight
+digit numbers together
+
+267
+00:10:48,960 --> 00:10:50,490
+in a 10th of a second.
+
+268
+00:10:50,490 --> 00:10:52,590
+It could also multiply eight digit numbers
+
+269
+00:10:52,590 --> 00:10:54,870
+and do multiplication of complex numbers,
+
+270
+00:10:54,870 --> 00:10:57,420
+though these more complicated
+operations took longer,
+
+271
+00:10:57,420 --> 00:10:59,550
+about a minute per calculation.
+
+272
+00:10:59,550 --> 00:11:01,909
+- So you put a voltage through a coil
+
+273
+00:11:01,909 --> 00:11:04,470
+and it'll turn that switch on or off.
+
+274
+00:11:04,470 --> 00:11:06,963
+So you've got your two operands here.
+
+275
+00:11:07,920 --> 00:11:09,960
+And if you wanna add two numbers together,
+
+276
+00:11:09,960 --> 00:11:11,130
+so 2 is this,
+
+277
+00:11:11,130 --> 00:11:12,783
+3 is this, right?
+
+278
+00:11:12,783 --> 00:11:16,290
+So 1, 0 is 2.
+
+279
+00:11:16,290 --> 00:11:17,123
+- [Derek] Yeah.
+
+280
+00:11:17,123 --> 00:11:19,470
+- [David] And 1, 1 is 3.
+
+281
+00:11:19,470 --> 00:11:21,270
+And so then when you want to calculate it,
+
+282
+00:11:21,270 --> 00:11:23,120
+you just hit the go button down here.
+
+283
+00:11:24,300 --> 00:11:26,100
+We get 101.
+
+284
+00:11:26,100 --> 00:11:28,140
+- [Derek] I love the sound of that.
+
+285
+00:11:28,140 --> 00:11:29,010
+That is amazing.
+
+286
+00:11:29,010 --> 00:11:31,293
+- It's magical, so if
+you wanna do like say,
+
+287
+00:11:32,157 --> 00:11:35,370
+8 plus, that would be 4
+
+288
+00:11:35,370 --> 00:11:37,439
+so 8 + 8, I think, right?
+
+289
+00:11:37,439 --> 00:11:38,272
+- [Derek] Okay.
+
+290
+00:11:38,272 --> 00:11:39,105
+- [David] Yeah, 8 + 8,
+
+291
+00:11:39,105 --> 00:11:41,190
+that would be, 16, no,
+it clears it on its own.
+
+292
+00:11:41,190 --> 00:11:42,450
+- [Derek] Okay.
+
+293
+00:11:42,450 --> 00:11:44,430
+- [David] There you go.
+
+294
+00:11:44,430 --> 00:11:46,419
+Eight plus eight is 16 in binary,
+
+295
+00:11:46,419 --> 00:11:49,713
+which would be 1 0 0 0 0.
+
+296
+00:11:50,576 --> 00:11:52,350
+(machine clacking)
+
+297
+00:11:52,350 --> 00:11:54,990
+This is essentially a
+1-bit arithmetic unit.
+
+298
+00:11:54,990 --> 00:11:56,250
+There's no logic functions.
+
+299
+00:11:56,250 --> 00:11:57,780
+It only ever does add.
+
+300
+00:11:57,780 --> 00:12:00,026
+Now, let's say we wanna do 5 - 2,
+
+301
+00:12:00,026 --> 00:12:01,560
+the answer's gonna be 3.
+
+302
+00:12:01,560 --> 00:12:02,850
+So we flip this little switch here
+
+303
+00:12:02,850 --> 00:12:05,340
+that lets me know that I'm
+doing a subtraction operation
+
+304
+00:12:05,340 --> 00:12:08,190
+and we do subtraction
+by doing 2's complement.
+
+305
+00:12:08,190 --> 00:12:09,180
+So essentially what we're doing
+
+306
+00:12:09,180 --> 00:12:11,580
+is we're inverting one of the operands
+
+307
+00:12:11,580 --> 00:12:13,200
+and we're adding one.
+
+308
+00:12:13,200 --> 00:12:14,181
+So now when I run it,
+
+309
+00:12:14,181 --> 00:12:15,720
+(machine clacking)
+
+310
+00:12:15,720 --> 00:12:18,209
+we can see 5 - 2 is equal to 3,
+
+311
+00:12:18,209 --> 00:12:20,105
+so 2 and 1 is 3.
+
+312
+00:12:20,105 --> 00:12:22,210
+Now, because of the way that we do this,
+
+313
+00:12:22,210 --> 00:12:23,468
+the final carry flag
+
+314
+00:12:23,468 --> 00:12:25,560
+ends up getting illuminated
+here on the end.
+
+315
+00:12:25,560 --> 00:12:28,650
+But if we know that we're
+doing a subtraction operation,
+
+316
+00:12:28,650 --> 00:12:30,030
+we know that this final carry flag
+
+317
+00:12:30,030 --> 00:12:32,940
+is never going to be on otherwise.
+
+318
+00:12:32,940 --> 00:12:34,050
+- [Derek] Over the next 10 years,
+
+319
+00:12:34,050 --> 00:12:36,630
+they built six more
+computers based on relays
+
+320
+00:12:36,630 --> 00:12:38,520
+which were used by the US military
+
+321
+00:12:38,520 --> 00:12:40,080
+and the National Advisory Committee
+
+322
+00:12:40,080 --> 00:12:42,660
+for Astronautics or NACA,
+
+323
+00:12:42,660 --> 00:12:44,970
+which later would become NASA.
+
+324
+00:12:44,970 --> 00:12:46,514
+But even by the early 1940s,
+
+325
+00:12:46,514 --> 00:12:49,500
+it was clear that the
+mechanical nature of the relay,
+
+326
+00:12:49,500 --> 00:12:52,260
+the physical closing and
+opening of the switches,
+
+327
+00:12:52,260 --> 00:12:55,140
+was too slow to be the future of computers
+
+328
+00:12:55,140 --> 00:12:57,030
+and they were also prone to breaking.
+
+329
+00:12:57,030 --> 00:12:58,650
+- Anytime you have
+something that's mechanical,
+
+330
+00:12:58,650 --> 00:13:00,030
+it's gonna wear down.
+
+331
+00:13:00,030 --> 00:13:02,040
+Every time that relay switches,
+
+332
+00:13:02,040 --> 00:13:03,270
+there's a little bit of friction
+
+333
+00:13:03,270 --> 00:13:05,550
+on the rotation point inside of there
+
+334
+00:13:05,550 --> 00:13:07,260
+and there's contacts
+
+335
+00:13:07,260 --> 00:13:09,390
+that are making and breaking
+electrical connections,
+
+336
+00:13:09,390 --> 00:13:10,590
+and those are gonna wear out.
+
+337
+00:13:10,590 --> 00:13:12,690
+- [Derek] And all the
+relays opening and closing
+
+338
+00:13:12,690 --> 00:13:15,678
+meant that the computers
+were incredibly loud.
+
+339
+00:13:15,678 --> 00:13:18,960
+(machine clacking)
+
+340
+00:13:18,960 --> 00:13:20,820
+- So it doesn't really work
+
+341
+00:13:20,820 --> 00:13:22,500
+in a business environment all that well.
+
+342
+00:13:22,500 --> 00:13:24,552
+You can't really stuff it into your office
+
+343
+00:13:24,552 --> 00:13:26,452
+that you're gonna drive people insane.
+
+344
+00:13:28,320 --> 00:13:30,180
+- [Derek] So what computer
+scientists really needed
+
+345
+00:13:30,180 --> 00:13:32,070
+was an electronic switch
+
+346
+00:13:32,070 --> 00:13:35,253
+and that is where the
+vacuum tube triode comes in.
+
+347
+00:13:36,150 --> 00:13:36,983
+Whoa!
+
+348
+00:13:39,030 --> 00:13:40,931
+I mean, sure it can work as an amplifier
+
+349
+00:13:40,931 --> 00:13:42,448
+if you put slightly positive
+
+350
+00:13:42,448 --> 00:13:44,850
+or negative voltages on the grid,
+
+351
+00:13:44,850 --> 00:13:47,520
+but it can also work as a switch.
+
+352
+00:13:47,520 --> 00:13:49,920
+If the grid voltage is very negative,
+
+353
+00:13:49,920 --> 00:13:51,480
+then no current flows.
+
+354
+00:13:51,480 --> 00:13:53,880
+And if the grid voltage is very positive,
+
+355
+00:13:53,880 --> 00:13:56,040
+then maximum current flows.
+
+356
+00:13:56,040 --> 00:13:58,140
+So a triode can be controlled
+
+357
+00:13:58,140 --> 00:14:00,360
+using no moving parts.
+
+358
+00:14:00,360 --> 00:14:02,160
+Just a voltage will set it
+
+359
+00:14:02,160 --> 00:14:04,680
+to be either a 0 or a 1.
+
+360
+00:14:04,680 --> 00:14:06,540
+And best of all, switching between the two
+
+361
+00:14:06,540 --> 00:14:09,450
+can be done rapidly with no noise
+
+362
+00:14:09,450 --> 00:14:10,938
+since you're just controlling electrons
+
+363
+00:14:10,938 --> 00:14:13,500
+zipping around in a vacuum.
+
+364
+00:14:13,500 --> 00:14:16,683
+This is the invention that took
+computing to the next level.
+
+365
+00:14:18,060 --> 00:14:20,430
+The world's first electronic
+programmable computer
+
+366
+00:14:20,430 --> 00:14:21,690
+was called ENIAC
+
+367
+00:14:21,690 --> 00:14:23,310
+and it came online for the first time
+
+368
+00:14:23,310 --> 00:14:25,830
+on December 10th, 1945.
+
+369
+00:14:25,830 --> 00:14:29,340
+It took up a whole room, weighed 30 tons,
+
+370
+00:14:29,340 --> 00:14:33,000
+and used 175 kilowatts of power.
+
+371
+00:14:33,000 --> 00:14:34,579
+So much that it led to a rumor
+
+372
+00:14:34,579 --> 00:14:35,997
+that every time it turned on,
+
+373
+00:14:35,997 --> 00:14:37,306
+the lights in Philadelphia,
+
+374
+00:14:37,306 --> 00:14:40,503
+where ENIAC was located, would dim.
+
+375
+00:14:41,850 --> 00:14:43,230
+Now, that was just a rumor,
+
+376
+00:14:43,230 --> 00:14:44,820
+but mainly because ENIAC
+
+377
+00:14:44,820 --> 00:14:46,604
+had its own dedicated electrical generator
+
+378
+00:14:46,604 --> 00:14:50,220
+to keep up with the enormous power draw.
+
+379
+00:14:50,220 --> 00:14:51,720
+Unlike previous computers,
+
+380
+00:14:51,720 --> 00:14:52,680
+ENIAC wasn't limited
+
+381
+00:14:52,680 --> 00:14:55,740
+to just solving one type
+of mathematical problem.
+
+382
+00:14:55,740 --> 00:14:58,440
+It could be programmed and it was fast,
+
+383
+00:14:58,440 --> 00:15:01,860
+completing 500 operations per second.
+
+384
+00:15:01,860 --> 00:15:03,480
+At the time, the word computers
+
+385
+00:15:03,480 --> 00:15:04,545
+still referred to people
+
+386
+00:15:04,545 --> 00:15:07,470
+doing calculations with pen and paper.
+
+387
+00:15:07,470 --> 00:15:11,970
+So 500 operations per
+second was really fast.
+
+388
+00:15:11,970 --> 00:15:13,890
+ENIAC's flexibility and power
+
+389
+00:15:13,890 --> 00:15:15,180
+was immediately useful
+
+390
+00:15:15,180 --> 00:15:17,430
+for the development of the hydrogen bomb.
+
+391
+00:15:17,430 --> 00:15:19,710
+The computations needed were so complex
+
+392
+00:15:19,710 --> 00:15:21,510
+that the director of
+Los Alamos at the time
+
+393
+00:15:21,510 --> 00:15:23,280
+said that, "It would've been impossible
+
+394
+00:15:23,280 --> 00:15:24,930
+to arrive at any solution
+
+395
+00:15:24,930 --> 00:15:27,390
+without the aid of ENIAC."
+
+396
+00:15:27,390 --> 00:15:30,154
+- This is a hilarious part
+bout having a processor
+
+397
+00:15:30,154 --> 00:15:33,180
+that is 1 meter tall
+and 70 centimeters wide,
+
+398
+00:15:33,180 --> 00:15:36,330
+is that you can point at
+actual parts of the processor.
+
+399
+00:15:36,330 --> 00:15:37,740
+- [Derek] This is what a 1-bit
+
+400
+00:15:37,740 --> 00:15:39,843
+vacuum tube computer looks like.
+
+401
+00:15:42,690 --> 00:15:45,060
+- [David] Can you feel
+the heat coming off of it?
+
+402
+00:15:45,060 --> 00:15:46,140
+- [Derek] I certainly can.
+
+403
+00:15:46,140 --> 00:15:47,970
+- [David] I can feel the heat coming off.
+
+404
+00:15:47,970 --> 00:15:49,080
+- [Derek] It's getting warm.
+
+405
+00:15:49,080 --> 00:15:51,870
+- Well, I mean, 190 vacuum tubes is a lot.
+
+406
+00:15:51,870 --> 00:15:53,040
+I think we figured it out.
+
+407
+00:15:53,040 --> 00:15:56,520
+This is pulling like 350
+or 400 watts of power
+
+408
+00:15:56,520 --> 00:15:57,854
+or something like that,
+
+409
+00:15:57,854 --> 00:15:59,910
+which is absurd.
+
+410
+00:15:59,910 --> 00:16:02,100
+At night, it's awesome.
+
+411
+00:16:02,100 --> 00:16:04,143
+It looks like a city.
+
+412
+00:16:05,880 --> 00:16:07,590
+- [Derek] But there were also major flaws
+
+413
+00:16:07,590 --> 00:16:08,850
+with vacuum tubes.
+
+414
+00:16:08,850 --> 00:16:10,830
+The filaments always needed to be heated,
+
+415
+00:16:10,830 --> 00:16:14,070
+so they used a lot of
+power even when idle,
+
+416
+00:16:14,070 --> 00:16:15,450
+and they were big.
+
+417
+00:16:15,450 --> 00:16:18,000
+It was hard to make a glass vacuum tube
+
+418
+00:16:18,000 --> 00:16:21,900
+with complex electrodes
+inside arbitrarily small.
+
+419
+00:16:21,900 --> 00:16:23,790
+They were also unreliable.
+
+420
+00:16:23,790 --> 00:16:25,212
+On average, a vacuum tube in ENIAC
+
+421
+00:16:25,212 --> 00:16:27,510
+broke down every few days.
+
+422
+00:16:27,510 --> 00:16:30,900
+And then, it needed to
+be found and replaced.
+
+423
+00:16:30,900 --> 00:16:33,255
+The longest that ENIAC
+operated for without failure
+
+424
+00:16:33,255 --> 00:16:36,690
+was just 116 hours.
+
+425
+00:16:36,690 --> 00:16:41,640
+The first digital computers
+ran on glorified light bulbs.
+
+426
+00:16:41,640 --> 00:16:45,600
+That is why they were so big,
+power-hungry, and unreliable.
+
+427
+00:16:45,600 --> 00:16:48,810
+The miracle and what has made
+our modern lives possible
+
+428
+00:16:48,810 --> 00:16:50,130
+is that someone figured out
+
+429
+00:16:50,130 --> 00:16:53,070
+how to perform the same
+trick with electrons
+
+430
+00:16:53,070 --> 00:16:57,990
+inside a solid piece of
+material, in silicon.
+
+431
+00:16:57,990 --> 00:17:00,363
+But that's a story for another day.
+
+432
+00:17:06,569 --> 00:17:08,879
+If you wanna learn about
+how modern computing devices
+
+433
+00:17:08,880 --> 00:17:10,380
+store and access information,
+
+434
+00:17:10,380 --> 00:17:11,880
+I highly recommend you check out
+
+435
+00:17:11,880 --> 00:17:14,339
+this video's sponsor brilliant.org.
+
+436
+00:17:14,339 --> 00:17:15,659
+They have courses on everything
+
+437
+00:17:15,660 --> 00:17:17,220
+from computer science fundamentals
+
+438
+00:17:17,220 --> 00:17:19,920
+to neural networks to quantum computing.
+
+439
+00:17:19,920 --> 00:17:21,270
+Their latest interactive course
+
+440
+00:17:21,270 --> 00:17:23,520
+is called How Technology Works.
+
+441
+00:17:23,520 --> 00:17:25,589
+It includes a lesson on computer memory
+
+442
+00:17:25,589 --> 00:17:27,389
+where you can get hands-on with the kinds
+
+443
+00:17:27,390 --> 00:17:30,840
+of computational logic gates
+we discussed in this video.
+
+444
+00:17:30,840 --> 00:17:33,230
+It also has a lesson that
+delves into the ingenious ways
+
+445
+00:17:33,230 --> 00:17:36,630
+video compression makes
+modern day streaming possible,
+
+446
+00:17:36,630 --> 00:17:39,210
+so you can watch videos like this one.
+
+447
+00:17:39,210 --> 00:17:41,460
+Ever wondered how your
+phone knows where you are?
+
+448
+00:17:41,460 --> 00:17:43,410
+There's a lesson on that too.
+
+449
+00:17:43,410 --> 00:17:45,570
+There's even a lesson on password theft
+
+450
+00:17:45,570 --> 00:17:47,670
+where you can walk in
+the footsteps of a hacker
+
+451
+00:17:47,670 --> 00:17:50,820
+to discover why some passwords
+are stronger than others.
+
+452
+00:17:50,820 --> 00:17:52,380
+You can try all these out for free
+
+453
+00:17:52,380 --> 00:17:55,590
+by going to brilliant.org/veritasium.
+
+454
+00:17:55,590 --> 00:17:57,300
+You know, whether it's
+getting a working knowledge
+
+455
+00:17:57,300 --> 00:18:00,180
+of modern day technology
+or building skills in math,
+
+456
+00:18:00,180 --> 00:18:02,100
+computer science or data science,
+
+457
+00:18:02,100 --> 00:18:04,230
+Brilliant is the best way to learn.
+
+458
+00:18:04,230 --> 00:18:06,930
+They have thousands of
+bite-sized interactive lessons
+
+459
+00:18:06,930 --> 00:18:08,466
+that not only help master key concepts
+
+460
+00:18:08,466 --> 00:18:11,730
+but connect what you learn
+to real-world examples.
+
+461
+00:18:11,730 --> 00:18:13,830
+And because each lesson is hands-on,
+
+462
+00:18:13,830 --> 00:18:15,510
+you'll build real intuition
+
+463
+00:18:15,510 --> 00:18:17,880
+so you can put what you've learned to use.
+
+464
+00:18:17,880 --> 00:18:19,650
+Now, as we've seen, the
+development of technology
+
+465
+00:18:19,650 --> 00:18:21,802
+is an ongoing process
+that constantly reshapes
+
+466
+00:18:21,802 --> 00:18:24,480
+the way we interact with
+the world around us.
+
+467
+00:18:24,480 --> 00:18:26,220
+Today, it's more important than ever
+
+468
+00:18:26,220 --> 00:18:28,200
+to keep up with these changes.
+
+469
+00:18:28,200 --> 00:18:31,051
+Who knows what revolutionary
+technology will emerge next?
+
+470
+00:18:31,051 --> 00:18:33,330
+But whatever it is, you can rest assured
+
+471
+00:18:33,330 --> 00:18:35,610
+that you'll be able to
+learn about it on Brilliant.
+
+472
+00:18:35,610 --> 00:18:38,490
+And you can try everything
+Brilliant has to offer for free
+
+473
+00:18:38,490 --> 00:18:39,549
+for a full 30 days.
+
+474
+00:18:39,549 --> 00:18:42,930
+Just go to brilliant.org/veritasium.
+
+475
+00:18:42,930 --> 00:18:45,180
+I will put that link
+down in the description
+
+476
+00:18:45,180 --> 00:18:47,340
+and the first 200 of you to sign up
+
+477
+00:18:47,340 --> 00:18:50,940
+will get 20% off Brilliant's
+annual premium subscription.
+
+478
+00:18:50,940 --> 00:18:53,220
+So I wanna thank Brilliant
+for sponsoring this video
+
+479
+00:18:53,220 --> 00:18:55,143
+and I wanna thank you for watching.
+

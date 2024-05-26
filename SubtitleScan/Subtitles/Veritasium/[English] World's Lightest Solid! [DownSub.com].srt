@@ -1,0 +1,753 @@
+1
+00:00:00,030 --> 00:00:05,099
+This is aerogel.
+The world's lightest, that is least dense, solid.
+
+2
+00:00:05,700 --> 00:00:10,700
+This piece has a mass of just 1.22 grams.
+
+3
+00:00:11,580 --> 00:00:18,440
+That is only a few times the mass of the same volume of air, which kind of makes sense because it is
+
+4
+00:00:18,800 --> 00:00:25,160
+99.8% air. In fact, some aerogels are so light that if you removed all the air from them,
+
+5
+00:00:25,330 --> 00:00:30,840
+they would be less dense than air. I have long been fascinated by aerogel
+
+6
+00:00:30,840 --> 00:00:37,559
+so I actually flew out to Aerogel Technologies in Boston to find out why was aerogel invented. How is it made?
+
+7
+00:00:37,960 --> 00:00:41,610
+Why is it such a good thermal insulator and what is it used for?
+
+8
+00:00:42,190 --> 00:00:49,980
+- Okay, we are going to try an experiment to demonstrate the insulating power of aerogel so over here we have
+
+9
+00:00:50,680 --> 00:00:56,849
+two setups: one with a glass petri dish, and the other one with aerogel on top.
+
+10
+00:00:56,860 --> 00:01:00,989
+- Both are made of silica, but with very different physical structures.
+
+11
+00:01:01,329 --> 00:01:05,279
+We're gonna see how long it takes to melt these chocolate bunnies with a Bunsen burner.
+
+12
+00:01:05,890 --> 00:01:08,220
+- Now to have a look at this experiment,
+
+13
+00:01:08,240 --> 00:01:14,220
+we have a FLIR T1020 which can see temperatures up to 2,000 degrees Celsius.
+
+14
+00:01:14,300 --> 00:01:14,940
+- Looks like it's getting pretty hot.
+
+15
+00:01:15,000 --> 00:01:20,120
+- Yeah, you can see that the glass is getting really hot already. And after just a minute:
+
+16
+00:01:20,140 --> 00:01:23,680
+- It's starting to smoke.
+- Okay.
+
+17
+00:01:23,940 --> 00:01:25,340
+- It's definitely melting and smoking.
+
+18
+00:01:25,600 --> 00:01:29,120
+Oh, yeah, here we go. I would say that's phase change.
+
+19
+00:01:29,280 --> 00:01:30,660
+- We've got
+
+20
+00:01:30,670 --> 00:01:34,860
+a liquid chocolate situation. We have some smoking bunny. Over here,
+
+21
+00:01:34,860 --> 00:01:39,560
+the bunny is actually sort of melting over, and look, there, it's sort of tilting to the side.
+
+22
+00:01:39,820 --> 00:01:43,120
+- Alright, I think we're going to call that a melt.
+
+23
+00:01:43,440 --> 00:01:44,520
+- What is that?
+- Oh!
+
+24
+00:01:44,640 --> 00:01:45,840
+On cue, on cue.
+
+25
+00:01:46,320 --> 00:01:47,960
+[Laughs.]
+
+26
+00:01:48,720 --> 00:01:50,500
+- I would say that is material fail.
+
+27
+00:01:50,520 --> 00:01:55,120
+- Not only did the bunny melt quickly, the petri dish cracked under the thermal expansion.
+
+28
+00:01:55,240 --> 00:01:55,740
+- Wanna pop it in?
+
+29
+00:01:55,840 --> 00:01:57,640
+- So now let's try the aerogel.
+
+30
+00:01:58,660 --> 00:02:01,340
+[Music]
+- So how is aerogel invented back in?
+
+31
+00:02:01,340 --> 00:02:07,340
+- Back in 1931, a guy named Professor Samuel Kistler had a bet with his colleague Charles Learned.
+
+32
+00:02:07,600 --> 00:02:12,700
+- Now the bet revolved around jellies,
+like peanut-butter-and-jelly jellies.
+
+33
+00:02:12,700 --> 00:02:17,780
+Now the thing about jellies is they are actually a combination of liquids and solids.
+
+34
+00:02:17,860 --> 00:02:18,360
+[Music]
+
+35
+00:02:18,360 --> 00:02:24,000
+I mean, they're mostly liquid,
+but it's embedded within this 3D solid structure.
+
+36
+00:02:24,000 --> 00:02:29,980
+- So if you think of a gel, like jello, has a skeleton with nano-sized pores that gives it its rigidity,
+
+37
+00:02:29,980 --> 00:02:32,580
+and then that's about 1% of the gel.
+
+38
+00:02:32,580 --> 00:02:33,940
+- So the bet was this:
+
+39
+00:02:33,940 --> 00:02:37,000
+Could you remove the liquid from the jelly?
+
+40
+00:02:37,580 --> 00:02:43,690
+Without affecting the solid structure?
+I mean, if you just evaporate the liquid out, well,
+
+41
+00:02:43,690 --> 00:02:50,640
+then the solid structure shrinks, because as you remove liquid molecules, they pull on each other, and they pull on the solid structure around them, basically crumpling it from the inside.
+
+43
+00:02:56,180 --> 00:03:00,360
+Now Samuel Kistler solved this problem in two ways.
+
+44
+00:03:00,360 --> 00:03:04,200
+First, he realized you could replace one liquid with another
+
+45
+00:03:04,400 --> 00:03:08,739
+inside the jelly just by washing it thoroughly. So you could swap out, say,
+
+46
+00:03:09,020 --> 00:03:16,220
+water, for alcohol. And then, if you take the jelly and put it in a high-pressure vessel called a autoclave,
+
+47
+00:03:16,340 --> 00:03:21,680
+- By heating it to the high-temperature, high-pressure point called the critical point of the liquid,
+
+48
+00:03:21,680 --> 00:03:26,540
+that liquid transformed into a semi-liquid, semi-gas called a supercritical fluid.
+
+49
+00:03:26,680 --> 00:03:30,380
+- At this point, there is no longer a distinction between liquid and gas.
+
+50
+00:03:30,560 --> 00:03:33,740
+Those molecules are no longer pulling on each other.
+
+51
+00:03:33,740 --> 00:03:40,820
+- So once you've depressurized the vessel, that solid skeleton, that 1% of the mass of the gel, is left behind
+
+52
+00:03:40,960 --> 00:03:45,240
+intact, except for where there was liquid in the pores before is now gas,
+
+53
+00:03:45,340 --> 00:03:49,900
+and that solid skeleton, that nanoporous solid is what we call aerogel.
+
+54
+00:03:50,100 --> 00:03:53,260
+- Kistler published his findings in Nature in 1931.
+
+55
+00:03:54,820 --> 00:03:58,380
+It is getting pretty hot as you can see through the thermal camera.
+
+56
+00:03:58,380 --> 00:04:01,920
+But coming up on three minutes, there's still no sign of melted chocolate.
+
+57
+00:04:02,340 --> 00:04:06,440
+So we're gonna pull out a thermocouple and just check the temperature underneath the bunny.
+
+58
+00:04:06,440 --> 00:04:09,620
+Like, underneath the aerogel, and see what, what the flame temperature is.
+
+59
+00:04:09,640 --> 00:04:14,529
+You can kind of see that, that parts of the bunny are getting hot, but it's not the bottom of the bunny,
+
+60
+00:04:14,750 --> 00:04:16,885
+It's all the, around the bunny.
+
+61
+00:04:16,885 --> 00:04:21,060
+- Exactly. That convective heat is moving up and around the aerogel,
+
+62
+00:04:21,060 --> 00:04:25,180
+- So you can see the thing is getting red hot.
+- And by four minutes, the bunny is looking a little soft.
+
+63
+00:04:25,180 --> 00:04:28,458
+- Still pretty good though, considering how easy it is to melt chocolate.
+
+64
+00:04:28,780 --> 00:04:29,900
+- Can I put my finger here?
+
+65
+00:04:30,920 --> 00:04:31,660
+- Be careful.
+
+66
+00:04:32,980 --> 00:04:36,440
+It's not that it's hot, it's that it's brittle.
+- Right.
+
+67
+00:04:37,460 --> 00:04:41,900
+- But yeah, totally cool to touch, right?
+- It is, it is just warm to the touch.
+
+68
+00:04:42,120 --> 00:04:44,620
+- He made aerogels out of all sorts of things.
+
+69
+00:04:44,840 --> 00:04:49,080
+He made them out of eggs.
+He made them out of rubber, out of nitrocellulose.
+
+70
+00:04:49,280 --> 00:04:56,160
+And, included in there was silica. Actually right here on the table, I have some examples of some silica gels.
+
+71
+00:04:56,340 --> 00:04:58,840
+This is a, a wet silica gel
+
+72
+00:04:58,840 --> 00:05:02,600
+It's kind of rubbery so I can just,
+you know, carve out a piece.
+
+73
+00:05:02,600 --> 00:05:08,060
+It is 97% alcohol inside of its pores.
+
+74
+00:05:08,300 --> 00:05:12,380
+And then the remaining 3% solid is amorphous silica. Just--
+
+75
+00:05:12,380 --> 00:05:16,500
+- Can I touch it?
+- Yeah, absolutely. It's kind of rubbery. Not that strong.
+
+76
+00:05:17,180 --> 00:05:19,440
+- So was I cracking it there or was it already kinda cracked?
+
+77
+00:05:19,440 --> 00:05:22,560
+- Yeah, you just, no--
+- Oh whoa, it's very easy to break. Very crumbly.
+
+78
+00:05:22,820 --> 00:05:27,280
+- The next step is to replace the alcohol in the gel with liquid carbon dioxide.
+
+79
+00:05:27,280 --> 00:05:29,400
+- We're about to see liquid CO₂.
+
+80
+00:05:29,540 --> 00:05:34,360
+- Liquid CO₂ has the advantage of being non-flammable, plus it's got a low critical temperature.
+
+81
+00:05:34,360 --> 00:05:36,220
+- Open it up, and--
+- Yeah, I see it flooding in there.
+
+82
+00:05:36,360 --> 00:05:39,100
+- Yeah, it's flooding in. There it goes.
+Just another solvent.
+
+83
+00:05:39,760 --> 00:05:40,480
+[Vibration.]
+
+84
+00:05:40,580 --> 00:05:44,480
+- You can clearly see that it's so much cooler on top.
+
+85
+00:05:45,740 --> 00:05:49,120
+- What temperature is it on the bottom?
+- We're at 600 right now?
+
+86
+00:05:49,560 --> 00:05:53,920
+- 600 degrees Celsius.
+- 600 degrees Celsius, that's 1250 Fahrenheit right now.
+
+87
+00:05:53,920 --> 00:05:56,180
+- Notice where the bunny is melting.
+
+88
+00:05:56,180 --> 00:06:02,560
+It's melting right on that edge where the heat's, like, the flame is kind of crawling up and over. - So, yeah, that's
+
+89
+00:06:02,700 --> 00:06:03,440
+- Oh!
+
+90
+00:06:03,660 --> 00:06:05,660
+Bunny down! [Laughs.]
+
+91
+00:06:06,260 --> 00:06:09,840
+- Well, not a bad result.
+- Not a bad result at all.
+
+92
+00:06:10,180 --> 00:06:12,880
+- I'm interested in in tasting some of this chocolate here.
+
+93
+00:06:13,580 --> 00:06:14,080
+( - Gross.)
+
+94
+00:06:16,720 --> 00:06:17,860
+- Is it hot?
+
+95
+00:06:17,860 --> 00:06:19,140
+- It's warm. 
+- Warm.
+
+96
+00:06:19,140 --> 00:06:20,780
+- And delicious.
+- Like fondue.
+
+97
+00:06:20,820 --> 00:06:22,800
+- Mm-hmm. That was great.
+
+98
+00:06:23,020 --> 00:06:28,020
+Once the liquid CO₂ has filled all the pores of the gel, it's time to take it supercritical.
+
+99
+00:06:28,120 --> 00:06:33,380
+- It was, I would say, a kind of a spiritual experience the first time that I saw a supercritical fluid.
+
+100
+00:06:33,540 --> 00:06:34,480
+- We'll get to that here.
+
+101
+00:06:34,480 --> 00:06:37,740
+- [Laughs.] I love how much you're into these autoclaves.
+- I love aerogels.
+
+102
+00:06:37,940 --> 00:06:39,640
+To make a supercritical fluid,
+
+103
+00:06:39,640 --> 00:06:43,100
+we can heat this with a hairdryer actually.
+
+104
+00:06:43,260 --> 00:06:44,460
+[Hairdryer blows.]
+
+105
+00:06:45,880 --> 00:06:50,460
+As we approach the critical point, the surface of the liquid becomes kind of blurry.
+
+106
+00:06:50,860 --> 00:06:51,360
+- Weird, huh?
+
+107
+00:06:51,860 --> 00:06:54,480
+- That is like weird waves in there, yeah.
+
+108
+00:06:54,480 --> 00:06:57,820
+I'll speed it up so you can watch the surface disappear altogether.
+
+109
+00:06:58,580 --> 00:07:02,140
+You're now looking at the supercritical fluid of CO₂.
+
+110
+00:07:02,720 --> 00:07:08,960
+In this state, the CO₂ can be vented without affecting the solid structure, and what you're left with is aerogel.
+
+111
+00:07:09,020 --> 00:07:09,840
+♫
+
+112
+00:07:10,440 --> 00:07:13,340
+- If you look at aerogel on a light background,
+
+113
+00:07:13,740 --> 00:07:18,160
+it's almost impossible to see,
+because it is pretty transparent.
+
+114
+00:07:18,740 --> 00:07:22,600
+But if you look at it on a darker background,
+
+115
+00:07:23,180 --> 00:07:27,480
+then you can see that it has a slight bluish color.
+
+116
+00:07:28,160 --> 00:07:31,440
+And, it's bluish for the same reason that the sky is blue,
+
+117
+00:07:31,640 --> 00:07:35,280
+because all those tiny little nanoscale structures,
+
+118
+00:07:35,360 --> 00:07:38,280
+they scatter the light according to Rayleigh scattering.
+
+119
+00:07:38,360 --> 00:07:43,560
+And, the intensity of light scattered is proportional to
+1 over wavelength to the power of 4,
+
+120
+00:07:43,560 --> 00:07:49,300
+which means it scatters shorter wavelengths, like blue, much more than it scatters yellow or red.
+
+121
+00:07:49,940 --> 00:07:55,640
+And, for that reason, aerogel looks opaque in the ultraviolet and transparent in the infrared.
+
+122
+00:07:56,760 --> 00:08:00,560
+- Now, what do you think this would look like
+if I held it up to the blue sky?
+
+123
+00:08:00,880 --> 00:08:03,840
+What do you think we would see?
+Would it look ultra blue?
+
+124
+00:08:05,720 --> 00:08:13,040
+No, it looks yellow. And that's because the aerogel is actually scattering out that blue light,
+
+125
+00:08:13,040 --> 00:08:18,400
+and so what passes through and makes it to our eyes is the longer wavelengths like the yellows and oranges.
+
+126
+00:08:18,920 --> 00:08:22,160
+It's basically the same effect as looking at a sunset
+
+127
+00:08:22,660 --> 00:08:25,020
+When you see the yellows and oranges of a sunset,
+
+128
+00:08:25,120 --> 00:08:27,440
+it's because the blue light
+has already been scattered out
+
+129
+00:08:27,440 --> 00:08:31,880
+by the atmosphere the light had to pass through
+before it reached your eyes.
+
+130
+00:08:32,799 --> 00:08:38,099
+So effectively looking at aerogel against blue sky
+is like looking at a portable sunset.
+
+131
+00:08:38,380 --> 00:08:43,200
+The nanoscale pores of the aerogel are also what makes it such a good thermal insulator.
+
+132
+00:08:43,600 --> 00:08:44,100
+( - Three.)
+
+133
+00:08:47,620 --> 00:08:48,120
+- That's awesome.
+
+134
+00:08:48,300 --> 00:08:50,120
+- Does that look hot?
+- It's definitely hot.
+
+135
+00:08:50,160 --> 00:08:54,260
+- You might think that because aerogel is
+
+136
+00:08:54,380 --> 00:08:57,080
+largely comprised of air, like 99% air,
+
+137
+00:08:57,780 --> 00:09:02,160
+that it has the same thermal properties as air,
+but that is not correct.
+
+138
+00:09:02,170 --> 00:09:04,810
+It's actually a better insulator than air is.
+
+139
+00:09:05,200 --> 00:09:10,620
+- That's because the width of the pores is smaller than the distance air molecules travel on average
+
+140
+00:09:10,680 --> 00:09:12,020
+before colliding with something.
+
+141
+00:09:12,420 --> 00:09:14,340
+Their so-called mean free path.
+
+142
+00:09:14,680 --> 00:09:19,880
+Hence, it's really difficult for the hot, fast-moving air molecules below the aerogel
+
+143
+00:09:19,880 --> 00:09:23,640
+to diffuse through it and transfer heat to the top of the aerogel.
+
+144
+00:09:23,720 --> 00:09:27,740
+This is called the Knudsen effect.
+- It is so weird because
+
+145
+00:09:28,120 --> 00:09:36,060
+you know, you don't expect something that's transparent to block the heat that well, but this really does.
+
+146
+00:09:36,589 --> 00:09:40,389
+- And that's why NASA used aerogel insulation on the Sojourner Rover,
+
+147
+00:09:41,080 --> 00:09:46,920
+Spirit and Opportunity, the Curiosity Rover, and they plan to use it on future missions to Mars.
+
+148
+00:09:47,180 --> 00:09:50,280
+- Why does it need insulation?
+- The electronics, because
+
+149
+00:09:50,680 --> 00:09:55,380
+they don't want the electronics to get cold during the cold nights on Mars
+
+150
+00:09:55,800 --> 00:09:59,240
+- NASA has also put aerogel to more exotic uses,
+
+151
+00:09:59,240 --> 00:10:02,980
+notably to catch dust from a comet
+as part of the Stardust mission.
+
+152
+00:10:03,220 --> 00:10:08,440
+- So the particles were traveling about six kilometers per second relative to the aerogel
+
+153
+00:10:08,700 --> 00:10:15,080
+So when they hit the aerogel, because the aerogel's
+a very low density material, very, very porous material,
+
+154
+00:10:15,080 --> 00:10:20,460
+the particles actually enter the aerogel,
+and as they travel through the aerogel,
+
+155
+00:10:20,580 --> 00:10:26,360
+they basically break apart the network that makes up the aerogel and they lose energy in the process
+
+156
+00:10:26,360 --> 00:10:27,960
+and eventually come to a stop.
+
+157
+00:10:28,120 --> 00:10:29,720
+This is good for capturing particles,
+
+158
+00:10:29,720 --> 00:10:34,440
+because if a particle like that were to hit a solid surface then it just stops, you know, immediately.
+
+159
+00:10:34,440 --> 00:10:36,520
+- It just vaporizes.
+- And vaporizes.
+
+160
+00:10:36,620 --> 00:10:40,989
+- So should we expect to see aerogel in our everyday lives anytime soon?
+
+161
+00:10:40,989 --> 00:10:47,840
+- One of my running jokes is when they build skyscrapers in Antarctica, they'll use aerogel as thermal insulation.
+
+162
+00:10:48,240 --> 00:10:49,340
+[Both laugh.]
+
+163
+00:10:49,640 --> 00:10:50,840
+- Why do you say that?
+
+164
+00:10:50,840 --> 00:10:53,660
+- Well, because then they'll really care about how,
+
+165
+00:10:53,660 --> 00:10:56,680
+just how thermal efficient it is
+because it would be so cold there.
+
+166
+00:10:56,680 --> 00:10:57,180
+- Right.
+
+167
+00:10:57,240 --> 00:11:04,900
+- So instead of having, you know, ten feet of fiberglass insulation, you could have six inches or something of aerogel.
+
+168
+00:11:05,420 --> 00:11:09,560
+- Scientists are currently working on reducing costs and increasing durability.
+
+169
+00:11:10,060 --> 00:11:12,310
+- And that's true. They do have some elasticity.
+- Okay.
+
+170
+00:11:12,310 --> 00:11:15,910
+- Yeah, so there we go. So it is not hard to break.
+
+171
+00:11:16,160 --> 00:11:21,549
+- They've already made a lot of progress.
+For example, original silica aerogel is hydrophilic.
+
+172
+00:11:22,160 --> 00:11:25,980
+- There we go. Now this is a hydrophilic aerogel.
+
+173
+00:11:26,020 --> 00:11:30,500
+- So once we've done this, is that piece of aerogel ruined now?
+
+174
+00:11:30,500 --> 00:11:31,220
+- Pretty much.
+
+175
+00:11:31,340 --> 00:11:33,920
+- But there are ways to make it waterproof.
+
+176
+00:11:34,240 --> 00:11:38,020
+So if you want to see that and all the other next generation aerogels,
+
+177
+00:11:38,020 --> 00:11:42,880
+then subscribe to the channel and this may be the start of an aerogel trilogy.
+
+178
+00:11:43,380 --> 00:11:46,440
+♫
+
+179
+00:11:46,440 --> 00:11:48,460
+[Subtitles credits: 雜碎 Chop Suey, ]
+[Translation credits: ]
+

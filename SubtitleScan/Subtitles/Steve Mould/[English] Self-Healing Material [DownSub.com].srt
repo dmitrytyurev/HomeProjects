@@ -1,0 +1,1151 @@
+1
+00:00:00,210 --> 00:00:03,330
+- [Steve] This is a strip
+of self-healing polymer.
+
+2
+00:00:03,330 --> 00:00:06,210
+That means I can slice it into two pieces,
+
+3
+00:00:06,210 --> 00:00:08,820
+and then with the application
+of gentle pressure,
+
+4
+00:00:08,820 --> 00:00:10,620
+push the two pieces together,
+
+5
+00:00:10,620 --> 00:00:11,453
+and it'll become,
+
+6
+00:00:11,453 --> 00:00:14,370
+once again, one single piece.
+
+7
+00:00:14,370 --> 00:00:15,577
+At first, you might think,
+
+8
+00:00:15,577 --> 00:00:17,497
+"Well, that's not so unusual,
+
+9
+00:00:17,497 --> 00:00:19,567
+"like, if I took a strip of Blu Tack
+
+10
+00:00:19,567 --> 00:00:21,097
+"and slice that into two pieces,
+
+11
+00:00:21,097 --> 00:00:23,107
+"and then press those two pieces together,
+
+12
+00:00:23,107 --> 00:00:23,977
+"I would, once again,
+
+13
+00:00:23,977 --> 00:00:26,550
+"have a single piece of Blu Tack."
+
+14
+00:00:26,550 --> 00:00:27,383
+You might also say,
+
+15
+00:00:27,383 --> 00:00:29,347
+"Look, if I have two droplets of water,
+
+16
+00:00:29,347 --> 00:00:30,217
+"and I push them together,
+
+17
+00:00:30,217 --> 00:00:32,549
+"they become a single droplet of water."
+
+18
+00:00:32,549 --> 00:00:33,990
+The difference between Blu Tack
+
+19
+00:00:33,990 --> 00:00:35,340
+and this self-healing polymer
+
+20
+00:00:35,340 --> 00:00:36,330
+is that, well,
+
+21
+00:00:36,330 --> 00:00:38,130
+Blu Tack is sticky,
+
+22
+00:00:38,130 --> 00:00:39,210
+it sticks to my hand,
+
+23
+00:00:39,210 --> 00:00:40,590
+it sticks to a wall,
+
+24
+00:00:40,590 --> 00:00:42,630
+it sticks to the back of this picture
+
+25
+00:00:42,630 --> 00:00:44,100
+of Patrick Stewart.
+
+26
+00:00:44,100 --> 00:00:45,690
+So, it's not surprising
+
+27
+00:00:45,690 --> 00:00:48,180
+that Blu Tack sticks to itself,
+
+28
+00:00:48,180 --> 00:00:51,060
+but this polymer isn't sticky.
+
+29
+00:00:51,060 --> 00:00:52,860
+The same goes for droplets of water,
+
+30
+00:00:52,860 --> 00:00:55,380
+they're sticky and they flow,
+
+31
+00:00:55,380 --> 00:00:56,640
+because they're a liquid,
+
+32
+00:00:56,640 --> 00:00:59,880
+so, we should naturally
+expect different behavior
+
+33
+00:00:59,880 --> 00:01:01,290
+from droplets of water,
+
+34
+00:01:01,290 --> 00:01:04,140
+as we do from a strip of polymer.
+
+35
+00:01:04,140 --> 00:01:06,240
+We can actually flip this
+question on its head,
+
+36
+00:01:06,240 --> 00:01:07,297
+instead of saying,
+
+37
+00:01:07,297 --> 00:01:09,180
+"Why is this polymer self-healing?"
+
+38
+00:01:09,180 --> 00:01:10,013
+We can say,
+
+39
+00:01:10,013 --> 00:01:12,427
+"Why aren't other things self-healing?
+
+40
+00:01:12,427 --> 00:01:14,190
+"Why isn't metal self-healing?"
+
+41
+00:01:14,190 --> 00:01:16,890
+Like, if I cut this piece of metal in two,
+
+42
+00:01:16,890 --> 00:01:20,040
+why is it that I can't just
+push the two ends together,
+
+43
+00:01:20,040 --> 00:01:23,160
+and it fuses back into
+a single piece of metal?
+
+44
+00:01:23,160 --> 00:01:24,750
+Like, if you think about what's happening
+
+45
+00:01:24,750 --> 00:01:26,610
+at the molecular level,
+
+46
+00:01:26,610 --> 00:01:30,240
+a metal is a lattice of ions
+
+47
+00:01:30,240 --> 00:01:34,530
+in a cloud of mobile electrons.
+
+48
+00:01:34,530 --> 00:01:37,740
+So, if you slice this lattice in two,
+
+49
+00:01:37,740 --> 00:01:40,560
+and bring those two ends back together,
+
+50
+00:01:40,560 --> 00:01:41,430
+well, (chuckles) to me,
+
+51
+00:01:41,430 --> 00:01:44,340
+that looks like a single metal lattice,
+
+52
+00:01:44,340 --> 00:01:46,800
+so, why doesn't it become one?
+
+53
+00:01:46,800 --> 00:01:47,670
+In the case of metal,
+
+54
+00:01:47,670 --> 00:01:49,650
+the answer's actually
+quite straightforward,
+
+55
+00:01:49,650 --> 00:01:51,090
+it's oxidation.
+
+56
+00:01:51,090 --> 00:01:53,010
+I've got some sodium metal here,
+
+57
+00:01:53,010 --> 00:01:55,230
+which is soft enough to cut with a knife,
+
+58
+00:01:55,230 --> 00:01:56,190
+and when I do,
+
+59
+00:01:56,190 --> 00:01:59,160
+you can see it's actually
+a really shiny metal,
+
+60
+00:01:59,160 --> 00:02:00,750
+but that doesn't last forever,
+
+61
+00:02:00,750 --> 00:02:01,920
+it doesn't take long
+
+62
+00:02:01,920 --> 00:02:05,460
+for that shiny surface to
+become dull in appearance.
+
+63
+00:02:05,460 --> 00:02:07,380
+That's because the metal is reacting
+
+64
+00:02:07,380 --> 00:02:09,419
+with oxygen in the air.
+
+65
+00:02:09,419 --> 00:02:10,679
+Actually, the same thing happens
+
+66
+00:02:10,680 --> 00:02:12,180
+when you cut any metal,
+
+67
+00:02:12,180 --> 00:02:15,240
+it's just that that oxidation
+layer isn't as visible
+
+68
+00:02:15,240 --> 00:02:17,430
+in the case of, say, steel,
+
+69
+00:02:17,430 --> 00:02:19,290
+as compared to sodium.
+
+70
+00:02:19,290 --> 00:02:20,790
+So, it's understandable then
+
+71
+00:02:20,790 --> 00:02:22,680
+that if you took two pieces of metal
+
+72
+00:02:22,680 --> 00:02:24,030
+and pushed them together,
+
+73
+00:02:24,030 --> 00:02:26,820
+they wouldn't form one
+single piece of metal,
+
+74
+00:02:26,820 --> 00:02:29,370
+because there is a layer of oxidized metal
+
+75
+00:02:29,370 --> 00:02:30,780
+in between.
+
+76
+00:02:30,780 --> 00:02:33,510
+In fact, if you were
+to cut a piece of metal
+
+77
+00:02:33,510 --> 00:02:35,250
+in the vacuum of space,
+
+78
+00:02:35,250 --> 00:02:38,310
+and then push those cut surfaces together,
+
+79
+00:02:38,310 --> 00:02:40,680
+they would fuse together.
+
+80
+00:02:40,680 --> 00:02:41,513
+We know this,
+
+81
+00:02:41,513 --> 00:02:43,440
+because it's happened in situations
+
+82
+00:02:43,440 --> 00:02:45,390
+when we don't want it to happen,
+
+83
+00:02:45,390 --> 00:02:46,770
+at least, once.
+
+84
+00:02:46,770 --> 00:02:48,210
+In April, 1991,
+
+85
+00:02:48,210 --> 00:02:50,100
+the Galileo spacecraft
+
+86
+00:02:50,100 --> 00:02:53,040
+was supposed to open
+its high-gain antenna,
+
+87
+00:02:53,040 --> 00:02:54,450
+looks a bit like an umbrella,
+
+88
+00:02:54,450 --> 00:02:56,670
+but three ribs of that umbrella
+
+89
+00:02:56,670 --> 00:03:00,030
+had cold welded to the
+body of the spacecraft,
+
+90
+00:03:00,030 --> 00:03:01,620
+and so, it couldn't open.
+
+91
+00:03:01,620 --> 00:03:02,820
+This stuff is a bit different
+
+92
+00:03:02,820 --> 00:03:04,440
+to a metal, though,
+
+93
+00:03:04,440 --> 00:03:05,700
+because it's a polymer,
+
+94
+00:03:05,700 --> 00:03:08,910
+so, it would be more like
+if I cut a piece of plastic
+
+95
+00:03:08,910 --> 00:03:10,200
+into two pieces,
+
+96
+00:03:10,200 --> 00:03:12,750
+and then try to push
+those two pieces together.
+
+97
+00:03:12,750 --> 00:03:13,770
+In this case, clearly,
+
+98
+00:03:13,770 --> 00:03:15,540
+they don't fuse back together.
+
+99
+00:03:15,540 --> 00:03:16,950
+And I suppose that makes sense,
+
+100
+00:03:16,950 --> 00:03:19,080
+like, if you're cutting
+a piece of plastic in two
+
+101
+00:03:19,080 --> 00:03:22,470
+then you're cutting through
+individual polymer chains,
+
+102
+00:03:22,470 --> 00:03:25,320
+you're breaking bonds
+between carbon atoms.
+
+103
+00:03:25,320 --> 00:03:27,000
+When you break a covalent bond like this,
+
+104
+00:03:27,000 --> 00:03:28,590
+you're left with radicals,
+
+105
+00:03:28,590 --> 00:03:31,620
+that's atoms that have
+unpaired valence electrons,
+
+106
+00:03:31,620 --> 00:03:32,880
+they're incredibly reactive,
+
+107
+00:03:32,880 --> 00:03:36,270
+so, we should expect the
+exposed surface atoms
+
+108
+00:03:36,270 --> 00:03:40,050
+to react with molecules in the atmosphere,
+
+109
+00:03:40,050 --> 00:03:41,790
+or if it was in a vacuum,
+
+110
+00:03:41,790 --> 00:03:45,870
+I imagine, they would react
+with the atoms around them
+
+111
+00:03:45,870 --> 00:03:47,850
+in the substance itself,
+
+112
+00:03:47,850 --> 00:03:51,810
+and so, that exposed
+surface becomes unreactive.
+
+113
+00:03:51,810 --> 00:03:53,310
+It's not sticky anymore.
+
+114
+00:03:53,310 --> 00:03:55,620
+If you press those two surfaces together,
+
+115
+00:03:55,620 --> 00:03:58,230
+those bonds aren't going to reform,
+
+116
+00:03:58,230 --> 00:04:02,160
+unless you can introduce quite
+a high activation energy.
+
+117
+00:04:02,160 --> 00:04:05,070
+So, why is it then that
+I can cut this material
+
+118
+00:04:05,070 --> 00:04:06,270
+into two pieces,
+
+119
+00:04:06,270 --> 00:04:07,800
+push the two pieces together,
+
+120
+00:04:07,800 --> 00:04:10,500
+and it reforms into a single piece?
+
+121
+00:04:10,500 --> 00:04:12,690
+Well, the full explanation it seems
+
+122
+00:04:12,690 --> 00:04:15,120
+is hidden behind trade secrets,
+
+123
+00:04:15,120 --> 00:04:17,399
+but there is some information out there.
+
+124
+00:04:17,399 --> 00:04:20,429
+I want to announce this
+Patreon exclusive live Q and A
+
+125
+00:04:20,430 --> 00:04:21,690
+I'm doing on Monday,
+
+126
+00:04:21,690 --> 00:04:23,010
+the 20th of June,
+
+127
+00:04:23,010 --> 00:04:25,170
+but I don't know where
+to put it in the video.
+
+128
+00:04:25,170 --> 00:04:26,460
+Put it anywhere.
+
+129
+00:04:26,460 --> 00:04:28,050
+Okay, thanks, Patrick.
+
+130
+00:04:28,050 --> 00:04:30,390
+Not all self-healing
+polymers are the same,
+
+131
+00:04:30,390 --> 00:04:31,590
+and it seems that there are,
+
+132
+00:04:31,590 --> 00:04:33,780
+at least, two possible explanations
+
+133
+00:04:33,780 --> 00:04:36,120
+for what's happening with this one.
+
+134
+00:04:36,120 --> 00:04:38,940
+The first is a polymerization reaction,
+
+135
+00:04:38,940 --> 00:04:41,910
+and the second is a crosslinking reaction.
+
+136
+00:04:41,910 --> 00:04:44,130
+A polymerization reaction
+is just a reaction
+
+137
+00:04:44,130 --> 00:04:46,830
+that joins lots of small
+molecules together,
+
+138
+00:04:46,830 --> 00:04:49,020
+into long chain molecules,
+
+139
+00:04:49,020 --> 00:04:50,250
+into polymers.
+
+140
+00:04:50,250 --> 00:04:52,830
+It can also be when you take
+two existing polymer chains
+
+141
+00:04:52,830 --> 00:04:56,250
+and join them together into
+one longer polymer chain,
+
+142
+00:04:56,250 --> 00:04:57,990
+and that's potentially what's happening
+
+143
+00:04:57,990 --> 00:04:59,610
+with this self-healing polymer.
+
+144
+00:04:59,610 --> 00:05:02,550
+When you bring two surfaces together,
+
+145
+00:05:02,550 --> 00:05:05,790
+some of the ends of the
+polymers on one surface
+
+146
+00:05:05,790 --> 00:05:08,430
+are joining to some of
+the ends of the polymers
+
+147
+00:05:08,430 --> 00:05:10,260
+on the other surface,
+
+148
+00:05:10,260 --> 00:05:12,630
+creating longer polymer chains
+
+149
+00:05:12,630 --> 00:05:15,180
+that span the break.
+
+150
+00:05:15,180 --> 00:05:16,410
+Unlike with the plastic,
+
+151
+00:05:16,410 --> 00:05:18,660
+this polymerization reaction can happen
+
+152
+00:05:18,660 --> 00:05:19,770
+at room temperature,
+
+153
+00:05:19,770 --> 00:05:22,020
+perhaps because when
+you break the polymers,
+
+154
+00:05:22,020 --> 00:05:25,230
+you're not left with
+highly reactive radicals,
+
+155
+00:05:25,230 --> 00:05:28,950
+or perhaps because of the
+presence of a catalyst.
+
+156
+00:05:28,950 --> 00:05:30,330
+Actually, that might explain
+
+157
+00:05:30,330 --> 00:05:32,640
+why the polymer isn't sticky.
+
+158
+00:05:32,640 --> 00:05:35,730
+If the catalyst has a high specificity
+
+159
+00:05:35,730 --> 00:05:38,940
+to that particular
+polymerization reaction,
+
+160
+00:05:38,940 --> 00:05:41,130
+and very few others,
+
+161
+00:05:41,130 --> 00:05:45,480
+that would explain why
+it's only sticky to itself.
+
+162
+00:05:45,480 --> 00:05:46,590
+The second possibility,
+
+163
+00:05:46,590 --> 00:05:47,910
+crosslinking, is what happens
+
+164
+00:05:47,910 --> 00:05:50,460
+when you have lots of individual chains,
+
+165
+00:05:50,460 --> 00:05:52,560
+and you link them together
+
+166
+00:05:52,560 --> 00:05:55,470
+at different positions along the chain.
+
+167
+00:05:55,470 --> 00:05:58,710
+Like, for example, I've got
+loads of little chains here,
+
+168
+00:05:58,710 --> 00:06:01,380
+and maybe I'm gonna join
+these two chains together
+
+169
+00:06:01,380 --> 00:06:02,310
+at this point,
+
+170
+00:06:02,310 --> 00:06:03,750
+these two chains together at this point,
+
+171
+00:06:03,750 --> 00:06:04,740
+and so on.
+
+172
+00:06:04,740 --> 00:06:07,110
+Crosslinking strengthens a polymer.
+
+173
+00:06:07,110 --> 00:06:10,740
+For example, I've got
+this liquid latex here,
+
+174
+00:06:10,740 --> 00:06:13,230
+it's liquid, because the
+individual polymer chains
+
+175
+00:06:13,230 --> 00:06:15,840
+are able to slide over each other,
+
+176
+00:06:15,840 --> 00:06:17,640
+but I can cause crosslinks to form
+
+177
+00:06:17,640 --> 00:06:19,560
+between these separate chains
+
+178
+00:06:19,560 --> 00:06:21,240
+by changing the pH.
+
+179
+00:06:21,240 --> 00:06:23,040
+So, by adding vinegar,
+
+180
+00:06:23,040 --> 00:06:25,830
+for example, I turn this liquid latex
+
+181
+00:06:25,830 --> 00:06:28,170
+into a bouncy ball.
+
+182
+00:06:28,170 --> 00:06:30,900
+It's interesting to think that before,
+
+183
+00:06:30,900 --> 00:06:33,090
+I had lots of individual molecules,
+
+184
+00:06:33,090 --> 00:06:36,150
+and now, I have one giant molecule,
+
+185
+00:06:36,150 --> 00:06:37,890
+the size of a bouncy ball.
+
+186
+00:06:37,890 --> 00:06:41,220
+And this is true for
+things like car tires.
+
+187
+00:06:41,220 --> 00:06:44,550
+This car tire is one giant molecule.
+
+188
+00:06:44,550 --> 00:06:46,710
+How does this relate to
+self-healing polymers?
+
+189
+00:06:46,710 --> 00:06:48,810
+Well, when two surfaces of the polymer
+
+190
+00:06:48,810 --> 00:06:49,920
+are brought together,
+
+191
+00:06:49,920 --> 00:06:51,420
+chains on one surface,
+
+192
+00:06:51,420 --> 00:06:53,220
+and chains on the other surface,
+
+193
+00:06:53,220 --> 00:06:54,540
+come into contact,
+
+194
+00:06:54,540 --> 00:06:57,030
+and a crosslinking reaction occurs.
+
+195
+00:06:57,030 --> 00:06:58,920
+It's interesting that
+that reaction can happen
+
+196
+00:06:58,920 --> 00:07:00,000
+at room temperature.
+
+197
+00:07:00,000 --> 00:07:01,410
+And it's interesting that the polymer
+
+198
+00:07:01,410 --> 00:07:03,810
+is able to create bonds with itself,
+
+199
+00:07:03,810 --> 00:07:05,910
+but not other things.
+
+200
+00:07:05,910 --> 00:07:08,040
+It's interesting that it's not sticky.
+
+201
+00:07:08,040 --> 00:07:09,420
+Whether it's a crosslinking reaction
+
+202
+00:07:09,420 --> 00:07:10,920
+or a polymerization reaction,
+
+203
+00:07:10,920 --> 00:07:13,320
+the explanation for why this substance
+
+204
+00:07:13,320 --> 00:07:14,760
+is only sticky to itself,
+
+205
+00:07:14,760 --> 00:07:15,840
+and not other things,
+
+206
+00:07:15,840 --> 00:07:18,630
+seems to be in the molecular detail,
+
+207
+00:07:18,630 --> 00:07:21,540
+and that detail seems
+to be a trade secret.
+
+208
+00:07:21,540 --> 00:07:22,500
+But I'll keep digging,
+
+209
+00:07:22,500 --> 00:07:23,970
+and if I find out any more,
+
+210
+00:07:23,970 --> 00:07:25,350
+I'll tell you.
+
+211
+00:07:25,350 --> 00:07:27,480
+Actually, there is a third possibility,
+
+212
+00:07:27,480 --> 00:07:29,550
+but I don't think it's
+what's going on here,
+
+213
+00:07:29,550 --> 00:07:31,980
+and that is micro encapsulation.
+
+214
+00:07:31,980 --> 00:07:34,830
+You have these tiny microcapsules
+
+215
+00:07:34,830 --> 00:07:36,870
+throughout the substance,
+
+216
+00:07:36,870 --> 00:07:40,710
+and inside those capsules is
+some kind of sticky substance,
+
+217
+00:07:40,710 --> 00:07:43,110
+some kind of glue type of thing,
+
+218
+00:07:43,110 --> 00:07:44,910
+or maybe a catalyst,
+
+219
+00:07:44,910 --> 00:07:46,290
+or something like that.
+
+220
+00:07:46,290 --> 00:07:47,520
+When the material is damaged,
+
+221
+00:07:47,520 --> 00:07:49,800
+it tears open those microcapsules,
+
+222
+00:07:49,800 --> 00:07:52,650
+and the content spills
+out and gets to work,
+
+223
+00:07:52,650 --> 00:07:54,030
+healing the damage.
+
+224
+00:07:54,030 --> 00:07:55,530
+You can buy something quite similar
+
+225
+00:07:55,530 --> 00:07:57,060
+from a standard hardware store,
+
+226
+00:07:57,060 --> 00:07:59,220
+usually, called self amalgamating tape,
+
+227
+00:07:59,220 --> 00:08:02,760
+but the fusing isn't quite so good,
+
+228
+00:08:02,760 --> 00:08:04,500
+but it's a similar idea.
+
+229
+00:08:04,500 --> 00:08:06,480
+This video is sponsored by Wondrium.
+
+230
+00:08:06,480 --> 00:08:07,320
+You may have heard me talk
+
+231
+00:08:07,320 --> 00:08:08,850
+about The Great Courses Plus before,
+
+232
+00:08:08,850 --> 00:08:10,890
+well, they've rebranded to Wondrium,
+
+233
+00:08:10,890 --> 00:08:13,080
+because they do a bunch more stuff now.
+
+234
+00:08:13,080 --> 00:08:15,060
+The service is now much broader,
+
+235
+00:08:15,060 --> 00:08:17,520
+and it's much deeper than it was.
+
+236
+00:08:17,520 --> 00:08:19,770
+They've still got those
+educational courses
+
+237
+00:08:19,770 --> 00:08:20,820
+that they've always had,
+
+238
+00:08:20,820 --> 00:08:22,860
+but they also have long-form videos,
+
+239
+00:08:22,860 --> 00:08:24,120
+short-form videos,
+
+240
+00:08:24,120 --> 00:08:26,340
+how-tos, documentaries,
+
+241
+00:08:26,340 --> 00:08:27,810
+travel logs, things like that.
+
+242
+00:08:27,810 --> 00:08:30,090
+The courses are more academically comprehensive than ever before,
+
+243
+00:08:30,090 --> 00:08:30,923
+than ever before,
+
+244
+00:08:30,923 --> 00:08:32,100
+but they're still presented
+
+245
+00:08:32,100 --> 00:08:34,320
+by these really engaging experts,
+
+246
+00:08:34,320 --> 00:08:37,799
+and the content is thoughtfully curated.
+
+247
+00:08:37,799 --> 00:08:39,359
+Couple of things that blew my mind
+
+248
+00:08:39,360 --> 00:08:40,980
+recently on Wondrium,
+
+249
+00:08:40,980 --> 00:08:42,570
+Olbers' Paradox.
+
+250
+00:08:42,570 --> 00:08:44,400
+Olbers' Paradox states that,
+
+251
+00:08:44,400 --> 00:08:47,520
+given everything we
+know about the universe,
+
+252
+00:08:47,520 --> 00:08:50,010
+the night sky shouldn't be dark
+
+253
+00:08:50,010 --> 00:08:52,260
+with pin-points of light,
+
+254
+00:08:52,260 --> 00:08:54,780
+the whole night sky should be bright,
+
+255
+00:08:54,780 --> 00:08:55,680
+but it isn't.
+
+256
+00:08:55,680 --> 00:08:56,940
+And the paradox is solved,
+
+257
+00:08:56,940 --> 00:08:58,830
+interestingly, by the Big Bang.
+
+258
+00:08:58,830 --> 00:09:00,870
+Another mind-blowing thing that I learnt,
+
+259
+00:09:00,870 --> 00:09:04,380
+you can float a cruise
+ship on a gallon of water,
+
+260
+00:09:04,380 --> 00:09:06,120
+the question is, how do you do it?
+
+261
+00:09:06,120 --> 00:09:07,590
+I recommend you have a
+look around this site,
+
+262
+00:09:07,590 --> 00:09:09,480
+because there's loads of stuff
+
+263
+00:09:09,480 --> 00:09:11,220
+for whatever you're interested in.
+
+264
+00:09:11,220 --> 00:09:12,450
+The offer on this one's really good,
+
+265
+00:09:12,450 --> 00:09:13,620
+it's a free trial,
+
+266
+00:09:13,620 --> 00:09:15,840
+if you go to my special URL,
+
+267
+00:09:15,840 --> 00:09:18,720
+wondrium.com/stevemould.
+
+268
+00:09:18,720 --> 00:09:20,730
+The link is also in the description,
+
+269
+00:09:20,730 --> 00:09:22,560
+so, get your free trial today.
+
+270
+00:09:22,560 --> 00:09:23,640
+I hope you enjoyed this video.
+
+271
+00:09:23,640 --> 00:09:25,590
+If you did, don't forget to hit Subscribe,
+
+272
+00:09:25,590 --> 00:09:27,420
+and the algorithm thinks you'll enjoy
+
+273
+00:09:27,420 --> 00:09:28,592
+this video next.
+
+274
+00:09:28,592 --> 00:09:33,592
+(logo whooshes)
+(lively jazz music)
+

@@ -1,0 +1,1313 @@
+1
+00:00:00,090 --> 00:00:02,880
+- This is a hologram that I made by hand.
+
+2
+00:00:02,880 --> 00:00:05,190
+This is also a handmade hologram,
+
+3
+00:00:05,190 --> 00:00:07,200
+but as you can see, it was made by someone
+
+4
+00:00:07,200 --> 00:00:09,030
+who actually knows what they're doing.
+
+5
+00:00:09,030 --> 00:00:12,000
+Both holograms were made
+using the same technique,
+
+6
+00:00:12,000 --> 00:00:14,550
+and this one and this one,
+
+7
+00:00:14,550 --> 00:00:17,340
+the technique is deceptively simple.
+
+8
+00:00:17,340 --> 00:00:20,670
+You just make scratches
+in a shiny surface.
+
+9
+00:00:20,670 --> 00:00:21,990
+I made my holograms
+
+10
+00:00:21,990 --> 00:00:25,560
+on sheets of black
+acrylic using a divider,
+
+11
+00:00:25,560 --> 00:00:28,170
+basically a compass where
+both ends are pointy.
+
+12
+00:00:28,170 --> 00:00:32,100
+These aren't like traditional
+holograms like this one,
+
+13
+00:00:32,100 --> 00:00:35,010
+but these types of holograms
+you get on credit cards
+
+14
+00:00:35,010 --> 00:00:37,590
+are the same as these handmade ones.
+
+15
+00:00:37,590 --> 00:00:39,990
+It's just that the
+etching is much smaller.
+
+16
+00:00:39,990 --> 00:00:41,460
+One thing that's hard to appreciate
+
+17
+00:00:41,460 --> 00:00:44,100
+on video is that this thing is 3D.
+
+18
+00:00:44,100 --> 00:00:46,770
+It appears to hover
+below the acrylic plate.
+
+19
+00:00:46,770 --> 00:00:49,290
+I can give you a sense of
+that by tilting the thing
+
+20
+00:00:49,290 --> 00:00:52,440
+in front of the camera or
+moving the camera side to side,
+
+21
+00:00:52,440 --> 00:00:54,060
+but to really appreciate it.
+
+22
+00:00:54,060 --> 00:00:56,280
+Here's a cross view stereogram.
+
+23
+00:00:56,280 --> 00:00:59,580
+If you're able to go cross eyed
+until the two images overlap
+
+24
+00:00:59,580 --> 00:01:02,700
+with each other, it should
+pop out as a 3D image.
+
+25
+00:01:02,700 --> 00:01:04,950
+You know, while we're doing
+the crossview stereogram thing
+
+26
+00:01:04,950 --> 00:01:07,860
+why don't I show you this
+traditional hologram as well?
+
+27
+00:01:07,860 --> 00:01:09,540
+It's pretty cool, isn't it?
+
+28
+00:01:09,540 --> 00:01:12,033
+And here are those other etch holograms.
+
+29
+00:01:14,850 --> 00:01:18,060
+To show you how etch holograms
+work and how to make them.
+
+30
+00:01:18,060 --> 00:01:19,740
+We'll start with a really simple
+
+31
+00:01:19,740 --> 00:01:21,660
+just a floating point of light
+
+32
+00:01:21,660 --> 00:01:24,150
+and then we'll work up to
+something as complex as this.
+
+33
+00:01:24,150 --> 00:01:25,950
+To create a floating point of light
+
+34
+00:01:25,950 --> 00:01:28,560
+all you have to do is gently score an arc
+
+35
+00:01:28,560 --> 00:01:29,820
+into the acrylic sheet.
+
+36
+00:01:29,820 --> 00:01:32,643
+Now, if I put the camera
+here and a light source here
+
+37
+00:01:32,643 --> 00:01:36,780
+then you can see that the light
+glint off the etched line.
+
+38
+00:01:36,780 --> 00:01:39,060
+But what decides the
+position of the glint?
+
+39
+00:01:39,060 --> 00:01:42,900
+Because look, as the camera
+moves, the glint moves as well.
+
+40
+00:01:42,900 --> 00:01:44,040
+Well, the simplest way to think about it is that the etched groove is like a curved trough shaped mirror.
+
+41
+00:01:44,040 --> 00:01:46,560
+
+
+42
+00:01:46,560 --> 00:01:49,470
+like a curved trough shaped mirror.
+
+43
+00:01:49,470 --> 00:01:52,980
+I was gonna try and figure
+out how to build a large one
+
+44
+00:01:52,980 --> 00:01:55,800
+of those so that you could
+see what was going on.
+
+45
+00:01:55,800 --> 00:01:57,870
+But actually it pretty much acts the same
+
+46
+00:01:57,870 --> 00:02:00,630
+as a shiny tube like this one.
+
+47
+00:02:00,630 --> 00:02:01,860
+And this has the added benefit
+
+48
+00:02:01,860 --> 00:02:04,170
+of being able to change how bent it is.
+
+49
+00:02:04,170 --> 00:02:07,350
+See when the tube is straight,
+the glint is always directly
+
+50
+00:02:07,350 --> 00:02:10,259
+in front of the light source,
+wherever I put the camera.
+
+51
+00:02:10,259 --> 00:02:11,610
+But when the tube is curved
+
+52
+00:02:11,610 --> 00:02:13,650
+the glint doesn't travel as far
+
+53
+00:02:13,650 --> 00:02:16,350
+and the same thing happens
+with the etch on the arc.
+
+54
+00:02:16,350 --> 00:02:18,450
+And that's really the
+key to the whole thing
+
+55
+00:02:18,450 --> 00:02:21,030
+because your left eye sees this image
+
+56
+00:02:21,030 --> 00:02:24,060
+and your right eye sees this image.
+
+57
+00:02:24,060 --> 00:02:26,070
+And if your brain makes the assumption
+
+58
+00:02:26,070 --> 00:02:28,860
+that the glint is in fact an object
+
+59
+00:02:28,860 --> 00:02:33,060
+then your eyes will move so
+as to converge on that object.
+
+60
+00:02:33,060 --> 00:02:36,030
+Just like how if you hold your
+finger in front of your face
+
+61
+00:02:36,030 --> 00:02:39,840
+you'll see two fingers
+until your eyes move inwards they converge on your finger.
+
+62
+00:02:39,840 --> 00:02:42,090
+they converge on your finger.
+
+63
+00:02:42,090 --> 00:02:45,240
+Then you see one finger
+and two backgrounds
+
+64
+00:02:45,240 --> 00:02:46,560
+and the same thing is happening
+
+65
+00:02:46,560 --> 00:02:49,110
+with the glint except in
+the opposite direction.
+
+66
+00:02:49,110 --> 00:02:52,980
+Your eyes have to move apart
+to get the glint to overlap.
+
+67
+00:02:52,980 --> 00:02:54,870
+And of course, your
+brain uses the position
+
+68
+00:02:54,870 --> 00:02:58,350
+of your eyes to figure out
+how far away objects are.
+
+69
+00:02:58,350 --> 00:03:00,600
+So if your eyes have to move apart
+
+70
+00:03:00,600 --> 00:03:02,550
+to bring the two glints together
+
+71
+00:03:02,550 --> 00:03:05,130
+then that tells your brain
+the glint is further away
+
+72
+00:03:05,130 --> 00:03:06,480
+than the surface of the acrylic.
+
+73
+00:03:06,480 --> 00:03:07,313
+The opposite happens
+
+74
+00:03:07,313 --> 00:03:09,060
+when you turn the arc upside down actually
+
+75
+00:03:09,060 --> 00:03:12,090
+and the glint appears to be
+hovering above the acrylic.
+
+76
+00:03:12,090 --> 00:03:14,010
+If you want to make a more complex object
+
+77
+00:03:14,010 --> 00:03:17,640
+then you simply draw out your
+shape and then create lots
+
+78
+00:03:17,640 --> 00:03:20,130
+and lots of points around your drawing,
+
+79
+00:03:20,130 --> 00:03:22,500
+creating an etch for each point.
+
+80
+00:03:22,500 --> 00:03:24,270
+You'll notice that the image is distorted
+
+81
+00:03:24,270 --> 00:03:25,710
+compared to the original.
+
+82
+00:03:25,710 --> 00:03:27,840
+And the distortion of the
+image actually depends
+
+83
+00:03:27,840 --> 00:03:30,300
+on the location of the
+light source and the camera.
+
+84
+00:03:30,300 --> 00:03:31,260
+From what I can tell, if it was possible to have the get a proper rendition of the image, but at that angle you get basically no glint at all.
+
+85
+00:03:31,260 --> 00:03:34,320
+
+
+
+86
+00:03:34,320 --> 00:03:37,110
+
+
+
+87
+00:03:37,110 --> 00:03:38,970
+
+
+88
+00:03:38,970 --> 00:03:40,560
+
+
+89
+00:03:40,560 --> 00:03:43,830
+So there's a trade off, and if
+I was gonna do this properly
+
+90
+00:03:43,830 --> 00:03:47,760
+I would pre warp the image
+in the opposite direction
+
+91
+00:03:47,760 --> 00:03:50,550
+so that when the image became warped
+
+92
+00:03:50,550 --> 00:03:53,070
+by the viewing experience,
+
+93
+00:03:53,070 --> 00:03:56,820
+it would undo the pre-applied warp
+
+94
+00:03:56,820 --> 00:03:57,960
+and the image would look normal.
+
+95
+00:03:57,960 --> 00:04:00,457
+This is all well and good,
+but you might be thinking,
+
+96
+00:04:00,457 --> 00:04:03,180
+"Hold on a second, this thing is flat."
+
+97
+00:04:03,180 --> 00:04:05,250
+Yes, it's floating below the acrylic,
+
+98
+00:04:05,250 --> 00:04:07,080
+but it's all at the same depth
+
+99
+00:04:07,080 --> 00:04:09,510
+and the drawing itself is two dimensional.
+
+100
+00:04:09,510 --> 00:04:12,330
+So how can we make this
+hologram more interesting
+
+101
+00:04:12,330 --> 00:04:14,850
+by creating lines at different depths
+
+102
+00:04:14,850 --> 00:04:18,240
+and maybe even lines that plunge
+in and out of the acrylic?
+
+103
+00:04:18,240 --> 00:04:21,959
+Well, one clue is to be found
+in accidental etch holograms
+
+104
+00:04:21,959 --> 00:04:23,880
+that you may have
+witnessed in your own life
+
+105
+00:04:23,880 --> 00:04:25,860
+like when you've run out of wiper fluid
+
+106
+00:04:25,860 --> 00:04:28,560
+but you use the windscreen wiper anyway,
+
+107
+00:04:28,560 --> 00:04:31,740
+the top of that bright line
+appears to be further away
+
+108
+00:04:31,740 --> 00:04:33,780
+than the bottom of the bright line.
+
+109
+00:04:33,780 --> 00:04:36,120
+Similarly, if a metal
+surface has been worked
+
+110
+00:04:36,120 --> 00:04:38,730
+in a circular motion
+like this source panel
+
+111
+00:04:38,730 --> 00:04:39,870
+then you'll have a glint line
+
+112
+00:04:39,870 --> 00:04:42,090
+that appears to be
+touching the metal surface
+
+113
+00:04:42,090 --> 00:04:44,310
+at the center of the circular work pattern
+
+114
+00:04:44,310 --> 00:04:47,010
+and move away as the light
+glint moves outwards.
+
+115
+00:04:47,010 --> 00:04:49,380
+And that's because, well, it turns out
+
+116
+00:04:49,380 --> 00:04:51,300
+that the tighter the arc,
+
+117
+00:04:51,300 --> 00:04:53,670
+the closer the glint appears to be,
+
+118
+00:04:53,670 --> 00:04:56,190
+and the straighter the
+arc, the further away
+
+119
+00:04:56,190 --> 00:04:57,660
+the glint appears to be.
+
+120
+00:04:57,660 --> 00:04:59,250
+And that makes sense because
+
+121
+00:04:59,250 --> 00:05:02,220
+if the arc was perfectly
+straight at one extreme
+
+122
+00:05:02,220 --> 00:05:03,150
+well that's analogous
+
+123
+00:05:03,150 --> 00:05:05,730
+to the straight tube that I was holding
+
+124
+00:05:05,730 --> 00:05:07,170
+in front of the lights.
+
+125
+00:05:07,170 --> 00:05:08,550
+And in that situation
+
+126
+00:05:08,550 --> 00:05:11,910
+the glint is always directly
+in front of the light source.
+
+127
+00:05:11,910 --> 00:05:13,770
+So when your eyes move to line
+
+128
+00:05:13,770 --> 00:05:17,730
+up the glint in that
+scenario, they will converge
+
+129
+00:05:17,730 --> 00:05:21,240
+at the same depth as
+the light source itself.
+
+130
+00:05:21,240 --> 00:05:22,650
+And then at the opposite end,
+
+131
+00:05:22,650 --> 00:05:26,280
+if the arc was so tight that
+it was basically just a dot,
+
+132
+00:05:26,280 --> 00:05:28,620
+well the glint wouldn't
+move at all relative
+
+133
+00:05:28,620 --> 00:05:30,390
+to the surface of the acrylic.
+
+134
+00:05:30,390 --> 00:05:33,570
+So it should appear to be at
+the surface of the acrylic.
+
+135
+00:05:33,570 --> 00:05:36,600
+And so curvatures in
+between those two extremes
+
+136
+00:05:36,600 --> 00:05:38,730
+will give you depths in between.
+
+137
+00:05:38,730 --> 00:05:39,563
+Here, for example
+
+138
+00:05:39,563 --> 00:05:42,690
+I've created a tilted
+square where the top edge
+
+139
+00:05:42,690 --> 00:05:44,490
+of the square is further away.
+
+140
+00:05:44,490 --> 00:05:47,370
+So the top edge is created
+with straighter arcs.
+
+141
+00:05:47,370 --> 00:05:48,840
+The sides of the square were much trickier
+
+142
+00:05:48,840 --> 00:05:51,630
+because each point along the
+line was at a different depth.
+
+143
+00:05:51,630 --> 00:05:53,640
+So I had to adjust the divider
+
+144
+00:05:53,640 --> 00:05:55,800
+and change the position of the pivot point
+
+145
+00:05:55,800 --> 00:05:57,120
+as I went down the line.
+
+146
+00:05:57,120 --> 00:05:59,910
+By specifying where the
+arcs start and stop.
+
+147
+00:05:59,910 --> 00:06:02,880
+You can have objects that
+appear and disappear, depending
+
+148
+00:06:02,880 --> 00:06:05,520
+on the viewing angle, and
+if you get it just right,
+
+149
+00:06:05,520 --> 00:06:09,780
+that means you can create opaque
+objects with other objects
+
+150
+00:06:09,780 --> 00:06:14,520
+behind that you can only see
+by looking around the corner.
+
+151
+00:06:14,520 --> 00:06:16,950
+Because the opaque square in
+this hologram is quite close
+
+152
+00:06:16,950 --> 00:06:18,270
+to the surface of the acrylic.
+
+153
+00:06:18,270 --> 00:06:20,400
+In other words, I was
+using quite short arcs.
+
+154
+00:06:20,400 --> 00:06:22,830
+You can actually see the
+pivot points that I used
+
+155
+00:06:22,830 --> 00:06:23,663
+for the divider,
+
+156
+00:06:23,663 --> 00:06:26,310
+because it's created all these
+little dots in the surface
+
+157
+00:06:26,310 --> 00:06:29,040
+and there are various techniques
+you can use to prevent that
+
+158
+00:06:29,040 --> 00:06:31,560
+from happening, but it makes
+the whole process a lot slower.
+
+159
+00:06:31,560 --> 00:06:34,140
+The final thing I wanted
+to try was a hologram
+
+160
+00:06:34,140 --> 00:06:37,020
+of the corner of a cube sticking out.
+
+161
+00:06:37,020 --> 00:06:37,890
+This is a lot harder,
+
+162
+00:06:37,890 --> 00:06:41,610
+because all the lines are
+changing death along their length
+
+163
+00:06:41,610 --> 00:06:43,530
+and it was really mind bending to try
+
+164
+00:06:43,530 --> 00:06:45,030
+and work out pivot position
+
+165
+00:06:45,030 --> 00:06:48,450
+and divider adjustment
+for every single point.
+
+166
+00:06:48,450 --> 00:06:50,700
+I also wanted to see if I could have the actual tip of the cube poking out from the surface of the acrylic, which meant having some arcs that were upside down.
+
+167
+00:06:50,700 --> 00:06:53,310
+
+
+168
+00:06:53,310 --> 00:06:56,040
+
+
+169
+00:06:56,040 --> 00:06:57,030
+In the end, I made a bunch of mistakes and it was so hard to get to this point that I just rage quit on this particular hologram.
+
+170
+00:06:57,030 --> 00:06:58,950
+
+
+171
+00:06:58,950 --> 00:07:01,140
+
+
+172
+00:07:01,140 --> 00:07:02,970
+on this particular hologram.
+
+173
+00:07:02,970 --> 00:07:05,250
+So this is as much as you get of this one.
+
+174
+00:07:05,250 --> 00:07:08,310
+This is actually my attempt
+to copy William J Beaty.
+
+175
+00:07:08,310 --> 00:07:10,620
+He discovered the divider
+method independently.
+
+176
+00:07:10,620 --> 00:07:11,453
+Though he does mention
+
+177
+00:07:11,453 --> 00:07:13,530
+that he found some prior
+literature on this subject.
+
+178
+00:07:13,530 --> 00:07:15,300
+Actually, he has some great advice
+
+179
+00:07:15,300 --> 00:07:18,240
+on things like etching
+technique and stuff like that.
+
+180
+00:07:18,240 --> 00:07:20,250
+I'll leave a link to his website.
+
+181
+00:07:20,250 --> 00:07:22,710
+Actually, his YouTube
+channel is brilliant too.
+
+182
+00:07:22,710 --> 00:07:24,510
+There's a link to that in
+the description as well.
+
+183
+00:07:24,510 --> 00:07:27,960
+But anyway, as you can see,
+I got part of the way there.
+
+184
+00:07:27,960 --> 00:07:30,720
+The bits that stick out from
+the acrylic behave weirdly
+
+185
+00:07:30,720 --> 00:07:32,580
+and the glints are quite long.
+
+186
+00:07:32,580 --> 00:07:35,730
+I think that's an artifact of
+the arcs being upside down.
+
+187
+00:07:35,730 --> 00:07:37,890
+I thought it would be
+really cool to have a way
+
+188
+00:07:37,890 --> 00:07:40,530
+for people to be able to
+share their own creations
+
+189
+00:07:40,530 --> 00:07:43,470
+like if you end up making
+your own etch hologram.
+
+190
+00:07:43,470 --> 00:07:45,330
+So on my Discord server,
+
+191
+00:07:45,330 --> 00:07:47,730
+I've created a channel
+specifically for that.
+
+192
+00:07:47,730 --> 00:07:50,130
+I've called it Science Fair Project.
+
+193
+00:07:50,130 --> 00:07:52,530
+So if you do end up
+making an edge hologram
+
+194
+00:07:52,530 --> 00:07:54,420
+do hop over to my Discord server.
+
+195
+00:07:54,420 --> 00:07:55,530
+The link is in the description.
+
+196
+00:07:55,530 --> 00:07:56,550
+Now here's the question.
+
+197
+00:07:56,550 --> 00:08:00,060
+How do you get from this to this?
+
+198
+00:08:00,060 --> 00:08:02,640
+Well, this one was
+created by Matthew Brand.
+
+199
+00:08:02,640 --> 00:08:05,520
+He really helped me to
+understand what's going on,
+
+200
+00:08:05,520 --> 00:08:07,290
+linked to all his stuff
+in the description.
+
+201
+00:08:07,290 --> 00:08:09,240
+Some of his creations
+are for sale, in fact.
+
+202
+00:08:09,240 --> 00:08:12,810
+So one issue you may have
+realized with these holograms
+
+203
+00:08:12,810 --> 00:08:14,790
+that you don't get with this hologram,
+
+204
+00:08:14,790 --> 00:08:18,000
+is the image warps and bends
+
+205
+00:08:18,000 --> 00:08:21,720
+in weird ways as you
+change your viewing angle.
+
+206
+00:08:21,720 --> 00:08:22,860
+Matthew explained that that's
+
+207
+00:08:22,860 --> 00:08:26,370
+because actually an
+arc is the wrong shape.
+
+208
+00:08:26,370 --> 00:08:28,680
+In fact, most people
+creating etch holograms
+
+209
+00:08:28,680 --> 00:08:30,300
+aren't using the right shape.
+
+210
+00:08:30,300 --> 00:08:33,120
+They're all approximations
+to the correct curve.
+
+211
+00:08:33,120 --> 00:08:35,520
+Matthew figured out what
+that curve should be.
+
+212
+00:08:35,520 --> 00:08:37,890
+I won't go into the equations
+or anything like that
+
+213
+00:08:37,890 --> 00:08:39,659
+but look, he kindly sent me this animation
+
+214
+00:08:39,659 --> 00:08:42,239
+of how you might create the correct curve.
+
+215
+00:08:42,240 --> 00:08:44,100
+So it's possible to do it mechanically
+
+216
+00:08:44,100 --> 00:08:45,270
+with the right linkages.
+
+217
+00:08:45,270 --> 00:08:48,360
+But actually what Matthew
+did was create a CNC process.
+
+218
+00:08:48,360 --> 00:08:51,720
+So he defines the 3D shape
+that he wants in software,
+
+219
+00:08:51,720 --> 00:08:53,490
+and then his code converts
+
+220
+00:08:53,490 --> 00:08:55,530
+that into the appropriate etching.
+
+221
+00:08:55,530 --> 00:08:58,440
+The etching is then carried
+out by the computer.
+
+222
+00:08:58,440 --> 00:08:59,273
+It's really interesting
+
+223
+00:08:59,273 --> 00:09:00,960
+to just look at the etches themselves
+
+224
+00:09:00,960 --> 00:09:02,640
+because there would be no way of knowing
+
+225
+00:09:02,640 --> 00:09:05,850
+just looking at this mess
+here, that this would pop out
+
+226
+00:09:05,850 --> 00:09:09,150
+into a 3D shape with an
+appropriate light source.
+
+227
+00:09:09,150 --> 00:09:11,520
+This is a depiction of
+Borromean rings, by the way.
+
+228
+00:09:11,520 --> 00:09:13,590
+So here's a quick tangent about that,
+
+229
+00:09:13,590 --> 00:09:14,580
+because they're really cool.
+
+230
+00:09:14,580 --> 00:09:17,910
+It's possible to link
+three closed loops together
+
+231
+00:09:17,910 --> 00:09:20,760
+in such a way that no two
+loops are linked together
+
+232
+00:09:20,760 --> 00:09:23,340
+meaning if you break any
+one of the three loops
+
+233
+00:09:23,340 --> 00:09:26,460
+the other two come apart,
+and that's Borromean rings.
+
+234
+00:09:26,460 --> 00:09:27,930
+What about those vinyl records?
+
+235
+00:09:27,930 --> 00:09:29,700
+Well, earlier I said that the arc
+
+236
+00:09:29,700 --> 00:09:32,070
+of a circle is not the right shape
+
+237
+00:09:32,070 --> 00:09:35,580
+for the etch because it
+causes warping and distortion,
+
+238
+00:09:35,580 --> 00:09:39,390
+except under very specific
+circumstances where the arc
+
+239
+00:09:39,390 --> 00:09:42,000
+of a circle is the right
+shape for the edge line.
+
+240
+00:09:42,000 --> 00:09:44,820
+And that specific circumstance
+is when the etch goes
+
+241
+00:09:44,820 --> 00:09:46,020
+in a full circle
+
+242
+00:09:46,020 --> 00:09:50,280
+and the image rotates once for
+every rotation of the circle.
+
+243
+00:09:50,280 --> 00:09:52,350
+And that fact has been used beautifully
+
+244
+00:09:52,350 --> 00:09:55,830
+in these commemorative
+Star Wars vinyl records.
+
+245
+00:09:55,830 --> 00:09:58,560
+I really like it when
+a new service pops up
+
+246
+00:09:58,560 --> 00:10:02,010
+and you look at what they
+offer and you think, yeah,
+
+247
+00:10:02,010 --> 00:10:03,960
+that makes logical sense.
+
+248
+00:10:03,960 --> 00:10:05,910
+That thing should exist.
+
+249
+00:10:05,910 --> 00:10:09,240
+Like maybe there's a task
+that you don't want to do,
+
+250
+00:10:09,240 --> 00:10:11,340
+but you know that you should do it
+
+251
+00:10:11,340 --> 00:10:14,850
+and now you can pay this
+company to do it for you.
+
+252
+00:10:14,850 --> 00:10:16,830
+And that's exactly the logic
+
+253
+00:10:16,830 --> 00:10:19,650
+behind this sponsor of
+this video, Incogni.
+
+254
+00:10:19,650 --> 00:10:20,940
+Here's what Incogni does.
+
+255
+00:10:20,940 --> 00:10:22,020
+There are these companies
+
+256
+00:10:22,020 --> 00:10:24,630
+called data brokers
+that collect information
+
+257
+00:10:24,630 --> 00:10:27,510
+about you and then sell that
+information to other people.
+
+258
+00:10:27,510 --> 00:10:30,060
+You don't know who they're selling it to,
+
+259
+00:10:30,060 --> 00:10:32,227
+but you can contact them and say,
+
+260
+00:10:32,227 --> 00:10:34,950
+"Please stop and actually delete my data."
+
+261
+00:10:34,950 --> 00:10:37,560
+The problem is there are
+thousands of these companies
+
+262
+00:10:37,560 --> 00:10:40,800
+and they all want to be
+contacted in different ways
+
+263
+00:10:40,800 --> 00:10:43,350
+and sometimes they'll reject your request
+
+264
+00:10:43,350 --> 00:10:45,150
+and you have to make an appeal.
+
+265
+00:10:45,150 --> 00:10:48,120
+Well, Incogni have figured
+out what needs to be done
+
+266
+00:10:48,120 --> 00:10:50,940
+for each one of those
+thousands of companies.
+
+267
+00:10:50,940 --> 00:10:54,930
+So one service has done
+all the hard work upfront.
+
+268
+00:10:54,930 --> 00:10:58,170
+So now I can just sign up to Incogni
+
+269
+00:10:58,170 --> 00:11:00,240
+give them permission to act on my behalf
+
+270
+00:11:00,240 --> 00:11:02,160
+and they just take care of it.
+
+271
+00:11:02,160 --> 00:11:03,960
+I've been with Incogni for a little while,
+
+272
+00:11:03,960 --> 00:11:06,060
+so I can show you the progress.
+
+273
+00:11:06,060 --> 00:11:08,310
+Look, these are all the
+companies that have confirmed
+
+274
+00:11:08,310 --> 00:11:10,800
+that they now don't have my data.
+
+275
+00:11:10,800 --> 00:11:11,910
+The thing that really annoys me
+
+276
+00:11:11,910 --> 00:11:14,250
+about these companies
+is I'll get a phone call
+
+277
+00:11:14,250 --> 00:11:16,800
+and they'll know my full
+name and they want to talk
+
+278
+00:11:16,800 --> 00:11:18,780
+about life insurance
+or something like that.
+
+279
+00:11:18,780 --> 00:11:22,590
+And I just think, how did
+you get this data about me?
+
+280
+00:11:22,590 --> 00:11:24,570
+And typically, there's no way to find out
+
+281
+00:11:24,570 --> 00:11:26,442
+but you can make it stop.
+
+282
+00:11:26,442 --> 00:11:28,650
+I just know myself well enough
+
+283
+00:11:28,650 --> 00:11:32,040
+that I will never go
+through that manual process.
+
+284
+00:11:32,040 --> 00:11:33,840
+I mean, it would take months anyway.
+
+285
+00:11:33,840 --> 00:11:37,230
+And in that sense, I'm the
+perfect demographic for Incogni
+
+286
+00:11:37,230 --> 00:11:38,760
+and maybe you are too.
+
+287
+00:11:38,760 --> 00:11:40,320
+If you're interested to
+find out more about Incogni,
+
+288
+00:11:40,320 --> 00:11:42,270
+I'd recommend you check out
+the promotion on this one.
+
+289
+00:11:42,270 --> 00:11:45,120
+If you go to incogni.com/science,
+
+290
+00:11:45,120 --> 00:11:48,330
+the first 100 people will get 20% off.
+
+291
+00:11:48,330 --> 00:11:49,800
+The link is also in the description
+
+292
+00:11:49,800 --> 00:11:52,239
+so check out Incogni today.
+
+293
+00:11:52,239 --> 00:11:54,822
+(upbeat music)
+

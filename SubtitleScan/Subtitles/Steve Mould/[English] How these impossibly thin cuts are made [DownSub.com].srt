@@ -1,0 +1,1035 @@
+1
+00:00:00,000 --> 00:00:03,000
+(warm twangy music)
+
+2
+00:00:08,400 --> 00:00:11,700
+- This piece of metal is an offcut from a machine shop.
+
+3
+00:00:11,700 --> 00:00:14,310
+There doesn't seem to be
+anything unusual about it
+
+4
+00:00:14,310 --> 00:00:16,710
+until I push this piece out.
+
+5
+00:00:16,710 --> 00:00:18,120
+How amazing is that?
+
+6
+00:00:18,120 --> 00:00:19,770
+Until the part is pushed out,
+
+7
+00:00:19,770 --> 00:00:22,743
+it's as though there is no seam at all.
+
+8
+00:00:24,060 --> 00:00:24,893
+Look at this one.
+
+9
+00:00:24,893 --> 00:00:26,733
+This is called a MetMo cube.
+
+10
+00:00:28,170 --> 00:00:31,080
+What's cool about this is
+there are actually two parts
+
+11
+00:00:31,080 --> 00:00:32,580
+that slide in and out,
+
+12
+00:00:32,580 --> 00:00:35,850
+and internally they're connected via a small borehole.
+
+13
+00:00:35,850 --> 00:00:39,690
+So when you push one of them
+down, the other one pops up.
+
+14
+00:00:39,690 --> 00:00:40,950
+It's very satisfying.
+
+15
+00:00:40,950 --> 00:00:44,100
+But like, how on earth is
+one of these things made?
+
+16
+00:00:44,100 --> 00:00:46,890
+How can there be almost
+no discernible seam
+
+17
+00:00:46,890 --> 00:00:48,570
+between these parts?
+
+18
+00:00:48,570 --> 00:00:50,940
+Well, these curiosities are made
+
+19
+00:00:50,940 --> 00:00:53,370
+with a technique called wire EDM,
+
+20
+00:00:53,370 --> 00:00:56,880
+or wire electrical discharge machining.
+
+21
+00:00:56,880 --> 00:01:00,120
+Wire EDM is used for all
+sorts of useful things.
+
+22
+00:01:00,120 --> 00:01:03,720
+These curiosities aren't useful as such,
+
+23
+00:01:03,720 --> 00:01:05,610
+but they're a good way to demonstrate
+
+24
+00:01:05,610 --> 00:01:08,790
+the ridiculous precision of wire EDM.
+
+25
+00:01:08,790 --> 00:01:11,460
+You may have seen other
+examples of this online.
+
+26
+00:01:11,460 --> 00:01:13,230
+When I did, I became obsessed
+
+27
+00:01:13,230 --> 00:01:15,420
+with figuring out how it was made
+
+28
+00:01:15,420 --> 00:01:17,850
+and more importantly getting hold of one.
+
+29
+00:01:17,850 --> 00:01:19,560
+There are actually a couple
+of really clever tricks
+
+30
+00:01:19,560 --> 00:01:22,290
+involved in the manufacture
+of these invisible seams.
+
+31
+00:01:22,290 --> 00:01:23,820
+Like when I heard that these were made
+
+32
+00:01:23,820 --> 00:01:25,650
+by a process called wire EDM,
+
+33
+00:01:25,650 --> 00:01:27,180
+I immediately got distracted
+
+34
+00:01:27,180 --> 00:01:29,970
+by what I assumed that must mean.
+
+35
+00:01:29,970 --> 00:01:32,970
+I just thought, "Oh, right,
+it's like a cheese wire."
+
+36
+00:01:32,970 --> 00:01:34,650
+If you want to cut a circular hole,
+
+37
+00:01:34,650 --> 00:01:38,040
+then you drag the wire
+across into the cheese,
+
+38
+00:01:38,040 --> 00:01:41,400
+cut the circle, and then
+carefully pull the wire out.
+
+39
+00:01:41,400 --> 00:01:43,620
+Or if you don't want this cut here,
+
+40
+00:01:43,620 --> 00:01:45,480
+you first drill a hole in the cheese,
+
+41
+00:01:45,480 --> 00:01:46,470
+we've all done it,
+
+42
+00:01:46,470 --> 00:01:50,253
+feed the wire through, reattach
+it, and then do the cut.
+
+43
+00:01:53,430 --> 00:01:54,300
+Another good analogy analogy
+
+44
+00:01:54,300 --> 00:01:56,940
+is cutting styrofoam with a hot wire.
+
+45
+00:01:56,940 --> 00:01:58,833
+The wire melts the styrofoam.
+
+46
+00:02:00,630 --> 00:02:02,220
+It's quite therapeutic, actually.
+
+47
+00:02:02,220 --> 00:02:03,330
+There's a problem, though.
+
+48
+00:02:03,330 --> 00:02:06,150
+You either need to have a cut in this part
+
+49
+00:02:06,150 --> 00:02:09,030
+or a cut and a drill hole in this part,
+
+50
+00:02:09,030 --> 00:02:12,360
+but neither of these
+seem to have those cuts.
+
+51
+00:02:12,360 --> 00:02:15,090
+Also, look how much wriggle room there is there.
+
+52
+00:02:15,090 --> 00:02:16,650
+That's at least half a millimeter.
+
+53
+00:02:16,650 --> 00:02:20,220
+Whereas here, there appears
+to be no apparent clearance.
+
+54
+00:02:20,220 --> 00:02:22,680
+Like, how thin is this flipping wire?
+
+55
+00:02:22,680 --> 00:02:24,930
+And actually that's the first trick.
+
+56
+00:02:24,930 --> 00:02:28,290
+This is actually made from
+two separate bits of metal.
+
+57
+00:02:28,290 --> 00:02:29,460
+First you cut the hole,
+
+58
+00:02:29,460 --> 00:02:33,540
+then separately you cut the
+part that goes into the hole.
+
+59
+00:02:33,540 --> 00:02:35,160
+And you just have to make sure that you compensate for the thickness of the wire so that when one part slides into the other, it's a nice snug fit.
+
+60
+00:02:35,160 --> 00:02:38,070
+
+
+
+61
+00:02:38,070 --> 00:02:40,740
+
+
+
+62
+00:02:40,740 --> 00:02:42,210
+
+
+63
+00:02:42,210 --> 00:02:44,610
+And actually, that's something
+we can see with this part
+
+64
+00:02:44,610 --> 00:02:47,640
+because the piston was
+actually cut from over here.
+
+65
+00:02:47,640 --> 00:02:50,340
+And if I put that piece back
+to where it was cut from,
+
+66
+00:02:50,340 --> 00:02:52,500
+you can see the wriggle room.
+
+67
+00:02:52,500 --> 00:02:53,610
+Measuring with calipers,
+
+68
+00:02:53,610 --> 00:02:56,820
+it's about 0.2 millimeters
+all the way around.
+
+69
+00:02:56,820 --> 00:02:58,710
+That's consistent with
+the width of the wire.
+
+70
+00:02:58,710 --> 00:03:01,470
+And look, there's that
+unavoidable cut line.
+
+71
+00:03:01,470 --> 00:03:04,320
+I managed to do the same thing
+with the cheese, actually.
+
+72
+00:03:04,320 --> 00:03:06,060
+Fits perfectly.
+
+73
+00:03:06,060 --> 00:03:07,410
+Now, what about this second trick?
+
+74
+00:03:07,410 --> 00:03:09,090
+Well, we'll get to that in a moment,
+
+75
+00:03:09,090 --> 00:03:11,760
+but first how does wire EDM work?
+
+76
+00:03:11,760 --> 00:03:12,660
+I went to a machine shop
+
+77
+00:03:12,660 --> 00:03:15,780
+called Travelling Wire in
+West Sussex to find out.
+
+78
+00:03:15,780 --> 00:03:19,260
+So this machine does EDM without a wire,
+
+79
+00:03:19,260 --> 00:03:21,810
+and it's a bit easier to see
+what's going on, actually.
+
+80
+00:03:21,810 --> 00:03:23,070
+So this is the part
+
+81
+00:03:23,070 --> 00:03:26,310
+and this is the tool that's
+going to cut into the part,
+
+82
+00:03:26,310 --> 00:03:28,770
+except it's not cutting
+in the normal sense.
+
+83
+00:03:28,770 --> 00:03:31,530
+The way it works is you
+put a really high voltage
+
+84
+00:03:31,530 --> 00:03:33,630
+between the tool and the part
+
+85
+00:03:33,630 --> 00:03:34,830
+so that if there were to touch,
+
+86
+00:03:34,830 --> 00:03:36,330
+it would complete the circuit.
+
+87
+00:03:36,330 --> 00:03:38,670
+But in reality, the voltage is so high
+
+88
+00:03:38,670 --> 00:03:41,513
+that the part and the tool
+wouldn't need to touch.
+
+89
+00:03:41,513 --> 00:03:43,770
+They would only need to get close enough
+
+90
+00:03:43,770 --> 00:03:46,170
+for a spark to jump from one to the other.
+
+91
+00:03:46,170 --> 00:03:47,970
+And every time the spark jumps,
+
+92
+00:03:47,970 --> 00:03:50,790
+it erodes the surface
+of the part slightly.
+
+93
+00:03:50,790 --> 00:03:52,260
+For the purposes of EDM though,
+
+94
+00:03:52,260 --> 00:03:55,440
+you don't allow the spark
+to travel through air.
+
+95
+00:03:55,440 --> 00:03:57,600
+Instead you surround the part and the tool
+
+96
+00:03:57,600 --> 00:03:59,070
+with an insulating liquid.
+
+97
+00:03:59,070 --> 00:04:01,260
+The liquid has well controlled properties
+
+98
+00:04:01,260 --> 00:04:04,650
+so it breaks down at predictable
+voltages and distances.
+
+99
+00:04:04,650 --> 00:04:06,480
+It's also a better heat sink than air,
+
+100
+00:04:06,480 --> 00:04:09,750
+keeping the bulk of the part
+cool to prevent expansion.
+
+101
+00:04:09,750 --> 00:04:11,137
+Why doesn't an electrical spark
+
+102
+00:04:11,137 --> 00:04:13,050
+erode a contact point though?
+
+103
+00:04:13,050 --> 00:04:15,780
+Well, interestingly,
+we don't know for sure.
+
+104
+00:04:15,780 --> 00:04:18,450
+One impossible explanation is heat.
+
+105
+00:04:18,450 --> 00:04:21,120
+When there's a spark, a huge
+amount of electrical energy
+
+106
+00:04:21,120 --> 00:04:23,070
+is converted into heat energy
+
+107
+00:04:23,070 --> 00:04:24,720
+in a very short period of time,
+
+108
+00:04:24,720 --> 00:04:27,300
+so the metal gets very hot, very briefly.
+
+109
+00:04:27,300 --> 00:04:29,010
+And some of those metal atoms
+
+110
+00:04:29,010 --> 00:04:31,230
+will vaporize away from the surface.
+
+111
+00:04:31,230 --> 00:04:33,660
+So if you want to etch away at something,
+
+112
+00:04:33,660 --> 00:04:35,040
+this is the tool for you.
+
+113
+00:04:35,040 --> 00:04:36,845
+But if you want to
+slice through something,
+
+114
+00:04:36,845 --> 00:04:38,610
+you need a different tool.
+
+115
+00:04:38,610 --> 00:04:40,770
+That's where wire EDM comes in.
+
+116
+00:04:40,770 --> 00:04:43,445
+This is one of Travelling
+Wire's wire EDM machines.
+
+117
+00:04:43,445 --> 00:04:46,020
+By the way, check out the
+link to Travelling Wire
+
+118
+00:04:46,020 --> 00:04:49,200
+in the description for
+all your wire EDM needs.
+
+119
+00:04:49,200 --> 00:04:50,490
+They're not paying me to say that.
+
+120
+00:04:50,490 --> 00:04:51,540
+So we want to cut out
+
+121
+00:04:51,540 --> 00:04:53,760
+a little bit of this sheet of metal here.
+
+122
+00:04:53,760 --> 00:04:55,200
+There's already a hole in the middle
+
+123
+00:04:55,200 --> 00:04:57,270
+so we can feed the wire through there.
+
+124
+00:04:57,270 --> 00:05:00,090
+This jet of water helps to guide the wire
+
+125
+00:05:00,090 --> 00:05:01,470
+as it's being fed in,
+
+126
+00:05:01,470 --> 00:05:02,520
+and once it's through the hole,
+
+127
+00:05:02,520 --> 00:05:04,740
+some machinery underneath grabs it.
+
+128
+00:05:04,740 --> 00:05:06,960
+The whole thing is then submerged in water.
+
+129
+00:05:06,960 --> 00:05:09,120
+Actually, water is only
+a good insulating liquid
+
+130
+00:05:09,120 --> 00:05:10,830
+if it's free of ions,
+
+131
+00:05:10,830 --> 00:05:13,230
+so this water is deionized.
+
+132
+00:05:13,230 --> 00:05:14,370
+There's a machine around the back
+
+133
+00:05:14,370 --> 00:05:17,460
+that takes tap water
+and this special resin.
+
+134
+00:05:17,460 --> 00:05:20,310
+It does something with it and
+pumps out deionized water.
+
+135
+00:05:20,310 --> 00:05:22,590
+Unfortunately, once the
+sides of the tank are up
+
+136
+00:05:22,590 --> 00:05:23,760
+and the thing's filled with water,
+
+137
+00:05:23,760 --> 00:05:25,230
+you really can't see what's going on.
+
+138
+00:05:25,230 --> 00:05:26,460
+Not that it matters
+
+139
+00:05:26,460 --> 00:05:28,470
+when you've got a
+brilliant cheese analogy.
+
+140
+00:05:28,470 --> 00:05:31,620
+One big difference between the
+cheese wire and the EDM wire
+
+141
+00:05:31,620 --> 00:05:34,200
+is that the EDM wire is constantly moving.
+
+142
+00:05:34,200 --> 00:05:36,150
+These pulleys are constantly turning, and if we go around the back you can see it's being chopped up and spat out.
+
+143
+00:05:36,150 --> 00:05:38,100
+
+
+144
+00:05:38,100 --> 00:05:40,650
+
+
+145
+00:05:40,650 --> 00:05:42,690
+That's because the wire itself erodes
+
+146
+00:05:42,690 --> 00:05:44,670
+as well as the part you're machining.
+
+147
+00:05:44,670 --> 00:05:48,720
+This spool here contains about
+10 kilometers of brass wire.
+
+148
+00:05:48,720 --> 00:05:50,970
+And look, there's the part now,
+
+149
+00:05:50,970 --> 00:05:53,160
+cut out exactly how Richard here
+
+150
+00:05:53,160 --> 00:05:55,050
+drew it in his CAD software.
+
+151
+00:05:55,050 --> 00:05:57,840
+You can also angle the wire in clever ways
+
+152
+00:05:57,840 --> 00:05:59,370
+so you can cut tapered parts
+
+153
+00:05:59,370 --> 00:06:01,680
+and holes that have a
+different shape at the opening
+
+154
+00:06:01,680 --> 00:06:02,880
+than they do at the end.
+
+155
+00:06:02,880 --> 00:06:05,190
+You can do all sorts of
+cool stuff with wire EDM.
+
+156
+00:06:05,190 --> 00:06:07,140
+But what about that second trick?
+
+157
+00:06:07,140 --> 00:06:09,570
+Well, look, here's the
+first part that I showed you
+
+158
+00:06:09,570 --> 00:06:12,090
+when it's halfway through
+the manufacturing process.
+
+159
+00:06:12,090 --> 00:06:15,180
+The piston is already cut
+out and it fits perfectly.
+
+160
+00:06:15,180 --> 00:06:16,680
+But look, because it was cut
+
+161
+00:06:16,680 --> 00:06:18,570
+from a different part of the metal,
+
+162
+00:06:18,570 --> 00:06:20,250
+you can see it, right?
+
+163
+00:06:20,250 --> 00:06:22,770
+You can see that it's a
+different piece of metal.
+
+164
+00:06:22,770 --> 00:06:26,400
+So the final trick is to
+polish, or grind, really,
+
+165
+00:06:26,400 --> 00:06:28,800
+the two parts together in situ.
+
+166
+00:06:28,800 --> 00:06:30,930
+By grinding the two parts
+together in this way,
+
+167
+00:06:30,930 --> 00:06:33,240
+they obtain a matching finish.
+
+168
+00:06:33,240 --> 00:06:36,750
+The grain of the abrasion
+pattern flows seamlessly
+
+169
+00:06:36,750 --> 00:06:39,780
+across the seam.
+
+170
+00:06:39,780 --> 00:06:43,170
+And so it seems as though
+the seam can't be seen.
+
+171
+00:06:43,170 --> 00:06:45,690
+And look, you can achieve
+the same thing with cheese.
+
+172
+00:06:45,690 --> 00:06:47,550
+Even knowing how this is done,
+
+173
+00:06:47,550 --> 00:06:50,070
+the precision is unbelievable.
+
+174
+00:06:50,070 --> 00:06:52,200
+A typical wire EDM machine
+will have a precision
+
+175
+00:06:52,200 --> 00:06:55,150
+of around 5000ths of a millimeter,
+
+176
+00:06:55,150 --> 00:06:57,510
+which in inches is a different number.
+
+177
+00:06:57,510 --> 00:07:00,180
+Why is wire EDM so precise?
+
+178
+00:07:00,180 --> 00:07:03,690
+Well, it's mainly because the tool and the part never touch so they don't perturb each other in the same way that you get with an abrading tool.
+
+179
+00:07:03,690 --> 00:07:05,790
+
+
+180
+00:07:05,790 --> 00:07:08,010
+
+
+181
+00:07:08,010 --> 00:07:10,890
+So there you go, wire EDM.
+
+182
+00:07:10,890 --> 00:07:14,010
+The mechanism that joins
+this thing to this thing
+
+183
+00:07:14,010 --> 00:07:17,100
+is really clever but not in
+the way that you might think,
+
+184
+00:07:17,100 --> 00:07:18,840
+and actually not in a good way.
+
+185
+00:07:18,840 --> 00:07:21,240
+In fact, it's in an evil way.
+
+186
+00:07:21,240 --> 00:07:22,320
+Let me explain.
+
+187
+00:07:22,320 --> 00:07:25,050
+The mechanism is just complicated enough
+
+188
+00:07:25,050 --> 00:07:27,810
+and just novel enough to be patentable.
+
+189
+00:07:27,810 --> 00:07:29,490
+That means no other manufacturer
+
+190
+00:07:29,490 --> 00:07:32,460
+is allowed to make blade cartridges
+
+191
+00:07:32,460 --> 00:07:33,900
+that go with this handle,
+
+192
+00:07:33,900 --> 00:07:37,410
+which means if you buy this
+handle you can only buy blades
+
+193
+00:07:37,410 --> 00:07:39,090
+from the same manufacturer
+
+194
+00:07:39,090 --> 00:07:41,580
+at a significantly inflated price.
+
+195
+00:07:41,580 --> 00:07:43,980
+The same thing is true for
+single use coffee pods.
+
+196
+00:07:43,980 --> 00:07:44,813
+The same thing is true
+
+197
+00:07:44,813 --> 00:07:46,920
+for the heads of electric toothbrushes.
+
+198
+00:07:46,920 --> 00:07:50,310
+And amazingly, the same thing
+is true for the uranium rods
+
+199
+00:07:50,310 --> 00:07:53,250
+that go into certain nuclear power plants.
+
+200
+00:07:53,250 --> 00:07:54,510
+Like, wouldn't it be nice
+
+201
+00:07:54,510 --> 00:07:57,420
+if you could just pay a reasonable price
+
+202
+00:07:57,420 --> 00:07:58,740
+for your nuclear power plant?
+
+203
+00:07:58,740 --> 00:08:00,330
+And then you get to buy the uranium rods
+
+204
+00:08:00,330 --> 00:08:01,410
+from wherever you like.
+
+205
+00:08:01,410 --> 00:08:02,340
+Wait, sorry.
+
+206
+00:08:02,340 --> 00:08:03,870
+I mean, wouldn't it be nice
+
+207
+00:08:03,870 --> 00:08:05,805
+if you could pay a reasonable price
+
+208
+00:08:05,805 --> 00:08:09,330
+for a really well-engineered
+razor blade handle,
+
+209
+00:08:09,330 --> 00:08:12,150
+and then you get to buy the
+blades from wherever you like?
+
+210
+00:08:12,150 --> 00:08:12,983
+And actually,
+
+211
+00:08:12,983 --> 00:08:16,230
+even the really good quality
+ones are just pennies.
+
+212
+00:08:16,230 --> 00:08:18,570
+And that's the idea behind Henson Shaving,
+
+213
+00:08:18,570 --> 00:08:19,890
+the sponsor of this video.
+
+214
+00:08:19,890 --> 00:08:21,900
+The Henson AL13 is what you get
+
+215
+00:08:21,900 --> 00:08:24,150
+when a family-run aerospace machine shop
+
+216
+00:08:24,150 --> 00:08:26,010
+pivots to making its own products.
+
+217
+00:08:26,010 --> 00:08:28,680
+Its CNC machines to aerospace standards,
+
+218
+00:08:28,680 --> 00:08:31,421
+and because it's all metal,
+the blades are well supported,
+
+219
+00:08:31,421 --> 00:08:34,140
+unlike the multi-blade
+plastic cartridge razors.
+
+220
+00:08:34,140 --> 00:08:35,789
+And it's just nice to own something
+
+221
+00:08:35,789 --> 00:08:38,519
+that's well made that you're
+gonna make good use of,
+
+222
+00:08:38,520 --> 00:08:40,470
+nevermind the fact that
+the total cost of ownership
+
+223
+00:08:40,470 --> 00:08:43,799
+would easily be cartridge
+razors after only a few months.
+
+224
+00:08:43,799 --> 00:08:45,000
+But what's it like to use?
+
+225
+00:08:45,000 --> 00:08:49,050
+Well, I shaved this side of
+my face with the Henson AL13
+
+226
+00:08:49,050 --> 00:08:50,700
+and I shaved this side of my face
+
+227
+00:08:50,700 --> 00:08:52,920
+with the leading cartridge brand,
+
+228
+00:08:52,920 --> 00:08:55,080
+and the difference is remarkable.
+
+229
+00:08:55,080 --> 00:08:57,630
+Go to hensonshaving.com/stevemould
+
+230
+00:08:57,630 --> 00:08:59,760
+and use promo code STEVEMOULD at checkout
+
+231
+00:08:59,760 --> 00:09:03,360
+to get 100 free blades with
+your purchase of a razor.
+
+232
+00:09:03,360 --> 00:09:05,280
+Just make sure both
+products are in the basket
+
+233
+00:09:05,280 --> 00:09:06,570
+when you apply the code.
+
+234
+00:09:06,570 --> 00:09:08,040
+The link is also in the description,
+
+235
+00:09:08,040 --> 00:09:11,490
+so get yourself a precision
+engineered safety razor today.
+
+236
+00:09:11,490 --> 00:09:12,480
+I hope you enjoyed this video.
+
+237
+00:09:12,480 --> 00:09:14,400
+If you did, don't forget to hit Subscribe.
+
+238
+00:09:14,400 --> 00:09:17,816
+And the algorithm thinks
+you'll enjoy this video next.
+
+239
+00:09:17,816 --> 00:09:20,399
+(upbeat music)
+

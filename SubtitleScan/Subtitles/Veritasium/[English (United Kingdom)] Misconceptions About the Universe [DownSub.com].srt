@@ -1,0 +1,373 @@
+1
+00:00:05,640 --> 00:00:11,110
+- There was a time when the universe was expanding
+so rapidly that parts of it were moving apart
+
+2
+00:00:11,110 --> 00:00:15,070
+from each other faster than the speed of light.
+
+3
+00:00:15,070 --> 00:00:17,650
+That time is right now.
+
+4
+00:00:17,650 --> 00:00:21,750
+A lot of people make a big deal out of the
+fact that during inflation, right after our
+
+5
+00:00:21,750 --> 00:00:27,070
+universe burst into existence, the whole universe
+was expanding faster than light.
+
+6
+00:00:27,070 --> 00:00:32,430
+Now, while that is true, it kind of implies
+that the universe doesn't normally do that,
+
+7
+00:00:32,430 --> 00:00:33,430
+and it does.
+
+8
+00:00:33,430 --> 00:00:38,510
+I mean, if you pick two points far enough
+apart in our universe, you can always find
+
+9
+00:00:38,510 --> 00:00:42,559
+ones that are moving apart from each other
+faster than light.
+
+10
+00:00:42,559 --> 00:00:47,250
+That is simply due to all of the expanding
+space in between.
+
+11
+00:00:47,250 --> 00:00:53,329
+So our universe is now and has always been
+expanding faster than the speed of light.
+
+12
+00:00:53,329 --> 00:00:57,680
+But doesn't this violate Einstein's special
+theory of relativity that says nothing should
+
+13
+00:00:57,680 --> 00:00:59,809
+be able to move faster than light?
+
+14
+00:00:59,809 --> 00:01:01,790
+Actually, no.
+
+15
+00:01:01,790 --> 00:01:05,519
+Relativity says nothing can move through space
+faster than light, but that doesn't stop space
+
+16
+00:01:05,519 --> 00:01:08,170
+itself from expanding however it likes.
+
+17
+00:01:08,170 --> 00:01:13,659
+Now, it was Hubble in the late 1920s who made
+the observations of the night sky, which led
+
+18
+00:01:13,659 --> 00:01:18,250
+us to see that our universe is expanding.
+
+19
+00:01:18,250 --> 00:01:24,680
+The further out in space he looked, the faster
+the objects were moving away from us.
+
+20
+00:01:24,680 --> 00:01:31,990
+So imagine a point so far out there that the
+average recession velocity is the speed of
+
+21
+00:01:31,990 --> 00:01:32,990
+light.
+
+22
+00:01:32,990 --> 00:01:37,990
+I mean, if you think about it, it's going
+to be the same distance in every direction.
+
+23
+00:01:37,990 --> 00:01:42,610
+So that would form a sphere which we call
+the Hubble Sphere.
+
+24
+00:01:42,610 --> 00:01:48,090
+Everything beyond that sphere is moving away
+from us faster than the speed of light.
+
+25
+00:01:48,090 --> 00:01:53,969
+So common sense would say we would never be
+able to see the light from those objects because
+
+26
+00:01:53,969 --> 00:01:56,280
+of how fast they're moving away from us.
+
+27
+00:01:56,280 --> 00:01:58,880
+But in fact, this is not true.
+
+28
+00:01:58,880 --> 00:02:01,450
+We can see those objects.
+
+29
+00:02:01,450 --> 00:02:06,090
+To understand how this could work, picture
+a galaxy beyond our Hubble Sphere.
+
+30
+00:02:06,090 --> 00:02:11,930
+It's receding faster than light, it's in a
+super luminal region of space from our perspective.
+
+31
+00:02:11,930 --> 00:02:18,170
+So any light that emits in our direction,
+will actually be moving away from us as time
+
+32
+00:02:18,170 --> 00:02:19,170
+goes on.
+
+33
+00:02:19,170 --> 00:02:22,459
+Well that doesn't sound very promising.
+
+34
+00:02:22,459 --> 00:02:29,459
+But due to the accelerating expansion of space,
+our Hubble Sphere is actually getting bigger.
+
+35
+00:02:29,459 --> 00:02:34,140
+And if it gets bigger faster than that light
+can get away, then at some point that light
+
+36
+00:02:34,140 --> 00:02:39,780
+is going to travel from a super luminal region
+of space into a subluminal region of space,
+
+37
+00:02:39,780 --> 00:02:42,700
+and so it can start making progress towards
+us.
+
+38
+00:02:42,700 --> 00:02:48,510
+So we can detect it, so we can see that distant
+galaxy, which is of course now even further
+
+39
+00:02:48,510 --> 00:02:52,020
+beyond our Hubble Sphere, but we can see its
+light.
+
+40
+00:02:52,020 --> 00:02:55,000
+We can detect that it's there.
+
+41
+00:02:55,000 --> 00:02:56,890
+This is remarkable.
+
+42
+00:02:56,890 --> 00:03:05,269
+In fact, all of the photons we now receive
+from the first 5 billion years of the universe,
+
+43
+00:03:05,269 --> 00:03:10,510
+they were all emitted in regions of space
+that were traveling, at the time, faster than
+
+44
+00:03:10,510 --> 00:03:12,459
+the speed of light relative to us.
+
+45
+00:03:12,459 --> 00:03:18,780
+The objects that emitted them were, are, and
+always have been moving away from us faster
+
+46
+00:03:18,780 --> 00:03:20,510
+than the speed of light.
+
+47
+00:03:20,510 --> 00:03:25,980
+But their light has entered our Hubble Sphere
+and had enough time to reach us, and so we
+
+48
+00:03:25,980 --> 00:03:27,450
+can see them.
+
+49
+00:03:27,450 --> 00:03:32,060
+So the observable universe is larger than
+our Hubble Sphere.
+
+50
+00:03:32,060 --> 00:03:35,530
+It's actually limited by what's called the
+particle horizon.
+
+51
+00:03:35,530 --> 00:03:40,640
+That is based on the amount of time light
+has had to travel towards us since the beginning
+
+52
+00:03:40,640 --> 00:03:45,629
+of time, that is 13.8 billion years ago as
+far as we can tell.
+
+53
+00:03:45,629 --> 00:03:50,280
+Now because the universe has been expanding
+and that expansion has been accelerating,
+
+54
+00:03:50,280 --> 00:03:54,520
+things are much further out than 13.8 billion
+light years away.
+
+55
+00:03:54,520 --> 00:04:00,519
+I mean, the observable universe has a radius
+of over 46 billion light years.
+
+56
+00:04:00,519 --> 00:04:05,319
+The diameter is about 93 billion light years.
+
+57
+00:04:05,319 --> 00:04:09,239
+That is a huge volume of things that we can
+see.
+
+58
+00:04:09,239 --> 00:04:14,659
+And 13.8 billion years ago, everything in
+that volume and everything beyond it that
+
+59
+00:04:14,659 --> 00:04:20,510
+we can't see would have been compressed into
+a tiny infinitesimally small point that we
+
+60
+00:04:20,510 --> 00:04:21,910
+call the singularity.
+
+61
+00:04:21,910 --> 00:04:23,870
+Actually, no.
+
+62
+00:04:23,870 --> 00:04:28,610
+I mean, that would be true if the universe
+is finite.
+
+63
+00:04:28,610 --> 00:04:36,700
+But if the universe is infinite, and it kind
+of looks like it is, then it was always infinite.
+
+64
+00:04:36,700 --> 00:04:41,970
+So the big bang would have happened literally
+everywhere.
+
+65
+00:04:41,970 --> 00:04:46,270
+But if the universe has always been infinite,
+then what is it expanding into?
+
+66
+00:04:46,270 --> 00:04:49,130
+Well, it doesn't have to expand into anything.
+
+67
+00:04:49,130 --> 00:04:53,170
+I mean, it can expand into itself.
+
+68
+00:04:53,170 --> 00:04:55,200
+That's the thing about infinity.
+
+69
+00:04:55,200 --> 00:05:02,420
+You never run out of it.
+
+70
+00:05:02,420 --> 00:05:06,580
+This episode of Veritasium was supported by
+audible.com, a leading provider of audiobooks
+
+71
+00:05:06,580 --> 00:05:12,510
+with over 150,000 titles in all areas of literature,
+including fiction, non-fiction, and periodicals.
+
+72
+00:05:12,510 --> 00:05:15,540
+This week I wanted to recommend the book Hitchhiker's
+Guide To The Galaxy.
+
+73
+00:05:15,540 --> 00:05:18,360
+It's one of my favorites and it's a classic
+of the science genre.
+
+74
+00:05:18,360 --> 00:05:23,080
+You know, people often ask me, why is the
+number 42 on the Veritasium logo?
+
+75
+00:05:23,080 --> 00:05:26,671
+And that's because it's the answer to the
+ultimate question of life, the universe, and
+
+76
+00:05:26,671 --> 00:05:27,671
+everything.
+
+77
+00:05:27,671 --> 00:05:30,850
+So if you haven't read this book yet, you
+should definitely check it out, and in fact,
+
+78
+00:05:30,850 --> 00:05:35,860
+you can download it for free by going to audible.com/veritasium,
+or you can pick any other book of your choosing
+
+79
+00:05:35,860 --> 00:05:37,450
+for a one month free trial.
+
+80
+00:05:37,450 --> 00:05:40,400
+So I want to thank Audible for supporting
+me and I want to thank you for watching.
+

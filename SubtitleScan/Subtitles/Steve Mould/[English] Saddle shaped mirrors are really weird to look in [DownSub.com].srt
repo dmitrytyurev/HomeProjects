@@ -1,0 +1,1314 @@
+1
+00:00:00,000 --> 00:00:03,450
+- This mirror is convex and
+concave at the same time.
+
+2
+00:00:03,450 --> 00:00:05,760
+So what's it like to
+look into this mirror?
+
+3
+00:00:05,760 --> 00:00:08,670
+We all know what it's like
+to look into a convex mirror,
+
+4
+00:00:08,670 --> 00:00:10,140
+like this security mirror.
+
+5
+00:00:10,140 --> 00:00:12,030
+It creates a sort of fisheye effect.
+
+6
+00:00:12,030 --> 00:00:13,770
+And if you've ever looked
+into a makeup mirror,
+
+7
+00:00:13,770 --> 00:00:15,840
+you'll know what it's like
+to see your reflection
+
+8
+00:00:15,840 --> 00:00:17,280
+from a concave surface.
+
+9
+00:00:17,280 --> 00:00:18,990
+It magnifies your face.
+
+10
+00:00:18,990 --> 00:00:21,570
+Or you know, just look at the
+front and back of a spoon,
+
+11
+00:00:21,570 --> 00:00:24,129
+though it's interesting
+that this concave mirror
+
+12
+00:00:24,129 --> 00:00:25,290
+magnifies your face, while this one
+
+13
+00:00:25,290 --> 00:00:26,670
+turns your face upside down.
+
+14
+00:00:26,670 --> 00:00:27,780
+We'll need to figure that out.
+
+15
+00:00:27,780 --> 00:00:30,359
+What I'm actually showing
+you here is what it's like
+
+16
+00:00:30,359 --> 00:00:32,729
+to be a camera looking into
+concave and convex mirrors.
+
+17
+00:00:32,729 --> 00:00:34,590
+But for this video, I
+want you to experience
+
+18
+00:00:34,590 --> 00:00:36,810
+what it's like to be a person looking into
+
+19
+00:00:36,810 --> 00:00:38,250
+all these different types of mirrors,
+
+20
+00:00:38,250 --> 00:00:39,840
+so I stuck my phone to the inside
+
+21
+00:00:39,840 --> 00:00:41,580
+of this Arnold Schwarzenegger mask.
+
+22
+00:00:41,580 --> 00:00:44,070
+So this is what it's like
+to be Arnold Schwarzenegger
+
+23
+00:00:44,070 --> 00:00:47,160
+looking into a concave mirror
+and this is what it's like
+
+24
+00:00:47,160 --> 00:00:49,650
+to be Arnold Schwarzenegger
+looking into a convex mirror.
+
+25
+00:00:49,650 --> 00:00:51,450
+But what's it like to
+be Arnold Schwarzenegger
+
+26
+00:00:51,450 --> 00:00:52,980
+looking into a mirror that's convex
+
+27
+00:00:52,980 --> 00:00:55,050
+and concave at the same time?
+
+28
+00:00:55,050 --> 00:00:56,850
+What do I even mean by that?
+
+29
+00:00:56,850 --> 00:00:59,850
+Well, I'm talking about a
+mirror that has a saddle point,
+
+30
+00:00:59,850 --> 00:01:02,280
+and just from the name, you
+probably already have an idea
+
+31
+00:01:02,280 --> 00:01:03,780
+what I'm talking about.
+
+32
+00:01:03,780 --> 00:01:06,420
+I don't have a saddle for
+illustration purposes,
+
+33
+00:01:06,420 --> 00:01:09,450
+but I do have a Pringle,
+and a Pringle is a saddle,
+
+34
+00:01:09,450 --> 00:01:11,010
+from a mathematical point of view
+
+35
+00:01:11,010 --> 00:01:13,320
+and only a mathematical point of view.
+
+36
+00:01:13,320 --> 00:01:15,180
+This is the saddle point of the Pringle
+
+37
+00:01:15,180 --> 00:01:18,360
+and if you travel left or
+right away from that point,
+
+38
+00:01:18,360 --> 00:01:20,160
+the height of the Pringle goes down.
+
+39
+00:01:20,160 --> 00:01:22,860
+In other words, the
+saddle point is a maxima,
+
+40
+00:01:22,860 --> 00:01:25,848
+but if I rotate the
+Pringle and do it again,
+
+41
+00:01:25,848 --> 00:01:27,840
+traveling left or right
+away from the saddle point,
+
+42
+00:01:27,840 --> 00:01:29,880
+the height of the Pringle goes up.
+
+43
+00:01:29,880 --> 00:01:31,620
+In other words, this point is a minima.
+
+44
+00:01:31,620 --> 00:01:34,500
+So depending on which plane
+through the Pringle you choose,
+
+45
+00:01:34,500 --> 00:01:37,290
+the saddle point is either
+a maxima or a minima,
+
+46
+00:01:37,290 --> 00:01:38,790
+but when you take the shape as a whole,
+
+47
+00:01:38,790 --> 00:01:40,350
+it's neither of those things.
+
+48
+00:01:40,350 --> 00:01:44,310
+But for the purposes of
+experiencing a mirror of this shape,
+
+49
+00:01:44,310 --> 00:01:46,590
+well, it's concave in this direction
+
+50
+00:01:46,590 --> 00:01:48,720
+and convex in this direction.
+
+51
+00:01:48,720 --> 00:01:50,250
+I was trying to figure out how the hell
+
+52
+00:01:50,250 --> 00:01:52,110
+do you make a saddle-shaped mirror,
+
+53
+00:01:52,110 --> 00:01:53,790
+and then I came across this video
+
+54
+00:01:53,790 --> 00:01:55,860
+on the AlphaPhoenix channel about putting
+
+55
+00:01:55,860 --> 00:01:58,980
+a mirrored surface on 3D
+prints, so I asked him
+
+56
+00:01:58,980 --> 00:02:01,350
+if he'd be interested in
+working on it together
+
+57
+00:02:01,350 --> 00:02:03,150
+and this is what he came up with.
+
+58
+00:02:03,150 --> 00:02:05,160
+Actually, it doesn't
+involve 3D printing at all.
+
+59
+00:02:05,160 --> 00:02:07,650
+It's really clever actually,
+and if you wanna find out
+
+60
+00:02:07,650 --> 00:02:10,050
+how it's done, I recommend
+you watch his video
+
+61
+00:02:10,050 --> 00:02:11,910
+on the subject, but actually check out
+
+62
+00:02:11,910 --> 00:02:14,760
+the whole AlphaPhoenix channel,
+because it's incredible.
+
+63
+00:02:14,760 --> 00:02:16,950
+The link is in the card
+and the description there.
+
+64
+00:02:16,950 --> 00:02:19,140
+So this is what it's like
+to be Arnold Schwarzenegger
+
+65
+00:02:19,140 --> 00:02:21,330
+looking into a saddle-shaped mirror.
+
+66
+00:02:21,330 --> 00:02:23,730
+As I rotate the mirror,
+the direction of stretch
+
+67
+00:02:23,730 --> 00:02:26,130
+also rotates, but the image itself
+
+68
+00:02:26,130 --> 00:02:27,900
+never ends up inverted.
+
+69
+00:02:27,900 --> 00:02:29,550
+I found that quite surprising initially,
+
+70
+00:02:29,550 --> 00:02:32,640
+because the mirror's
+concave in one direction,
+
+71
+00:02:32,640 --> 00:02:35,520
+and concave mirrors flip
+images, but then I realized
+
+72
+00:02:35,520 --> 00:02:38,310
+this mirror is acting
+like a makeup mirror.
+
+73
+00:02:38,310 --> 00:02:40,470
+The concave axis is magnifying the image
+
+74
+00:02:40,470 --> 00:02:42,570
+in that direction instead of flipping it.
+
+75
+00:02:42,570 --> 00:02:44,754
+So how can I get this
+thing to act like a spoon
+
+76
+00:02:44,754 --> 00:02:47,610
+and invert the image in the concave axis?
+
+77
+00:02:47,610 --> 00:02:50,070
+Well, it's all to do with the
+location of the focal point.
+
+78
+00:02:50,070 --> 00:02:52,370
+If the head is between the
+mirror and the focal point
+
+79
+00:02:52,370 --> 00:02:54,810
+of the mirror, then the head is magnified.
+
+80
+00:02:54,810 --> 00:02:57,960
+If the focal point is between
+the mirror and the head,
+
+81
+00:02:57,960 --> 00:02:59,850
+then the head is flipped.
+
+82
+00:02:59,850 --> 00:03:02,490
+With this mirror, the focal
+point is somewhere out here,
+
+83
+00:03:02,490 --> 00:03:05,220
+and if I tried to film from
+outside the focal point,
+
+84
+00:03:05,220 --> 00:03:06,390
+it just wouldn't work.
+
+85
+00:03:06,390 --> 00:03:07,410
+It's too small.
+
+86
+00:03:07,410 --> 00:03:09,720
+You wouldn't be able to see
+any of Arnold Schwarzenegger.
+
+87
+00:03:09,720 --> 00:03:12,360
+So what I need to do is
+bring the focal point
+
+88
+00:03:12,360 --> 00:03:13,590
+closer to the mirror.
+
+89
+00:03:13,590 --> 00:03:15,820
+In other words, I need
+to make the curvature
+
+90
+00:03:16,719 --> 00:03:18,360
+of the mirror more
+extreme, and fortunately,
+
+91
+00:03:18,360 --> 00:03:20,010
+this mirror is adjustable.
+
+92
+00:03:20,010 --> 00:03:21,990
+But then we run into a slight issue.
+
+93
+00:03:21,990 --> 00:03:24,630
+When you try to do that
+with, say, a playing card,
+
+94
+00:03:24,630 --> 00:03:26,460
+you actually don't get a saddle point.
+
+95
+00:03:26,460 --> 00:03:28,890
+You get either a trough in this direction
+
+96
+00:03:28,890 --> 00:03:30,450
+or a trough in this direction,
+
+97
+00:03:30,450 --> 00:03:32,010
+and you can flip between the two.
+
+98
+00:03:32,010 --> 00:03:33,840
+If you try hard enough, you can end up
+
+99
+00:03:33,840 --> 00:03:35,850
+with this situation where two corners
+
+100
+00:03:35,850 --> 00:03:38,250
+are pointing up and two
+corners are pointing down,
+
+101
+00:03:38,250 --> 00:03:40,740
+but then you've got this
+flat region in the middle.
+
+102
+00:03:40,740 --> 00:03:43,920
+An acrylic sheet is more
+elastic than a playing card,
+
+103
+00:03:43,920 --> 00:03:47,490
+so this isn't an issue
+for shallow curvatures,
+
+104
+00:03:47,490 --> 00:03:49,140
+but when I try to increase the curvature,
+
+105
+00:03:49,140 --> 00:03:52,620
+you end up with one axis
+more curved than the other
+
+106
+00:03:52,620 --> 00:03:55,080
+and you have this slight
+flat region in the middle.
+
+107
+00:03:55,080 --> 00:03:57,360
+Andrew Dubinsky and
+Michael Barson also offered
+
+108
+00:03:57,360 --> 00:03:59,970
+to make me a saddle-shaped
+mirror and I'm hugely grateful
+
+109
+00:03:59,970 --> 00:04:01,140
+for what they've produced.
+
+110
+00:04:01,140 --> 00:04:02,340
+They used a different method.
+
+111
+00:04:02,340 --> 00:04:05,610
+The traditional way to make
+a saddle point mathematically
+
+112
+00:04:05,610 --> 00:04:09,120
+is to construct a surface
+called a hyperbolic paraboloid.
+
+113
+00:04:09,120 --> 00:04:12,030
+The equation for that
+is Z equals X times Y,
+
+114
+00:04:12,030 --> 00:04:13,860
+which makes intuitive sense.
+
+115
+00:04:13,860 --> 00:04:17,160
+If X and Y are both
+positive or both negative,
+
+116
+00:04:17,160 --> 00:04:20,790
+then Z is positive, which
+pulls these two corners up,
+
+117
+00:04:20,790 --> 00:04:24,420
+but if X is positive and y
+is negative or vice versa,
+
+118
+00:04:24,420 --> 00:04:27,630
+then Z is negative, which
+pulls these two corners down.
+
+119
+00:04:27,630 --> 00:04:28,920
+But one thing that's really surprising
+
+120
+00:04:28,920 --> 00:04:30,630
+about a hyperbolic paraboloid is that
+
+121
+00:04:30,630 --> 00:04:33,300
+it can be constructed
+using only straight lines.
+
+122
+00:04:33,300 --> 00:04:35,700
+You can see that here in these two sweeps.
+
+123
+00:04:35,700 --> 00:04:37,830
+Look, you've got straight
+lines in this plane
+
+124
+00:04:37,830 --> 00:04:39,660
+and straight lines in this plane.
+
+125
+00:04:39,660 --> 00:04:41,460
+With that in mind, when Andrew and Michael
+
+126
+00:04:41,460 --> 00:04:43,950
+came across a bamboo
+placemat, they realized
+
+127
+00:04:43,950 --> 00:04:45,810
+they might have the perfect beginnings
+
+128
+00:04:45,810 --> 00:04:47,610
+of a hyperbolic paraboloid mirror.
+
+129
+00:04:47,610 --> 00:04:49,860
+You see, the strips of bamboo constrained
+
+130
+00:04:49,860 --> 00:04:52,320
+those straight lines, but with a twist,
+
+131
+00:04:52,320 --> 00:04:54,180
+we can get that saddle point.
+
+132
+00:04:54,180 --> 00:04:56,880
+You can see here how they
+created a cardboard frame
+
+133
+00:04:56,880 --> 00:04:59,130
+to lock it in the
+saddle-point configuration.
+
+134
+00:04:59,130 --> 00:05:01,500
+Then by heating sheets of PETG above
+
+135
+00:05:01,500 --> 00:05:03,030
+the plastic transition temperature,
+
+136
+00:05:03,030 --> 00:05:06,330
+they could lay that over the
+top and then clamp it down
+
+137
+00:05:06,330 --> 00:05:08,670
+with a similarly-manufactured top plate.
+
+138
+00:05:08,670 --> 00:05:11,850
+Once cooled, the sheet
+of PETG would be smoother
+
+139
+00:05:11,850 --> 00:05:13,590
+than the surface it cooled on.
+
+140
+00:05:13,590 --> 00:05:16,230
+Then that became the surface that the next sheet is molded to.
+
+141
+00:05:16,230 --> 00:05:17,250
+
+
+142
+00:05:17,250 --> 00:05:19,980
+Each step makes the surface
+smoother and smoother
+
+143
+00:05:19,980 --> 00:05:22,890
+than the original bamboo,
+and this is what we have.
+
+144
+00:05:22,890 --> 00:05:23,910
+So there's definitely a trade off
+
+145
+00:05:23,910 --> 00:05:26,760
+between these two methods of
+making a saddle-shaped mirror.
+
+146
+00:05:26,760 --> 00:05:28,920
+You can achieve a greater
+curvature with this one,
+
+147
+00:05:28,920 --> 00:05:31,050
+but it's a little more wobbly.
+
+148
+00:05:31,050 --> 00:05:33,690
+It's interesting to see how even very minor wobbles in the surface can distort the reflection so much.
+
+149
+00:05:33,690 --> 00:05:36,660
+
+
+150
+00:05:36,660 --> 00:05:38,670
+I mean, I should've known,
+that given that I made
+
+151
+00:05:38,670 --> 00:05:41,160
+two videos on the subject,
+one about caustics
+
+152
+00:05:41,160 --> 00:05:43,200
+and one about Chinese magic mirrors.
+
+153
+00:05:43,200 --> 00:05:45,120
+Link in the card and the
+description for them.
+
+154
+00:05:45,120 --> 00:05:47,310
+So now that the focal point is between
+
+155
+00:05:47,310 --> 00:05:49,800
+Arnold Schwarzenegger and the mirror,
+
+156
+00:05:49,800 --> 00:05:51,840
+look what happens when
+I rotate the mirror.
+
+157
+00:05:51,840 --> 00:05:55,010
+The head ends up on its side at one point,
+
+158
+00:05:55,010 --> 00:05:55,843
+which is quite surprising.
+
+159
+00:05:55,843 --> 00:05:57,360
+When the mirror is positioned like this,
+
+160
+00:05:57,360 --> 00:06:00,330
+with that concave axis at 45 degrees,
+
+161
+00:06:00,330 --> 00:06:03,390
+then you're flipping the
+image in this direction.
+
+162
+00:06:03,390 --> 00:06:05,370
+Look what happens when
+I do that in Photoshop.
+
+163
+00:06:05,370 --> 00:06:07,860
+Here's the flip, and
+that quite intuitively
+
+164
+00:06:07,860 --> 00:06:09,720
+puts the image on its side.
+
+165
+00:06:09,720 --> 00:06:11,670
+The mirror's convex in this direction,
+
+166
+00:06:11,670 --> 00:06:14,880
+so the image is squished
+in this direction.
+
+167
+00:06:14,880 --> 00:06:16,680
+Shrinking the image in this direction
+
+168
+00:06:16,680 --> 00:06:18,540
+is what skews the image.
+
+169
+00:06:18,540 --> 00:06:20,280
+That focal point actually
+does something brilliant
+
+170
+00:06:20,280 --> 00:06:22,380
+to the rays of light hitting the mirror.
+
+171
+00:06:22,380 --> 00:06:24,420
+Andrew and Michael used a laser line
+
+172
+00:06:24,420 --> 00:06:26,190
+and a fog machine to illustrate this.
+
+173
+00:06:26,190 --> 00:06:28,890
+See, there's a focal
+point, but as you rotate
+
+174
+00:06:28,890 --> 00:06:30,810
+the laser line around, the focal point
+
+175
+00:06:30,810 --> 00:06:33,570
+kind of untwists itself as it moves
+
+176
+00:06:33,570 --> 00:06:36,180
+from the concave plane
+to the convex plane.
+
+177
+00:06:36,180 --> 00:06:37,961
+How cool is that?
+
+178
+00:06:37,961 --> 00:06:39,900
+By the way, it's fiendishly
+difficult to keep the subject
+
+179
+00:06:39,900 --> 00:06:42,990
+in the mirror when you're
+watching a mirrored version
+
+180
+00:06:42,990 --> 00:06:45,750
+of your phone filming a mirror
+that behaves differently
+
+181
+00:06:45,750 --> 00:06:48,300
+when you tilt it, depending on how it's oriented, and it's constantly overheating, because you've stuffed the head to stop it collapsing.
+
+
+182
+00:06:48,300 --> 00:06:49,500
+
+
+183
+00:06:49,500 --> 00:06:51,660
+
+
+184
+00:06:51,660 --> 00:06:54,480
+Which leads me to the
+third saddle-shaped mirror,
+
+185
+00:06:54,480 --> 00:06:57,810
+which I commissioned animator
+peak Pete McPartland to make.
+
+186
+00:06:57,810 --> 00:06:59,850
+With this, there's no
+fiddling about with masks
+
+187
+00:06:59,850 --> 00:07:01,140
+and cameras and everything.
+
+188
+00:07:01,140 --> 00:07:03,480
+You just put a 3D model of a head in there
+
+189
+00:07:03,480 --> 00:07:05,340
+and stick the camera inside the head,
+
+190
+00:07:05,340 --> 00:07:08,250
+and I can easily adjust the
+parameters of the mirror.
+
+191
+00:07:08,250 --> 00:07:09,810
+So there's lots to play with here,
+
+192
+00:07:09,810 --> 00:07:12,480
+but first, as this is rendered digitally,
+
+193
+00:07:12,480 --> 00:07:15,570
+we can explore a little bit of
+the mathematics of the curve.
+
+194
+00:07:15,570 --> 00:07:18,570
+It's really cool to look at a
+contour map of a saddle point.
+
+195
+00:07:18,570 --> 00:07:20,370
+Look, as I cut through the mirror,
+
+196
+00:07:20,370 --> 00:07:23,370
+these two curves are hyperbolas, and look,
+
+197
+00:07:23,370 --> 00:07:25,410
+when you get to this point, they touch
+
+198
+00:07:25,410 --> 00:07:27,180
+and you end up with a cross, and actually,
+
+199
+00:07:27,180 --> 00:07:29,160
+that's true of all saddle points.
+
+200
+00:07:29,160 --> 00:07:31,950
+Every saddle point has
+contour lines that cross.
+
+201
+00:07:31,950 --> 00:07:34,200
+Interestingly, a hyperbolic
+paraboloid can also
+
+202
+00:07:34,200 --> 00:07:36,820
+be formed with the
+equation Z equals X squared
+
+203
+00:07:37,691 --> 00:07:38,524
+minus Y squared.
+
+204
+00:07:38,524 --> 00:07:41,010
+Look, you can see there's
+the X squared curve
+
+205
+00:07:41,010 --> 00:07:45,060
+and there it is sweeping over
+the minus Y squared curve.
+
+206
+00:07:45,060 --> 00:07:47,340
+So this is what happens
+when you approach the mirror
+
+207
+00:07:47,340 --> 00:07:49,260
+but don't go past the focal point.
+
+208
+00:07:49,260 --> 00:07:51,000
+Your face basically stretches out.
+
+209
+00:07:51,000 --> 00:07:52,980
+Then if you carry on past the focal point,
+
+210
+00:07:52,980 --> 00:07:54,690
+your face unstretches again.
+
+211
+00:07:54,690 --> 00:07:56,880
+That's counterintuitive
+to me, but actually,
+
+212
+00:07:56,880 --> 00:07:59,430
+if we rotate the mirror through 45 degrees
+
+213
+00:07:59,430 --> 00:08:02,010
+so that the concave axis is vertical,
+
+214
+00:08:02,010 --> 00:08:05,610
+we can see that the face
+starts flipped top to bottom,
+
+215
+00:08:05,610 --> 00:08:07,470
+and when you pass through the focal point,
+
+216
+00:08:07,470 --> 00:08:09,900
+it comes back 'round to the right way up.
+
+217
+00:08:09,900 --> 00:08:12,510
+And so actually what you're
+seeing in this orientation
+
+218
+00:08:12,510 --> 00:08:15,390
+is the face flipped
+horizontally and then unflipping
+
+219
+00:08:15,390 --> 00:08:17,190
+when you go through the focal point.
+
+220
+00:08:19,920 --> 00:08:23,490
+You also see copies of the face
+creeping in from the sides.
+
+221
+00:08:23,490 --> 00:08:26,520
+It might be more correct to
+say that those side faces
+
+222
+00:08:26,520 --> 00:08:28,590
+replace the middle face, as opposed
+
+223
+00:08:28,590 --> 00:08:31,020
+to the middle face flipping,
+and that's a brand new sentence
+
+224
+00:08:31,020 --> 00:08:32,220
+that's never been said before.
+
+225
+00:08:32,220 --> 00:08:33,780
+I used an iPhone to take a scan
+
+226
+00:08:33,780 --> 00:08:36,090
+of my face so I could
+put that in the render.
+
+227
+00:08:36,090 --> 00:08:38,429
+It's not a great quality
+model, but it's interesting
+
+228
+00:08:38,429 --> 00:08:41,732
+that you can use an iPhone's
+face ID tech in this way.
+
+229
+00:08:43,590 --> 00:08:46,390
+Here's what happens when you
+move your head up and down,
+
+230
+00:08:48,510 --> 00:08:51,210
+and when you move your head side to side,
+
+231
+00:08:51,210 --> 00:08:53,490
+and for completeness and because we can,
+
+232
+00:08:53,490 --> 00:08:55,980
+here's what happens when
+the mirror slowly flattens
+
+233
+00:08:55,980 --> 00:08:57,663
+and then goes the other way.
+
+234
+00:08:59,850 --> 00:09:02,250
+Probably the ultimate
+way to make a physical
+
+235
+00:09:02,250 --> 00:09:05,310
+saddle-shaped mirror would be with CNC.
+
+236
+00:09:05,310 --> 00:09:08,130
+There are some significant
+complications with that.
+
+237
+00:09:08,130 --> 00:09:10,230
+A lot of it's to do with
+the time and expense
+
+238
+00:09:10,230 --> 00:09:13,260
+of finishing the surface,
+though because the saddle shape
+
+239
+00:09:13,260 --> 00:09:15,570
+is made of straight lines,
+you could potentially
+
+240
+00:09:15,570 --> 00:09:17,760
+make this thing using wire EDM.
+
+241
+00:09:17,760 --> 00:09:20,760
+Link in the card and description
+to my video about wire EDM.
+
+242
+00:09:20,760 --> 00:09:23,220
+But potentially you could
+have a really nice surface
+
+243
+00:09:23,220 --> 00:09:26,910
+after the cut that doesn't need
+a huge amount of finishing.
+
+244
+00:09:26,910 --> 00:09:29,460
+If that ever happens, I'll
+make a follow-up video.
+
+245
+00:09:29,460 --> 00:09:32,673
+I will watch any movie
+starring Arnold Schwarzenegger.
+
+246
+00:09:34,089 --> 00:09:37,407
+"Terminator," "Terminator 2," "Twins."
+
+247
+00:09:38,820 --> 00:09:39,720
+Here's the thing, though.
+
+248
+00:09:39,720 --> 00:09:42,210
+I've never seen "Conan the Barbarian,"
+
+249
+00:09:42,210 --> 00:09:44,250
+even though it's on
+Netflix, and that's because
+
+250
+00:09:44,250 --> 00:09:46,770
+it's not on Netflix in the UK.
+
+251
+00:09:46,770 --> 00:09:49,740
+Brilliantly, if I search for,
+"Conan the," Netflix shows me
+
+252
+00:09:49,740 --> 00:09:51,630
+this show called "Barbarians."
+
+253
+00:09:51,630 --> 00:09:52,620
+It knows what I want.
+
+254
+00:09:52,620 --> 00:09:54,090
+It's just not giving it to me.
+
+255
+00:09:54,090 --> 00:09:56,070
+But it is available in the U.S.,
+
+256
+00:09:56,070 --> 00:10:00,480
+so if I turn on a U.S.
+location in Surfshark VPN,
+
+257
+00:10:00,480 --> 00:10:02,220
+the sponsor of this video, and then look,
+
+258
+00:10:02,220 --> 00:10:05,430
+I go back to Netflix, and
+there's "Conan the Barbarian!"
+
+259
+00:10:05,430 --> 00:10:06,270
+Yay!
+
+260
+00:10:06,270 --> 00:10:09,840
+A VPN encrypts all the web
+traffic leaving your device,
+
+261
+00:10:09,840 --> 00:10:12,660
+meaning that nobody on your Wi-Fi network,
+
+262
+00:10:12,660 --> 00:10:14,640
+nobody at your internet service provider,
+
+263
+00:10:14,640 --> 00:10:16,590
+nobody in your government,
+if that's something
+
+264
+00:10:16,590 --> 00:10:18,600
+you need to worry about, is able to see
+
+265
+00:10:18,600 --> 00:10:20,280
+the websites that you visit.
+
+266
+00:10:20,280 --> 00:10:22,530
+Typically, they wouldn't
+be able to see the content
+
+267
+00:10:22,530 --> 00:10:26,040
+of the websites you visit,
+because most websites use HTTPS,
+
+268
+00:10:26,040 --> 00:10:28,590
+but they would still be
+able to see the domain names
+
+269
+00:10:28,590 --> 00:10:31,140
+that you visit if you didn't use a VPN.
+
+270
+00:10:31,140 --> 00:10:33,030
+If that's important to
+you, then that's another
+
+271
+00:10:33,030 --> 00:10:34,260
+use case scenario.
+
+272
+00:10:34,260 --> 00:10:36,630
+To flip the Netflix use case on its head,
+
+273
+00:10:36,630 --> 00:10:40,230
+I was in France recently and
+it was a real pain in the arse
+
+274
+00:10:40,230 --> 00:10:43,590
+to do any kind of life
+admin, because any website
+
+275
+00:10:43,590 --> 00:10:46,410
+that I visited while I was
+there wanted to redirect me
+
+276
+00:10:46,410 --> 00:10:50,460
+to the French version, but
+by switching Surfshark VPN
+
+277
+00:10:50,460 --> 00:10:55,080
+to a UK IP address, everything
+worked as if I was at home.
+
+278
+00:10:55,080 --> 00:10:56,250
+That's just a couple of use cases.
+
+279
+00:10:56,250 --> 00:10:57,083
+What else to say?
+
+280
+00:10:57,083 --> 00:10:59,010
+Once Surfshark account can be used
+
+281
+00:10:59,010 --> 00:11:00,540
+on an unlimited number of devices.
+
+282
+00:11:00,540 --> 00:11:02,550
+There's a 30-day money back guarantee,
+
+283
+00:11:02,550 --> 00:11:05,070
+which means you can try
+absolutely risk free.
+
+284
+00:11:05,070 --> 00:11:07,200
+If you're interested, then
+there's a great promotion
+
+285
+00:11:07,200 --> 00:11:08,660
+on this one.
+
+286
+00:11:08,660 --> 00:11:12,120
+If you go to surfshark.deals/stevemould,
+
+287
+00:11:12,120 --> 00:11:14,610
+you'll get three extra
+months absolutely free.
+
+288
+00:11:14,610 --> 00:11:16,050
+The link is also in the description,
+
+289
+00:11:16,050 --> 00:11:17,760
+so check out Surfshark today.
+
+290
+00:11:17,760 --> 00:11:18,630
+I hope you enjoyed this video.
+
+291
+00:11:18,630 --> 00:11:20,640
+If you did, don't forget to hit subscribe,
+
+292
+00:11:20,640 --> 00:11:23,829
+and the algorithm thinks
+you'll enjoy this video next.
+
+293
+00:11:23,829 --> 00:11:26,829
+(funky jazzy music)
+

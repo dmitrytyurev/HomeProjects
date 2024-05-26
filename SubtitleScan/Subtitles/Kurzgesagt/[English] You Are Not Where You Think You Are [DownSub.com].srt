@@ -1,0 +1,536 @@
+1
+00:00:00,720 --> 00:00:07,520
+Look around you. Where are you? Where is this 
+place you are occupying? Somewhere in a room,  
+
+2
+00:00:07,520 --> 00:00:12,720
+maybe in a city on a continent on a planet 
+orbiting a star in a galaxy among billions.  
+
+3
+00:00:13,680 --> 00:00:18,160
+But… where is all of that? While 
+this may feel like a daft question,  
+
+4
+00:00:18,160 --> 00:00:23,280
+it turns out that the concept of an absolute 
+position is something humans made up.
+
+5
+00:00:23,920 --> 00:00:27,920
+In a nutshell, the universe is a big 
+bag of space that has things in it.  
+
+6
+00:00:28,560 --> 00:00:32,960
+If someone removed all these things, the 
+stars and planets and black holes and dust,  
+
+7
+00:00:32,960 --> 00:00:37,600
+there would just be empty space left. 
+In empty space, the concept of having  
+
+8
+00:00:37,600 --> 00:00:42,560
+a position loses all meaning. Empty 
+space is uniform, the same everywhere.
+
+9
+00:00:43,520 --> 00:00:49,200
+The space we occupy is not like a stage under 
+our feet. We can't mark specific points, or staple something to spacetime as an anchor. 
+
+10
+00:00:49,200 --> 00:00:54,880
+
+ Without things there is no position.  
+
+11
+00:00:55,600 --> 00:00:59,600
+We are really ever only at a position 
+in relation to something else.  
+
+12
+00:01:00,320 --> 00:01:05,120
+Which also means that things we take for granted, 
+like up and down are actually relative too.
+
+13
+00:01:06,000 --> 00:01:08,880
+Ok, let us fill the universe up with things again  
+
+14
+00:01:08,880 --> 00:01:12,640
+and try to find out where you are, 
+right now. Relative to everything else.
+
+15
+00:01:24,080 --> 00:01:29,280
+Let us start this video at a familiar place 
+and then get increasingly weird. From your  
+
+16
+00:01:29,280 --> 00:01:34,720
+perspective the world is seemingly flat and you 
+can move in 3 dimensions. It's what physicists  
+
+17
+00:01:34,720 --> 00:01:39,360
+call a 'frame of reference' - the perspective 
+you have of the universe and how you see things  
+
+18
+00:01:39,360 --> 00:01:45,040
+moving around you. Where your up and down 
+is. Your frame of reference is correct.  
+
+19
+00:01:45,040 --> 00:01:47,840
+For you – but not for the rest of the universe.
+
+20
+00:01:49,040 --> 00:01:54,240
+Around 5 kilometers from you, where the horizon 
+begins, the ground noticeably curves away from  
+
+21
+00:01:54,240 --> 00:01:58,800
+you. If you could see through the ground, 
+you’d see people from below or sideways.  
+
+22
+00:01:59,440 --> 00:02:03,840
+But they don't fall 'down' off the planet 
+because gravity doesn't actually pull them down.  
+
+23
+00:02:04,640 --> 00:02:10,800
+'Down' is an illusion of your reference frame. To 
+earth's reference frame, gravity just pulls in.
+
+24
+00:02:11,520 --> 00:02:16,400
+But for humans there is an up and down because 
+within our frame of reference that just makes  
+
+25
+00:02:16,400 --> 00:02:22,320
+sense. Which is also why we think that the planet 
+itself has an up and down, north and south. And  
+
+26
+00:02:22,320 --> 00:02:28,240
+we made our maps accordingly. But an observer 
+looking at the solar system might disagree.  
+
+27
+00:02:29,120 --> 00:02:33,280
+Our maps make sense to us because we are 
+used to them, not because they are correct.
+
+28
+00:02:34,240 --> 00:02:39,200
+Ok. So this is step one – your position 
+on what feels like a flat surface but  
+
+29
+00:02:39,200 --> 00:02:44,400
+is actually a sphere. But this sphere is 
+always moving, never staying in one position.  
+
+30
+00:02:45,040 --> 00:02:48,560
+Earth is orbiting a star, the sun 
+at the center of the solar system.
+
+31
+00:02:49,200 --> 00:02:51,920
+While we usually imagine this as pretty orderly,  
+
+32
+00:02:51,920 --> 00:02:55,120
+someone looking at us from the outside 
+would see something pretty messy.  
+
+33
+00:02:55,840 --> 00:03:00,160
+To see this more clearly we’ll exaggerate 
+all these movements, this is not to scale.
+
+34
+00:03:01,280 --> 00:03:05,760
+First of all, our orbit really is an ellipse, 
+so we spend half the year sinking a little  
+
+35
+00:03:05,760 --> 00:03:10,080
+bit closer to the sun speeding up, and half 
+the year rising up a bit and slowing down.  
+
+36
+00:03:10,960 --> 00:03:15,040
+And the ellipsis itself changes 
+its shape every 100,000 years too.
+
+37
+00:03:15,760 --> 00:03:21,520
+And in another cycle of 112,000 years, the 
+ellipse itself is drifting – which at least  
+
+38
+00:03:21,520 --> 00:03:26,880
+creates a beautiful shape. In the end, we get an orbital path that looks like a wobbly circle with wavy edges.
+
+39
+00:03:26,880 --> 00:03:32,240
+circle with wavy edges. And it gets worse, as the moon now starts to screw things up too.
+
+40
+00:03:32,960 --> 00:03:38,800
+As the moon is a pretty massive thing, it pulls on 
+earth. Both objects orbit their common center of  
+
+41
+00:03:38,800 --> 00:03:45,280
+gravity, that lies around 4700 km off to the 
+side of Earth’s core. In practice this means  
+
+42
+00:03:45,280 --> 00:03:49,920
+that as the moon orbits earth, it is jerking earth around a bit, enough to make it jiggle.
+
+43
+00:03:50,720 --> 00:03:53,920
+Ok so you are standing on the 
+surface of a rotating planet,  
+
+44
+00:03:53,920 --> 00:03:58,960
+that is jiggling around the sun in an 
+elliptical orbit that changes a bit every year.
+
+45
+00:03:58,960 --> 00:04:01,840
+But who's to say the earth is right? From  
+
+46
+00:04:01,840 --> 00:04:06,000
+the perspective of the sun the plane 
+of the solar system is arbitrary,  
+
+47
+00:04:06,000 --> 00:04:11,840
+it's defined as the plane the earth orbits in 
+because that is convenient for us. In reality  
+
+48
+00:04:11,840 --> 00:04:15,840
+the other planets are just a little 
+bit inclined with respect to our plane.  
+
+49
+00:04:15,840 --> 00:04:19,120
+From their point of view, we're the 
+ones with a slightly bent orbit.
+
+50
+00:04:20,160 --> 00:04:26,000
+But this is not it – far from it! The solar system 
+as a whole is orbiting the center of the milky  
+
+51
+00:04:26,000 --> 00:04:31,440
+way galaxy. If we look at the milky way, we can 
+clearly make out a galactic plane in which the  
+
+52
+00:04:31,440 --> 00:04:37,440
+solar system orbits the center every 230 million 
+years. But of course it is not that simple.
+
+53
+00:04:38,400 --> 00:04:43,120
+First of all, the plane of the solar system 
+is not aligned with the plane of the galaxy.  
+
+54
+00:04:43,120 --> 00:04:48,240
+Nothing really is – just like the planets in the 
+solar system orbit the sun on their own planes, so  
+
+55
+00:04:48,240 --> 00:04:54,720
+do all the stars orbiting the galactic center. The 
+solar system as a whole is tilted about 60 degrees  
+
+56
+00:04:54,720 --> 00:04:59,520
+towards the galactic plane, speeding through 
+space at almost a million kilometers per hour.
+
+57
+00:05:00,400 --> 00:05:04,400
+Someone in the center of the galaxy would see 
+the orbits of the planets moving through space  
+
+58
+00:05:04,400 --> 00:05:07,600
+in a helix shape, which you can 
+imagine as a corkscrew motion,  
+
+59
+00:05:07,600 --> 00:05:11,280
+on the tilted plane of the solar system, 
+relative to the plane of the galaxy.
+
+60
+00:05:12,080 --> 00:05:14,560
+This orientation in space means that sometimes the  
+
+61
+00:05:14,560 --> 00:05:18,240
+planets are sort of in front of the sun 
+as it orbits around the galactic core.  
+
+62
+00:05:18,880 --> 00:05:23,520
+Let us just look at this for a moment 
+– there is a strange and eerie beauty  
+
+63
+00:05:23,520 --> 00:05:29,120
+abouthow our planets and the sun move through 
+space. Do you feel a bit dizzy? It gets worse.
+
+64
+00:05:30,160 --> 00:05:35,200
+This is still not the whole story because the 
+mass of the galactic disk is constantly pulling on  
+
+65
+00:05:35,200 --> 00:05:41,280
+the solar system too. Like a drunk dolphin, we're 
+diving down and shooting up hundreds of lightyears  
+
+66
+00:05:41,280 --> 00:05:46,320
+through the galactic plane, ten times every 
+orbit, along arcs thousands of light years long.  
+
+67
+00:05:47,520 --> 00:05:50,640
+We haven’t mapped this motion out 
+completely, as it takes the solar  
+
+68
+00:05:50,640 --> 00:05:56,400
+system tens of millions of years to go up and 
+back once; and, well, humanity is not that old.
+
+69
+00:05:57,440 --> 00:06:00,720
+Let’s look at your relative 
+position again. On a planet,  
+
+70
+00:06:00,720 --> 00:06:05,440
+tilted towards the sun, jiggled around by 
+the moon. In a solar system tilted towards  
+
+71
+00:06:05,440 --> 00:06:10,320
+the galactic plane, moving forward in a helical 
+shape, diving up and down through the plane.
+
+72
+00:06:10,840 --> 00:06:17,680
+Hm. But where is “up” in a galaxy? At this point 
+the frame of reference becomes a bit arbitrary  
+
+73
+00:06:17,680 --> 00:06:22,400
+and pointless because of the nature of the 
+universe at this scale. The Milky way is  
+
+74
+00:06:22,400 --> 00:06:27,280
+part of a galaxy group that appears to be part of 
+greater structures like the Laniakea Supercluster,  
+
+75
+00:06:27,280 --> 00:06:33,440
+which itself is part of the gigantic Pisces–Cetus 
+Supercluster Complex and finally a galactic  
+
+76
+00:06:33,440 --> 00:06:38,320
+filament that spans hundreds of millions of lightyears in all directions and orientations.
+
+77
+00:06:39,200 --> 00:06:44,400
+Someone looking right at us from that far 
+away will only see the End of Greatness.  
+
+78
+00:06:44,960 --> 00:06:50,080
+All stuff appears homogeneous, the same 
+everywhere. Just like with empty space,  
+
+79
+00:06:50,080 --> 00:06:54,320
+when everything looks the same, who's to say 
+anyone's view is better than anyone else's?
+
+80
+00:06:55,360 --> 00:06:59,280
+We have reached the end of our 
+little exercise in cosmic humility.  
+
+81
+00:06:59,840 --> 00:07:04,560
+Let us make the journey backwards again. From 
+the indescribably large, to the really large,  
+
+82
+00:07:04,560 --> 00:07:10,400
+to our galactic home, to our galaxy, to the solar 
+system diving up and down through the milky way,  
+
+83
+00:07:10,400 --> 00:07:15,840
+to the jiggle of existence. And finally, 
+back to you, right now, watching this video.
+
+84
+00:07:17,520 --> 00:07:23,200
+If this is all a bit much, don’t feel bad. 
+The scale of the universe is brain crushing  
+
+85
+00:07:23,200 --> 00:07:27,760
+and trying to keep track of how everything is 
+oriented or decide where the best up and down is,  
+
+86
+00:07:27,760 --> 00:07:32,000
+is hard. But it doesn't really matter. 
+Because it doesn't change where you are.  
+
+87
+00:07:32,000 --> 00:07:38,480
+You're already in the best spot you could possibly 
+be – right here, right now. For all you care  
+
+88
+00:07:38,480 --> 00:07:43,840
+nothing can stop you from being right at 
+the center of your own little universe.
+
+89
+00:07:46,240 --> 00:07:51,760
+Perspective really is everything. That is true 
+for the universe we all inhabit, but even more  
+
+90
+00:07:51,760 --> 00:07:57,920
+so within your personal universe. The way your 
+life will unfold also depends on what you consider  
+
+91
+00:07:57,920 --> 00:08:04,960
+possible. Take us at Kurzgesagt: our passion is 
+to spark curiosity for science and make videos for  
+
+92
+00:08:04,960 --> 00:08:11,680
+free. But this is not a great business model so we 
+began to create our own lines of science posters,  
+
+93
+00:08:11,680 --> 00:08:16,960
+calendars and fun kurzgesagt merch - pieces of 
+Kurzgesagt - that you can take home and touch.
+
+94
+00:08:17,520 --> 00:08:21,840
+And we are doing this with Shopify, who 
+also were so kind as to sponsor this  
+
+95
+00:08:21,840 --> 00:08:25,840
+video – which delighted us because we have 
+been using their platform for years now.  
+
+96
+00:08:26,400 --> 00:08:30,720
+Shopify is an e-commerce platform that 
+allows you to start and grow your business.  
+
+97
+00:08:30,720 --> 00:08:36,080
+And by starting a business, we really do mean 
+from scratch: if you want to sell your handmade  
+
+98
+00:08:36,080 --> 00:08:41,360
+ceramic mugs out of your bedroom today, you can. 
+But not just that – if you want to scale your  
+
+99
+00:08:41,360 --> 00:08:46,080
+one-man show to a sizeable team, then Shopify 
+has the tools to support you on your journey.  
+
+100
+00:08:46,640 --> 00:08:54,240
+Now you just have to get started: go to 
+shopify.com/kurzgesagt to get a free 14 day trial.
+
+101
+00:08:54,240 --> 00:08:59,760
+If you think that this does not apply to you and 
+your ideas are too small, we want to encourage you  
+
+102
+00:08:59,760 --> 00:09:05,360
+to think again: the first video on this channel 
+was a university project and Kurzgesagt itself  
+
+103
+00:09:05,360 --> 00:09:10,160
+was a creative outlet. Eventually we grew 
+into a business and the team that is making  
+
+104
+00:09:10,160 --> 00:09:14,560
+videos for you today. And all of that just 
+because we wanted to try out something new.
+
+105
+00:09:15,200 --> 00:09:19,440
+This is exactly the sort of thing 
+that Shopify is determined to support  
+
+106
+00:09:19,440 --> 00:09:25,040
+and you can build your own thing with it. After 
+all, whetheryour idea is still just a dream or  
+
+107
+00:09:25,040 --> 00:09:32,320
+might turn into a plan today is also just a matter 
+of perspective. Millions of businesses in over 175  
+
+108
+00:09:32,320 --> 00:09:37,520
+countries are currently using Shopify to sell 
+their products and we are one of them. Thanks  
+
+109
+00:09:37,520 --> 00:09:49,840
+to them for helping us get here and thanks to 
+all of you for making our channel possible.
+

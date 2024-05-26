@@ -1,0 +1,1285 @@
+1
+00:00:00,120 --> 00:00:02,640
+- This is a camera that can see sound.
+
+2
+00:00:02,640 --> 00:00:05,970
+In other words, it can show
+you where in a scene sounds
+
+3
+00:00:05,970 --> 00:00:06,803
+are coming from.
+
+4
+00:00:06,803 --> 00:00:08,370
+How acoustic cameras work,
+
+5
+00:00:08,370 --> 00:00:10,980
+and what they're capable of is remarkable.
+
+6
+00:00:10,980 --> 00:00:14,640
+But before we get into that,
+I went to an anechoic chamber
+
+7
+00:00:14,640 --> 00:00:16,320
+to have a play with one.
+
+8
+00:00:16,320 --> 00:00:19,890
+Here's me playing the ukulele
+and talking at the same time.
+
+9
+00:00:19,890 --> 00:00:22,230
+It's interesting that the
+sound appears to switch
+
+10
+00:00:22,230 --> 00:00:25,440
+between coming from my mouth
+and coming from the ukulele,
+
+11
+00:00:25,440 --> 00:00:27,930
+even though sometimes
+both are making a sound
+
+12
+00:00:27,930 --> 00:00:28,950
+at the same time.
+
+13
+00:00:28,950 --> 00:00:31,380
+And brilliantly, this
+is completely analogous
+
+14
+00:00:31,380 --> 00:00:34,140
+to a traditional light-based camera.
+
+15
+00:00:34,140 --> 00:00:37,500
+What we have here is an
+issue of dynamic range.
+
+16
+00:00:37,500 --> 00:00:40,770
+If you have your camera
+set to automatic exposure
+
+17
+00:00:40,770 --> 00:00:42,990
+which your smartphone is by default,
+
+18
+00:00:42,990 --> 00:00:45,630
+and you shoot a video of a dim light,
+
+19
+00:00:45,630 --> 00:00:49,290
+then turn on a much brighter
+light, the camera will switch
+
+20
+00:00:49,290 --> 00:00:52,440
+between showing you lots
+of detail of the dim light
+
+21
+00:00:52,440 --> 00:00:55,530
+to showing you lots of
+detail of the bright light.
+
+22
+00:00:55,530 --> 00:00:58,650
+And the same thing is happening
+here with the ukulele.
+
+23
+00:00:58,650 --> 00:01:01,440
+The ukulele is louder than my voice.
+
+24
+00:01:01,440 --> 00:01:03,180
+So when the ukulele is being played,
+
+25
+00:01:03,180 --> 00:01:06,750
+the acoustic camera dials
+down its sensitivity
+
+26
+00:01:06,750 --> 00:01:09,870
+and you can no longer see my voice.
+
+27
+00:01:09,870 --> 00:01:12,390
+But when I stop strumming the ukulele, the camera dials up the sensitivity, and then you can see my voice.
+
+
+28
+00:01:12,390 --> 00:01:15,300
+
+
+29
+00:01:15,300 --> 00:01:18,150
+What's really cool is
+that because my voice is
+
+30
+00:01:18,150 --> 00:01:20,730
+in a different frequency
+range to the ukulele,
+
+31
+00:01:20,730 --> 00:01:23,370
+it's possible to isolate just my voice
+
+32
+00:01:23,370 --> 00:01:26,040
+and ignore the ukulele or vice versa.
+
+33
+00:01:26,040 --> 00:01:27,810
+And actually, this starts to hint
+
+34
+00:01:27,810 --> 00:01:31,710
+at one of the industrial
+applications for acoustic cameras.
+
+35
+00:01:31,710 --> 00:01:34,768
+One really noisy appliance
+is a vacuum cleaner.
+
+36
+00:01:34,768 --> 00:01:36,990
+(vacuum cleaner buzzing)
+
+37
+00:01:36,990 --> 00:01:39,420
+It just seems like a cacophony of sound.
+
+38
+00:01:39,420 --> 00:01:41,190
+But look at this spectrogram,
+
+39
+00:01:41,190 --> 00:01:44,460
+which is like a heat map of
+the different frequencies
+
+40
+00:01:44,460 --> 00:01:46,260
+that the vacuum cleaner is producing.
+
+41
+00:01:46,260 --> 00:01:47,910
+You can see that there are a handful
+
+42
+00:01:47,910 --> 00:01:50,190
+of really strong frequencies.
+
+43
+00:01:50,190 --> 00:01:51,450
+With the acoustic camera software,
+
+44
+00:01:51,450 --> 00:01:53,670
+you can isolate different frequencies.
+
+45
+00:01:53,670 --> 00:01:57,060
+So look, this frequency
+here we now can see
+
+46
+00:01:57,060 --> 00:01:59,670
+is from the tube of the vacuum cleaner.
+
+47
+00:01:59,670 --> 00:02:02,130
+So we now know that the tube
+of the vacuum cleaner resonates
+
+48
+00:02:02,130 --> 00:02:05,100
+at 400 hertz, and we
+can see that the motor
+
+49
+00:02:05,100 --> 00:02:09,210
+of the vacuum cleaner produces
+a frequency of 7,000 hertz.
+
+50
+00:02:09,210 --> 00:02:10,830
+And all this is really useful information
+
+51
+00:02:10,830 --> 00:02:13,800
+if you're trying to engineer
+a quieter appliance.
+
+52
+00:02:13,800 --> 00:02:16,380
+Another cool trick is once you have the recording, you can use something akin to the eyedropper tool in Photoshop to point at different parts of the recording and see what just that part sounds like.
+
+53
+00:02:16,380 --> 00:02:19,170
+
+
+54
+00:02:19,170 --> 00:02:22,290
+
+
+55
+00:02:22,290 --> 00:02:25,350
+
+
+56
+00:02:25,350 --> 00:02:26,183
+How cool is that?
+
+57
+00:02:26,183 --> 00:02:28,620
+Thanks by the way, to
+Ian McFarlane from AcSoft
+
+58
+00:02:28,620 --> 00:02:31,230
+who supply acoustic cameras in the U.K.
+
+59
+00:02:31,230 --> 00:02:32,430
+Check them out in the description
+
+60
+00:02:32,430 --> 00:02:34,110
+for all your acoustic camera needs.
+
+61
+00:02:34,110 --> 00:02:35,610
+They're not paying me
+to say that, by the way.
+
+62
+00:02:35,610 --> 00:02:37,770
+And thanks also to Manny and Zomi
+
+63
+00:02:37,770 --> 00:02:40,830
+and the Birmingham Center for
+Railway Research Education
+
+64
+00:02:40,830 --> 00:02:43,770
+at the University of Birmingham
+who hosted the whole thing.
+
+65
+00:02:43,770 --> 00:02:46,290
+Why would a railway research
+facility be interested
+
+66
+00:02:46,290 --> 00:02:47,910
+in using an acoustic camera?
+
+67
+00:02:47,910 --> 00:02:52,230
+Well, here's one setup, track
+side and as trains go by,
+
+68
+00:02:52,230 --> 00:02:55,680
+you can identify what
+wheels are making a noise
+
+69
+00:02:55,680 --> 00:02:57,030
+and need maintenance.
+
+70
+00:02:57,030 --> 00:03:00,484
+Without this kind of monitoring,
+often the first you know
+
+71
+00:03:00,484 --> 00:03:04,530
+about a problem with a
+train is when it breaks down
+
+72
+00:03:04,530 --> 00:03:07,980
+in service which causes
+delays and costs money.
+
+73
+00:03:07,980 --> 00:03:10,200
+Like imagine the lost productivity
+
+74
+00:03:10,200 --> 00:03:12,480
+if all these people were late for work.
+
+75
+00:03:12,480 --> 00:03:14,610
+I actually realized
+I've got this hypothesis
+
+76
+00:03:14,610 --> 00:03:17,850
+that I could test using
+the acoustic cameras.
+
+77
+00:03:17,850 --> 00:03:19,500
+There's this demo that I used to do for live shows like, you know, science shows for kids where you get an aluminum rod like this and you pinch it in the middle
+
+78
+00:03:19,500 --> 00:03:21,840
+
+
+
+79
+00:03:21,840 --> 00:03:23,940
+
+
+80
+00:03:23,940 --> 00:03:26,520
+
+
+81
+00:03:26,520 --> 00:03:30,097
+and then with a bit of
+rosin between your fingers
+
+82
+00:03:30,097 --> 00:03:34,620
+you pinch along the rod
+and headphone warning,
+
+83
+00:03:34,620 --> 00:03:37,388
+it makes a horribly high-pitched sound.
+
+84
+00:03:37,388 --> 00:03:40,055
+(rod screaming)
+
+85
+00:03:43,680 --> 00:03:45,630
+It's horrible, isn't it?
+
+86
+00:03:45,630 --> 00:03:48,030
+The question is, how is the rod vibrating?
+
+87
+00:03:48,030 --> 00:03:50,760
+Is it vibrating in the same way that like when you twang a ruler waggling like that?
+
+
+88
+00:03:50,760 --> 00:03:54,330
+
+
+89
+00:03:54,330 --> 00:03:58,050
+Or is it more like, you know when you pluck a guitar string?
+
+90
+00:03:58,050 --> 00:04:00,810
+So it's kind of like, you
+know it's going like that.
+
+91
+00:04:00,810 --> 00:04:02,730
+Well, depending on how it's vibrating,
+
+92
+00:04:02,730 --> 00:04:05,970
+the sound would be coming from
+different parts of the rod.
+
+93
+00:04:05,970 --> 00:04:08,220
+And you can see here
+that the sound is coming
+
+94
+00:04:08,220 --> 00:04:11,640
+from the very tips of the
+rod, and that's consistent
+
+95
+00:04:11,640 --> 00:04:14,280
+with a really unexpected vibrational mode
+
+96
+00:04:14,280 --> 00:04:16,560
+where the rod is essentially contracting
+
+97
+00:04:16,560 --> 00:04:19,079
+and then expanding and
+contracting and expanding.
+
+98
+00:04:19,079 --> 00:04:21,839
+One thing that's insanely
+cool about acoustic cameras
+
+99
+00:04:21,839 --> 00:04:23,100
+is the frame rate.
+
+100
+00:04:23,100 --> 00:04:25,020
+Like a typical frame rate for a camera
+
+101
+00:04:25,020 --> 00:04:26,820
+is 60 frames per second.
+
+102
+00:04:26,820 --> 00:04:29,220
+That's what I film my YouTube videos in.
+
+103
+00:04:29,220 --> 00:04:32,340
+But when you record sound,
+you are typically sampling
+
+104
+00:04:32,340 --> 00:04:35,850
+at about 40,000 samples per second.
+
+105
+00:04:35,850 --> 00:04:38,370
+And when you translate
+that to an acoustic camera,
+
+106
+00:04:38,370 --> 00:04:41,640
+that's 40,000 frames per second.
+
+107
+00:04:41,640 --> 00:04:46,110
+So by accident, acoustic cameras
+are also high-speed cameras
+
+108
+00:04:46,110 --> 00:04:48,120
+which means you can do things like film
+
+109
+00:04:48,120 --> 00:04:50,580
+what an echo looks like
+and then play it back
+
+110
+00:04:50,580 --> 00:04:52,110
+in super-slow motion.
+
+111
+00:04:52,110 --> 00:04:53,400
+Before we get to that though,
+
+112
+00:04:53,400 --> 00:04:56,280
+I want to explain how
+acoustic cameras work.
+
+113
+00:04:56,280 --> 00:04:58,500
+And actually this relates to
+a video I made a while back
+
+114
+00:04:58,500 --> 00:05:01,560
+about how humans detect
+where sounds are coming from,
+
+115
+00:05:01,560 --> 00:05:03,030
+linked to that in the
+card in the description,
+
+116
+00:05:03,030 --> 00:05:06,030
+but here's a quick summary
+of the salient part.
+
+117
+00:05:06,030 --> 00:05:07,830
+We detect where sounds
+are coming from based
+
+118
+00:05:07,830 --> 00:05:10,980
+on the timings of sound
+reaching our two ears.
+
+119
+00:05:10,980 --> 00:05:13,110
+So if a sound is coming
+from directly in front,
+
+120
+00:05:13,110 --> 00:05:14,970
+it'll reach both ears at the same time.
+
+121
+00:05:14,970 --> 00:05:17,520
+And that's how we know
+it's coming from in front.
+
+122
+00:05:17,520 --> 00:05:20,700
+But suppose there's a
+delay of 0.3 milliseconds,
+
+123
+00:05:20,700 --> 00:05:22,770
+that tells our brain the sound is coming
+
+124
+00:05:22,770 --> 00:05:25,680
+from like off to one
+side, like over there.
+
+125
+00:05:25,680 --> 00:05:26,790
+But actually it could also be coming
+
+126
+00:05:26,790 --> 00:05:27,810
+from over there, couldn't it?
+
+127
+00:05:27,810 --> 00:05:28,950
+Cuz the delay would be the same,
+
+128
+00:05:28,950 --> 00:05:31,680
+or like up there at an
+angle, or down there.
+
+129
+00:05:31,680 --> 00:05:34,200
+In fact, there's a whole
+region of possible places
+
+130
+00:05:34,200 --> 00:05:35,580
+the sound could be coming from.
+
+131
+00:05:35,580 --> 00:05:38,550
+And that region is called
+the cone of confusion,
+
+132
+00:05:38,550 --> 00:05:42,210
+though technically it's a
+hyperboloid of confusion.
+
+133
+00:05:42,210 --> 00:05:43,530
+Here's an illustration of that.
+
+134
+00:05:43,530 --> 00:05:45,450
+The two yellow dots are the ears
+
+135
+00:05:45,450 --> 00:05:48,810
+and here is the cone of
+possible locations of a sound
+
+136
+00:05:48,810 --> 00:05:51,900
+for which the delay between
+the two ears is the same.
+
+137
+00:05:51,900 --> 00:05:54,060
+So how do you reduce that surface
+
+138
+00:05:54,060 --> 00:05:57,120
+of possible sound locations
+down to a single point?
+
+139
+00:05:57,120 --> 00:06:00,330
+Well, the human brain has lots
+of clever ways of doing that.
+
+140
+00:06:00,330 --> 00:06:02,340
+But for a device like an acoustic camera,
+
+141
+00:06:02,340 --> 00:06:04,680
+you just need to add more ears.
+
+142
+00:06:04,680 --> 00:06:08,310
+Like here, look, imagine
+if I added a third ear.
+
+143
+00:06:08,310 --> 00:06:11,760
+Well, the same sound source
+will create a new cone
+
+144
+00:06:11,760 --> 00:06:15,060
+based on the delay
+between this pair of ears.
+
+145
+00:06:15,060 --> 00:06:17,220
+So now we know that the
+sound must be coming
+
+146
+00:06:17,220 --> 00:06:20,760
+from a point that rests
+on both of these cones.
+
+147
+00:06:20,760 --> 00:06:23,940
+In other words, somewhere
+along this intersecting line.
+
+148
+00:06:23,940 --> 00:06:26,670
+You might be thinking, well
+there's another pairing of ears
+
+149
+00:06:26,670 --> 00:06:27,720
+we haven't looked at.
+
+150
+00:06:27,720 --> 00:06:29,970
+These two ears make another cone.
+
+151
+00:06:29,970 --> 00:06:31,890
+But actually the way the maths works out
+
+152
+00:06:31,890 --> 00:06:35,010
+all three cones intersect
+at the same hyperbole.
+
+153
+00:06:35,010 --> 00:06:37,980
+So to really pinpoint
+the location of a sound,
+
+154
+00:06:37,980 --> 00:06:39,330
+you need a fourth ear.
+
+155
+00:06:39,330 --> 00:06:42,720
+A fourth ear would give us three new ear pairings and therefore three new cones of confusion.
+
+156
+00:06:42,720 --> 00:06:46,020
+
+
+157
+00:06:46,020 --> 00:06:48,120
+But if I showed all three new cones,
+
+158
+00:06:48,120 --> 00:06:50,490
+that would be confusing.
+
+159
+00:06:50,490 --> 00:06:52,500
+But just by adding one of them, we can see
+
+160
+00:06:52,500 --> 00:06:56,280
+that it passes through the
+hyperbole in just one place.
+
+161
+00:06:56,280 --> 00:06:57,510
+So with four ears,
+
+162
+00:06:57,510 --> 00:07:00,570
+you should be able to
+locate the exact direction
+
+163
+00:07:00,570 --> 00:07:02,850
+and distance to the sound source.
+
+164
+00:07:02,850 --> 00:07:06,120
+So why do these acoustic cameras
+need more than four ears?
+
+165
+00:07:06,120 --> 00:07:09,810
+Well, what if there were two
+sound sources simultaneously?
+
+166
+00:07:09,810 --> 00:07:10,860
+In that scenario,
+
+167
+00:07:10,860 --> 00:07:15,120
+two microphones would receive
+completely different sounds.
+
+168
+00:07:15,120 --> 00:07:17,595
+That's because the sounds
+from the two sources
+
+169
+00:07:17,595 --> 00:07:19,500
+would overlap differently
+
+170
+00:07:19,500 --> 00:07:21,336
+because of the different travel times
+
+171
+00:07:21,336 --> 00:07:23,820
+to the two different microphones.
+
+172
+00:07:23,820 --> 00:07:26,220
+That's okay for humans
+because humans are good
+
+173
+00:07:26,220 --> 00:07:30,000
+at filtering sounds in
+all sorts of clever ways.
+
+174
+00:07:30,000 --> 00:07:32,250
+But for software, that's a problem.
+
+175
+00:07:32,250 --> 00:07:35,610
+So instead, what the
+software does is analyze
+
+176
+00:07:35,610 --> 00:07:39,120
+individual frequencies
+instead of the whole waveform.
+
+177
+00:07:39,120 --> 00:07:41,460
+So where a human brain
+is trying to match up
+
+178
+00:07:41,460 --> 00:07:45,660
+complex wave forms, the
+acoustic camera is looking at
+
+179
+00:07:45,660 --> 00:07:48,521
+individual frequencies and
+the difference in phase
+
+180
+00:07:48,521 --> 00:07:50,370
+at the two microphones.
+
+181
+00:07:50,370 --> 00:07:51,660
+And it turns out that when you're looking
+
+182
+00:07:51,660 --> 00:07:53,730
+at different frequencies individually,
+
+183
+00:07:53,730 --> 00:07:57,510
+the distance between mics
+becomes really important.
+
+184
+00:07:57,510 --> 00:07:58,860
+For any given frequency,
+
+185
+00:07:58,860 --> 00:08:01,110
+there's an optimum distance between mics.
+
+186
+00:08:01,110 --> 00:08:04,260
+So by having lots of
+mics, you can have a range
+
+187
+00:08:04,260 --> 00:08:06,900
+of different distances between mics,
+
+188
+00:08:06,900 --> 00:08:08,340
+and so you'll be able to analyze
+
+189
+00:08:08,340 --> 00:08:10,830
+more frequencies more accurately.
+
+190
+00:08:10,830 --> 00:08:13,020
+In my previous video
+that I mentioned earlier,
+
+191
+00:08:13,020 --> 00:08:17,220
+I talk about why a high
+frequency sound is problematic
+
+192
+00:08:17,220 --> 00:08:19,650
+for microphones that are far apart
+
+193
+00:08:19,650 --> 00:08:23,430
+and actually it's problematic
+for human ears as well.
+
+194
+00:08:23,430 --> 00:08:24,630
+So I won't repeat myself,
+
+195
+00:08:24,630 --> 00:08:26,310
+but the link is in the description.
+
+196
+00:08:26,310 --> 00:08:30,390
+But anyway, all this explains
+why this acoustic camera also
+
+197
+00:08:30,390 --> 00:08:34,559
+from gfai tech has mics
+that are irregularly spaced.
+
+198
+00:08:34,559 --> 00:08:36,389
+If the mics replaced at regular intervals,
+
+199
+00:08:36,390 --> 00:08:38,880
+you would have some repeating distances
+
+200
+00:08:38,880 --> 00:08:40,049
+between pairs of mics.
+
+201
+00:08:40,049 --> 00:08:41,939
+Like all these distances are the same,
+
+202
+00:08:41,940 --> 00:08:43,409
+all these distances are the same.
+
+203
+00:08:43,409 --> 00:08:45,300
+By having a irregularly spaced mics,
+
+204
+00:08:45,300 --> 00:08:48,690
+you cover a greater range
+of distances between mics.
+
+205
+00:08:48,690 --> 00:08:51,000
+How acoustic cameras
+work is more complicated
+
+206
+00:08:51,000 --> 00:08:52,470
+than I've presented here.
+
+207
+00:08:52,470 --> 00:08:53,400
+Like for example,
+
+208
+00:08:53,400 --> 00:08:57,007
+having more mics gives you
+essentially better resolution,
+
+209
+00:08:57,007 --> 00:08:59,850
+but it's beyond the scope of this video.
+
+210
+00:08:59,850 --> 00:09:01,260
+I kind of glossed over the fact
+
+211
+00:09:01,260 --> 00:09:04,860
+that you get depth information
+from an array of microphones.
+
+212
+00:09:04,860 --> 00:09:06,630
+So here's a more recent model
+
+213
+00:09:06,630 --> 00:09:09,630
+from gfai tech that
+takes advantage of that.
+
+214
+00:09:09,630 --> 00:09:11,550
+The video camera in the middle of this one
+
+215
+00:09:11,550 --> 00:09:13,020
+captures depth information.
+
+216
+00:09:13,020 --> 00:09:14,820
+So when you're traveling around an object,
+
+217
+00:09:14,820 --> 00:09:16,380
+you're basically scanning it.
+
+218
+00:09:16,380 --> 00:09:19,800
+You can then map the
+sound onto that 3D object
+
+219
+00:09:19,800 --> 00:09:21,000
+and look around it.
+
+220
+00:09:21,000 --> 00:09:21,833
+How cool is that?
+
+221
+00:09:21,833 --> 00:09:22,800
+But the coolest thing for me
+
+222
+00:09:22,800 --> 00:09:26,040
+was watching an echo
+propagate around the room.
+
+223
+00:09:26,040 --> 00:09:27,090
+This is Paul.
+
+224
+00:09:27,090 --> 00:09:29,730
+After the initial clap,
+which is obviously centered
+
+225
+00:09:29,730 --> 00:09:33,900
+on his hands, you start to see
+these other hotspots flashing
+
+226
+00:09:33,900 --> 00:09:38,070
+around the screen where the
+sound is bouncing off walls.
+
+227
+00:09:38,070 --> 00:09:40,020
+The echo itself takes milliseconds,
+
+228
+00:09:40,020 --> 00:09:43,380
+but you can see all this
+detail in slow motion.
+
+229
+00:09:43,380 --> 00:09:44,700
+So flipping cool.
+
+230
+00:09:44,700 --> 00:09:46,860
+The echo pattern looks quite
+a bit different when you are
+
+231
+00:09:46,860 --> 00:09:48,813
+in the corner of a room.
+
+232
+00:09:49,830 --> 00:09:51,360
+I'm really interested in the logic
+
+233
+00:09:51,360 --> 00:09:54,420
+behind different business
+models like food delivery apps
+
+234
+00:09:54,420 --> 00:09:56,730
+for example, I'm hungry,
+I don't wanna cook
+
+235
+00:09:56,730 --> 00:09:59,070
+I don't wanna go out, and
+I want lots of choice,
+
+236
+00:09:59,070 --> 00:10:00,120
+food delivery apps.
+
+237
+00:10:00,120 --> 00:10:02,190
+The logic is incredibly straightforward
+
+238
+00:10:02,190 --> 00:10:04,080
+and so is the logic behind the sponsor
+
+239
+00:10:04,080 --> 00:10:05,640
+of this video, Incogni.
+
+240
+00:10:05,640 --> 00:10:07,800
+They offer something that you want,
+
+241
+00:10:07,800 --> 00:10:09,840
+but you don't want to do yourself
+
+242
+00:10:09,840 --> 00:10:11,130
+but it's not food delivery.
+
+243
+00:10:11,130 --> 00:10:12,540
+Why am I hungry now.?
+
+244
+00:10:12,540 --> 00:10:13,923
+Here's what Incogni offers.
+
+245
+00:10:15,150 --> 00:10:17,460
+There are these companies
+called data brokers
+
+246
+00:10:17,460 --> 00:10:18,900
+that collect data about you
+
+247
+00:10:18,900 --> 00:10:20,370
+and then shout it onto other people.
+
+248
+00:10:20,370 --> 00:10:22,770
+You don't know who they're selling it to,
+
+249
+00:10:22,770 --> 00:10:24,540
+but you can contact them and say,
+
+250
+00:10:24,540 --> 00:10:27,210
+stop doing that and also delete my data.
+
+251
+00:10:27,210 --> 00:10:29,160
+The problem is there are
+thousands of these companies
+
+252
+00:10:29,160 --> 00:10:31,350
+and they all want to be
+contacted in different ways
+
+253
+00:10:31,350 --> 00:10:33,270
+and sometimes they'll reject your requests
+
+254
+00:10:33,270 --> 00:10:35,250
+and you have to appeal and
+all this sort of stuff.
+
+255
+00:10:35,250 --> 00:10:37,530
+It will take months to do it yourself.
+
+256
+00:10:37,530 --> 00:10:41,760
+And actually it took Incogni
+months to do it the first time
+
+257
+00:10:41,760 --> 00:10:43,350
+but now they've automated it all.
+
+258
+00:10:43,350 --> 00:10:46,020
+One company has done all the hard work
+
+259
+00:10:46,020 --> 00:10:48,090
+and now we can all benefit from it.
+
+260
+00:10:48,090 --> 00:10:50,820
+So now I can just sign up to Incogni,
+
+261
+00:10:50,820 --> 00:10:52,860
+give them permission to act on my behalf,
+
+262
+00:10:52,860 --> 00:10:54,780
+and they just take care of it.
+
+263
+00:10:54,780 --> 00:10:56,580
+I've been within Incogni
+for a little while
+
+264
+00:10:56,580 --> 00:10:58,680
+so I can show you the progress.
+
+265
+00:10:58,680 --> 00:11:00,900
+Look, these are all the
+companies that have confirmed
+
+266
+00:11:00,900 --> 00:11:03,330
+that they now don't have my data.
+
+267
+00:11:03,330 --> 00:11:06,210
+It's a really unobtrusive
+service, which I value.
+
+268
+00:11:06,210 --> 00:11:07,530
+It just happens in the background.
+
+269
+00:11:07,530 --> 00:11:09,720
+But it's funny, like it's so unobtrusive
+
+270
+00:11:09,720 --> 00:11:11,843
+that I was saying to my wife
+the other day, you know what?
+
+271
+00:11:11,843 --> 00:11:14,610
+I don't get any of those
+weird phone calls anymore
+
+272
+00:11:14,610 --> 00:11:16,380
+from companies that don't recognize
+
+273
+00:11:16,380 --> 00:11:18,510
+who seem to know a lot about me.
+
+274
+00:11:18,510 --> 00:11:21,750
+Maybe the U.K. have changed legislation
+
+275
+00:11:21,750 --> 00:11:23,430
+so that companies can't do that.
+
+276
+00:11:23,430 --> 00:11:25,236
+Oh, no, wait, hold on.
+
+277
+00:11:25,236 --> 00:11:27,840
+It's Incogni, isn't it?
+
+278
+00:11:27,840 --> 00:11:30,540
+Like I just hadn't put,
+you know, it's I, I forgot.
+
+279
+00:11:30,540 --> 00:11:31,373
+And that's it.
+
+280
+00:11:31,373 --> 00:11:32,460
+You know, it's peace of mind.
+
+281
+00:11:32,460 --> 00:11:33,293
+You just do it.
+
+282
+00:11:33,293 --> 00:11:35,417
+And then that thing that
+you were supposed to do,
+
+283
+00:11:35,417 --> 00:11:36,630
+you've done it.
+
+284
+00:11:36,630 --> 00:11:38,550
+The promo on this one
+is three times better
+
+285
+00:11:38,550 --> 00:11:39,930
+than it was last month.
+
+286
+00:11:39,930 --> 00:11:43,860
+The first 100 people to
+go to incogni.com/science
+
+287
+00:11:43,860 --> 00:11:48,450
+and use promo code science
+at checkout will get 60% off.
+
+288
+00:11:48,450 --> 00:11:49,890
+The link is also in the description.
+
+289
+00:11:49,890 --> 00:11:51,573
+So checkout Incogni today.
+

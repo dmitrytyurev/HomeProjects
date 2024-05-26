@@ -1,0 +1,1143 @@
+1
+00:00:00,090 --> 00:00:02,220
+- This is a polo mint,
+the British equivalent
+
+2
+00:00:02,220 --> 00:00:04,019
+of a Life Saver under a microscope,
+
+3
+00:00:04,019 --> 00:00:06,330
+except it's a really weird microscope.
+
+4
+00:00:06,330 --> 00:00:07,260
+Honestly, I'm not sure
+
+5
+00:00:07,260 --> 00:00:09,270
+that you could even call it a microscope.
+
+6
+00:00:09,270 --> 00:00:11,880
+I just don't know how to
+characterize this thing.
+
+7
+00:00:11,880 --> 00:00:13,533
+Look, here's a Lego brick,
+
+8
+00:00:15,090 --> 00:00:16,500
+and what about this thing?
+
+9
+00:00:16,500 --> 00:00:17,580
+What is this?
+
+10
+00:00:17,580 --> 00:00:18,413
+I'll tell you at the end
+
+11
+00:00:18,413 --> 00:00:20,340
+of the video if you want to
+have a guess in the meantime.
+
+12
+00:00:20,340 --> 00:00:22,410
+What's weird about these images is
+
+13
+00:00:22,410 --> 00:00:23,970
+that there's no color information
+
+14
+00:00:23,970 --> 00:00:25,980
+or transparency information.
+
+15
+00:00:25,980 --> 00:00:28,170
+What we're seeing is just the shape.
+
+16
+00:00:28,170 --> 00:00:29,820
+In that way it's kind of reminiscent
+
+17
+00:00:29,820 --> 00:00:32,189
+of what you see under an electron microscope,
+
+18
+00:00:32,189 --> 00:00:34,770
+but actually this is a
+normal sized Lego brick
+
+19
+00:00:34,770 --> 00:00:37,590
+and this microscope uses touch
+
+20
+00:00:37,590 --> 00:00:38,910
+and I got to play with one thanks
+
+21
+00:00:38,910 --> 00:00:40,560
+to the Sempre Group who
+said I could come round
+
+22
+00:00:40,560 --> 00:00:41,393
+and have a play.
+
+23
+00:00:41,393 --> 00:00:43,740
+They're are distributor of
+precision measurement instruments
+
+24
+00:00:43,740 --> 00:00:45,780
+in the UK, link to what
+they do in the description.
+
+25
+00:00:45,780 --> 00:00:47,040
+They're not paying me to make this video
+
+26
+00:00:47,040 --> 00:00:49,050
+neither is the manufacturer of the device.
+
+27
+00:00:49,050 --> 00:00:51,990
+I just saw it out the corner
+of my eye when I was walking
+
+28
+00:00:51,990 --> 00:00:54,060
+around the advanced engineering expo
+
+29
+00:00:54,060 --> 00:00:57,780
+and I went up to them and said,
+can I make a YouTube video?
+
+30
+00:00:57,780 --> 00:00:59,370
+So thank you for saying yes.
+
+31
+00:00:59,370 --> 00:01:01,050
+It's a handheld device.
+
+32
+00:01:01,050 --> 00:01:02,850
+It's called Gel Site because
+
+33
+00:01:02,850 --> 00:01:05,340
+at the end there's this gel pad.
+
+34
+00:01:05,340 --> 00:01:07,620
+The gel is especially formulated so
+
+35
+00:01:07,620 --> 00:01:09,180
+that when you push an object into it the gel deforms so that it can get into all the tiny nooks and crannies of the object.
+
+36
+00:01:09,180 --> 00:01:11,250
+
+
+37
+00:01:11,250 --> 00:01:14,280
+
+
+38
+00:01:14,280 --> 00:01:17,130
+Just behind the gel, there's
+a camera pointing at it
+
+39
+00:01:17,130 --> 00:01:20,490
+and crucially, there is
+a ring of six lights.
+
+40
+00:01:20,490 --> 00:01:22,590
+What you see in the preview image
+
+41
+00:01:22,590 --> 00:01:25,290
+on the screen is just
+what the camera sees when
+
+42
+00:01:25,290 --> 00:01:28,140
+only one of those lights is switched on.
+
+43
+00:01:28,140 --> 00:01:31,050
+And you can see how the
+image changes as we cycle
+
+44
+00:01:31,050 --> 00:01:32,340
+through the six lights.
+
+45
+00:01:32,340 --> 00:01:35,370
+By illuminating the
+deformed gel in this way,
+
+46
+00:01:35,370 --> 00:01:38,370
+the human visual system
+can discern the shape
+
+47
+00:01:38,370 --> 00:01:41,700
+of the object using cues
+about light and shade
+
+48
+00:01:41,700 --> 00:01:43,620
+and shadows and highlights.
+
+49
+00:01:43,620 --> 00:01:47,010
+It's a bit like whitewashing
+the object because by doing so
+
+50
+00:01:47,010 --> 00:01:48,330
+you are removing all information
+
+51
+00:01:48,330 --> 00:01:50,370
+about color and transparency.
+
+52
+00:01:50,370 --> 00:01:51,720
+And you might think, well
+
+53
+00:01:51,720 --> 00:01:55,830
+what's the point of a microscope
+that removes information?
+
+54
+00:01:55,830 --> 00:01:58,950
+Why don't we just stick with
+a light-based microscope
+
+55
+00:01:58,950 --> 00:02:01,200
+and then we don't lose any information?
+
+56
+00:02:01,200 --> 00:02:03,750
+Well, it turns out that
+with some clever mathematics
+
+57
+00:02:03,750 --> 00:02:06,660
+we can actually gain
+information that we would never
+
+58
+00:02:06,660 --> 00:02:09,330
+have had access to with
+a regular microscope.
+
+59
+00:02:09,330 --> 00:02:10,163
+And it's all to do
+
+60
+00:02:10,163 --> 00:02:13,800
+with those six lights
+arranged around the gel pad,
+
+61
+00:02:13,800 --> 00:02:17,160
+like in the preview image where
+only one light is turned on.
+
+62
+00:02:17,160 --> 00:02:19,530
+The human eye can
+discern things like, well
+
+63
+00:02:19,530 --> 00:02:22,770
+this area is higher up than this area.
+
+64
+00:02:22,770 --> 00:02:24,750
+This area slopes down to the left.
+
+65
+00:02:24,750 --> 00:02:27,330
+This area slopes down
+to the right and so on.
+
+66
+00:02:27,330 --> 00:02:29,970
+But could a computer
+brain do the same thing?
+
+67
+00:02:29,970 --> 00:02:31,120
+Well, it turns out that
+
+68
+00:02:32,074 --> 00:02:34,050
+if you present the computer
+brain with six images,
+
+69
+00:02:34,050 --> 00:02:37,410
+one taken with each of the
+six different light sources
+
+70
+00:02:37,410 --> 00:02:41,130
+you can use a clever algorithm
+to analyze those six images
+
+71
+00:02:41,130 --> 00:02:42,990
+and come up with a 3D model
+
+72
+00:02:42,990 --> 00:02:46,500
+of that object accurate to
+plus or minus four microns
+
+73
+00:02:46,500 --> 00:02:48,210
+in the case of this device
+
+74
+00:02:48,210 --> 00:02:51,210
+which is way better than
+the human brain can do.
+
+75
+00:02:51,210 --> 00:02:53,520
+It's called the photometric
+stereo technique
+
+76
+00:02:53,520 --> 00:02:57,000
+and there are publicly
+available papers on the subject
+
+77
+00:02:57,000 --> 00:02:59,490
+and then there's some
+proprietary stuff on top
+
+78
+00:02:59,490 --> 00:03:02,070
+in the case of this
+device, and you can see why
+
+79
+00:03:02,070 --> 00:03:05,400
+it would be desirable
+to remove information
+
+80
+00:03:05,400 --> 00:03:08,700
+about color and
+transparency from the object
+
+81
+00:03:08,700 --> 00:03:12,000
+before trying to run the
+algorithm on the six images.
+
+82
+00:03:12,000 --> 00:03:13,620
+By removing all color information
+
+83
+00:03:13,620 --> 00:03:15,900
+we can say with certainty that this region
+
+84
+00:03:15,900 --> 00:03:19,980
+of the image is bright because
+it's facing the light source.
+
+85
+00:03:19,980 --> 00:03:23,310
+This region of the image is
+dark because it's facing away
+
+86
+00:03:23,310 --> 00:03:26,340
+from the light source, but
+real life objects have light
+
+87
+00:03:26,340 --> 00:03:29,880
+and dark regions unrelated
+to the lighting of the thing.
+
+88
+00:03:29,880 --> 00:03:32,790
+In principle, the algorithm
+should be able to cope
+
+89
+00:03:32,790 --> 00:03:35,340
+with objects that have
+light and dark regions
+
+90
+00:03:35,340 --> 00:03:37,380
+because after all, it's only looking
+
+91
+00:03:37,380 --> 00:03:40,140
+at the differences that it perceives
+
+92
+00:03:40,140 --> 00:03:43,620
+from the six different images
+at each point on the object
+
+93
+00:03:43,620 --> 00:03:45,630
+unless part of the object is jet black
+
+94
+00:03:45,630 --> 00:03:47,940
+in which case it's jet black regardless
+
+95
+00:03:47,940 --> 00:03:49,860
+of what direction it's lit from.
+
+96
+00:03:49,860 --> 00:03:51,810
+But perhaps the most challenging thing for the algorithm is transparency, reflection, and glare
+
+97
+00:03:51,810 --> 00:03:56,810
+
+
+98
+00:03:56,850 --> 00:04:00,060
+and the gel pad removes
+all of those things.
+
+99
+00:04:00,060 --> 00:04:01,830
+I think there's an
+interesting distinction here
+
+100
+00:04:01,830 --> 00:04:04,710
+between human brains and computer brains.
+
+101
+00:04:04,710 --> 00:04:07,440
+Like human brains can
+discern 3D information
+
+102
+00:04:07,440 --> 00:04:10,500
+from flat images of things,
+even when color, glare,
+
+103
+00:04:10,500 --> 00:04:13,050
+and transparency haven't
+been removed from the object.
+
+104
+00:04:13,050 --> 00:04:15,960
+That's because the human
+brain can draw on experience.
+
+105
+00:04:15,960 --> 00:04:18,899
+Like your brain recognizes this flat image
+
+106
+00:04:18,899 --> 00:04:22,590
+of a Lego minifigure head
+as a Lego minifigure head,
+
+107
+00:04:22,590 --> 00:04:25,590
+your brain doesn't think,
+oh this region is dark
+
+108
+00:04:25,590 --> 00:04:28,230
+because it's facing away
+from the light source.
+
+109
+00:04:28,230 --> 00:04:31,200
+You know that it's the eyeball.
+
+110
+00:04:31,200 --> 00:04:34,260
+Perhaps one day with the
+addition of machine learning
+
+111
+00:04:34,260 --> 00:04:36,210
+an algorithm like the one used
+
+112
+00:04:36,210 --> 00:04:39,540
+by Gel Site could discern 3D information
+
+113
+00:04:39,540 --> 00:04:42,030
+from objects that haven't had color glare
+
+114
+00:04:42,030 --> 00:04:44,220
+transparency and reflection removed
+
+115
+00:04:44,220 --> 00:04:48,120
+by training the neural
+network on everyday objects
+
+116
+00:04:48,120 --> 00:04:50,820
+in the same way that our
+brains have been trained
+
+117
+00:04:50,820 --> 00:04:53,790
+through our lives to recognize objects.
+
+118
+00:04:53,790 --> 00:04:55,650
+There's an interesting side note here
+
+119
+00:04:55,650 --> 00:04:58,800
+about the way human brains perceive depth.
+
+120
+00:04:58,800 --> 00:05:00,960
+Like the human brain perceives depth
+
+121
+00:05:00,960 --> 00:05:02,400
+in lots of different ways.
+
+122
+00:05:02,400 --> 00:05:05,580
+For example, by having two
+eyeballs, the slight difference
+
+123
+00:05:05,580 --> 00:05:08,790
+in the two images that
+each eyeball gets can be
+
+124
+00:05:08,790 --> 00:05:11,400
+used to extract information about depth.
+
+125
+00:05:11,400 --> 00:05:13,200
+Another example is parallax.
+
+126
+00:05:13,200 --> 00:05:15,240
+There's loads of different
+ways we perceive depth
+
+127
+00:05:15,240 --> 00:05:17,250
+but one way that's relevant
+
+128
+00:05:17,250 --> 00:05:20,910
+to this video is using light cues.
+
+129
+00:05:20,910 --> 00:05:23,850
+We don't need to take six different images
+
+130
+00:05:23,850 --> 00:05:27,750
+of an object with a light source
+in six different locations.
+
+131
+00:05:27,750 --> 00:05:30,150
+We can do it with just
+a single light source.
+
+132
+00:05:30,150 --> 00:05:32,820
+But to do that, your brain
+has to make an assumption
+
+133
+00:05:32,820 --> 00:05:34,890
+and every time your
+brain makes an assumption
+
+134
+00:05:34,890 --> 00:05:36,000
+it can be tricked.
+
+135
+00:05:36,000 --> 00:05:38,520
+It can be tricked with
+an optical illusion.
+
+136
+00:05:38,520 --> 00:05:40,140
+Take this image, for example.
+
+137
+00:05:40,140 --> 00:05:42,930
+It looks like a mountain of some kind
+
+138
+00:05:42,930 --> 00:05:47,370
+but if I turn it 180 degrees,
+you can now see it's a crater.
+
+139
+00:05:47,370 --> 00:05:49,140
+It's called the crater illusion.
+
+140
+00:05:49,140 --> 00:05:51,600
+Your brain is tricked in this orientation
+
+141
+00:05:51,600 --> 00:05:53,490
+because it assumes the scene is lit
+
+142
+00:05:53,490 --> 00:05:56,490
+from the top down, and
+that's a sensible assumption
+
+143
+00:05:56,490 --> 00:05:58,230
+given our every day experience.
+
+144
+00:05:58,230 --> 00:06:00,690
+Light typically comes from above us.
+
+145
+00:06:00,690 --> 00:06:02,790
+And the cool thing is you
+can see the crater illusion
+
+146
+00:06:02,790 --> 00:06:03,720
+with these images.
+
+147
+00:06:03,720 --> 00:06:06,690
+Like here, the lettering
+looks like it's sticking out
+
+148
+00:06:06,690 --> 00:06:09,540
+but that's only because
+it's being lit from below.
+
+149
+00:06:09,540 --> 00:06:11,700
+By switching to the light at the top
+
+150
+00:06:11,700 --> 00:06:14,760
+you can see that the
+lettering is in fact indented.
+
+151
+00:06:14,760 --> 00:06:17,100
+And of course, the crater
+illusion disappears.
+
+152
+00:06:17,100 --> 00:06:19,410
+Where there are other
+depth clues available
+
+153
+00:06:19,410 --> 00:06:22,830
+like no one would see this face as concave
+
+154
+00:06:22,830 --> 00:06:25,590
+even though it's lit from
+below, because our experience
+
+155
+00:06:25,590 --> 00:06:29,790
+of faces gives us overriding
+information about depth.
+
+156
+00:06:29,790 --> 00:06:32,070
+So what's this device actually used for?
+
+157
+00:06:32,070 --> 00:06:34,020
+Well, using the software
+that comes with it
+
+158
+00:06:34,020 --> 00:06:35,850
+you can take actual measurements.
+
+159
+00:06:35,850 --> 00:06:37,620
+So you can see that the lettering
+
+160
+00:06:37,620 --> 00:06:41,040
+on this coin is raised by 70 microns
+
+161
+00:06:41,040 --> 00:06:43,080
+and this is really what
+the device is all about.
+
+162
+00:06:43,080 --> 00:06:44,100
+It's handheld.
+
+163
+00:06:44,100 --> 00:06:45,450
+You can take it around with you
+
+164
+00:06:45,450 --> 00:06:49,290
+press it into things, and
+as a manufacturer, let's say
+
+165
+00:06:49,290 --> 00:06:51,360
+you can figure out the tolerances
+
+166
+00:06:51,360 --> 00:06:53,730
+of the things you are
+making in your factory.
+
+167
+00:06:53,730 --> 00:06:57,270
+You can also characterize a
+surface and say how rough it is.
+
+168
+00:06:57,270 --> 00:06:59,610
+Another scenario is an
+aircraft has a scratch
+
+169
+00:06:59,610 --> 00:07:00,443
+on the surface
+
+170
+00:07:00,443 --> 00:07:02,370
+and you need to characterize
+the scratch to figure
+
+171
+00:07:02,370 --> 00:07:04,350
+out whether the aircraft can still fly.
+
+172
+00:07:04,350 --> 00:07:05,850
+Traditionally, you would create a cast
+
+173
+00:07:05,850 --> 00:07:08,850
+of the scratch and then
+measure the cast in a lab, but
+
+174
+00:07:08,850 --> 00:07:11,250
+with this handheld device, you
+can do it in a few minutes.
+
+175
+00:07:11,250 --> 00:07:16,140
+I asked them about drape because presumably there are parts of the object that the gel won't be able to get into.
+
+176
+00:07:16,140 --> 00:07:19,680
+
+
+177
+00:07:19,680 --> 00:07:22,380
+So how does that affect
+the use of the device?
+
+178
+00:07:22,380 --> 00:07:26,190
+- So we need the depth to
+not be wider than the mark.
+
+179
+00:07:26,190 --> 00:07:27,312
+- Oh, okay.
+
+180
+00:07:27,312 --> 00:07:29,910
+- Say that was one millimeter
+here and that was two.
+
+181
+00:07:29,910 --> 00:07:31,830
+What we would have is
+the effect is we probably
+
+182
+00:07:31,830 --> 00:07:33,300
+get that deep.
+
+183
+00:07:33,300 --> 00:07:34,800
+We wouldn't get the corner.
+
+184
+00:07:34,800 --> 00:07:37,170
+But normally what the operator's looking
+
+185
+00:07:37,170 --> 00:07:42,170
+for is that value as opposed
+to the the value of this area.
+
+186
+00:07:42,768 --> 00:07:44,700
+- So in terms of the application
+
+187
+00:07:44,700 --> 00:07:45,983
+- That's the important bit.
+
+188
+00:07:45,983 --> 00:07:46,816
+- Yeah, like the important bit
+
+189
+00:07:46,816 --> 00:07:48,060
+for me is, ooh, that looks pretty.
+
+190
+00:07:48,060 --> 00:07:49,308
+- That looks cool.
+
+191
+00:07:49,308 --> 00:07:50,340
+- Yeah yeah.
+
+192
+00:07:50,340 --> 00:07:51,810
+Here's some other cool things that we put
+
+193
+00:07:51,810 --> 00:07:52,830
+under the microscope.
+
+194
+00:07:52,830 --> 00:07:56,250
+This is some woven fabric
+under the microscope.
+
+195
+00:07:56,250 --> 00:07:58,170
+This is a UK driver's license
+
+196
+00:07:58,170 --> 00:08:00,450
+and you can see there's
+a slight emboss here
+
+197
+00:08:00,450 --> 00:08:02,910
+which you can't see with the naked eye.
+
+198
+00:08:02,910 --> 00:08:04,740
+This is a button battery, and what I like
+
+199
+00:08:04,740 --> 00:08:07,200
+about this shot is that
+there's a bit of hair
+
+200
+00:08:07,200 --> 00:08:11,670
+and dust stuck to the gel, so
+you can see how the gel moves
+
+201
+00:08:11,670 --> 00:08:15,090
+and warps around the object
+as you press into it.
+
+202
+00:08:15,090 --> 00:08:17,460
+Here's a phone speaker under
+a microscope, and you can see
+
+203
+00:08:17,460 --> 00:08:19,890
+that the screen protector
+isn't quite lined up.
+
+204
+00:08:19,890 --> 00:08:22,290
+Here's a chip and pin from a credit card.
+
+205
+00:08:22,290 --> 00:08:23,123
+This is interesting.
+
+206
+00:08:23,123 --> 00:08:25,590
+It's a part that I had 3D printed
+
+207
+00:08:25,590 --> 00:08:29,190
+and you can see how the
+printhead must have moved
+
+208
+00:08:29,190 --> 00:08:30,660
+as it was printing the thing.
+
+209
+00:08:30,660 --> 00:08:32,130
+It goes around the edge
+
+210
+00:08:32,130 --> 00:08:35,490
+and then it fills in in
+this kind of zigzag motion.
+
+211
+00:08:35,490 --> 00:08:36,842
+How cool is that?
+
+212
+00:08:36,842 --> 00:08:37,860
+Can you guess what this one is?
+
+213
+00:08:37,860 --> 00:08:39,690
+It's my stubble.
+
+214
+00:08:39,690 --> 00:08:41,039
+Sorry about that.
+
+215
+00:08:41,039 --> 00:08:42,359
+This is a love heart,
+
+216
+00:08:42,360 --> 00:08:45,210
+and this is the take home
+message of the video by the way,
+
+217
+00:08:45,210 --> 00:08:46,043
+just be you.
+
+218
+00:08:46,043 --> 00:08:48,600
+The gel pads get sticky
+over time and need to
+
+219
+00:08:48,600 --> 00:08:52,290
+be replaced periodically, but
+when it's a little bit sticky
+
+220
+00:08:52,290 --> 00:08:54,872
+the visuals are really interesting.
+
+221
+00:08:54,872 --> 00:08:55,950
+I really think this needs a sound effect.
+
+222
+00:08:55,950 --> 00:08:57,000
+You know what I mean?
+
+223
+00:09:00,000 --> 00:09:02,550
+The sponsor of this video
+doesn't want your money.
+
+224
+00:09:02,550 --> 00:09:05,070
+In fact, maybe it wants to give you money.
+
+225
+00:09:05,070 --> 00:09:07,980
+If you are graduating
+from high school in 2023
+
+226
+00:09:07,980 --> 00:09:11,550
+and you have an interest in
+maths and or computer science
+
+227
+00:09:11,550 --> 00:09:13,740
+or you know someone with that profile
+
+228
+00:09:13,740 --> 00:09:16,530
+then this is a really
+interesting opportunity.
+
+229
+00:09:16,530 --> 00:09:19,050
+Jane Street is a company
+that solves problems
+
+230
+00:09:19,050 --> 00:09:22,170
+in the financial world, and
+for the second year in a row
+
+231
+00:09:22,170 --> 00:09:24,600
+they're offering a five
+week summer program
+
+232
+00:09:24,600 --> 00:09:26,160
+for recent high school graduates.
+
+233
+00:09:26,160 --> 00:09:29,310
+It's called the Jane Street
+Academy of Math and Programming.
+
+234
+00:09:29,310 --> 00:09:30,450
+It's in New York.
+
+235
+00:09:30,450 --> 00:09:33,180
+Not only is the program
+completely free, but travel,
+
+236
+00:09:33,180 --> 00:09:35,640
+accommodation, and meals are paid for
+
+237
+00:09:35,640 --> 00:09:39,930
+and there's a $5,000 scholarship
+for every participant.
+
+238
+00:09:39,930 --> 00:09:42,600
+It's an in-person program
+offering an interactive
+
+239
+00:09:42,600 --> 00:09:45,630
+STEM curriculum, focusing on mathematics,
+
+240
+00:09:45,630 --> 00:09:48,510
+computer programming, data
+analysis, and game theory.
+
+241
+00:09:48,510 --> 00:09:51,000
+The program is for 2023
+high school graduates
+
+242
+00:09:51,000 --> 00:09:52,020
+with an interest in maths
+
+243
+00:09:52,020 --> 00:09:54,660
+and computer science who
+have experienced barriers
+
+244
+00:09:54,660 --> 00:09:58,050
+to accessing advanced STEM
+educational opportunities.
+
+245
+00:09:58,050 --> 00:10:00,690
+The deadline for applications
+is the 15th of March
+
+246
+00:10:00,690 --> 00:10:02,970
+so check out the link in the description.
+
+247
+00:10:02,970 --> 00:10:04,650
+There's loads of information there.
+
+248
+00:10:04,650 --> 00:10:05,483
+There's an FAQ,
+
+249
+00:10:05,483 --> 00:10:07,260
+everything you need to
+understand the program
+
+250
+00:10:07,260 --> 00:10:09,450
+and of course, a button to apply.
+
+251
+00:10:09,450 --> 00:10:10,830
+So check it out today.
+
+252
+00:10:10,830 --> 00:10:11,910
+I hope you enjoyed this video.
+
+253
+00:10:11,910 --> 00:10:14,040
+If you did, don't forget to hit subscribe.
+
+254
+00:10:14,040 --> 00:10:16,560
+Oh, and that thing from the beginning
+
+255
+00:10:16,560 --> 00:10:20,073
+it's the inside of a quartz analog watch.
+
+256
+00:10:21,369 --> 00:10:23,952
+(upbeat music)
+

@@ -1,0 +1,513 @@
+1
+00:00:02,310 --> 00:00:06,029
+This will revolutionize education.
+
+2
+00:00:06,029 --> 00:00:10,760
+No prediction has been made as often or as
+incorrectly as that one.
+
+3
+00:00:10,760 --> 00:00:15,389
+In 1922, it was Thomas Edison who declared
+that, “The motion picture is destined to
+
+4
+00:00:15,389 --> 00:00:20,019
+revolutionize our educational system and that
+in a few years, it will supplant largely,
+
+5
+00:00:20,019 --> 00:00:22,730
+if not entirely, the use of textbooks.”
+
+6
+00:00:22,730 --> 00:00:23,730
+Yeah.
+
+7
+00:00:23,730 --> 00:00:25,029
+And you know how that worked out?
+
+8
+00:00:25,029 --> 00:00:27,240
+By the 1930s it was radio.
+
+9
+00:00:27,240 --> 00:00:32,270
+The idea was you could beam experts directly
+into classrooms, improving the quality of
+
+10
+00:00:32,270 --> 00:00:34,930
+education for more students at lower cost.
+
+11
+00:00:34,930 --> 00:00:39,860
+And that would mean you require fewer skilled
+teachers, a theme common to all of the proposed
+
+12
+00:00:39,860 --> 00:00:45,760
+education revolutions, like that of educational
+television in the 1950s and 60s.
+
+13
+00:00:45,760 --> 00:00:50,050
+Studies were conducted to determine whether
+students preferred watching a lecture live,
+
+14
+00:00:50,050 --> 00:00:55,950
+or sitting in an adjacent room where the same
+lecture was broadcast via closed circuit TV.
+
+15
+00:00:55,950 --> 00:00:56,950
+What would you prefer?
+
+16
+00:00:56,950 --> 00:01:00,220
+In the 80s there was no debating.
+
+17
+00:01:00,220 --> 00:01:03,950
+Computers were the revolutionary solution to our education woes.
+
+18
+00:01:03,950 --> 00:01:09,090
+They were audiovisual, interactive, and could
+be programmed to do almost anything you like.
+
+19
+00:01:09,090 --> 00:01:11,520
+Well at the time, they could run Oregon Trail.
+
+20
+00:01:11,520 --> 00:01:14,060
+But their potential was obvious.
+
+21
+00:01:14,060 --> 00:01:18,170
+Researches suspected that if they could teach
+kids to program, say how to move a turtle
+
+22
+00:01:18,170 --> 00:01:23,310
+around a screen, then their procedural reasoning
+skills would also improve.
+
+23
+00:01:23,310 --> 00:01:24,720
+So how did it go?
+
+24
+00:01:24,720 --> 00:01:28,469
+Well the students got better at programming
+the turtle, but their reasoning skills were
+
+25
+00:01:28,469 --> 00:01:29,759
+unaffected.
+
+26
+00:01:29,759 --> 00:01:35,200
+Even by the 1990s we had not learned from
+the failure of our past predictions and I
+
+27
+00:01:35,200 --> 00:01:40,060
+quote, “The use of videodiscs in classroom
+instruction is increasing every year and promises
+
+28
+00:01:40,060 --> 00:01:44,009
+to revolutionize what will happen in the classroom
+of tomorrow.”
+
+29
+00:01:44,009 --> 00:01:45,009
+Videodiscs?
+
+30
+00:01:45,009 --> 00:01:48,240
+Yeah, those giant oversized CD things.
+
+31
+00:01:48,240 --> 00:01:51,420
+Remember when they revolutionized education?
+
+32
+00:01:51,420 --> 00:01:57,179
+Nowadays plenty of things are poised to revolutionize
+education like, smartboards, smartphones,
+
+33
+00:01:57,179 --> 00:01:58,969
+tables, and M.O.O.C.s.
+
+34
+00:01:58,969 --> 00:02:01,689
+Those are massive open online courses.
+
+35
+00:02:01,689 --> 00:02:05,990
+And some belief we’re getting close to universal
+teaching machine, a computer so quick and
+
+36
+00:02:05,990 --> 00:02:10,840
+well-programmed that it’s basically like
+having your own personal tutor in a machine.
+
+37
+00:02:10,840 --> 00:02:15,120 A student could work through well-structured lessons at their own pace receiving immediate and personally-tailored feedback, and all without the interference of a meddlesome and expensive teacher.
+
+39
+00:02:19,580 --> 00:02:21,319
+
+
+40
+00:02:21,319 --> 00:02:23,269
+Do these claims sound familiar?
+
+41
+00:02:23,269 --> 00:02:28,640
+Over the past 100 years, a lot of areas of
+life have been revolutionized, but education
+
+42
+00:02:28,640 --> 00:02:30,430
+is not one of them.
+
+43
+00:02:30,430 --> 00:02:34,849
+By in large, students are still taught in
+groups by a single teacher.
+
+44
+00:02:34,849 --> 00:02:38,500
+And that is not what a revolution looks like.
+
+45
+00:02:38,500 --> 00:02:42,280
+Some might blame this state of affairs on
+the inertia of our educational institutions.
+
+46
+00:02:42,280 --> 00:02:46,160
+It’s just too hard to get a huge bureaucracy
+to change.
+
+47
+00:02:46,160 --> 00:02:50,740
+But I think the reason technology hasn’t
+revolutionized education is something else,
+
+48
+00:02:50,740 --> 00:02:53,800
+something that goes to the very heart of what
+education is.
+
+49
+00:02:53,800 --> 00:02:55,739
+Let’s consider the process of learning.
+
+50
+00:02:55,739 --> 00:02:59,599
+Say you want to teach someone how a human
+heart pumps blood.
+
+51
+00:02:59,599 --> 00:03:04,700
+Which learning aid do you think would be more
+effective, this animation with narration or
+
+52
+00:03:04,700 --> 00:03:07,769
+this set of static picture with text?
+
+53
+00:03:07,769 --> 00:03:09,659
+Obviously the animation is better.
+
+54
+00:03:09,659 --> 00:03:13,370
+I mean for one thing it shows exactly what
+the heart does.
+
+55
+00:03:13,370 --> 00:03:16,519
+For decades, educational research focused
+on questions like this.
+
+56
+00:03:16,519 --> 00:03:19,530
+Does a video promote learning better than
+a book?
+
+57
+00:03:19,530 --> 00:03:23,099
+Are live lectures more effective than televised
+lectures?
+
+58
+00:03:23,099 --> 00:03:26,129
+Is animation better than static graphics?
+
+59
+00:03:26,129 --> 00:03:30,689
+In all well-controlled studies, the result
+is no significant difference.
+
+60
+00:03:30,689 --> 00:03:35,110
+That is, so long as the content is equivalent
+between the two treatments, the learning outcomes
+
+61
+00:03:35,110 --> 00:03:37,719
+are the same with all different media.
+
+62
+00:03:37,719 --> 00:03:39,250
+How is this possible?
+
+63
+00:03:39,250 --> 00:03:43,310
+How can something which seems so powerful,
+like animation, be no more effective than
+
+64
+00:03:43,310 --> 00:03:44,640
+static graphics?
+
+65
+00:03:44,640 --> 00:03:49,540
+Well for one thing, animations are fleeting
+and so you might miss something as they go
+
+66
+00:03:49,540 --> 00:03:50,540
+by.
+
+67
+00:03:50,540 --> 00:03:55,060
+Plus, since the parts are animated for you,
+you don’t have to mentally envision how
+
+68
+00:03:55,060 --> 00:03:56,579
+the parts are moving.
+
+69
+00:03:56,579 --> 00:04:00,580
+And so you don’t have to invest as much
+mental effort which would make it more memorable.
+
+70
+00:04:00,580 --> 00:04:04,409
+In fact, sometimes static graphics perform
+better than animations.
+
+71
+00:04:04,409 --> 00:04:10,260
+And I think this points to a really fundamental
+aspect of education which is, it doesn’t
+
+72
+00:04:10,260 --> 00:04:12,069
+matter what happens around the learner.
+
+73
+00:04:12,069 --> 00:04:17,670
+We are not limited by the experiences we can
+give to students.
+
+74
+00:04:17,670 --> 00:04:23,430
+What limits learning is what can happen inside
+the student’s head.
+
+75
+00:04:23,430 --> 00:04:27,060
+That is where the important part of learning
+takes place.
+
+76
+00:04:27,060 --> 00:04:30,889
+No technology is inherently superior to any other.
+
+77
+00:04:30,889 --> 00:04:34,810
+Researchers spent so much time investigating
+whether one medium or technology was more
+
+78
+00:04:34,810 --> 00:04:40,060
+effective than another that they failed to
+investigate exactly how to use the technology
+
+79
+00:04:40,060 --> 00:04:42,500
+to promote meaningful thought processes.
+
+80
+00:04:42,500 --> 00:04:47,680
+So the question really is what experiences
+promote the kind of thinking that is required
+
+81
+00:04:47,680 --> 00:04:49,000
+for learning?
+
+82
+00:04:49,000 --> 00:04:53,610
+Recently, that research is being conducted
+and we’re finding out some pretty important
+
+83
+00:04:53,610 --> 00:04:54,610
+stuff.
+
+84
+00:04:54,610 --> 00:04:58,620
+I mean it may seem obvious, but it turns out
+learning with words and pictures together,
+
+85
+00:04:58,620 --> 00:05:03,110
+whether they’re animation and narration
+or static pictures and text, works better
+
+86
+00:05:03,110 --> 00:05:04,669
+than words alone.
+
+87
+00:05:04,669 --> 00:05:10,090
+Also, we see that anything which is extraneous
+needs to be eliminated from a lesson.
+
+88
+00:05:10,090 --> 00:05:14,660
+For example, on-screen text competes with visuals, so learners perform better when it is omitted than when it is present.
+
+89
+00:05:14,660 --> 00:05:17,030
+
+
+90
+00:05:17,030 --> 00:05:22,169
+Now that we know how best to make educational
+videos, and any experience can be simulated
+
+91
+00:05:22,169 --> 00:05:27,419
+in the video setting, YouTube must be the
+platform that will revolutionize education.
+
+92
+00:05:27,419 --> 00:05:32,620
+I mean the number of educational videos on
+YouTube is increasing every day.
+
+93
+00:05:32,620 --> 00:05:34,280
+So why do we need teachers?
+
+94
+00:05:34,280 --> 00:05:39,310
+Well, if you think that the fundamental job
+of a teacher is to transmit information from
+
+95
+00:05:39,310 --> 00:05:44,150
+their head to their students’, then you’re
+right, they are obsolete.
+
+96
+00:05:44,150 --> 00:05:48,460
+I mean, you probably imagine a classroom where this teacher is spewing out facts at a pace which is appropriate for one student, too fast for half, and too slow for the rest.
+
+98
+00:05:53,539 --> 00:05:57,180
+Luckily the fundamental role of a teachers
+is not to deliver information.
+
+99
+00:05:57,180 --> 00:06:00,490
+It is to guide the social process of learning.
+
+100
+00:06:00,490 --> 00:06:08,100
+The job of a teacher is to inspire, to challenge,
+to excite their students to want to learn.
+
+101
+00:06:08,100 --> 00:06:14,150
+Yes, they also do explain and demonstrate
+and show things, but fundamentally that is
+
+102
+00:06:14,150 --> 00:06:15,220
+beside the point.
+
+103
+00:06:15,220 --> 00:06:21,150
+The most important thing a teacher does is
+make every student feel like they are important,
+
+104
+00:06:21,150 --> 00:06:25,050
+to make them feel accountable for doing the
+work of learning.
+
+105
+00:06:25,050 --> 00:06:29,080
+All of this is not to say technology has had
+no impact on education.
+
+106
+00:06:29,080 --> 00:06:32,229
+Students and teachers work and communicate
+via computers.
+
+107
+00:06:32,229 --> 00:06:35,610
+And videos are used both inside and outside
+of classrooms.
+
+108
+00:06:35,610 --> 00:06:40,940
+But all of this is best characterized as an
+evolution, not a revolution.
+
+109
+00:06:40,940 --> 00:06:45,650
+The foundation of education is still based
+on the social interaction between teachers
+
+110
+00:06:45,650 --> 00:06:46,830
+and students.
+
+111
+00:06:46,830 --> 00:06:52,030
+For as transformative as each new technology
+seems to be, like motion pictures or computer
+
+112
+00:06:52,030 --> 00:06:57,630
+or smartboards, what really matters is what
+happens inside the learner’s head.
+
+113
+00:06:57,630 --> 00:07:03,860
+And making a learner think seems best achieved
+in a social environment with other learners
+
+114
+00:07:03,860 --> 00:07:08,530
+and a caring teacher.
+

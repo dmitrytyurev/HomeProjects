@@ -1,0 +1,706 @@
+1
+00:00:30,609 --> 00:00:32,250
+Radiation is frightening.
+
+2
+00:00:32,250 --> 00:00:34,480
+At least, certain types of it are.
+
+3
+00:00:34,480 --> 00:00:39,519
+I mean my Geiger counter doesn't go off near
+my mobile phone, or the Wi-Fi router or my
+
+4
+00:00:39,519 --> 00:00:40,519
+microwave.
+
+5
+00:00:40,519 --> 00:00:44,370
+That’s because a Geiger counter only measures
+ionizing radiation — that is, radiation
+
+6
+00:00:44,370 --> 00:00:47,800
+with enough energy to rip electrons off atoms.
+
+7
+00:00:47,800 --> 00:00:50,329
+And it’s measured in units called sieverts.
+
+8
+00:00:50,329 --> 00:00:55,399
+If you're exposed to more than two sieverts
+all at once you'll probably die shortly after
+
+9
+00:00:55,399 --> 00:00:56,399
+that.
+
+10
+00:00:56,399 --> 00:01:00,370
+But we’re exposed to low levels of ionizing
+radiation all the time.
+
+11
+00:01:00,370 --> 00:01:05,890
+Bananas for example are rich in potassium
+and some of that potassium is naturally radioactive.
+
+12
+00:01:05,890 --> 00:01:12,759
+So when you eat a banana you're actually exposed
+to about 0.1 microsieverts of radiation.
+
+13
+00:01:12,759 --> 00:01:15,399
+That’s one ten millionth of a sievert.
+
+14
+00:01:15,399 --> 00:01:19,400
+Let’s use a banana for scale of radiation
+doses.
+
+15
+00:01:19,400 --> 00:01:23,409
+You know, since people eat bananas we become
+radioactive too.
+
+16
+00:01:23,409 --> 00:01:27,820
+So you're actually exposed to more radiation
+if you sleep next to someone than if you sleep
+
+17
+00:01:27,820 --> 00:01:29,350
+alone.
+
+18
+00:01:29,350 --> 00:01:33,450
+But I wouldn't worry about that because that
+dose is insignificant compared to the natural
+
+19
+00:01:33,450 --> 00:01:34,640
+background radiation of earth.
+
+20
+00:01:34,640 --> 00:01:38,870
+I mean there’s ionizing radiation coming
+out of the soil in the rocks, in the air,
+
+21
+00:01:38,870 --> 00:01:40,750
+and even from space.
+
+22
+00:01:40,750 --> 00:01:46,110
+The level of radiation here in Sydney is about
+.15 microsieverts per hour, and that's about
+
+23
+00:01:46,110 --> 00:01:47,290
+average globally.
+
+24
+00:01:47,290 --> 00:01:51,080
+The level’s usually between .1 and .2 microsieverts
+per hour.
+
+25
+00:01:51,080 --> 00:01:54,500
+But there are places with significantly higher
+levels.
+
+26
+00:01:54,500 --> 00:01:58,960
+So who on earth do you think receives the
+maximum dose of ionizing radiation?
+
+27
+00:01:58,960 --> 00:02:06,020
+Let’s answer that question by going to the
+most radioactive places on earth.
+
+28
+00:02:06,020 --> 00:02:09,899
+Some places you’d expect to have high levels
+of radiation might surprise you.
+
+29
+00:02:09,899 --> 00:02:12,940
+I’m in Hiroshima and that is the Peace Dome.
+
+30
+00:02:12,940 --> 00:02:18,170
+It was about 600 meters above that dome where
+the worlds first nuclear bomb was detonated
+
+31
+00:02:18,170 --> 00:02:19,189
+over a city.
+
+32
+00:02:19,189 --> 00:02:22,730
+It was detonated there to have maximum destructive
+impact.
+
+33
+00:02:22,730 --> 00:02:29,060
+Well the level of radiation today almost 70
+years later is only 0.3 microsieverts per
+
+34
+00:02:29,060 --> 00:02:33,060
+hour.
+
+35
+00:02:33,060 --> 00:02:35,170
+I'm about to get into an elevator.
+
+36
+00:02:35,170 --> 00:02:38,120
+We're going down in a mineshaft.
+
+37
+00:02:38,120 --> 00:02:41,880
+This is an old uranium mine.
+
+38
+00:02:41,880 --> 00:02:49,860
+This is the mine where uranium was discovered.
+
+39
+00:02:49,860 --> 00:02:53,820
+It's also the place where Marie Curie obtained
+her raw material.
+
+40
+00:02:53,820 --> 00:02:55,890
+1.7 microsieverts per hour.
+
+41
+00:02:55,890 --> 00:03:00,550
+That's about 10 times the natural background
+that you would have.
+
+42
+00:03:00,550 --> 00:03:03,220
+Nowadays most of the uranium has been removed.
+
+43
+00:03:03,220 --> 00:03:08,840
+But in this wall there’s still a small piece
+and you can see under UV light it floresces.
+
+44
+00:03:08,840 --> 00:03:11,450
+Look at that.
+
+45
+00:03:11,450 --> 00:03:16,920
+Fluorescent uranium ore.
+
+46
+00:03:16,920 --> 00:03:19,920
+This is the lab of Marie Curie.
+
+47
+00:03:19,920 --> 00:03:24,360
+She won two Nobel prizes, one in physics and
+one in chemistry.
+
+48
+00:03:24,360 --> 00:03:27,650
+And she conducted a lot of her work here.
+
+49
+00:03:27,650 --> 00:03:29,629
+And this is her office.
+
+50
+00:03:29,629 --> 00:03:33,550
+She would have sat right there.
+
+51
+00:03:33,550 --> 00:03:37,459
+Apparently there are only a few parts of this
+area which are still radioactive.
+
+52
+00:03:37,459 --> 00:03:39,780
+One is this doorknob.
+
+53
+00:03:39,780 --> 00:03:45,510
+Well it climbs not not much but — But that's
+like 10 times the background.
+
+54
+00:03:45,510 --> 00:03:47,040
+Yeah.
+
+55
+00:03:47,040 --> 00:03:48,230
+More than 10.
+
+56
+00:03:48,230 --> 00:03:51,550
+And another is the back of her chair.
+
+57
+00:03:51,550 --> 00:03:55,730
+You can still detect alpha particles coming
+off this spot right here.
+
+58
+00:03:55,730 --> 00:04:01,150
+Apparently after she was working in the lab
+she would come, oopen the door leaving traces
+
+59
+00:04:01,150 --> 00:04:06,520
+of radium here and then go and pull out her
+chair.
+
+60
+00:04:06,520 --> 00:04:08,880
+Welcome to New Mexico.
+
+61
+00:04:08,880 --> 00:04:15,739
+This is the Trinity bomb test site where the
+world’s first nuclear bomb was set off.
+
+62
+00:04:15,739 --> 00:04:17,000
+Right here.
+
+63
+00:04:17,000 --> 00:04:20,970
+Right in the spot.
+
+64
+00:04:20,970 --> 00:04:22,960
+This whole area was vaporized.
+
+65
+00:04:22,960 --> 00:04:30,660
+In fact, there was so much heat liberated
+by that bomb that it fused all of the desert
+
+66
+00:04:30,660 --> 00:04:33,520
+sand into this green glass.
+
+67
+00:04:33,520 --> 00:04:35,720
+And you can still find it here.
+
+68
+00:04:35,720 --> 00:04:40,580
+They've actually named this mineral after
+the test.
+
+69
+00:04:40,580 --> 00:04:42,199
+It's called Trinitite.
+
+70
+00:04:42,199 --> 00:04:43,440
+Yeah.
+
+71
+00:04:43,440 --> 00:04:49,180
+This is the only place on earth that this
+has ever been made.
+
+72
+00:04:49,180 --> 00:04:54,229
+The level of radiation here is about 0.8 microsieverts
+an hour.
+
+73
+00:04:54,229 --> 00:04:57,080
+The Trinitite itself is a little bit more
+radioactive.
+
+74
+00:04:57,080 --> 00:05:01,330
+I got readings of two or three microsieverts
+an hour off them.
+
+75
+00:05:01,330 --> 00:05:05,560
+Now which place has higher levels of radiation
+then anywhere we've seen so far?
+
+76
+00:05:05,560 --> 00:05:07,319
+The answer is an airplane.
+
+77
+00:05:07,319 --> 00:05:12,589
+You know, as you gain altitude there's less
+atmosphere above you to shield you from cosmic
+
+78
+00:05:12,589 --> 00:05:13,589
+rays.
+
+79
+00:05:13,589 --> 00:05:17,530
+So the level of radiation inside the plane
+can go up to 0.5 microsieverts per hour at
+
+80
+00:05:17,530 --> 00:05:23,249
+18,000 feet, up to one microsievert per hour
+at 23,000 feet, over two microsieverts per
+
+81
+00:05:23,249 --> 00:05:28,770
+hour at 30,000 feet, and over three microsieverts
+per hour at even higher altitudes and towards
+
+82
+00:05:28,770 --> 00:05:32,210
+the poles.
+
+83
+00:05:32,210 --> 00:05:41,969
+That is Chernobyl nuclear reactor number four.
+
+84
+00:05:41,969 --> 00:05:46,020
+It melted down on April 26, 1986.
+
+85
+00:05:46,020 --> 00:05:52,259
+So, what happened was so much heat was generated
+inside that reactor that it basically blew
+
+86
+00:05:52,259 --> 00:05:59,089
+the top off spreading radioactive isotopes
+throughout this whole surrounding area and
+
+87
+00:05:59,089 --> 00:06:00,369
+over into Europe.
+
+88
+00:06:00,369 --> 00:06:03,629
+And that is why we can still detect the contamination
+here today.
+
+89
+00:06:03,629 --> 00:06:06,969
+Now, right now it's reading around five microsieverts
+an hour.
+
+90
+00:06:06,969 --> 00:06:12,980
+If I stayed here for one hour my body would
+receive a similar dose to what you’d receive
+
+91
+00:06:12,980 --> 00:06:15,240
+when you get a dental x-ray.
+
+92
+00:06:15,240 --> 00:06:18,639
+So this is not a huge amount of radiation.
+
+93
+00:06:18,639 --> 00:06:25,380
+And one of the reasons why the radiation level
+is not too high is because they actually removed
+
+94
+00:06:25,380 --> 00:06:30,310
+a couple meters worth of topsoil from this
+whole area, then they dumped it somewhere.
+
+95
+00:06:30,310 --> 00:06:34,129
+That's why we can stand here.
+
+96
+00:06:34,129 --> 00:06:39,300
+We're driving into the Fukushima exclusion
+zone now.
+
+97
+00:06:39,300 --> 00:06:45,460
+I'm just watching as the levels on my Geiger
+counter go up as we approach the zone.
+
+98
+00:06:45,460 --> 00:06:47,939
+See those black bags at the side of the road?
+
+99
+00:06:47,939 --> 00:06:53,099
+The Japanese are doing now exactly what the
+people in Chernobyl did, collecting up meters
+
+100
+00:06:53,099 --> 00:07:17,319
+and meters of topsoil.
+
+101
+00:07:17,319 --> 00:07:20,449
+The mask is probably overkill.
+
+102
+00:07:20,449 --> 00:07:24,639
+It's just to stop radioactive dust from getting
+into my lungs.
+
+103
+00:07:24,639 --> 00:07:28,889
+This is definitely one of the most radioactive
+places where I've been.
+
+104
+00:07:28,889 --> 00:07:34,720
+Even though the release of radioactive material
+was less than Chernobyl, only about 10%, because
+
+105
+00:07:34,720 --> 00:07:40,949
+it's much fresher—only three years since
+the accident— much less of it has decayed.
+
+106
+00:07:40,949 --> 00:07:45,699
+So I've been getting readings up around 5
+to 10 microsieverts an hour.
+
+107
+00:07:45,699 --> 00:07:52,710
+And I think we won't be staying here for too
+long because of that.
+
+108
+00:07:52,710 --> 00:07:55,990
+I'm about to go into the hospital at Pripyat.
+
+109
+00:07:55,990 --> 00:08:02,659
+And this is where the firemen were taken after
+they fought the fires at the Chernobyl reactor.
+
+110
+00:08:02,659 --> 00:08:08,219
+And in the basement of this building they
+have left all the firemen's clothing.
+
+111
+00:08:08,219 --> 00:08:13,669
+Once they realize it was so contaminated they chucked it down there.
+
+112
+00:08:13,669 --> 00:08:35,610
+(Inaudible) But you can see there's a huge
+pile of their gear there.
+
+113
+00:08:35,610 --> 00:08:40,480
+Right outside the door I'm getting 500 microsieverts
+an hour just outside the door.
+
+114
+00:08:40,480 --> 00:08:45,060
+One thousand five hundred microsieverts an
+hour.
+
+115
+00:08:45,060 --> 00:08:52,060
+You know if we stayed here for a couple hours
+we’d receive our annual dose of background
+
+116
+00:08:52,060 --> 00:08:54,430
+radiation.
+
+117
+00:08:54,430 --> 00:08:59,160
+That basement was the most radioactive place
+I visited and it's one of the most radioactive
+
+118
+00:08:59,160 --> 00:09:00,480
+places on earth.
+
+119
+00:09:00,480 --> 00:09:04,769
+If I'd stayed down there for one hour I would’ve
+received 2000 microsieverts.
+
+120
+00:09:04,769 --> 00:09:08,079
+That's a years worth of natural background
+radiation.
+
+121
+00:09:08,079 --> 00:09:10,839
+Every yellow pixel here represents a banana.
+
+122
+00:09:10,839 --> 00:09:15,120
+Now that might seem like a lot, but consider
+that in a CT scan the patient receives about
+
+123
+00:09:15,120 --> 00:09:17,410
+7000 microsieverts.
+
+124
+00:09:17,410 --> 00:09:20,769
+That's three years worth of natural backround
+radiation.
+
+125
+00:09:20,769 --> 00:09:24,899
+It's been estimated that the people living
+around Fukushima will receive an additional
+
+126
+00:09:24,899 --> 00:09:30,190
+10,000 microsieverts over their lifetime due
+to the nuclear power disaster.
+
+127
+00:09:30,190 --> 00:09:36,879
+For comparison US radiation workers are limited
+to a maximum of 50,000 microsieverts per year.
+
+128
+00:09:36,879 --> 00:09:39,830
+But that's less than another occupation.
+
+129
+00:09:39,830 --> 00:09:41,209
+Astronaut.
+
+130
+00:09:41,209 --> 00:09:46,170
+An astronaut on the space station for six
+months will receive about 80,000 microsieverts
+
+131
+00:09:46,170 --> 00:09:47,920
+worth of radiation.
+
+132
+00:09:47,920 --> 00:09:51,230
+But not even they are exposed to the highest
+levels of ionizing radiation.
+
+133
+00:09:51,230 --> 00:09:53,910
+So can you guess who is?
+
+134
+00:09:53,910 --> 00:09:57,079
+The answer is a smoker’s lungs.
+
+135
+00:09:57,079 --> 00:10:04,759
+A smoker’s lungs on average receive 160,000
+microsieverts worth of radiation every year.
+
+136
+00:10:04,759 --> 00:10:08,830
+That's due to the radioactive polonium and
+radioactive lead in the tobacco that they're
+
+137
+00:10:08,830 --> 00:10:09,830
+smoking.
+
+138
+00:10:09,830 --> 00:10:14,639
+So not only are they exposed to carcinogens
+and toxins they also receive very high levels
+
+139
+00:10:14,639 --> 00:10:16,320
+of radiation.
+
+140
+00:10:16,320 --> 00:10:21,310
+So it's not the people of Fukushima or Chernobyl
+or radiation workers or even astronauts that
+
+141
+00:10:21,310 --> 00:10:24,509
+receive the highest dosage of ionizing radiation.
+
+142
+00:10:24,509 --> 00:10:30,389
+That honor goes to your ordinary average smoker.
+
+143
+00:10:30,389 --> 00:10:33,889
+Hey.
+
+144
+00:10:33,889 --> 00:10:37,189
+As you can see over the last few months I've
+been traveling around the world actually filming
+
+145
+00:10:37,189 --> 00:10:38,899
+a documentary for television.
+
+146
+00:10:38,899 --> 00:10:40,850
+It should be on in the middle of next year.
+
+147
+00:10:40,850 --> 00:10:46,370
+But being in places like Chernobyl and Fukushima
+reminded me of this book The Day of the Triffids
+
+148
+00:10:46,370 --> 00:10:50,000
+and it's about a post-apocalyptic world in
+which plants take over.
+
+149
+00:10:50,000 --> 00:10:53,540
+I know it sounds like a crazy idea but it's
+actually a brilliant book so you should really
+
+150
+00:10:53,540 --> 00:10:56,810
+check it out if you're looking for something
+to do over the holidays.
+
+151
+00:10:56,810 --> 00:11:01,120
+Now you can download this book for free by
+going to audible.com/Veritasium or you can
+
+152
+00:11:01,120 --> 00:11:04,660
+pick any other book of your choosing for a
+one month free trial.
+
+153
+00:11:04,660 --> 00:11:09,290
+Audible is a great audiobook website with
+over 150,000 titles in all areas of literature
+
+154
+00:11:09,290 --> 00:11:12,250
+including fiction, nonfiction, and periodicals.
+
+155
+00:11:12,250 --> 00:11:15,949
+So I really want to thank audible for supporting
+me and I want to thank you for watching.
+
